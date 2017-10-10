@@ -115,7 +115,7 @@ namespace StartGame
             Continent maxContinent = new Continent();
             foreach (Continent continent in continents)
             {
-                if (continent.type == MapTileTypeEnum.land && maxSize < continent.tiles.Count)
+                if (continent.Type == MapTileTypeEnum.land && maxSize < continent.tiles.Count)
                 {
                     maxSize = continent.tiles.Count;
                     maxContinent = continent;

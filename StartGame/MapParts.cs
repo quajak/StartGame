@@ -118,7 +118,7 @@ namespace StartGame
     internal class Continent
     {
         public List<MapTile> tiles;
-        public MapTileTypeEnum type { get; }
+        public MapTileTypeEnum Type { get; private set; }
         private string id;
         public EdgeArray edges;
         public Color color;
@@ -132,7 +132,7 @@ namespace StartGame
             id = ID;
 
             MapTile activeTile = map.map[point.X, point.Y];
-            type = activeTile.type.type;
+            Type = activeTile.type.type;
             map.map[point.X, point.Y].isBeingChecked = true;
 
             toCheck = new List<MapTile>();
@@ -141,7 +141,7 @@ namespace StartGame
             while (true)
             {
                 //Add new tiles to continent
-                List<MapTile> neighbours = activeTile.neighbours.GetSameType(type);
+                List<MapTile> neighbours = activeTile.neighbours.GetSameType(Type);
                 if (neighbours.Count != 0)
                 {
                     foreach (MapTile tile in neighbours)
