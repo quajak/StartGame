@@ -32,7 +32,7 @@ namespace StartGame
         private void Recalulate()
         {
             map.SetupMap(0.1, seed, ((double)heightDifference.Value - 4) / 20, 1);
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: 10);
+            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: 10, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value, Debug: debug.Checked);
             mapType.Text = map.Stats();
         }
 
@@ -90,12 +90,12 @@ namespace StartGame
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: 10, continentAlpha: (int)numericUpDown1.Value);
+            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: 10, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value, Debug: debug.Checked);
         }
 
         private void goalChooser_ValueChanged(object sender, EventArgs e)
         {
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: 10, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value);
+            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: 10, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value, Debug: debug.Checked);
         }
     }
 }

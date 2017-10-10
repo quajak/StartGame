@@ -115,7 +115,7 @@ namespace StartGame
             Continent maxContinent = new Continent();
             foreach (Continent continent in continents)
             {
-                if (maxSize < continent.tiles.Count)
+                if (continent.type == MapTileTypeEnum.land && maxSize < continent.tiles.Count)
                 {
                     maxSize = continent.tiles.Count;
                     maxContinent = continent;
@@ -191,11 +191,13 @@ namespace StartGame
             }
             CalculateCost();
 
+            //Draw path
             List<MapTile> toDraw = new List<MapTile>(goals);
             toDraw.Remove(goals[0]);
             foreach (MapTile goal in toDraw)
             {
                 MapTile position = goals[0];
+                map[position.position.X, position.position.Y].type.type = MapTileTypeEnum.path;
                 while (true)
                 {
                     //Find lowest distance neighbour

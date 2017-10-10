@@ -40,11 +40,12 @@
             this.cancel = new System.Windows.Forms.Button();
             this.mapType = new System.Windows.Forms.Label();
             this.getData = new System.Windows.Forms.Button();
-            this.randomise = new System.Windows.Forms.Button();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
             this.goalChooser = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
+            this.debug = new System.Windows.Forms.CheckBox();
+            this.randomise = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.heightDifference)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -73,7 +74,7 @@
             // 
             this.seedInput.Location = new System.Drawing.Point(370, 93);
             this.seedInput.Name = "seedInput";
-            this.seedInput.Size = new System.Drawing.Size(295, 20);
+            this.seedInput.Size = new System.Drawing.Size(209, 20);
             this.seedInput.TabIndex = 4;
             this.seedInput.TextChanged += new System.EventHandler(this.SeedInput_TextChanged);
             // 
@@ -163,16 +164,6 @@
             this.getData.UseVisualStyleBackColor = true;
             this.getData.Click += new System.EventHandler(this.getData_Click);
             // 
-            // randomise
-            // 
-            this.randomise.Location = new System.Drawing.Point(335, 352);
-            this.randomise.Name = "randomise";
-            this.randomise.Size = new System.Drawing.Size(75, 23);
-            this.randomise.TabIndex = 14;
-            this.randomise.Text = "Randomise";
-            this.randomise.UseVisualStyleBackColor = true;
-            this.randomise.Click += new System.EventHandler(this.Randomise_Click);
-            // 
             // numericUpDown1
             // 
             this.numericUpDown1.Location = new System.Drawing.Point(433, 309);
@@ -217,16 +208,37 @@
             this.label7.TabIndex = 18;
             this.label7.Text = "Show dis for goal";
             // 
+            // debug
+            // 
+            this.debug.AutoSize = true;
+            this.debug.Location = new System.Drawing.Point(433, 260);
+            this.debug.Name = "debug";
+            this.debug.Size = new System.Drawing.Size(58, 17);
+            this.debug.TabIndex = 19;
+            this.debug.Text = "Debug";
+            this.debug.UseVisualStyleBackColor = true;
+            // 
+            // randomise
+            // 
+            this.randomise.Location = new System.Drawing.Point(585, 91);
+            this.randomise.Name = "randomise";
+            this.randomise.Size = new System.Drawing.Size(79, 23);
+            this.randomise.TabIndex = 20;
+            this.randomise.Text = "Randomise";
+            this.randomise.UseVisualStyleBackColor = true;
+            this.randomise.Click += new System.EventHandler(this.Randomise_Click);
+            // 
             // MapCreator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(683, 430);
+            this.Controls.Add(this.randomise);
+            this.Controls.Add(this.debug);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.goalChooser);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.numericUpDown1);
-            this.Controls.Add(this.randomise);
             this.Controls.Add(this.getData);
             this.Controls.Add(this.mapType);
             this.Controls.Add(this.cancel);
@@ -265,10 +277,11 @@
         private System.Windows.Forms.Button cancel;
         private System.Windows.Forms.Label mapType;
         private System.Windows.Forms.Button getData;
-        private System.Windows.Forms.Button randomise;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.NumericUpDown goalChooser;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.CheckBox debug;
+        private System.Windows.Forms.Button randomise;
     }
 }

@@ -118,7 +118,7 @@ namespace StartGame
     internal class Continent
     {
         public List<MapTile> tiles;
-        private MapTileTypeEnum type;
+        public MapTileTypeEnum type { get; }
         private string id;
         public EdgeArray edges;
         public Color color;
