@@ -13,7 +13,8 @@ namespace StartGame
         public SorroundingTiles neighbours;
         public bool isBeingChecked;
         public double Cost { set; get; }
-        public Dictionary<string, double> distanceCost;
+        public double[] Costs;
+        public string[] GoalIDs;
         public string id;
 
         public MapTile(Point Position, MapTileType Type, double Height)
@@ -24,7 +25,12 @@ namespace StartGame
             id = position.ToString();
             type = Type;
             height = Height;
-            distanceCost = new Dictionary<string, double>();
+        }
+
+        public void InitialiseDistances(int length)
+        {
+            Costs = new double[length];
+            GoalIDs = new string[length];
         }
 
         public void GetNeighbours(Map map)

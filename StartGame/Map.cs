@@ -136,6 +136,7 @@ namespace StartGame
                         break;
                     }
                 }
+                else break;
             }
             while (true)
             {
@@ -148,6 +149,7 @@ namespace StartGame
                         break;
                     }
                 }
+                else break;
             }
             while (true)
             {
@@ -160,6 +162,7 @@ namespace StartGame
                         break;
                     }
                 }
+                else break;
             }
             while (true)
             {
@@ -172,12 +175,22 @@ namespace StartGame
                         break;
                     }
                 }
+                else break;
+            }
+            for (int x = 0; x <= map.GetUpperBound(0); x++)
+            {
+                for (int y = 0; y <= map.GetUpperBound(1); y++)
+                {
+                    map[x, y].InitialiseDistances(goals.Count);
+                    map[x, y].GoalIDs = goals.ConvertAll(g => g.id).ToArray();
+                    for (int i = 0; i < goals.Count; i++)
+                    {
+                        map[x, y].Costs[i] = -1;
+                    }
+                }
             }
             CalculateCost();
-            //Generate paths
-            //foreach (MapTile startingPoint in goals)
-            //{
-            //TODO: Optimise in furture to only draw each path once
+
             List<MapTile> toDraw = new List<MapTile>(goals);
             toDraw.Remove(goals[0]);
             foreach (MapTile goal in toDraw)
@@ -196,10 +209,10 @@ namespace StartGame
                             break;
                         }
                         //TODO: Rather than try and catch use contains key
-                        if (neighbour.distanceCost.ContainsKey(goal.id) && (cost > neighbour.distanceCost[goal.id]
-                            || (cost <= neighbour.distanceCost[goal.id] && neighbour.type.type == MapTileTypeEnum.path)))
+                        int index = Array.IndexOf(neighbour.GoalIDs, goal.id);
+                        if (neighbour.Costs[index] != -1 && (cost > neighbour.Costs[index]))
                         {
-                            cost = neighbour.distanceCost[goal.id];
+                            cost = neighbour.Costs[index];
                             lowest = neighbour;
                         }
                     }
@@ -213,7 +226,6 @@ namespace StartGame
                 //Recalculate the costs of tiles
                 CalculateCost();
             }
-            //}
         }
 
         private void CalculateCost()
@@ -221,7 +233,8 @@ namespace StartGame
             //Set cost for all tiles
             foreach (MapTile goal in goals)
             {
-                map[goal.position.X, goal.position.Y].distanceCost[goal.id] = 0;
+                int position = Array.IndexOf(map[goal.position.X, goal.position.Y].GoalIDs, goal.id);
+                map[goal.position.X, goal.position.Y].Costs[position] = 0;
                 AddNeighbours(goal, goal.id);
             }
         }
@@ -232,18 +245,20 @@ namespace StartGame
             {
                 if (neighbour.type.type != pos.type.type) continue;
                 //If already has value
-                if (map[neighbour.position.X, neighbour.position.Y].distanceCost.TryGetValue(id, out double disCost))
+                int index = Array.IndexOf(map[neighbour.position.X, neighbour.position.Y].GoalIDs, id);
+                double disCost = map[neighbour.position.X, neighbour.position.Y].Costs[index];
+                if (disCost != -1)
                 {
-                    if (disCost > pos.distanceCost[id] + neighbour.Cost)
+                    if (disCost > pos.Costs[index] + neighbour.Cost)
                     {
-                        map[neighbour.position.X, neighbour.position.Y].distanceCost[id] = pos.distanceCost[id] + neighbour.Cost;
+                        map[neighbour.position.X, neighbour.position.Y].Costs[index] = pos.Costs[index] + neighbour.Cost;
                         AddNeighbours(neighbour, id);
                     }
                 }
                 else
                 {
                     //Else give value
-                    map[neighbour.position.X, neighbour.position.Y].distanceCost.Add(id, pos.distanceCost[id] + neighbour.Cost);
+                    map[neighbour.position.X, neighbour.position.Y].Costs[index] = pos.Costs[index] + neighbour.Cost;
                     AddNeighbours(neighbour, id);
                 }
             }
@@ -328,7 +343,7 @@ namespace StartGame
                         {
                             try
                             {
-                                string s = map[x, y].distanceCost[goals[showGoal].id].ToString();
+                                string s = map[x, y].Costs[showGoal].ToString();
                                 g.FillRectangle(Brushes.Black, x * size, y * size, size, size);
                                 g.DrawString(s, font, Brushes.White, new Point(x * size, y * size));
                             }
