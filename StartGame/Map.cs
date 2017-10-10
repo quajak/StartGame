@@ -345,9 +345,12 @@ namespace StartGame
                         {
                             try
                             {
-                                string s = map[x, y].Costs[showGoal].ToString();
-                                g.FillRectangle(Brushes.Black, x * size, y * size, size, size);
-                                g.DrawString(s, font, Brushes.White, new Point(x * size, y * size));
+                                if (map[x, y].Costs.Length > showGoal)
+                                {
+                                    string s = map[x, y].Costs[showGoal].ToString();
+                                    g.FillRectangle(Brushes.Black, x * size, y * size, size, size);
+                                    g.DrawString(s, font, Brushes.White, new Point(x * size, y * size));
+                                }
                             }
                             catch (System.Collections.Generic.KeyNotFoundException)
                             {
