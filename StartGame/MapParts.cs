@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 
 namespace StartGame
 {
+    [DebuggerDisplay("X:{position.X} Y:{position.Y} Type:{type.type.ToString()}")]
     internal class MapTile
     {
         public Point position;
@@ -93,10 +95,10 @@ namespace StartGame
     internal enum MapTileTypeEnum
     { land, mountain, hill, shallowWater, deepWater, path }
 
+    [DebuggerDisplay("Type: {type}")]
     internal struct MapTileType
     {
         public MapTileTypeEnum type;
-        public Color color;
     }
 
     internal class EdgeArray

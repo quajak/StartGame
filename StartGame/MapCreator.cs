@@ -15,6 +15,7 @@ namespace StartGame
         public Map map;
         private double seed;
         private Random rng;
+        private int fieldSize = 10;
 
         public MapCreator()
         {
@@ -25,15 +26,21 @@ namespace StartGame
 
         private void MapCreator_Load(object sender, EventArgs e)
         {
-            map = new Map(gameBoard.Width / 10, gameBoard.Height / 10);
+            map = new Map(gameBoard.Width / fieldSize, gameBoard.Height / fieldSize);
             Recalulate();
         }
 
         private void Recalulate()
         {
             map.SetupMap(0.1, seed, ((double)heightDifference.Value - 4) / 20, 1);
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: 10, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value, Debug: debug.Checked);
+            UpdateMap();
             mapType.Text = map.Stats();
+        }
+
+        private void UpdateMap()
+        {
+            seedInput.Text = seed.ToString();
+            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: fieldSize, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value, Debug: debug.Checked);
         }
 
         private void SeedInput_TextChanged(object sender, EventArgs e)
@@ -90,12 +97,22 @@ namespace StartGame
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: 10, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value, Debug: debug.Checked);
+            UpdateMap();
         }
 
         private void goalChooser_ValueChanged(object sender, EventArgs e)
         {
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: 10, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value, Debug: debug.Checked);
+            UpdateMap();
+        }
+
+        private void recalculate_Click(object sender, EventArgs e)
+        {
+            Recalulate();
+        }
+
+        private void gameBoard_MouseClick(object sender, MouseEventArgs e)
+        {
+            pos.Text = $"{e.X / fieldSize} : {e.Y / fieldSize} - {map.map[e.X / fieldSize, e.Y / fieldSize].type.type}";
         }
     }
 }

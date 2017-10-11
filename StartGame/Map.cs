@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 
 namespace StartGame
 {
@@ -8,6 +10,8 @@ namespace StartGame
     {
         private int width;
         private int height;
+
+        private int pathLength;
 
         private double averageTile = 0.5;
         private int hillTile = 0;
@@ -38,7 +42,7 @@ namespace StartGame
                 type = "Swamp";
             }
             else type = "Flat";
-            return $"Average tile: {averageTile}\nHilltile {hillTile}\nFlattile {flatTile}\nWatertile {waterTile}\n{type}";
+            return $"Average tile: {averageTile}\nHilltile {hillTile}\nFlattile {flatTile}\nWatertile {waterTile}\n{type}\nPathtiles {pathLength}";
         }
 
         public string RawStats()
@@ -66,8 +70,6 @@ namespace StartGame
                     mHeight = mHeight < 0 ? 0 : mHeight; //Remove negative values
                     mHeight = mHeight > 1 ? 1 : mHeight; //Remove values larger than 1
 
-                    Color c = Color.Black;
-
                     MapTileTypeEnum mapTileEnum = MapTileTypeEnum.land;
 
                     if (mHeight < 0.2) mapTileEnum = MapTileTypeEnum.deepWater;
@@ -78,8 +80,7 @@ namespace StartGame
 
                     map[x, y] = new MapTile(new Point(x, y), new MapTileType
                     {
-                        type = mapTileEnum,
-                        color = c
+                        type = mapTileEnum
                     }, mHeight);
                 }
             }
@@ -122,6 +123,7 @@ namespace StartGame
                 }
             }
             maxContinent.color = Color.Black;
+
             //TODO: For edges in continents find all the different zones, not only side
             //TODO: Create a road between each of the zones
             goals = new List<MapTile>();
@@ -192,11 +194,13 @@ namespace StartGame
             CalculateCost();
 
             //Draw path
+            pathLength = 0;
             List<MapTile> toDraw = new List<MapTile>(goals);
             toDraw.Remove(goals[0]);
             foreach (MapTile goal in toDraw)
             {
                 MapTile position = goals[0];
+                pathLength++;
                 map[position.position.X, position.position.Y].type.type = MapTileTypeEnum.path;
                 while (true)
                 {
@@ -205,6 +209,7 @@ namespace StartGame
                     MapTile lowest = null;
                     foreach (MapTile neighbour in position.neighbours.rawMaptiles)
                     {
+                        //If neighbour is goal
                         if (neighbour.position == goal.position)
                         {
                             lowest = neighbour;
@@ -219,6 +224,7 @@ namespace StartGame
                         }
                     }
                     //Set neighbour type to path
+                    pathLength++;
                     map[lowest.position.X, lowest.position.Y].type.type = MapTileTypeEnum.path;
                     //Change cost of field
                     map[lowest.position.X, lowest.position.Y].Cost = 0.5;
@@ -228,6 +234,239 @@ namespace StartGame
                 //Recalculate the costs of tiles
                 CalculateCost();
             }
+
+            //Clean up path
+            CleanPath();
+        }
+
+        private class Square<T>
+        {
+            public T top;
+            public T bottom;
+            public T left;
+            public T right;
+            public T[] raw;
+
+            public Square(T Top, T Bottom, T Left, T Right)
+            {
+                top = Top;
+                bottom = Bottom;
+                left = Left;
+                right = Right;
+                raw = new T[] { Top, Bottom, Left, Right };
+            }
+        }
+
+        private void CleanPath()
+        {
+            int x;
+            int y;
+            int width = 1;
+            int height = 1;
+            Square<bool> sides = new Square<bool>(true, true, true, true);
+            for (int X = 0; X < map.GetUpperBound(0) - width; X++)
+            {
+                for (int Y = 0; Y < map.GetUpperBound(1) - height; Y++)
+                {
+                    width = 1;
+                    height = 1;
+                    sides.top = true;
+                    sides.bottom = true;
+                    sides.left = true;
+                    sides.right = true;
+                    y = Y;
+                    x = X;
+                    if (map[x, y].type.type != MapTileTypeEnum.path) continue;
+                    while (true)
+                    {
+                        if (y != 0)
+                        {
+                            //Iterate top, if all true then enlarge
+                            for (int xDiff = 0; xDiff < width; xDiff++)
+                            {
+                                if (map[x + xDiff, y - 1].type.type != MapTileTypeEnum.path || width == map.GetUpperBound(0)) //This should be false if there is path next
+                                {
+                                    sides.top = false;
+                                    break;
+                                }
+                            }
+                            if (sides.top)
+                            {
+                                height++; //Height is increased as we are looking for the upper limit for top
+                                y--;
+                                continue;
+                            }
+                        }
+                        if (y + height != map.GetUpperBound(1))
+                        {
+                            //Iterate bottom, if all true then enlarge
+                            for (int xDiff = 0; xDiff < width; xDiff++)
+                            {
+                                if (map[x + xDiff, y + height].type.type != MapTileTypeEnum.path || width == map.GetUpperBound(0))
+                                {
+                                    sides.bottom = false;
+                                    break;
+                                }
+                            }
+                            if (sides.bottom)
+                            {
+                                height++;
+                                continue;
+                            }
+                        }
+                        if (x != 0)
+                        {
+                            //Iterate left, if all true then enlarge
+                            for (int yDiff = 0; yDiff < height; yDiff++)
+                            {
+                                if (map[x - 1, y + yDiff].type.type != MapTileTypeEnum.path || height == map.GetUpperBound(1))
+                                {
+                                    sides.left = false;
+                                    break;
+                                }
+                            }
+                            if (sides.left)
+                            {
+                                width++;
+                                x--;
+                                continue;
+                            }
+                        }
+                        if (x + width != map.GetUpperBound(0))
+                        {
+                            //Iterate right, if all true then enlarge
+                            for (int yDiff = 0; yDiff < height; yDiff++)
+                            {
+                                if (map[x + width, y + yDiff].type.type != MapTileTypeEnum.path || height == map.GetUpperBound(1))
+                                {
+                                    sides.right = false;
+                                    break;
+                                }
+                            }
+                            if (sides.right)
+                            {
+                                width++;
+                                continue;
+                            }
+                        }
+                        break;
+                    }
+                    //Clean it up
+                    if (width >= 2 && height >= 2)
+                    {
+                        MapTileTypeEnum mapTileType;
+                        Square<List<int>> paths = new Square<List<int>>(new List<int>(), new List<int>(), new List<int>(), new List<int>());
+                        //Find top
+                        if (y != 0)
+                        {
+                            //Iterate top
+                            for (int xDiff = 0; xDiff < width; xDiff++)
+                            {
+                                mapTileType = map[x + xDiff, y - 1].type.type;
+                                if (map[x + xDiff, y - 1].type.type == MapTileTypeEnum.path)
+                                {
+                                    paths.top.Add(xDiff);
+                                }
+                            }
+                        }
+                        if (y + height != map.GetUpperBound(1))
+                        {
+                            //Iterate bottom
+                            for (int xDiff = 0; xDiff < width; xDiff++)
+                            {
+                                mapTileType = map[x + xDiff, y + height].type.type;
+                                if (map[x + xDiff, y + height].type.type == MapTileTypeEnum.path)
+                                {
+                                    paths.bottom.Add(xDiff);
+                                }
+                            }
+                        }
+                        if (x != 0)
+                        {
+                            //Iterate left
+                            for (int yDiff = 0; yDiff < height; yDiff++)
+                            {
+                                mapTileType = map[x - 1, y + yDiff].type.type;
+                                if (map[x - 1, y + yDiff].type.type == MapTileTypeEnum.path)
+                                {
+                                    paths.left.Add(yDiff);
+                                }
+                            }
+                        }
+                        if (x + width != map.GetUpperBound(0))
+                        {
+                            //Iterate right
+                            for (int yDiff = 0; yDiff < height; yDiff++)
+                            {
+                                mapTileType = map[x + width, y + yDiff].type.type;
+                                if (map[x + width, y + yDiff].type.type == MapTileTypeEnum.path)
+                                {
+                                    paths.right.Add(yDiff);
+                                }
+                            }
+                        }
+                        //Found all exits
+                        //Clean
+                        for (int xOffset = 0; xOffset < width; xOffset++)
+                        {
+                            for (int yOffset = 0; yOffset < height; yOffset++)
+                            {
+                                map[x + xOffset, y + yOffset].type.type = MapTileTypeEnum.land;
+                            }
+                        }
+                        //Find max top, bottom + max left, right
+                        Square<int> max = new Square<int>(0, 0, 0, 0);
+                        if (paths.top.Count != 0) max.top = 0;
+                        else max.top = Min(paths.right, paths.left);
+                        if (paths.right.Count != 0) max.right = width - 1;
+                        else max.right = Max(paths.top, paths.bottom);
+                        if (paths.bottom.Count != 0) max.bottom = height - 1;
+                        else max.bottom = Max(paths.right, paths.left);
+                        if (paths.left.Count != 0) max.left = 0;
+                        else max.left = Min(paths.top, paths.bottom);
+                        //Calculate x offset to draw the top to bottom line
+                        int topPos = 0;
+                        if (paths.top.Count >= 1 && paths.bottom.Count >= 1) topPos = Min(paths.top, paths.bottom);
+                        else if (paths.top.Count >= 1) topPos = paths.top.Min();
+                        else if (paths.bottom.Count >= 1) topPos = paths.bottom.Min();
+                        else topPos = max.left;
+
+                        //Draw the top to bottom
+                        for (int yDiff = 0; yDiff < max.bottom + 1 - max.top; yDiff++)
+                        {
+                            map[x + topPos, y + yDiff + max.top].type.type = MapTileTypeEnum.path;
+                        }
+                        //Draw the left to right
+                        for (int xDiff = 0; xDiff < max.right + 1 - max.left; xDiff++)
+                        {
+                            map[x + max.left + xDiff, y + max.bottom].type.type = MapTileTypeEnum.path;
+                        }
+                    }
+                    else
+                    {
+                        //Nothing changed
+                    }
+                    //Reset
+                    width = 1;
+                    height = 1;
+                }
+            }
+        }
+
+        private int Min(List<int> list1, List<int> list2)
+        {
+            if (list1.Count != 0 && list2.Count != 0) return Math.Min(list1.Min(), list2.Min());
+            else if (list1.Count == 0) return list2.Min();
+            else if (list2.Count == 0) return list1.Min();
+            else throw new Exception("Both sides are empty!");
+        }
+
+        private int Max(List<int> list1, List<int> list2)
+        {
+            if (list1.Count != 0 && list2.Count != 0) return Math.Max(list1.Max(), list2.Max());
+            else if (list1.Count == 0) return list2.Max();
+            else if (list2.Count == 0) return list1.Max();
+            else throw new Exception("Both sides are empty!");
         }
 
         private void CalculateCost()

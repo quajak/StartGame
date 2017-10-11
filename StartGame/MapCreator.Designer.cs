@@ -46,6 +46,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.debug = new System.Windows.Forms.CheckBox();
             this.randomise = new System.Windows.Forms.Button();
+            this.recalculate = new System.Windows.Forms.Button();
+            this.pos = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.heightDifference)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -59,6 +61,7 @@
             this.gameBoard.Size = new System.Drawing.Size(310, 310);
             this.gameBoard.TabIndex = 2;
             this.gameBoard.TabStop = false;
+            this.gameBoard.MouseClick += new System.Windows.Forms.MouseEventHandler(this.gameBoard_MouseClick);
             // 
             // label1
             // 
@@ -228,11 +231,32 @@
             this.randomise.UseVisualStyleBackColor = true;
             this.randomise.Click += new System.EventHandler(this.Randomise_Click);
             // 
+            // recalculate
+            // 
+            this.recalculate.Location = new System.Drawing.Point(332, 352);
+            this.recalculate.Name = "recalculate";
+            this.recalculate.Size = new System.Drawing.Size(75, 23);
+            this.recalculate.TabIndex = 21;
+            this.recalculate.Text = "Recalculate";
+            this.recalculate.UseVisualStyleBackColor = true;
+            this.recalculate.Click += new System.EventHandler(this.recalculate_Click);
+            // 
+            // pos
+            // 
+            this.pos.AutoSize = true;
+            this.pos.Location = new System.Drawing.Point(12, 77);
+            this.pos.Name = "pos";
+            this.pos.Size = new System.Drawing.Size(44, 13);
+            this.pos.TabIndex = 22;
+            this.pos.Text = "Position";
+            // 
             // MapCreator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(683, 430);
+            this.Controls.Add(this.pos);
+            this.Controls.Add(this.recalculate);
             this.Controls.Add(this.randomise);
             this.Controls.Add(this.debug);
             this.Controls.Add(this.label7);
@@ -283,5 +307,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox debug;
         private System.Windows.Forms.Button randomise;
+        private System.Windows.Forms.Button recalculate;
+        private System.Windows.Forms.Label pos;
     }
 }
