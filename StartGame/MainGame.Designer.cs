@@ -28,34 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.troopCreator = new System.Windows.Forms.PictureBox();
             this.gameBoard = new System.Windows.Forms.PictureBox();
             this.playerList = new System.Windows.Forms.ListBox();
             this.enemyInfo = new System.Windows.Forms.Panel();
             this.playerName = new System.Windows.Forms.Label();
-            this.spawnTroop = new System.Windows.Forms.Button();
             this.playerInfo = new System.Windows.Forms.Panel();
             this.enemyName = new System.Windows.Forms.Label();
             this.spellList = new System.Windows.Forms.ListBox();
-            this.activateSpell = new System.Windows.Forms.Button();
             this.spellInfo = new System.Windows.Forms.Panel();
             this.nextAction = new System.Windows.Forms.Button();
-            this.showTroopTypes = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.troopCreator)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // troopCreator
-            // 
-            this.troopCreator.Location = new System.Drawing.Point(823, 231);
-            this.troopCreator.Name = "troopCreator";
-            this.troopCreator.Size = new System.Drawing.Size(202, 180);
-            this.troopCreator.TabIndex = 0;
-            this.troopCreator.TabStop = false;
-            this.troopCreator.Click += new System.EventHandler(this.TroopCreator_Click);
-            this.troopCreator.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TroopCreator_MouseClick);
             // 
             // gameBoard
             // 
@@ -91,18 +76,6 @@
             this.playerName.TabIndex = 0;
             this.playerName.Text = "_playerName";
             // 
-            // spawnTroop
-            // 
-            this.spawnTroop.Enabled = false;
-            this.spawnTroop.Location = new System.Drawing.Point(825, 419);
-            this.spawnTroop.Name = "spawnTroop";
-            this.spawnTroop.Size = new System.Drawing.Size(201, 23);
-            this.spawnTroop.TabIndex = 4;
-            this.spawnTroop.Text = "Spawn Troop";
-            this.spawnTroop.UseVisualStyleBackColor = true;
-            this.spawnTroop.Click += new System.EventHandler(this.SpawnTroop_Click);
-            this.spawnTroop.MouseClick += new System.Windows.Forms.MouseEventHandler(this.SpawnTroop_MouseClick);
-            // 
             // playerInfo
             // 
             this.playerInfo.Controls.Add(this.enemyName);
@@ -129,16 +102,6 @@
             this.spellList.Size = new System.Drawing.Size(202, 212);
             this.spellList.TabIndex = 7;
             // 
-            // activateSpell
-            // 
-            this.activateSpell.Enabled = false;
-            this.activateSpell.Location = new System.Drawing.Point(1030, 419);
-            this.activateSpell.Name = "activateSpell";
-            this.activateSpell.Size = new System.Drawing.Size(202, 23);
-            this.activateSpell.TabIndex = 8;
-            this.activateSpell.Text = "Cast Spell";
-            this.activateSpell.UseVisualStyleBackColor = true;
-            // 
             // spellInfo
             // 
             this.spellInfo.Location = new System.Drawing.Point(1030, 232);
@@ -156,37 +119,22 @@
             this.nextAction.UseVisualStyleBackColor = true;
             this.nextAction.Click += new System.EventHandler(this.NextAction_Click);
             // 
-            // showTroopTypes
-            // 
-            this.showTroopTypes.Location = new System.Drawing.Point(825, 448);
-            this.showTroopTypes.Name = "showTroopTypes";
-            this.showTroopTypes.Size = new System.Drawing.Size(201, 23);
-            this.showTroopTypes.TabIndex = 10;
-            this.showTroopTypes.Text = "Troop Types";
-            this.showTroopTypes.UseVisualStyleBackColor = true;
-            this.showTroopTypes.Click += new System.EventHandler(this.ShowTroopTypes_Click);
-            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 639);
-            this.Controls.Add(this.showTroopTypes);
             this.Controls.Add(this.nextAction);
             this.Controls.Add(this.spellInfo);
-            this.Controls.Add(this.activateSpell);
             this.Controls.Add(this.spellList);
             this.Controls.Add(this.playerInfo);
-            this.Controls.Add(this.spawnTroop);
             this.Controls.Add(this.enemyInfo);
             this.Controls.Add(this.playerList);
             this.Controls.Add(this.gameBoard);
-            this.Controls.Add(this.troopCreator);
             this.Name = "MainGameWindow";
             this.Text = "Start Game";
             this.Load += new System.EventHandler(this.MainGameWindow_Load);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainGameWindow_MouseMove);
-            ((System.ComponentModel.ISupportInitialize)(this.troopCreator)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).EndInit();
             this.enemyInfo.ResumeLayout(false);
             this.enemyInfo.PerformLayout();
@@ -197,19 +145,14 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.PictureBox troopCreator;
         private System.Windows.Forms.PictureBox gameBoard;
         private System.Windows.Forms.ListBox playerList;
         private System.Windows.Forms.Panel enemyInfo;
-        private System.Windows.Forms.Button spawnTroop;
         private System.Windows.Forms.Panel playerInfo;
         private System.Windows.Forms.ListBox spellList;
-        private System.Windows.Forms.Button activateSpell;
         private System.Windows.Forms.Panel spellInfo;
         private System.Windows.Forms.Label playerName;
         private System.Windows.Forms.Button nextAction;
-        private System.Windows.Forms.Button showTroopTypes;
         private System.Windows.Forms.Label enemyName;
     }
 }
