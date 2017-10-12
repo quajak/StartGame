@@ -7,6 +7,7 @@ namespace StartGame
     public partial class MainGameMenu : Form
     {
         private Map map;
+        private Troop playerTroop;
 
         public MainGameMenu()
         {
@@ -44,9 +45,12 @@ namespace StartGame
                 }
             }
             //Load player
-            Player player = new Player(PlayerType.localHuman, Settings.Default.Name);
+            Player player = new Player(PlayerType.localHuman, Settings.Default.Name)
+            {
+                troop = playerTroop
+            };
             Hide();
-            MainGameWindow mainGameWindow = new MainGameWindow(map, player, 1);
+            MainGameWindow mainGameWindow = new MainGameWindow(map, player);
             mainGameWindow.ShowDialog();
             Show();
         }
@@ -56,6 +60,7 @@ namespace StartGame
             PlayerProfile playerProfile = new PlayerProfile();
             Hide();
             playerProfile.ShowDialog();
+            playerTroop = playerProfile.troop;
             Show();
         }
 

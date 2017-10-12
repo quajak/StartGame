@@ -1,11 +1,14 @@
 ﻿using StartGame.Properties;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace StartGame
 {
-    public partial class PlayerProfile : Form
+    partial class PlayerProfile : Form
     {
+        public Troop troop;
+
         public PlayerProfile()
         {
             InitializeComponent();
@@ -21,6 +24,7 @@ namespace StartGame
             }
             Settings.Default.Name = name.Text;
             Settings.Default.Save();
+            troop = new Troop(name.Text, new Weapon((int)weaponAttack.Value, (AttackType)weaponType.SelectedIndex, (int)weaponRange.Value));
             Close();
         }
 
@@ -36,6 +40,11 @@ namespace StartGame
                 Settings.Default.Name = Resources.BasePlayerName;
                 Settings.Default.Save();
             }
+        }
+
+        private void PlayerProfile_Load(object sender, EventArgs e)
+        {
+            weaponType.Items.AddRange(Enum.GetValues(typeof(AttackType)).Cast<AttackType>().Select(E => E.ToString()).ToArray());
         }
     }
 }

@@ -6,6 +6,7 @@ namespace StartGame
     {
         private PlayerType type;
         public string Name;
+        public Troop troop;
 
         public Player(PlayerType Type, string Name)
         {

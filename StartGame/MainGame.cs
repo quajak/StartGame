@@ -21,7 +21,7 @@ namespace StartGame
         private Player humanPlayer;
         private int activePlayerCounter = 0;
 
-        public MainGameWindow(Map Map, Player Player, int AINumber)
+        public MainGameWindow(Map Map, Player Player)
         {
             map = Map;
 
@@ -29,22 +29,24 @@ namespace StartGame
             random = new Random();
 
             //Setup players
-            players = new Player[AINumber + 1];
+            players = new Player[2];
             players[0] = Player;
             humanPlayer = Player;
-            //Generate AIs
+            //Generate AI
+            //Get name of troop
             short botNumber = Convert.ToInt16(Resources.BOTAmount);
             List<string> botNames = new List<string>();
             for (int i = 0; i < botNumber; i++)
             {
                 botNames.Add(Resources.ResourceManager.GetString("BOTName" + i));
             }
-            for (int i = 0; i < AINumber; i++)
+            string name = botNames[random.Next(botNames.Count)];
+            players[1] = new Player(PlayerType.computer, name)
             {
-                string name = botNames[random.Next(botNames.Count)];
-                players[i + 1] = new Player(PlayerType.computer, name);
-                botNames.Remove(name);
-            }
+                troop = new Troop(name, new Weapon(2, AttackType.melee, 1))
+            };
+
+            //Setup game
             activePlayer = players[0];
 
             InitializeComponent();
@@ -54,11 +56,14 @@ namespace StartGame
             //Add players to list
             for (int i = 0; i < players.Length; i++)
             {
-                playerList.Items.Add(players[i].Name);
+                troopList.Items.Add(players[i].Name);
             }
 
             //Initialise information about player
             playerName.Text = humanPlayer.Name;
+            playerAttackDamage.Text = humanPlayer.troop.weapon.attackDamage.ToString();
+            playerAttackRange.Text = humanPlayer.troop.weapon.range.ToString();
+            playerAttackType.Text = humanPlayer.troop.weapon.type.ToString();
 
             //As it is first turn - set action button to start the game
             nextAction.Text = "Start game!";
@@ -88,16 +93,22 @@ namespace StartGame
 
         private void PlayerList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (playerList.SelectedIndex == -1) return;
-            Player player = players[playerList.SelectedIndex];
+            if (troopList.SelectedIndex == -1) return;
+            Player player = players[troopList.SelectedIndex];
             if (player.Name == activePlayer.Name)
             {
                 //Clear all data
                 enemyName.Text = "";
+                enemyAttackDamage.Text = "";
+                enemyAttackRange.Text = "";
+                enemyAttackRange.Text = "";
             }
             else
             {
                 enemyName.Text = player.Name;
+                enemyAttackDamage.Text = player.troop.weapon.attackDamage.ToString();
+                enemyAttackRange.Text = player.troop.weapon.range.ToString();
+                enemyAttackRange.Text = player.troop.weapon.type.ToString();
             }
         }
 
