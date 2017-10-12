@@ -179,6 +179,8 @@ namespace StartGame
                 }
                 else break;
             }
+            //Skip code to create path when there are to few goals
+            if (goals.Count <= 1) return;
             for (int x = 0; x <= map.GetUpperBound(0); x++)
             {
                 for (int y = 0; y <= map.GetUpperBound(1); y++)
@@ -191,6 +193,7 @@ namespace StartGame
                     }
                 }
             }
+
             CalculateCost(ref map);
 
             //Path creation
@@ -244,7 +247,7 @@ namespace StartGame
             FindPath(shortestGoals.ToList(), ref map, ref pathLength, goals.ToArray());
 
             //Clean up path
-            CleanPath();
+            //CleanPath();
         }
 
         private void FindPath(List<MapTile> toDraw, ref MapTile[,] map, ref double pathLength, MapTile[] goals)
@@ -549,7 +552,8 @@ namespace StartGame
         {
             foreach (MapTile neighbour in pos.neighbours.rawMaptiles)
             {
-                if (neighbour.type.type != pos.type.type) continue;
+                //Don't go through water or hills
+                if (neighbour.type.type != MapTileTypeEnum.path && neighbour.type.type != MapTileTypeEnum.land) continue;
                 //If already has value
                 int index = Array.IndexOf(map[neighbour.position.X, neighbour.position.Y].GoalIDs, id);
                 double disCost = map[neighbour.position.X, neighbour.position.Y].Costs[index];
@@ -576,7 +580,7 @@ namespace StartGame
             hillTile = 0;
             flatTile = 0;
             waterTile = 0;
-            Font font = new Font(FontFamily.GenericSansSerif, 6);
+            Font font = new Font(FontFamily.GenericSansSerif, 8);
             Bitmap mapBackground = new Bitmap(Width, Height);
             using (Graphics g = Graphics.FromImage(mapBackground))
             {

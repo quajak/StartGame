@@ -15,7 +15,7 @@ namespace StartGame
         public Map map;
         private double seed;
         private Random rng;
-        private int fieldSize = 10;
+        private int fieldSize = 20;
 
         public MapCreator()
         {
