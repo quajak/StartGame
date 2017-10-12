@@ -11,7 +11,7 @@ namespace StartGame
         private int width;
         private int height;
 
-        private int pathLength;
+        private double pathLength;
 
         private double averageTile = 0.5;
         private int hillTile = 0;
@@ -191,17 +191,72 @@ namespace StartGame
                     }
                 }
             }
-            CalculateCost();
+            CalculateCost(ref map);
+
+            //Path creation
+            List<MapTile> toDraw = new List<MapTile>(goals);
+            int positionsLength = toDraw.Count;
+            IEnumerable<IEnumerable<int>> rawPossibilites = GetPermutations(Enumerable.Range(0, positionsLength).ToList(), positionsLength);
+            List<List<int>> possibilites = rawPossibilites.ToList().ConvertAll(i => i.ToList());
+
+            //Save shortest path
+            double shortestLength = double.MaxValue;
+            MapTile[] shortestGoals = new MapTile[positionsLength];
+            //Calculate the length of each path option
+            foreach (IEnumerable<int> possibility in possibilites)
+            {
+                //Generate order
+                MapTile[] order = new MapTile[positionsLength];
+                foreach (int index in possibility)
+                {
+                    order[index] = toDraw[index];
+                }
+                //Initialise variables for path finding
+                //Copy map
+                MapTile[,] localMap = new MapTile[map.GetUpperBound(0) + 1, map.GetUpperBound(1) + 1];
+
+                for (int x = 0; x <= map.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= map.GetUpperBound(1); y++)
+                    {
+                        localMap[x, y] = (MapTile)map[x, y].Clone();
+                    }
+                }
+
+                double length = 0;
+                List<MapTile> localGoals = order.ToList();
+                localGoals.RemoveAt(0);
+                //Calculate path length
+                FindPath(order.ToList(), ref localMap, ref length, localGoals.ToArray());
+
+                //Check if shortest
+                if (length < shortestLength)
+                {
+                    shortestLength = length;
+                    shortestGoals = order;
+                }
+            }
 
             //Draw path
             pathLength = 0;
-            List<MapTile> toDraw = new List<MapTile>(goals);
+            //This is starting position
             toDraw.Remove(goals[0]);
+            FindPath(shortestGoals.ToList(), ref map, ref pathLength, goals.ToArray());
+
+            //Clean up path
+            CleanPath();
+        }
+
+        private void FindPath(List<MapTile> toDraw, ref MapTile[,] map, ref double pathLength, MapTile[] goals)
+        {
+            //Set goal of path
             foreach (MapTile goal in toDraw)
             {
+                //Set starting position
                 MapTile position = goals[0];
                 pathLength++;
                 map[position.position.X, position.position.Y].type.type = MapTileTypeEnum.path;
+                //Repeat until you have found the goal
                 while (true)
                 {
                     //Find lowest distance neighbour
@@ -215,7 +270,7 @@ namespace StartGame
                             lowest = neighbour;
                             break;
                         }
-                        //TODO: Rather than try and catch use contains key
+                        //Check if neighbour is cheaper
                         int index = Array.IndexOf(neighbour.GoalIDs, goal.id);
                         if (neighbour.Costs[index] != -1 && (cost > neighbour.Costs[index]))
                         {
@@ -223,20 +278,30 @@ namespace StartGame
                             lowest = neighbour;
                         }
                     }
-                    //Set neighbour type to path
-                    pathLength++;
-                    map[lowest.position.X, lowest.position.Y].type.type = MapTileTypeEnum.path;
-                    //Change cost of field
-                    map[lowest.position.X, lowest.position.Y].Cost = 0.5;
+                    //Set lowest neighbour type to path if not path
+                    if (map[lowest.position.X, lowest.position.Y].type.type != MapTileTypeEnum.path)
+                    {
+                        pathLength++;
+                        map[lowest.position.X, lowest.position.Y].type.type = MapTileTypeEnum.path;
+                        //Change cost of field
+                        map[lowest.position.X, lowest.position.Y].Cost = 0.5;
+                    }
+                    //If goal break while loop
                     if (position.position == goal.position) break;
+                    //Else continue with this position
                     position = lowest;
                 }
                 //Recalculate the costs of tiles
-                CalculateCost();
+                CalculateCost(ref map);
             }
+        }
 
-            //Clean up path
-            CleanPath();
+        private static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
+        {
+            if (length == 1) return list.Select(t => new T[] { t });
+            return GetPermutations(list, length - 1)
+                .SelectMany(t => list.Where(o => !t.Contains(o)),
+                    (t1, t2) => t1.Concat(new T[] { t2 }));
         }
 
         private class Square<T>
@@ -469,13 +534,13 @@ namespace StartGame
             else throw new Exception("Both sides are empty!");
         }
 
-        private void CalculateCost()
+        private void CalculateCost(ref MapTile[,] map)
         {
             //Set cost for all tiles
             foreach (MapTile goal in goals)
             {
                 int position = Array.IndexOf(map[goal.position.X, goal.position.Y].GoalIDs, goal.id);
-                map[goal.position.X, goal.position.Y].Costs[position] = 0;
+                map[goal.position.X, goal.position.Y].Costs[position] = 0; //This is the cost of the path
                 AddNeighbours(goal, goal.id);
             }
         }

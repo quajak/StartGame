@@ -95,22 +95,22 @@ namespace StartGame
             Recalulate();
         }
 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        private void NumericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             UpdateMap();
         }
 
-        private void goalChooser_ValueChanged(object sender, EventArgs e)
+        private void GoalChooser_ValueChanged(object sender, EventArgs e)
         {
             UpdateMap();
         }
 
-        private void recalculate_Click(object sender, EventArgs e)
+        private void Recalculate_Click(object sender, EventArgs e)
         {
             Recalulate();
         }
 
-        private void gameBoard_MouseClick(object sender, MouseEventArgs e)
+        private void GameBoard_MouseClick(object sender, MouseEventArgs e)
         {
             pos.Text = $"{e.X / fieldSize} : {e.Y / fieldSize} - {map.map[e.X / fieldSize, e.Y / fieldSize].type.type}";
         }

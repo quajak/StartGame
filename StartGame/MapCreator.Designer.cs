@@ -61,7 +61,7 @@
             this.gameBoard.Size = new System.Drawing.Size(310, 310);
             this.gameBoard.TabIndex = 2;
             this.gameBoard.TabStop = false;
-            this.gameBoard.MouseClick += new System.Windows.Forms.MouseEventHandler(this.gameBoard_MouseClick);
+            this.gameBoard.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GameBoard_MouseClick);
             // 
             // label1
             // 
@@ -178,7 +178,7 @@
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
             this.numericUpDown1.TabIndex = 15;
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.NumericUpDown1_ValueChanged);
             // 
             // label6
             // 
@@ -200,7 +200,7 @@
             this.goalChooser.Name = "goalChooser";
             this.goalChooser.Size = new System.Drawing.Size(120, 20);
             this.goalChooser.TabIndex = 17;
-            this.goalChooser.ValueChanged += new System.EventHandler(this.goalChooser_ValueChanged);
+            this.goalChooser.ValueChanged += new System.EventHandler(this.GoalChooser_ValueChanged);
             // 
             // label7
             // 
@@ -239,7 +239,7 @@
             this.recalculate.TabIndex = 21;
             this.recalculate.Text = "Recalculate";
             this.recalculate.UseVisualStyleBackColor = true;
-            this.recalculate.Click += new System.EventHandler(this.recalculate_Click);
+            this.recalculate.Click += new System.EventHandler(this.Recalculate_Click);
             // 
             // pos
             // 

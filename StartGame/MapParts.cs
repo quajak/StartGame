@@ -6,7 +6,7 @@ using System.Drawing;
 namespace StartGame
 {
     [DebuggerDisplay("X:{position.X} Y:{position.Y} Type:{type.type.ToString()}")]
-    internal class MapTile
+    internal class MapTile : ICloneable
     {
         public Point position;
         public MapTileType type;
@@ -39,9 +39,23 @@ namespace StartGame
         {
             neighbours = new SorroundingTiles(position, map);
         }
+
+        public object Clone()
+        {
+            return new MapTile(position, type, height)
+            {
+                id = id,
+                Cost = Cost,
+                Costs = Costs,
+                continent = continent,
+                neighbours = (SorroundingTiles)neighbours.Clone(),
+                isBeingChecked = isBeingChecked,
+                GoalIDs = GoalIDs
+            };
+        }
     }
 
-    internal class SorroundingTiles
+    internal class SorroundingTiles : ICloneable
     {
         public MapTile top;
         public MapTile left;
@@ -77,6 +91,20 @@ namespace StartGame
             }
             else bottom = null;
             rawMaptiles = rawData.ToArray();
+        }
+
+        public SorroundingTiles(MapTile Top, MapTile Bottom, MapTile Left, MapTile Right)
+        {
+            top = Top;
+            bottom = Bottom;
+            left = Left;
+            right = Right;
+            rawMaptiles = new MapTile[] { top, bottom, left, right };
+        }
+
+        public object Clone()
+        {
+            return new SorroundingTiles(top, bottom, left, right);
         }
 
         public List<MapTile> GetSameType(MapTileTypeEnum type)
