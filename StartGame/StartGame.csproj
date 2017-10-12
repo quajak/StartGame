@@ -147,5 +147,14 @@
   <ItemGroup>
     <None Include="Resources\outpostCursor.bmp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\playerTroop1.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\playerTroop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\enemyScout.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

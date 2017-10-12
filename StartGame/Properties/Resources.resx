@@ -138,4 +138,11 @@
   <data name="BOTName4" xml:space="preserve">
     <value>Hal</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="enemyScout" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\enemyScout.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="playerTroop" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\playerTroop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

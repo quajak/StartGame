@@ -30,8 +30,15 @@ namespace StartGame
 
             //Setup players
             players = new Player[2];
+
+            //Setup human player
             players[0] = Player;
             humanPlayer = Player;
+            map.troops.Add(players[0].troop);
+            //Get position for player troops
+            List<Point> startPos = map.DeterminSpawnPoint(1, SpawnType.road);
+            players[0].troop.position = startPos[0];
+
             //Generate AI
             //Get name of troop
             short botNumber = Convert.ToInt16(Resources.BOTAmount);
@@ -43,8 +50,10 @@ namespace StartGame
             string name = botNames[random.Next(botNames.Count)];
             players[1] = new Player(PlayerType.computer, name)
             {
-                troop = new Troop(name, new Weapon(2, AttackType.melee, 1))
+                troop = new Troop(name, new Weapon(2, AttackType.melee, 1), Resources.enemyScout)
             };
+            players[1].troop.position = map.DeterminSpawnPoint(1, SpawnType.randomLand)[0];
+            map.troops.Add(players[1].troop);
 
             //Setup game
             activePlayer = players[0];
@@ -56,7 +65,7 @@ namespace StartGame
             //Add players to list
             for (int i = 0; i < players.Length; i++)
             {
-                troopList.Items.Add(players[i].Name);
+                troopList.Items.Add(players[i].troop.name);
             }
 
             //Initialise information about player

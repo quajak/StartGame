@@ -10,9 +10,12 @@ namespace StartGame
         public string name;
         public Weapon weapon;
         public int MaxMovement = 5;
+        public Point position;
+        public Bitmap image;
 
-        public Troop(string Name, Weapon Weapon)
+        public Troop(string Name, Weapon Weapon, Bitmap Image)
         {
+            image = Image;
             name = Name;
             weapon = Weapon;
         }

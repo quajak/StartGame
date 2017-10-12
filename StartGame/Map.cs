@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StartGame.Properties;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -23,6 +24,10 @@ namespace StartGame
         public MapTile[,] map;
 
         private List<Continent> continents;
+
+        private Random generic = new Random();
+
+        public List<Troop> troops = new List<Troop>();
 
         public Map(int Width, int Height)
         {
@@ -666,8 +671,73 @@ namespace StartGame
                         }
                     }
                 }
+                //Draw troops
+                foreach (Troop troop in troops)
+                {
+                    g.DrawImage(troop.image, troop.position.X * size, troop.position.Y * size, 20, 20);
+                }
             }
             return mapBackground;
         }
+
+        public List<Point> DeterminSpawnPoint(int playerNumber, SpawnType spawnType)
+        {
+            List<Point> toReturn = new List<Point>();
+            switch (spawnType)
+            {
+                case SpawnType.road:
+
+                    if (goals.Count <= 1)
+                    {
+                        FindRandomLandTile(playerNumber, ref toReturn);
+                        break;
+                    }
+                    //Determin which road spawn point to start
+                    MapTile pathPoint = goals[generic.Next(goals.Count)];
+                    while (playerNumber >= 0)
+                    {
+                        toReturn.Add(pathPoint.position);
+                        //Find next path point
+                        playerNumber--;
+                        if (playerNumber != 0) pathPoint = pathPoint.neighbours.rawMaptiles.Where(m => m.type.type == MapTileTypeEnum.path).First();
+                    }
+                    break;
+
+                case SpawnType.random:
+                    for (int i = 0; i < playerNumber; i++)
+                    {
+                        toReturn.Add(new Point(generic.Next(map.GetUpperBound(0), generic.Next(map.GetUpperBound(1)))));
+                    }
+                    break;
+
+                case SpawnType.randomLand:
+                    FindRandomLandTile(playerNumber, ref toReturn);
+                    break;
+
+                default:
+                    break;
+            }
+            return toReturn;
+        }
+
+        private void FindRandomLandTile(int playerNumber, ref List<Point> toReturn)
+        {
+            for (int i = 0; i < playerNumber; i++)
+            {
+                Point point;
+                while (true)
+                {
+                    point = new Point(generic.Next(map.GetUpperBound(0)), generic.Next(map.GetUpperBound(1)));
+                    if (map[point.X, point.Y].type.type == MapTileTypeEnum.land || map[point.X, point.Y].type.type == MapTileTypeEnum.path)
+                    {
+                        toReturn.Add(point);
+                        break;
+                    }
+                }
+            }
+        }
     }
+
+    internal enum SpawnType
+    { road, random, randomLand };
 }

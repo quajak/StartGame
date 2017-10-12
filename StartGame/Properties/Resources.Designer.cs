@@ -122,5 +122,25 @@ namespace StartGame.Properties {
                 return ResourceManager.GetString("BOTName4", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap enemyScout {
+            get {
+                object obj = ResourceManager.GetObject("enemyScout", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap playerTroop {
+            get {
+                object obj = ResourceManager.GetObject("playerTroop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
