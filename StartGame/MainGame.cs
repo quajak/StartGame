@@ -1,4 +1,5 @@
-﻿using StartGame.Properties;
+﻿using PlayerCreator;
+using StartGame.Properties;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -50,7 +51,7 @@ namespace StartGame
             string name = botNames[random.Next(botNames.Count)];
             players[1] = new Player(PlayerType.computer, name)
             {
-                troop = new Troop(name, new Weapon(2, AttackType.melee, 1), Resources.enemyScout)
+                troop = new Troop(name, new Weapon(2, AttackType.melee, 1, "Fists"), Resources.enemyScout)
             };
             players[1].troop.position = map.DeterminSpawnPoint(1, SpawnType.randomLand)[0];
             map.troops.Add(players[1].troop);
@@ -67,15 +68,29 @@ namespace StartGame
             {
                 troopList.Items.Add(players[i].troop.name);
             }
+            troopList.SelectedIndex = 0;
 
             //Initialise information about player
-            playerName.Text = humanPlayer.Name;
-            playerAttackDamage.Text = humanPlayer.troop.weapon.attackDamage.ToString();
-            playerAttackRange.Text = humanPlayer.troop.weapon.range.ToString();
-            playerAttackType.Text = humanPlayer.troop.weapon.type.ToString();
+            ShowPlayerStats();
+            //Initialise information about player weapons
+            int c = 0;
+            foreach (var weapon in humanPlayer.troop.weapons)
+            {
+                playerWeaponList.Items.Add(weapon.name);
+                if (weapon == humanPlayer.troop.activeWeapon) playerWeaponList.SelectedIndex = c;
+                c++;
+            }
 
             //As it is first turn - set action button to start the game
             nextAction.Text = "Start game!";
+        }
+
+        private void ShowPlayerStats()
+        {
+            playerName.Text = humanPlayer.Name;
+            playerAttackDamage.Text = humanPlayer.troop.activeWeapon.attackDamage.ToString();
+            playerAttackRange.Text = humanPlayer.troop.activeWeapon.range.ToString();
+            playerAttackType.Text = humanPlayer.troop.activeWeapon.type.ToString();
         }
 
         private void MainGameWindow_Load(object sender, EventArgs e)
@@ -110,19 +125,38 @@ namespace StartGame
                 enemyName.Text = "";
                 enemyAttackDamage.Text = "";
                 enemyAttackRange.Text = "";
-                enemyAttackRange.Text = "";
+                enemyAttackType.Text = "";
             }
             else
             {
                 enemyName.Text = player.Name;
-                enemyAttackDamage.Text = player.troop.weapon.attackDamage.ToString();
-                enemyAttackRange.Text = player.troop.weapon.range.ToString();
-                enemyAttackRange.Text = player.troop.weapon.type.ToString();
+                enemyAttackDamage.Text = player.troop.activeWeapon.attackDamage.ToString();
+                enemyAttackRange.Text = player.troop.activeWeapon.range.ToString();
+                enemyAttackType.Text = player.troop.activeWeapon.type.ToString();
             }
         }
 
         private void MainGameWindow_MouseMove(object sender, MouseEventArgs e)
         {
+        }
+
+        private void PlayerWeaponList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int pos = playerWeaponList.SelectedIndex;
+            Weapon weapon = humanPlayer.troop.weapons[pos];
+            playerPossibleAttackRange.Text = $"Range: {weapon.range}";
+            playerPossibleWeaponDamage.Text = $"Damage: {weapon.attackDamage}";
+            playerPossibleWeaponName.Text = $"{weapon.name}";
+            playerPossibleWeaponType.Text = $"Type: {weapon.type}";
+        }
+
+        private void ChangeWeapon_Click(object sender, EventArgs e)
+        {
+            if (playerWeaponList.SelectedIndex >= 0)
+            {
+                humanPlayer.troop.activeWeapon = humanPlayer.troop.weapons[playerWeaponList.SelectedIndex];
+            }
+            ShowPlayerStats();
         }
     }
 }

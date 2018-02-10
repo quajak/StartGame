@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Windows.Forms;
+using PlayerCreator;
 
 namespace StartGame
 {
@@ -24,7 +25,7 @@ namespace StartGame
             }
             Settings.Default.Name = name.Text;
             Settings.Default.Save();
-            troop = new Troop(name.Text, new Weapon((int)weaponAttack.Value, (AttackType)weaponType.SelectedIndex, (int)weaponRange.Value), Resources.playerTroop);
+            troop = new Troop(name.Text, new Weapon((int)weaponAttack.Value, (AttackType)weaponType.SelectedIndex, (int)weaponRange.Value, "Fists"), Resources.playerTroop);
             Close();
         }
 

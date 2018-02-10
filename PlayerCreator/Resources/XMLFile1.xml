@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<weapons>
+  <Weapon>
+    <Damage>5</Damage>
+    <Type>melee</Type>
+    <Range>1</Range>
+    Fists
+  </Weapon>
+  <Weapon damage="10" type="melee" rage="1">Sword</Weapon>
+</weapons>

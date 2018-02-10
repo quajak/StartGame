@@ -1,6 +1,7 @@
 ﻿using StartGame.Properties;
 using System;
 using System.Windows.Forms;
+using PlayerCreator;
 
 namespace StartGame
 {
@@ -45,6 +46,11 @@ namespace StartGame
                 }
             }
             //Load player
+            if (playerTroop is null)
+            {
+                MessageBox.Show("Please create your troop before starting the game1");
+                return;
+            }
             Player player = new Player(PlayerType.localHuman, Settings.Default.Name)
             {
                 troop = playerTroop
@@ -57,7 +63,7 @@ namespace StartGame
 
         private void PlayerSetup_Click(object sender, EventArgs e)
         {
-            PlayerProfile playerProfile = new PlayerProfile();
+            PlayerCreator.PlayerProfile playerProfile = new PlayerCreator.PlayerProfile();
             Hide();
             playerProfile.ShowDialog();
             playerTroop = playerProfile.troop;

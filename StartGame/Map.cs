@@ -1,9 +1,8 @@
-﻿using StartGame.Properties;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using PlayerCreator;
 
 namespace StartGame
 {
@@ -650,24 +649,20 @@ namespace StartGame
                             d = map[x, y].continent.color;
                             d = Color.FromArgb(continentAlpha, d.R, d.G, d.B);
                         }
-                        g.FillRectangle(new SolidBrush(c), x * size, y * size, size, size);
-                        if (!Debug) g.FillRectangle(new SolidBrush(b), x * size, y * size, size, size);
-                        if (!Debug) g.FillRectangle(new SolidBrush(d), x * size, y * size, size, size);
 
                         if (Debug)
                         {
-                            try
+                            if (!(map[x, y].Costs is null) && map[x, y].Costs.Length > showGoal)
                             {
-                                if (map[x, y].Costs.Length > showGoal)
-                                {
-                                    string s = map[x, y].Costs[showGoal].ToString();
-                                    g.FillRectangle(Brushes.Black, x * size, y * size, size, size);
-                                    g.DrawString(s, font, Brushes.White, new Point(x * size, y * size));
-                                }
+                                string s = map[x, y].Costs[showGoal].ToString();
+                                g.FillRectangle(Brushes.Black, x * size, y * size, size, size);
+                                g.DrawString(s, font, Brushes.White, new Point(x * size, y * size));
                             }
-                            catch (System.Collections.Generic.KeyNotFoundException)
-                            {
-                            }
+                        }
+                        else
+                        {
+                            g.FillRectangle(new SolidBrush(c), x * size, y * size, size, size);
+                            g.FillRectangle(new SolidBrush(b), x * size, y * size, size, size);
                         }
                     }
                 }
