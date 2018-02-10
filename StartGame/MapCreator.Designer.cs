@@ -165,7 +165,7 @@
             this.getData.TabIndex = 13;
             this.getData.Text = "Calculate";
             this.getData.UseVisualStyleBackColor = true;
-            this.getData.Click += new System.EventHandler(this.getData_Click);
+            this.getData.Click += new System.EventHandler(this.GetData_Click);
             // 
             // numericUpDown1
             // 

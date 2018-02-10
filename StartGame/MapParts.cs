@@ -15,6 +15,7 @@ namespace StartGame
         public SorroundingTiles neighbours;
         public bool isBeingChecked;
         public double Cost { set; get; }
+        public double MovementCost;
         public double[] Costs;
         public string[] GoalIDs;
         public string id;
@@ -27,6 +28,35 @@ namespace StartGame
             id = position.ToString();
             type = Type;
             height = Height;
+            switch (Type.type)
+            {
+                case MapTileTypeEnum.land:
+                    MovementCost = 1;
+                    break;
+
+                case MapTileTypeEnum.mountain:
+                    MovementCost = 2;
+                    break;
+
+                case MapTileTypeEnum.hill:
+                    MovementCost = 1.5;
+                    break;
+
+                case MapTileTypeEnum.shallowWater:
+                    MovementCost = 1.5;
+                    break;
+
+                case MapTileTypeEnum.deepWater:
+                    MovementCost = 2;
+                    break;
+
+                case MapTileTypeEnum.path:
+                    MovementCost = 0.5;
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         public void InitialiseDistances(int length)

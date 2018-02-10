@@ -61,6 +61,8 @@
             this.gameBoard.Size = new System.Drawing.Size(620, 620);
             this.gameBoard.TabIndex = 1;
             this.gameBoard.TabStop = false;
+            this.gameBoard.Click += new System.EventHandler(this.GameBoard_Click);
+            this.gameBoard.MouseClick += new System.Windows.Forms.MouseEventHandler(this.GameBoard_MouseClick);
             // 
             // troopList
             // 

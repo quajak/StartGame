@@ -15,7 +15,7 @@ namespace StartGame
         public Map map;
         private double seed;
         private Random rng;
-        private int fieldSize = 20;
+        public const int fieldSize = 20;
 
         public MapCreator()
         {
@@ -40,7 +40,7 @@ namespace StartGame
         private void UpdateMap()
         {
             seedInput.Text = seed.ToString();
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, size: fieldSize, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value, Debug: debug.Checked);
+            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: (int)numericUpDown1.Value, showGoal: (int)goalChooser.Value, Debug: debug.Checked);
         }
 
         private void SeedInput_TextChanged(object sender, EventArgs e)
@@ -75,7 +75,7 @@ namespace StartGame
             Close();
         }
 
-        private void getData_Click(object sender, EventArgs e)
+        private void GetData_Click(object sender, EventArgs e)
         {
             int length = 1000;
             string[] data = new string[length];

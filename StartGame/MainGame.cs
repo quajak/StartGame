@@ -158,5 +158,32 @@ namespace StartGame
             }
             ShowPlayerStats();
         }
+
+        private void GameBoard_Click(object sender, EventArgs e)
+        {
+        }
+
+        private OverlayRectangle mousePos;
+
+        private void GameBoard_MouseClick(object sender, MouseEventArgs e)
+        {
+            int x = e.X - e.X % MapCreator.fieldSize;
+            int y = e.Y - e.Y % MapCreator.fieldSize;
+
+            if (!(mousePos is null)) map.overlayObjects.Remove(mousePos);
+            mousePos = new OverlayRectangle(x, y, 20, 20, Color.Red, false);
+            map.overlayObjects.Add(mousePos);
+            AddOverlay();
+        }
+
+        private void AddOverlay()
+        {
+            Image image = new Bitmap(map.background);
+            using (Graphics g = Graphics.FromImage(image))
+            {
+                g.DrawImage(map.DrawOverlay(gameBoard.Width, gameBoard.Height), 0, 0);
+            }
+            gameBoard.Image = image;
+        }
     }
 }

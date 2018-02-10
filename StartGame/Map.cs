@@ -578,6 +578,8 @@ namespace StartGame
             }
         }
 
+        public Image background;
+
         public Bitmap DrawMapBackground(int Width, int Height, bool Debug = false, int size = 20, int continentAlpha = 100, int showGoal = 1)
         {
             averageTile = 0.5;
@@ -672,6 +674,7 @@ namespace StartGame
                     g.DrawImage(troop.image, troop.position.X * size, troop.position.Y * size, 20, 20);
                 }
             }
+            background = mapBackground;
             return mapBackground;
         }
 
@@ -731,8 +734,62 @@ namespace StartGame
                 }
             }
         }
+
+        #region Overlay
+
+        public List<OverlayObject> overlayObjects = new List<OverlayObject>();
+
+        public Image DrawOverlay(int Width, int Height)
+        {
+            Image image = new Bitmap(Width, Height);
+            using (Graphics g = Graphics.FromImage(image))
+            {
+                g.Clear(Color.Transparent);
+                foreach (var obj in overlayObjects)
+                {
+                    if (obj is OverlayRectangle)
+                    {
+                        OverlayRectangle rect = obj as OverlayRectangle;
+                        g.DrawRectangle(new Pen(rect.color), rect.x, rect.y, rect.width, rect.height);
+                    }
+                }
+            }
+
+            return image;
+        }
+
+        #endregion Overlay
     }
 
     internal enum SpawnType
     { road, random, randomLand };
+
+    internal class OverlayObject
+    {
+        public int x;
+        public int y;
+
+        public OverlayObject(int X, int Y)
+        {
+            x = X;
+            y = Y;
+        }
+    }
+
+    internal class OverlayRectangle : OverlayObject
+    {
+        public int width;
+        public int height;
+        public Color color;
+        public bool filled;
+
+        public OverlayRectangle(int X, int Y, int Width, int Height, Color Color,
+            bool Filled) : base(X, Y)
+        {
+            width = Width;
+            height = Height;
+            color = Color;
+            filled = Filled;
+        }
+    }
 }
