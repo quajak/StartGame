@@ -19,6 +19,7 @@ namespace StartGame
         public double[] Costs;
         public string[] GoalIDs;
         public string id;
+        public double leftValue = -1;
 
         public MapTile(Point Position, MapTileType Type, double Height)
         {

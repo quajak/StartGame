@@ -141,15 +141,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\baseCursor.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\outpostCursor.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\playerTroop1.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\playerTroop.png" />
   </ItemGroup>
   <ItemGroup>

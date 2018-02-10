@@ -12,6 +12,9 @@ namespace PlayerCreator
         public PlayerProfile()
         {
             InitializeComponent();
+            playerStatsPanel.Hide();
+            weaponCreatorPanel.Hide();
+            Finish.Hide();
             name.Text = Settings.Default.Name;
             WeaponCreatorLoad();
         }
@@ -28,6 +31,9 @@ namespace PlayerCreator
             troop = new Troop(name.Text, new Weapon(5, AttackType.melee, 1, "Fists"), Resources.playerTroop);
             UpdatePlayerStats();
             UpdateWeaponStats(troop.WeaponIndex);
+            playerStatsPanel.Show();
+            weaponCreatorPanel.Show();
+            Finish.Show();
         }
 
         private void UpdatePlayerStats()

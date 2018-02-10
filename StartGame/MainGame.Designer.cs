@@ -49,6 +49,7 @@
             this.playerPossibleWeaponDamage = new System.Windows.Forms.Label();
             this.playerPossibleWeaponType = new System.Windows.Forms.Label();
             this.changeWeapon = new System.Windows.Forms.Button();
+            this.playerActionPoints = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
@@ -75,6 +76,7 @@
             // 
             // enemyInfo
             // 
+            this.enemyInfo.Controls.Add(this.playerActionPoints);
             this.enemyInfo.Controls.Add(this.playerAttackType);
             this.enemyInfo.Controls.Add(this.playerAttackRange);
             this.enemyInfo.Controls.Add(this.playerAttackDamage);
@@ -248,6 +250,15 @@
             this.changeWeapon.UseVisualStyleBackColor = true;
             this.changeWeapon.Click += new System.EventHandler(this.ChangeWeapon_Click);
             // 
+            // playerActionPoints
+            // 
+            this.playerActionPoints.AutoSize = true;
+            this.playerActionPoints.Location = new System.Drawing.Point(7, 60);
+            this.playerActionPoints.Name = "playerActionPoints";
+            this.playerActionPoints.Size = new System.Drawing.Size(94, 13);
+            this.playerActionPoints.TabIndex = 6;
+            this.playerActionPoints.Text = "playerActionPoints";
+            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -302,6 +313,7 @@
         private System.Windows.Forms.Label playerPossibleWeaponDamage;
         private System.Windows.Forms.Label playerPossibleWeaponType;
         private System.Windows.Forms.Button changeWeapon;
+        private System.Windows.Forms.Label playerActionPoints;
     }
 }
 

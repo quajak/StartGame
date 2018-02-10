@@ -31,7 +31,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.name = new System.Windows.Forms.TextBox();
             this.ok = new System.Windows.Forms.Button();
-            this.panel3 = new System.Windows.Forms.Panel();
+            this.playerStatsPanel = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.activeWeaponName = new System.Windows.Forms.Label();
             this.nextActiveWeapon = new System.Windows.Forms.Button();
@@ -43,7 +43,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.playerName = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.panel4 = new System.Windows.Forms.Panel();
+            this.weaponCreatorPanel = new System.Windows.Forms.Panel();
             this.addNewWeapon = new System.Windows.Forms.Button();
             this.panel5 = new System.Windows.Forms.Panel();
             this.weaponcreatornamebox = new System.Windows.Forms.Label();
@@ -56,9 +56,9 @@
             this.weaponCreatorDamage = new System.Windows.Forms.NumericUpDown();
             this.panel1 = new System.Windows.Forms.Panel();
             this.Finish = new System.Windows.Forms.Button();
-            this.panel3.SuspendLayout();
+            this.playerStatsPanel.SuspendLayout();
             this.panel2.SuspendLayout();
-            this.panel4.SuspendLayout();
+            this.weaponCreatorPanel.SuspendLayout();
             this.panel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.weaponCreatorRange)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.weaponCreatorDamage)).BeginInit();
@@ -91,15 +91,15 @@
             this.ok.UseVisualStyleBackColor = true;
             this.ok.Click += new System.EventHandler(this.Ok_Click);
             // 
-            // panel3
+            // playerStatsPanel
             // 
-            this.panel3.Controls.Add(this.panel2);
-            this.panel3.Controls.Add(this.label3);
-            this.panel3.Controls.Add(this.playerName);
-            this.panel3.Location = new System.Drawing.Point(267, 13);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(305, 307);
-            this.panel3.TabIndex = 5;
+            this.playerStatsPanel.Controls.Add(this.panel2);
+            this.playerStatsPanel.Controls.Add(this.label3);
+            this.playerStatsPanel.Controls.Add(this.playerName);
+            this.playerStatsPanel.Location = new System.Drawing.Point(267, 13);
+            this.playerStatsPanel.Name = "playerStatsPanel";
+            this.playerStatsPanel.Size = new System.Drawing.Size(305, 307);
+            this.playerStatsPanel.TabIndex = 5;
             // 
             // panel2
             // 
@@ -207,15 +207,15 @@
             this.label2.TabIndex = 6;
             this.label2.Text = "Weapon Creator";
             // 
-            // panel4
+            // weaponCreatorPanel
             // 
-            this.panel4.Controls.Add(this.addNewWeapon);
-            this.panel4.Controls.Add(this.label2);
-            this.panel4.Controls.Add(this.panel5);
-            this.panel4.Location = new System.Drawing.Point(578, 13);
-            this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(321, 260);
-            this.panel4.TabIndex = 5;
+            this.weaponCreatorPanel.Controls.Add(this.addNewWeapon);
+            this.weaponCreatorPanel.Controls.Add(this.label2);
+            this.weaponCreatorPanel.Controls.Add(this.panel5);
+            this.weaponCreatorPanel.Location = new System.Drawing.Point(578, 13);
+            this.weaponCreatorPanel.Name = "weaponCreatorPanel";
+            this.weaponCreatorPanel.Size = new System.Drawing.Size(321, 260);
+            this.weaponCreatorPanel.TabIndex = 5;
             // 
             // addNewWeapon
             // 
@@ -344,18 +344,18 @@
             this.ClientSize = new System.Drawing.Size(911, 332);
             this.Controls.Add(this.Finish);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.panel4);
-            this.Controls.Add(this.panel3);
+            this.Controls.Add(this.weaponCreatorPanel);
+            this.Controls.Add(this.playerStatsPanel);
             this.Name = "PlayerProfile";
             this.Text = "PlayerProfile";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PlayerProfile_FormClosing);
             this.Load += new System.EventHandler(this.PlayerProfile_Load);
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
+            this.playerStatsPanel.ResumeLayout(false);
+            this.playerStatsPanel.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            this.panel4.ResumeLayout(false);
-            this.panel4.PerformLayout();
+            this.weaponCreatorPanel.ResumeLayout(false);
+            this.weaponCreatorPanel.PerformLayout();
             this.panel5.ResumeLayout(false);
             this.panel5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.weaponCreatorRange)).EndInit();
@@ -371,10 +371,10 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox name;
         private System.Windows.Forms.Button ok;
-        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Panel playerStatsPanel;
         private System.Windows.Forms.Label playerName;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.Panel weaponCreatorPanel;
         private System.Windows.Forms.Button addNewWeapon;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.ListBox weaponCreatorType;

@@ -35,7 +35,7 @@ namespace StartGame
             //Setup human player
             players[0] = Player;
             humanPlayer = Player;
-            map.troops.Add(players[0].troop);
+            map.troops.Add(humanPlayer.troop);
             //Get position for player troops
             List<Point> startPos = map.DeterminSpawnPoint(1, SpawnType.road);
             players[0].troop.position = startPos[0];
@@ -91,6 +91,7 @@ namespace StartGame
             playerAttackDamage.Text = humanPlayer.troop.activeWeapon.attackDamage.ToString();
             playerAttackRange.Text = humanPlayer.troop.activeWeapon.range.ToString();
             playerAttackType.Text = humanPlayer.troop.activeWeapon.type.ToString();
+            playerActionPoints.Text = $"{humanPlayer.actionPoints} / {humanPlayer.maxActionPoints}";
         }
 
         private void MainGameWindow_Load(object sender, EventArgs e)
@@ -105,13 +106,16 @@ namespace StartGame
 
         public void NextTurn()
         {
+            canMoveTo.Clear();
             activePlayer = players[activePlayerCounter];
             activePlayer.PlayTurn(nextAction);
             activePlayerCounter = activePlayerCounter == players.Length - 1 ? 0 : activePlayerCounter + 1;
+            ShowPlayerStats();
         }
 
         private void NextAction_Click(object sender, EventArgs e)
         {
+            AddOverlay();
             activePlayer.ActionButtonPressed(this);
         }
 
@@ -163,17 +167,76 @@ namespace StartGame
         {
         }
 
-        private OverlayRectangle mousePos;
+        private List<MapTile> canMoveTo = new List<MapTile>();
 
         private void GameBoard_MouseClick(object sender, MouseEventArgs e)
         {
             int x = e.X - e.X % MapCreator.fieldSize;
             int y = e.Y - e.Y % MapCreator.fieldSize;
 
-            if (!(mousePos is null)) map.overlayObjects.Remove(mousePos);
-            mousePos = new OverlayRectangle(x, y, 20, 20, Color.Red, false);
-            map.overlayObjects.Add(mousePos);
+            map.overlayObjects.Add(new OverlayRectangle(x, y, 20, 20, Color.Red, false));
             AddOverlay();
+
+            int X = e.X / MapCreator.fieldSize;
+            int Y = e.Y / MapCreator.fieldSize;
+            if (humanPlayer.active)
+            {
+                //try to move player
+                if (canMoveTo.Count != 0)
+                {
+                    try
+                    {
+                        MapTile moveTo = canMoveTo.Find(f => f.position.X == X
+                            && Y == f.position.Y);
+                        humanPlayer.actionPoints = moveTo.leftValue;
+                        humanPlayer.troop.position.X = moveTo.position.X;
+                        humanPlayer.troop.position.Y = moveTo.position.Y;
+                        map.DrawTroops();
+                        AddOverlay();
+                        canMoveTo.Clear();
+                        ShowPlayerStats();
+                        return;
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+                canMoveTo.Clear();
+                //Find fields the player can move to
+                if (humanPlayer.troop.position.X == X && humanPlayer.troop.position.Y == Y)
+                {
+                    //Reset movement cost
+                    for (int _x = 0; _x <= map.map.GetUpperBound(0); _x++)
+                    {
+                        for (int _y = 0; _y <= map.map.GetUpperBound(1); _y++)
+                        {
+                            map.map[_x, _y].leftValue = -1;
+                        }
+                    }
+                    //Find all fields it can move to
+                    List<MapTile> possibleFields = new List<MapTile>();
+                    List<MapTile> toCheck = new List<MapTile> { map.map[X, Y] };
+                    map.map[X, Y].leftValue = humanPlayer.actionPoints;
+                    while (toCheck.Count != 0)
+                    {
+                        MapTile checking = toCheck[0];
+                        toCheck.Remove(checking);
+                        if (checking.leftValue >= 0)
+                        {
+                            possibleFields.Add(checking);
+                            List<MapTile> sorroundingTiles = new SorroundingTiles(checking.position, map).rawMaptiles.ToList();
+                            sorroundingTiles = sorroundingTiles.Where(t => t.leftValue == -1 || t.leftValue < checking.leftValue - t.MovementCost).ToList();
+                            sorroundingTiles.ForEach(t => t.leftValue = checking.leftValue - t.MovementCost);
+                            toCheck.AddRange(sorroundingTiles);
+                        }
+                    }
+                    //Add rectangles foreach to the overlay
+                    possibleFields.ForEach(f => map.overlayObjects.Add(new OverlayRectangle(f.position.X * MapCreator.fieldSize, f.position.Y * MapCreator.fieldSize, MapCreator.fieldSize, MapCreator.fieldSize, Color.Green, false)));
+                    canMoveTo.AddRange(possibleFields);
+                    AddOverlay();
+                    return;
+                }
+            }
         }
 
         private void AddOverlay()

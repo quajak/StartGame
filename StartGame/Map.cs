@@ -292,6 +292,7 @@ namespace StartGame
                         map[lowest.position.X, lowest.position.Y].type.type = MapTileTypeEnum.path;
                         //Change cost of field
                         map[lowest.position.X, lowest.position.Y].Cost = 0.5;
+                        map[lowest.position.X, lowest.position.Y].MovementCost = 0.5;
                     }
                     //If goal break while loop
                     if (position.position == goal.position) break;
@@ -578,7 +579,10 @@ namespace StartGame
             }
         }
 
+        #region Drawing
+
         public Image background;
+        private Image rawBackground; //No troops
 
         public Bitmap DrawMapBackground(int Width, int Height, bool Debug = false, int size = 20, int continentAlpha = 100, int showGoal = 1)
         {
@@ -668,15 +672,37 @@ namespace StartGame
                         }
                     }
                 }
+                rawBackground = mapBackground;
+            }
+            mapBackground = new Bitmap(rawBackground);
+            using (Graphics g = Graphics.FromImage(mapBackground))
+            {
                 //Draw troops
                 foreach (Troop troop in troops)
                 {
                     g.DrawImage(troop.image, troop.position.X * size, troop.position.Y * size, 20, 20);
                 }
             }
+
             background = mapBackground;
             return mapBackground;
         }
+
+        public Image DrawTroops(int size = 20)
+        {
+            Image img = new Bitmap(rawBackground);
+            using (Graphics g = Graphics.FromImage(img))
+            {
+                foreach (Troop troop in troops)
+                {
+                    g.DrawImage(troop.image, troop.position.X * size, troop.position.Y * size, 20, 20);
+                }
+            }
+            background = img;
+            return img;
+        }
+
+        #endregion Drawing
 
         public List<Point> DeterminSpawnPoint(int playerNumber, SpawnType spawnType)
         {
@@ -753,6 +779,7 @@ namespace StartGame
                         g.DrawRectangle(new Pen(rect.color), rect.x, rect.y, rect.width, rect.height);
                     }
                 }
+                overlayObjects = overlayObjects.Where(o => !o.once).ToList();
             }
 
             return image;
@@ -768,11 +795,13 @@ namespace StartGame
     {
         public int x;
         public int y;
+        public bool once;
 
-        public OverlayObject(int X, int Y)
+        public OverlayObject(int X, int Y, bool Once = true)
         {
             x = X;
             y = Y;
+            once = Once;
         }
     }
 
@@ -784,7 +813,7 @@ namespace StartGame
         public bool filled;
 
         public OverlayRectangle(int X, int Y, int Width, int Height, Color Color,
-            bool Filled) : base(X, Y)
+            bool Filled, bool Once = true) : base(X, Y, Once)
         {
             width = Width;
             height = Height;
