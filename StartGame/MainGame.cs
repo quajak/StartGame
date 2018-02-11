@@ -11,13 +11,15 @@ namespace StartGame
 {
     partial class MainGameWindow : Form
     {
+        private const int fieldSize = MapCreator.fieldSize;
         private Random random;
 
         private Map map;
 
         private Point selected;
 
-        private Player[] players;
+        private List<Player> players;
+        private int playerNumber = 2;
         private Player activePlayer;
         private Player humanPlayer;
         private int activePlayerCounter = 0;
@@ -30,10 +32,12 @@ namespace StartGame
             random = new Random();
 
             //Setup players
-            players = new Player[2];
+            players = new List<Player>
+            {
+                //Setup human player
+                Player
+            };
 
-            //Setup human player
-            players[0] = Player;
             humanPlayer = Player;
             map.troops.Add(humanPlayer.troop);
             //Get position for player troops
@@ -49,10 +53,10 @@ namespace StartGame
                 botNames.Add(Resources.ResourceManager.GetString("BOTName" + i));
             }
             string name = botNames[random.Next(botNames.Count)];
-            players[1] = new Player(PlayerType.computer, name, map, new Player[] { humanPlayer })
+            players.Add(new Player(PlayerType.computer, name, map, new Player[] { humanPlayer })
             {
-                troop = new Troop(name, new Weapon(2, AttackType.melee, 1, "Fists"), Resources.enemyScout)
-            };
+                troop = new Troop(name, 10, new Weapon(2, AttackType.melee, 1, "Fists"), Resources.enemyScout)
+            });
             players[1].troop.position = map.DeterminSpawnPoint(1, SpawnType.randomLand)[0];
             map.troops.Add(players[1].troop);
 
@@ -64,11 +68,7 @@ namespace StartGame
             //Start work to update information in GUI
 
             //Add players to list
-            for (int i = 0; i < players.Length; i++)
-            {
-                troopList.Items.Add(players[i].troop.name);
-            }
-            troopList.SelectedIndex = 0;
+            UpdatePlayerList();
 
             //Initialise information about player
             ShowPlayerStats();
@@ -85,6 +85,16 @@ namespace StartGame
             nextAction.Text = "Start game!";
         }
 
+        private void UpdatePlayerList()
+        {
+            troopList.Items.Clear();
+            for (int i = 0; i < players.Count; i++)
+            {
+                troopList.Items.Add(players[i].troop.name);
+            }
+            troopList.SelectedIndex = 0;
+        }
+
         private void ShowPlayerStats()
         {
             playerName.Text = humanPlayer.Name;
@@ -92,6 +102,7 @@ namespace StartGame
             playerAttackRange.Text = humanPlayer.troop.activeWeapon.range.ToString();
             playerAttackType.Text = humanPlayer.troop.activeWeapon.type.ToString();
             playerActionPoints.Text = $"{humanPlayer.actionPoints} / {humanPlayer.maxActionPoints}";
+            playerHealth.Text = $"{humanPlayer.troop.health} / {humanPlayer.troop.maxHealth}";
         }
 
         private void MainGameWindow_Load(object sender, EventArgs e)
@@ -109,18 +120,26 @@ namespace StartGame
             canMoveTo.Clear();
             activePlayer = players[activePlayerCounter];
             activePlayer.PlayTurn(nextAction);
-            AddOverlay();
-            activePlayerCounter = activePlayerCounter == players.Length - 1 ? 0 : activePlayerCounter + 1;
+            UpdateOverlay();
+            activePlayerCounter = activePlayerCounter == players.Count - 1 ? 0 : activePlayerCounter + 1;
             ShowPlayerStats();
+            if (activePlayer.type == PlayerType.localHuman)
+            {
+                playerAttack.Enabled = true;
+            }
+            else
+            {
+                playerAttack.Enabled = false;
+            }
         }
 
         private void NextAction_Click(object sender, EventArgs e)
         {
-            AddOverlay();
+            UpdateOverlay();
             activePlayer.ActionButtonPressed(this);
         }
 
-        private void PlayerList_SelectedIndexChanged(object sender, EventArgs e)
+        private void UpdateEnemyPlayerInfo()
         {
             if (troopList.SelectedIndex == -1) return;
             Player player = players[troopList.SelectedIndex];
@@ -131,6 +150,7 @@ namespace StartGame
                 enemyAttackDamage.Text = "";
                 enemyAttackRange.Text = "";
                 enemyAttackType.Text = "";
+                enemyHealth.Text = "";
             }
             else
             {
@@ -138,7 +158,13 @@ namespace StartGame
                 enemyAttackDamage.Text = player.troop.activeWeapon.attackDamage.ToString();
                 enemyAttackRange.Text = player.troop.activeWeapon.range.ToString();
                 enemyAttackType.Text = player.troop.activeWeapon.type.ToString();
+                enemyHealth.Text = $"{player.troop.health} / {player.troop.maxHealth}";
             }
+        }
+
+        private void PlayerList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateEnemyPlayerInfo();
         }
 
         private void MainGameWindow_MouseMove(object sender, MouseEventArgs e)
@@ -168,20 +194,58 @@ namespace StartGame
         {
         }
 
+        private void UpdateOverlay()
+        {
+            Image image = new Bitmap(map.background);
+            using (Graphics g = Graphics.FromImage(image))
+            {
+                g.DrawImage(map.DrawOverlay(gameBoard.Width, gameBoard.Height), 0, 0);
+            }
+            gameBoard.Image = image;
+        }
+
+        #region Player Game Board Interaction
+
         private List<MapTile> canMoveTo = new List<MapTile>();
+        private List<MapTile> canAttack = new List<MapTile>();
 
         private void GameBoard_MouseClick(object sender, MouseEventArgs e)
         {
-            int x = e.X - e.X % MapCreator.fieldSize;
-            int y = e.Y - e.Y % MapCreator.fieldSize;
+            int x = e.X - e.X % fieldSize;
+            int y = e.Y - e.Y % fieldSize;
 
             map.overlayObjects.Add(new OverlayRectangle(x, y, 20, 20, Color.Red, false));
-            AddOverlay();
+            UpdateOverlay();
 
-            int X = e.X / MapCreator.fieldSize;
-            int Y = e.Y / MapCreator.fieldSize;
+            int X = e.X / fieldSize;
+            int Y = e.Y / fieldSize;
             if (humanPlayer.active)
             {
+                //try to attack
+                if (canAttack.Count != 0 && canAttack.Exists(m => m.position.X == X
+                     && m.position.Y == Y))
+                {
+                    Troop attacked = map.troops.Find(t => t.position.X == X && t.position.Y == Y);
+                    int damage = attacked.health - humanPlayer.troop.activeWeapon.attackDamage < 0 ? attacked.health : humanPlayer.troop.activeWeapon.attackDamage;
+                    attacked.health -= damage;
+                    if (attacked.health == 0)
+                    {
+                        //TODO: Add reward to player!
+                        map.troops.Remove(attacked);
+                        players.Remove(players.Find(p => p.troop == attacked));
+                        UpdatePlayerList();
+                    }
+                    map.overlayObjects.Add(new OverlayText(attacked.position.X * fieldSize, attacked.position.Y * fieldSize, Color.Red, $"-{damage}"));
+                    humanPlayer.actionPoints--;
+                    map.DrawTroops();
+                    UpdateOverlay();
+                    ShowPlayerStats();
+                    canAttack.Clear();
+                    UpdateEnemyPlayerInfo();
+                    return;
+                }
+                canAttack.Clear();
+
                 //try to move player
                 if (canMoveTo.Count != 0)
                 {
@@ -193,7 +257,7 @@ namespace StartGame
                         humanPlayer.troop.position.X = moveTo.position.X;
                         humanPlayer.troop.position.Y = moveTo.position.Y;
                         map.DrawTroops();
-                        AddOverlay();
+                        UpdateOverlay();
                         canMoveTo.Clear();
                         ShowPlayerStats();
                         return;
@@ -232,22 +296,39 @@ namespace StartGame
                         }
                     }
                     //Add rectangles foreach to the overlay
-                    possibleFields.ForEach(f => map.overlayObjects.Add(new OverlayRectangle(f.position.X * MapCreator.fieldSize, f.position.Y * MapCreator.fieldSize, MapCreator.fieldSize, MapCreator.fieldSize, Color.Green, false)));
+                    possibleFields.ForEach(f => map.overlayObjects.Add(new OverlayRectangle(f.position.X * fieldSize, f.position.Y * fieldSize, fieldSize, fieldSize, Color.Green, false)));
                     canMoveTo.AddRange(possibleFields);
-                    AddOverlay();
+                    UpdateOverlay();
                     return;
                 }
             }
         }
 
-        private void AddOverlay()
+        private void PlayerAttack_Click(object sender, EventArgs e)
         {
-            Image image = new Bitmap(map.background);
-            using (Graphics g = Graphics.FromImage(image))
+            UpdateOverlay();
+            //Show all enemies it might hit
+            Point center = humanPlayer.troop.position;
+            if (humanPlayer.actionPoints >= 1)
             {
-                g.DrawImage(map.DrawOverlay(gameBoard.Width, gameBoard.Height), 0, 0);
+                foreach (var troop in map.troops)
+                {
+                    if (troop.position != center)
+                    {
+                        int distance = Math.Abs(troop.position.X - center.X) + Math.Abs(troop.position.Y - center.Y);
+                        if (distance <= humanPlayer.troop.activeWeapon.range)
+                        {
+                            map.overlayObjects.Add(new OverlayRectangle(troop.position.X * fieldSize,
+                                troop.position.Y * fieldSize, fieldSize, fieldSize,
+                                Color.Red, false));
+                            canAttack.Add(map.map[troop.position.X, troop.position.Y]);
+                        }
+                    }
+                }
             }
-            gameBoard.Image = image;
+            UpdateOverlay();
         }
+
+        #endregion Player Game Board Interaction
     }
 }

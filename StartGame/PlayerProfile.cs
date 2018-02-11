@@ -25,7 +25,7 @@ namespace StartGame
             }
             Settings.Default.Name = name.Text;
             Settings.Default.Save();
-            troop = new Troop(name.Text, new Weapon((int)weaponAttack.Value, (AttackType)weaponType.SelectedIndex, (int)weaponRange.Value, "Fists"), Resources.playerTroop);
+            troop = new Troop(name.Text, 10, new Weapon((int)weaponAttack.Value, (AttackType)weaponType.SelectedIndex, (int)weaponRange.Value, "Fists"), Resources.playerTroop);
             Close();
         }
 

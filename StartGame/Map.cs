@@ -778,6 +778,12 @@ namespace StartGame
                         OverlayRectangle rect = obj as OverlayRectangle;
                         g.DrawRectangle(new Pen(rect.color), rect.x, rect.y, rect.width, rect.height);
                     }
+                    else if (obj is OverlayText)
+                    {
+                        OverlayText txt = obj as OverlayText;
+                        g.DrawString(txt.text, SystemFonts.DefaultFont, new SolidBrush(txt.color),
+                            new PointF(txt.x, txt.y));
+                    }
                 }
                 overlayObjects = overlayObjects.Where(o => !o.once).ToList();
             }
@@ -819,6 +825,18 @@ namespace StartGame
             height = Height;
             color = Color;
             filled = Filled;
+        }
+    }
+
+    internal class OverlayText : OverlayObject
+    {
+        public Color color;
+        public string text;
+
+        public OverlayText(int X, int Y, Color Color, string Text, bool Once = true) : base(X, Y, Once)
+        {
+            color = Color;
+            text = Text;
         }
     }
 }

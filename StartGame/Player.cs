@@ -9,7 +9,7 @@ namespace StartGame
 {
     internal class Player
     {
-        private PlayerType type;
+        public PlayerType type;
         public string Name;
         public Troop troop;
         public double actionPoints = 0;

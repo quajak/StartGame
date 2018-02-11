@@ -28,7 +28,7 @@ namespace PlayerCreator
             }
             Settings.Default.Name = name.Text;
             Settings.Default.Save();
-            troop = new Troop(name.Text, new Weapon(5, AttackType.melee, 1, "Fists"), Resources.playerTroop);
+            troop = new Troop(name.Text, 10, new Weapon(5, AttackType.melee, 1, "Fists"), Resources.playerTroop);
             UpdatePlayerStats();
             UpdateWeaponStats(troop.WeaponIndex);
             playerStatsPanel.Show();

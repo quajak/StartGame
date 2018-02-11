@@ -14,6 +14,8 @@ namespace PlayerCreator
         public int MaxMovement = 5;
         public Point position;
         public Bitmap image;
+        public int maxHealth;
+        public int health;
 
         private int weaponIndex = 0;
 
@@ -27,10 +29,12 @@ namespace PlayerCreator
             }
         }
 
-        public Troop(string Name, Weapon Weapon, Bitmap Image)
+        public Troop(string Name, int Health, Weapon Weapon, Bitmap Image)
         {
             image = Image;
             name = Name;
+            maxHealth = Health;
+            health = Health;
             weapons.Add(Weapon);
             activeWeapon = weapons[WeaponIndex];
         }
