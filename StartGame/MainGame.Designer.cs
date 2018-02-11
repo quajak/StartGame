@@ -31,6 +31,7 @@
             this.gameBoard = new System.Windows.Forms.PictureBox();
             this.troopList = new System.Windows.Forms.ListBox();
             this.enemyInfo = new System.Windows.Forms.Panel();
+            this.playerActionPoints = new System.Windows.Forms.Label();
             this.playerAttackType = new System.Windows.Forms.Label();
             this.playerAttackRange = new System.Windows.Forms.Label();
             this.playerAttackDamage = new System.Windows.Forms.Label();
@@ -49,7 +50,6 @@
             this.playerPossibleWeaponDamage = new System.Windows.Forms.Label();
             this.playerPossibleWeaponType = new System.Windows.Forms.Label();
             this.changeWeapon = new System.Windows.Forms.Button();
-            this.playerActionPoints = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
@@ -85,6 +85,15 @@
             this.enemyInfo.Name = "enemyInfo";
             this.enemyInfo.Size = new System.Drawing.Size(202, 212);
             this.enemyInfo.TabIndex = 3;
+            // 
+            // playerActionPoints
+            // 
+            this.playerActionPoints.AutoSize = true;
+            this.playerActionPoints.Location = new System.Drawing.Point(7, 60);
+            this.playerActionPoints.Name = "playerActionPoints";
+            this.playerActionPoints.Size = new System.Drawing.Size(94, 13);
+            this.playerActionPoints.TabIndex = 6;
+            this.playerActionPoints.Text = "playerActionPoints";
             // 
             // playerAttackType
             // 
@@ -136,7 +145,7 @@
             // enemyAttackType
             // 
             this.enemyAttackType.AutoSize = true;
-            this.enemyAttackType.Location = new System.Drawing.Point(9, 48);
+            this.enemyAttackType.Location = new System.Drawing.Point(6, 48);
             this.enemyAttackType.Name = "enemyAttackType";
             this.enemyAttackType.Size = new System.Drawing.Size(93, 13);
             this.enemyAttackType.TabIndex = 10;
@@ -145,7 +154,7 @@
             // enemyAttackRange
             // 
             this.enemyAttackRange.AutoSize = true;
-            this.enemyAttackRange.Location = new System.Drawing.Point(9, 35);
+            this.enemyAttackRange.Location = new System.Drawing.Point(3, 35);
             this.enemyAttackRange.Name = "enemyAttackRange";
             this.enemyAttackRange.Size = new System.Drawing.Size(101, 13);
             this.enemyAttackRange.TabIndex = 3;
@@ -249,15 +258,6 @@
             this.changeWeapon.Text = "Use";
             this.changeWeapon.UseVisualStyleBackColor = true;
             this.changeWeapon.Click += new System.EventHandler(this.ChangeWeapon_Click);
-            // 
-            // playerActionPoints
-            // 
-            this.playerActionPoints.AutoSize = true;
-            this.playerActionPoints.Location = new System.Drawing.Point(7, 60);
-            this.playerActionPoints.Name = "playerActionPoints";
-            this.playerActionPoints.Size = new System.Drawing.Size(94, 13);
-            this.playerActionPoints.TabIndex = 6;
-            this.playerActionPoints.Text = "playerActionPoints";
             // 
             // MainGameWindow
             // 

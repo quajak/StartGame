@@ -48,10 +48,11 @@ namespace StartGame
             //Load player
             if (playerTroop is null)
             {
-                MessageBox.Show("Please create your troop before starting the game1");
-                return;
+                MessageBox.Show("Please create your troop before starting the game!");
+                playerTroop = new Troop("Player", new Weapon(5, AttackType.magic, 1, "Punch"), Resources.playerTroop);
+                //return;
             }
-            Player player = new Player(PlayerType.localHuman, Settings.Default.Name)
+            Player player = new Player(PlayerType.localHuman, Settings.Default.Name, null, null)
             {
                 troop = playerTroop
             };

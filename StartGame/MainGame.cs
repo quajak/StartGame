@@ -49,7 +49,7 @@ namespace StartGame
                 botNames.Add(Resources.ResourceManager.GetString("BOTName" + i));
             }
             string name = botNames[random.Next(botNames.Count)];
-            players[1] = new Player(PlayerType.computer, name)
+            players[1] = new Player(PlayerType.computer, name, map, new Player[] { humanPlayer })
             {
                 troop = new Troop(name, new Weapon(2, AttackType.melee, 1, "Fists"), Resources.enemyScout)
             };
@@ -109,6 +109,7 @@ namespace StartGame
             canMoveTo.Clear();
             activePlayer = players[activePlayerCounter];
             activePlayer.PlayTurn(nextAction);
+            AddOverlay();
             activePlayerCounter = activePlayerCounter == players.Length - 1 ? 0 : activePlayerCounter + 1;
             ShowPlayerStats();
         }
