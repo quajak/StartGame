@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -26,7 +27,7 @@ namespace StartGame
             map = Map;
         }
 
-        public void PlayTurn(Button actionDescriber)
+        public void PlayTurn(Button actionDescriber, MainGameWindow main)
         {
             if (type == PlayerType.localHuman)
             {
@@ -47,29 +48,65 @@ namespace StartGame
                 actionDescriber.Text = "Next Turn";
                 path.Join();
 
-                //Find closest field to player
-                int[] playerPos = new int[2] {
-                    enemies[0].troop.position.X, enemies[0].troop.position.Y };
-                int closestDistance = int.MaxValue;
-                int[] closestField = new int[2];
-                for (int x = 0; x <= distanceGraph.graph.GetUpperBound(0); x++)
+                while (actionPoints > 0)
                 {
-                    for (int y = 0; y <= distanceGraph.graph.GetUpperBound(1); y++)
+                    int[] playerPos = new int[2] {
+                        enemies[0].troop.position.X, enemies[0].troop.position.Y };
+                    //Check if it can attack player
+                    int playerDistance = Math.Abs(playerPos[0] - troop.position.X) + Math.Abs(playerPos[1] -
+                        troop.position.Y);
+                    if (playerDistance <= troop.activeWeapon.range)
                     {
-                        int playerDis = Math.Abs(playerPos[0] - x) + Math.Abs(playerPos[1] - y);
-                        if (playerDis < closestDistance && distanceGraph.graph[x, y] <= actionPoints)
+                        //Attack
+                        int damage = enemies[0].troop.health - troop.activeWeapon.attackDamage < 0 ? enemies[0].troop.health : troop.activeWeapon.attackDamage;
+                        enemies[0].troop.health -= damage;
+                        if (enemies[0].troop.health == 0)
                         {
-                            closestDistance = playerDis;
-                            closestField = new int[2] { x, y };
+                            //TODO: Add reward to player!
+                            map.troops.Remove(enemies[0].troop);
+                            main.PlayerDied();
+                            break;
+                        }
+                        map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damage}"));
+                        actionPoints = 0;
+                        map.DrawTroops();
+                        continue;
+                    }
+                    else if (troop.weapons.Exists(t => t.range >= playerDistance))
+                    {
+                        //Change weapon
+                        Weapon best = troop.weapons.FindAll(t => t.range >= playerDistance)
+                            .Aggregate((t1, t2) => t1.range > t2.range ? t1 : t2);
+                        troop.activeWeapon = best;
+                        continue;
+                    }
+
+                    //Find closest field to player
+                    int closestDistance = int.MaxValue;
+                    int[] closestField = new int[2];
+                    for (int x = 0; x <= distanceGraph.graph.GetUpperBound(0); x++)
+                    {
+                        for (int y = 0; y <= distanceGraph.graph.GetUpperBound(1); y++)
+                        {
+                            int playerDis = Math.Abs(playerPos[0] - x) + Math.Abs(playerPos[1] - y);
+                            if (playerDis < closestDistance && distanceGraph.graph[x, y] <= actionPoints
+                                && !map.troops.Exists(t => t.position.X == x && t.position.Y == y))
+                            {
+                                closestDistance = playerDis;
+                                closestField = new int[2] { x, y };
+                            }
                         }
                     }
+                    if (closestDistance >= playerDistance) continue;
+                    //Move to closest field
+                    troop.position.X = closestField[0];
+                    troop.position.Y = closestField[1];
+                    actionPoints -= closestDistance;
+                    map.DrawTroops();
+                    distanceGraph = new DistanceGraphCreator(troop.position.X, troop.position.Y,
+                        playerPos[0], playerPos[1], map);
+                    distanceGraph.CreateGraph();
                 }
-
-                //Move to closest field
-                troop.position.X = closestField[0];
-                troop.position.Y = closestField[1];
-                map.DrawTroops();
-
                 actionDescriber.Enabled = true;
             }
         }

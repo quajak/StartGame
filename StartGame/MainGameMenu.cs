@@ -36,7 +36,7 @@ namespace StartGame
                 {
                     //Start game with random map
                     Random rnd = new Random();
-                    map = new Map(31, 31); //TODO set global constant for the size
+                    map = new Map(10, 10); //TODO set global constant for the size
                     map.SetupMap(0.1, rnd.NextDouble() * 100, ((double)rnd.Next(8) - 4) / 20, 1);
                 }
                 else

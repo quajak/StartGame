@@ -19,10 +19,11 @@ namespace StartGame
         private Point selected;
 
         private List<Player> players;
-        private int playerNumber = 2;
         private Player activePlayer;
         private Player humanPlayer;
         private int activePlayerCounter = 0;
+
+        private bool dead = false;
 
         public MainGameWindow(Map Map, Player Player)
         {
@@ -119,11 +120,11 @@ namespace StartGame
         {
             canMoveTo.Clear();
             activePlayer = players[activePlayerCounter];
-            activePlayer.PlayTurn(nextAction);
+            activePlayer.PlayTurn(nextAction, this);
             UpdateOverlay();
             activePlayerCounter = activePlayerCounter == players.Count - 1 ? 0 : activePlayerCounter + 1;
             ShowPlayerStats();
-            if (activePlayer.type == PlayerType.localHuman)
+            if (activePlayer.type == PlayerType.localHuman && !dead)
             {
                 playerAttack.Enabled = true;
             }
@@ -143,7 +144,7 @@ namespace StartGame
         {
             if (troopList.SelectedIndex == -1) return;
             Player player = players[troopList.SelectedIndex];
-            if (player.Name == activePlayer.Name)
+            if (player.Name == humanPlayer.Name)
             {
                 //Clear all data
                 enemyName.Text = "";
@@ -242,6 +243,7 @@ namespace StartGame
                     ShowPlayerStats();
                     canAttack.Clear();
                     UpdateEnemyPlayerInfo();
+                    playerAttack.Enabled = false;
                     return;
                 }
                 canAttack.Clear();
@@ -330,5 +332,19 @@ namespace StartGame
         }
 
         #endregion Player Game Board Interaction
+
+        public void PlayerDied(string message = "You have died!")
+        {
+            players.Remove(humanPlayer);
+            UpdatePlayerList();
+            UpdateOverlay();
+            ShowPlayerStats();
+            canAttack.Clear();
+            UpdateEnemyPlayerInfo();
+            nextAction.Text = "Game Over";
+            nextAction.Enabled = false;
+            dead = true;
+            MessageBox.Show(message);
+        }
     }
 }
