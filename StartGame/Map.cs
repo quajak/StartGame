@@ -714,6 +714,12 @@ namespace StartGame
 
         #endregion Drawing
 
+        /// <summary>
+        /// Function which finds spawnpoints for one or more troops
+        /// </summary>
+        /// <param name="playerNumber">Determines how many co-ordinates should be returned</param>
+        /// <param name="spawnType">Deterines how the co-ordinates should relate to each other and the map</param>
+        /// <returns></returns>
         public List<Point> DeterminSpawnPoint(int playerNumber, SpawnType spawnType)
         {
             List<Point> toReturn = new List<Point>();
@@ -740,7 +746,18 @@ namespace StartGame
                 case SpawnType.random:
                     for (int i = 0; i < playerNumber; i++)
                     {
-                        toReturn.Add(new Point(generic.Next(map.GetUpperBound(0), generic.Next(map.GetUpperBound(1)))));
+                        Point p = new Point();
+                        while (true)
+                        {
+                            p = new Point(generic.Next(map.GetUpperBound(0),
+                            generic.Next(map.GetUpperBound(1))));
+                            //Determine is viable
+                            if (!troops.Exists(t => t.position.X == p.X &&
+                                 t.position.Y == p.Y) &&
+                                 !toReturn.Exists(c => c.X == p.X && c.Y == p.Y))
+                                break;
+                        }
+                        toReturn.Add(p);
                     }
                     break;
 

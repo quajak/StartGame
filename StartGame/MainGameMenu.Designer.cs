@@ -48,19 +48,19 @@
             // 
             // startGame
             // 
-            this.startGame.Location = new System.Drawing.Point(94, 63);
+            this.startGame.Location = new System.Drawing.Point(83, 63);
             this.startGame.Name = "startGame";
-            this.startGame.Size = new System.Drawing.Size(75, 23);
+            this.startGame.Size = new System.Drawing.Size(100, 23);
             this.startGame.TabIndex = 1;
-            this.startGame.Text = "Start Game";
+            this.startGame.Text = "Play Single Match";
             this.startGame.UseVisualStyleBackColor = true;
             this.startGame.Click += new System.EventHandler(this.StartGame_Click);
             // 
             // setMap
             // 
-            this.setMap.Location = new System.Drawing.Point(94, 92);
+            this.setMap.Location = new System.Drawing.Point(83, 92);
             this.setMap.Name = "setMap";
-            this.setMap.Size = new System.Drawing.Size(75, 23);
+            this.setMap.Size = new System.Drawing.Size(100, 23);
             this.setMap.TabIndex = 2;
             this.setMap.Text = "Set Map";
             this.setMap.UseVisualStyleBackColor = true;
@@ -77,9 +77,9 @@
             // 
             // playerSetup
             // 
-            this.playerSetup.Location = new System.Drawing.Point(94, 121);
+            this.playerSetup.Location = new System.Drawing.Point(83, 121);
             this.playerSetup.Name = "playerSetup";
-            this.playerSetup.Size = new System.Drawing.Size(75, 23);
+            this.playerSetup.Size = new System.Drawing.Size(100, 23);
             this.playerSetup.TabIndex = 4;
             this.playerSetup.Text = "Profile";
             this.playerSetup.UseVisualStyleBackColor = true;
@@ -87,9 +87,9 @@
             // 
             // quit
             // 
-            this.quit.Location = new System.Drawing.Point(94, 150);
+            this.quit.Location = new System.Drawing.Point(83, 150);
             this.quit.Name = "quit";
-            this.quit.Size = new System.Drawing.Size(75, 23);
+            this.quit.Size = new System.Drawing.Size(100, 23);
             this.quit.TabIndex = 5;
             this.quit.Text = "Quit";
             this.quit.UseVisualStyleBackColor = true;

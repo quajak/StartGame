@@ -64,6 +64,7 @@ namespace StartGame
                         {
                             //TODO: Add reward to player!
                             map.troops.Remove(enemies[0].troop);
+                            map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damage}"));
                             main.PlayerDied();
                             break;
                         }
