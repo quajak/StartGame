@@ -56,6 +56,11 @@ namespace StartGame
 
         public void SetupMap(double PerlinDiff, double Seed, double HeightBias, double Zoom)
         {
+            //Reset lists
+            goals = new List<MapTile>();
+            continents = new List<Continent>();
+            troops = new List<Troop>();
+
             map = new MapTile[width, height];
 
             PerlinNoise p = new PerlinNoise();
@@ -128,6 +133,11 @@ namespace StartGame
             }
             maxContinent.color = Color.Black;
 
+            if (maxContinent.edges is null)
+            {
+                SetupMap(PerlinDiff, Seed, HeightBias, Zoom);
+                return;
+            }
             //TODO: For edges in continents find all the different zones, not only side
             //TODO: Create a road between each of the zones
             goals = new List<MapTile>();

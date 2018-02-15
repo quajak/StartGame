@@ -56,7 +56,7 @@ namespace StartGame
             string name = botNames[random.Next(botNames.Count)];
             players.Add(new Player(PlayerType.computer, name, map, new Player[] { humanPlayer })
             {
-                troop = new Troop(name, 10, new Weapon(2, AttackType.melee, 1, "Fists"), Resources.enemyScout)
+                troop = new Troop(name, 10, new Weapon(20, AttackType.melee, 10, "Fists"), Resources.enemyScout)
             });
             players[1].troop.position = map.DeterminSpawnPoint(1, SpawnType.randomLand)[0];
             map.troops.Add(players[1].troop);
@@ -118,13 +118,23 @@ namespace StartGame
 
         public void NextTurn()
         {
+            if (dead)
+            {
+                nextAction.Enabled = false;
+                return;
+            }
             canMoveTo.Clear();
             activePlayer = players[activePlayerCounter];
             activePlayer.PlayTurn(nextAction, this);
+            if (dead)
+            {
+                nextAction.Enabled = false;
+                return;
+            }
             UpdateOverlay();
             activePlayerCounter = activePlayerCounter == players.Count - 1 ? 0 : activePlayerCounter + 1;
             ShowPlayerStats();
-            if (activePlayer.type == PlayerType.localHuman && !dead)
+            if (activePlayer.type == PlayerType.localHuman)
             {
                 playerAttack.Enabled = true;
             }
