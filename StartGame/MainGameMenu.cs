@@ -49,7 +49,7 @@ namespace StartGame
             if (playerTroop is null)
             {
                 MessageBox.Show("Please create your troop before starting the game!");
-                playerTroop = new Troop(Settings.Default.Name, 10, new Weapon(5, AttackType.magic, 1, "Punch", 2, false), Resources.playerTroop);
+                playerTroop = new Troop(Settings.Default.Name, 10, new Weapon(5, AttackType.magic, 1, "Punch", 2, false), Resources.playerTroop, 0);
                 playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
                 //return;
             }

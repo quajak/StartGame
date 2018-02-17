@@ -74,7 +74,7 @@ namespace StartGame
                 botNames.Remove(name);
                 players.Add(new Player(PlayerType.computer, name, map, new Player[] { humanPlayer })
                 {
-                    troop = new Troop(name, 10, new Weapon(4, AttackType.melee, 1, "Fists", 1, false), Resources.enemyScout)
+                    troop = new Troop(name, 10, new Weapon(4, AttackType.melee, 1, "Fists", 1, false), Resources.enemyScout, 0)
                 });
                 players[i + 1].troop.position = spawnPoints[i];
                 map.troops.Add(players[i + 1].troop);
@@ -168,6 +168,8 @@ namespace StartGame
             //As it is first turn - set action button to start the game
             nextAction.Text = "Start game!";
             changeWeapon.Enabled = false;
+
+            ShowPositionStats();
             dumpWeapon.Enabled = false;
         }
 
@@ -196,11 +198,14 @@ namespace StartGame
                 nextAction.Enabled = false;
                 return;
             }
+
             UpdateOverlay();
             ShowPlayerStats();
+
             if (humanPlayer.active)
             {
-                changeWeapon.Enabled = true;
+                if (humanPlayer.troop.activeWeapon != humanPlayer.troop.weapons[playerWeaponList.SelectedIndex])
+                    changeWeapon.Enabled = true;
                 if (humanPlayer.troop.weapons[playerWeaponList.SelectedIndex].discardeable)
                     dumpWeapon.Enabled = true;
             }
@@ -212,6 +217,31 @@ namespace StartGame
         }
 
         #region GUI Updates
+
+        private void SelectField(int X, int Y)
+        {
+            map.overlayObjects.Add(new OverlayRectangle(X * fieldSize, Y * fieldSize, fieldSize, fieldSize, Color.Orange, false));
+            UpdateOverlay();
+
+            position = new Point(X, Y);
+            ShowPositionStats();
+        }
+
+        private Point position;
+
+        private void ShowPositionStats()
+        {
+            if (position == null)
+            {
+                fieldPosition.Text = "--";
+                fieldHeight.Text = "--";
+            }
+            else
+            {
+                fieldPosition.Text = $"Co-ords: {position.X} : {position.Y}";
+                fieldHeight.Text = "Height: " + map.map[position.X, position.Y].height.ToString("0.##");
+            }
+        }
 
         private void ShowWeaponStats()
         {
@@ -258,7 +288,12 @@ namespace StartGame
             playerActionPoints.Text = $"{humanPlayer.actionPoints} / {humanPlayer.maxActionPoints}";
             playerHealth.Text = $"{humanPlayer.troop.health} / {humanPlayer.troop.maxHealth}";
             playerWeaponAttacks.Text = $"Attacks: {humanPlayer.troop.activeWeapon.attacks} / {humanPlayer.troop.activeWeapon.maxAttacks}";
-            playerHeight.Text = $"{map.map[humanPlayer.troop.position.X, humanPlayer.troop.position.Y].height}";
+            playerHeight.Text = $"{map.map[humanPlayer.troop.position.X, humanPlayer.troop.position.Y].height.ToString("0.##")}";
+            playerDefense.Text = $"Defense: {humanPlayer.troop.defense}";
+            playerStrength.Text = $"Strength: {humanPlayer.strength}";
+            playerAgility.Text = $"Agility: {humanPlayer.agility}";
+            playerEndurance.Text = $"Endurance: {humanPlayer.endurance}";
+            playerVitatlity.Text = $"Vitality: {humanPlayer.vitality}";
         }
 
         private void UpdateGameBoard()
@@ -290,6 +325,7 @@ namespace StartGame
                 enemyHealth.Text = "";
                 enemyPosition.Text = "";
                 enemyHeight.Text = "";
+                enemyDefense.Text = "";
             }
             else
             {
@@ -299,14 +335,12 @@ namespace StartGame
                 enemyAttackType.Text = player.troop.activeWeapon.type.ToString();
                 enemyHealth.Text = $"{player.troop.health} / {player.troop.maxHealth}";
                 enemyPosition.Text = $"{player.troop.position.X} : {player.troop.position.Y}";
-                enemyHeight.Text = $"{map.map[player.troop.position.X, player.troop.position.Y].height}";
+                enemyHeight.Text = $"{map.map[player.troop.position.X, player.troop.position.Y].height.ToString("0.##")}";
+                enemyDefense.Text = $"Defense: {player.troop.defense}";
             }
             if (clicked)
             {
-                map.overlayObjects.Add(new OverlayRectangle(player.troop.position.X * fieldSize,
-                    player.troop.position.Y * fieldSize, fieldSize, fieldSize, Color.Orange, false,
-                    true));
-                UpdateOverlay();
+                SelectField(player.troop.position.X, player.troop.position.Y);
             }
         }
 
@@ -417,8 +451,7 @@ namespace StartGame
             }
             else
             {
-                map.overlayObjects.Add(new OverlayRectangle(x, y, 20, 20, Color.Orange, false));
-                UpdateOverlay();
+                SelectField(X, Y);
             }
 
             if (humanPlayer.active)
@@ -561,17 +594,17 @@ namespace StartGame
 
         public int CalculateDamage(Player attacking, Player defending, Weapon weapon)
         {
-            return CalculateDamage(attacking.troop.position, defending, weapon);
+            return CalculateDamage(attacking.troop.position, attacking, defending, weapon);
         }
 
-        public int CalculateDamage(Point attacking, Player defending, Weapon weapon)
+        public int CalculateDamage(Point attackingPosition, Player attacking, Player defending, Weapon weapon)
         {
-            int damage = weapon.attackDamage;
+            int damage = weapon.attackDamage + attacking.strength - defending.troop.defense;
 
             //if melee code check for height difference
             if (weapon.type == AttackType.melee)
             {
-                double attackingHeight = map.map[attacking.X, attacking.Y].height;
+                double attackingHeight = map.map[attackingPosition.X, attackingPosition.Y].height;
                 double defendingHeight = map.map[defending.troop.position.X, defending.troop.position.Y].height;
 
                 double difference = attackingHeight - defendingHeight;
@@ -590,10 +623,20 @@ namespace StartGame
         /// <param name="attacked">Attacked player</param>
         /// <param name="show">If overlay should instantly be updated</param>
         /// <returns>Return tuple containg Damage dealt, If attacked troop is dead</returns>
-        public (int damage, bool killed) Attack(Player attacking, Player attacked, bool show = false)
+        public (int damage, bool killed, bool hit) Attack(Player attacking, Player attacked, bool show = false)
         {
             bool killed = false;
             int damage = CalculateDamage(attacking, attacked, attacking.troop.activeWeapon);
+
+            //Check if hit
+            if (random.Next(100) < attacked.troop.dodge)
+            {
+                //dodged
+                if (show)
+                    map.overlayObjects.Add(new OverlayText(attacked.troop.position.X * fieldSize, attacked.troop.position.Y * fieldSize, Color.Red, "Dodged!"));
+                UpdateOverlay();
+                return (0, false, false);
+            } //TODO: Add scraping hit
 
             attacked.troop.health -= damage;
 
@@ -632,7 +675,7 @@ namespace StartGame
             ShowPlayerStats();
             ShowEnemyStats();
 
-            return (damage, killed);
+            return (damage, killed, true);
         }
 
         #endregion Player Events

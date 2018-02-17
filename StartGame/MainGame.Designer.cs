@@ -31,6 +31,7 @@
             this.gameBoard = new System.Windows.Forms.PictureBox();
             this.troopList = new System.Windows.Forms.ListBox();
             this.enemyInfo = new System.Windows.Forms.Panel();
+            this.playerDefense = new System.Windows.Forms.Label();
             this.playerHeight = new System.Windows.Forms.Label();
             this.playerWeaponAttacks = new System.Windows.Forms.Label();
             this.playerHealth = new System.Windows.Forms.Label();
@@ -40,6 +41,7 @@
             this.playerAttackDamage = new System.Windows.Forms.Label();
             this.playerName = new System.Windows.Forms.Label();
             this.playerInfo = new System.Windows.Forms.Panel();
+            this.enemyDefense = new System.Windows.Forms.Label();
             this.enemyHeight = new System.Windows.Forms.Label();
             this.enemyPosition = new System.Windows.Forms.Label();
             this.enemyHealth = new System.Windows.Forms.Label();
@@ -59,9 +61,18 @@
             this.playerPossibleWeaponAttacks = new System.Windows.Forms.Label();
             this.showHeightDifference = new System.Windows.Forms.CheckBox();
             this.dumpWeapon = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.fieldHeight = new System.Windows.Forms.Label();
+            this.fieldPosition = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.playerStrength = new System.Windows.Forms.Label();
+            this.playerAgility = new System.Windows.Forms.Label();
+            this.playerEndurance = new System.Windows.Forms.Label();
+            this.playerVitatlity = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // gameBoard
@@ -85,6 +96,11 @@
             // 
             // enemyInfo
             // 
+            this.enemyInfo.Controls.Add(this.playerVitatlity);
+            this.enemyInfo.Controls.Add(this.playerEndurance);
+            this.enemyInfo.Controls.Add(this.playerAgility);
+            this.enemyInfo.Controls.Add(this.playerStrength);
+            this.enemyInfo.Controls.Add(this.playerDefense);
             this.enemyInfo.Controls.Add(this.playerHeight);
             this.enemyInfo.Controls.Add(this.playerWeaponAttacks);
             this.enemyInfo.Controls.Add(this.playerHealth);
@@ -97,6 +113,15 @@
             this.enemyInfo.Name = "enemyInfo";
             this.enemyInfo.Size = new System.Drawing.Size(202, 212);
             this.enemyInfo.TabIndex = 3;
+            // 
+            // playerDefense
+            // 
+            this.playerDefense.AutoSize = true;
+            this.playerDefense.Location = new System.Drawing.Point(4, 108);
+            this.playerDefense.Name = "playerDefense";
+            this.playerDefense.Size = new System.Drawing.Size(75, 13);
+            this.playerDefense.TabIndex = 11;
+            this.playerDefense.Text = "playerDefense";
             // 
             // playerHeight
             // 
@@ -172,6 +197,7 @@
             // 
             // playerInfo
             // 
+            this.playerInfo.Controls.Add(this.enemyDefense);
             this.playerInfo.Controls.Add(this.enemyHeight);
             this.playerInfo.Controls.Add(this.enemyPosition);
             this.playerInfo.Controls.Add(this.enemyHealth);
@@ -183,6 +209,15 @@
             this.playerInfo.Name = "playerInfo";
             this.playerInfo.Size = new System.Drawing.Size(178, 182);
             this.playerInfo.TabIndex = 6;
+            // 
+            // enemyDefense
+            // 
+            this.enemyDefense.AutoSize = true;
+            this.enemyDefense.Location = new System.Drawing.Point(3, 92);
+            this.enemyDefense.Name = "enemyDefense";
+            this.enemyDefense.Size = new System.Drawing.Size(78, 13);
+            this.enemyDefense.TabIndex = 13;
+            this.enemyDefense.Text = "enemyDefense";
             // 
             // enemyHeight
             // 
@@ -358,11 +393,87 @@
             this.dumpWeapon.UseVisualStyleBackColor = true;
             this.dumpWeapon.Click += new System.EventHandler(this.DumpWeapon_Click);
             // 
+            // panel1
+            // 
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.fieldHeight);
+            this.panel1.Controls.Add(this.fieldPosition);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Location = new System.Drawing.Point(643, 418);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(176, 67);
+            this.panel1.TabIndex = 19;
+            // 
+            // fieldHeight
+            // 
+            this.fieldHeight.AutoSize = true;
+            this.fieldHeight.Location = new System.Drawing.Point(4, 45);
+            this.fieldHeight.Name = "fieldHeight";
+            this.fieldHeight.Size = new System.Drawing.Size(57, 13);
+            this.fieldHeight.TabIndex = 2;
+            this.fieldHeight.Text = "fieldHeight";
+            // 
+            // fieldPosition
+            // 
+            this.fieldPosition.AutoSize = true;
+            this.fieldPosition.Location = new System.Drawing.Point(4, 32);
+            this.fieldPosition.Name = "fieldPosition";
+            this.fieldPosition.Size = new System.Drawing.Size(63, 13);
+            this.fieldPosition.TabIndex = 1;
+            this.fieldPosition.Text = "fieldPosition";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.label1.Location = new System.Drawing.Point(55, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(65, 17);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Field Info";
+            // 
+            // playerStrength
+            // 
+            this.playerStrength.AutoSize = true;
+            this.playerStrength.Location = new System.Drawing.Point(115, 4);
+            this.playerStrength.Name = "playerStrength";
+            this.playerStrength.Size = new System.Drawing.Size(75, 13);
+            this.playerStrength.TabIndex = 12;
+            this.playerStrength.Text = "playerStrength";
+            // 
+            // playerAgility
+            // 
+            this.playerAgility.AutoSize = true;
+            this.playerAgility.Location = new System.Drawing.Point(115, 17);
+            this.playerAgility.Name = "playerAgility";
+            this.playerAgility.Size = new System.Drawing.Size(62, 13);
+            this.playerAgility.TabIndex = 13;
+            this.playerAgility.Text = "playerAgility";
+            // 
+            // playerEndurance
+            // 
+            this.playerEndurance.AutoSize = true;
+            this.playerEndurance.Location = new System.Drawing.Point(115, 30);
+            this.playerEndurance.Name = "playerEndurance";
+            this.playerEndurance.Size = new System.Drawing.Size(87, 13);
+            this.playerEndurance.TabIndex = 14;
+            this.playerEndurance.Text = "playerEndurance";
+            // 
+            // playerVitatlity
+            // 
+            this.playerVitatlity.AutoSize = true;
+            this.playerVitatlity.Location = new System.Drawing.Point(115, 43);
+            this.playerVitatlity.Name = "playerVitatlity";
+            this.playerVitatlity.Size = new System.Drawing.Size(65, 13);
+            this.playerVitatlity.TabIndex = 15;
+            this.playerVitatlity.Text = "playerVitality";
+            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 639);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.dumpWeapon);
             this.Controls.Add(this.showHeightDifference);
             this.Controls.Add(this.playerPossibleWeaponAttacks);
@@ -389,6 +500,8 @@
             this.enemyInfo.PerformLayout();
             this.playerInfo.ResumeLayout(false);
             this.playerInfo.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -426,6 +539,16 @@
         private System.Windows.Forms.Label enemyHeight;
         private System.Windows.Forms.CheckBox showHeightDifference;
         private System.Windows.Forms.Button dumpWeapon;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label fieldHeight;
+        private System.Windows.Forms.Label fieldPosition;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label playerDefense;
+        private System.Windows.Forms.Label enemyDefense;
+        private System.Windows.Forms.Label playerVitatlity;
+        private System.Windows.Forms.Label playerEndurance;
+        private System.Windows.Forms.Label playerAgility;
+        private System.Windows.Forms.Label playerStrength;
     }
 }
 

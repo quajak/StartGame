@@ -11,11 +11,14 @@ namespace PlayerCreator
         public string name;
         public Weapon activeWeapon;
         public List<Weapon> weapons = new List<Weapon>();
-        public int MaxMovement = 5;
         public Point position;
         public Bitmap image;
+
         public int maxHealth;
         public int health;
+        public int defense;
+        public int baseDodge;
+        public int dodge;
 
         private int weaponIndex = 0;
 
@@ -29,7 +32,7 @@ namespace PlayerCreator
             }
         }
 
-        public Troop(string Name, int Health, Weapon Weapon, Bitmap Image)
+        public Troop(string Name, int Health, Weapon Weapon, Bitmap Image, int Defense, int Dodge = 10)
         {
             image = Image;
             name = Name;
@@ -37,6 +40,9 @@ namespace PlayerCreator
             health = Health;
             weapons.Add(Weapon);
             activeWeapon = weapons[WeaponIndex];
+            defense = Defense;
+            dodge = Dodge;
+            baseDodge = Dodge;
         }
 
         public void Spawn(Point point)

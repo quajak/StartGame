@@ -12,12 +12,22 @@ namespace StartGame
     {
         public PlayerType type;
         public string Name;
-        public Troop troop;
         public double actionPoints = 0;
-        public int maxActionPoints = 4;
         public bool active = false;
         public Map map;
         private Player[] enemies;
+
+        //Derived stats
+        public int maxActionPoints = 4;
+
+        public Troop troop;
+
+        //Base stats
+        public int strength; //Bonus damage dealt
+
+        public int agility; //Chance to dodge
+        public int endurance; //How many action points + defense
+        public int vitality; //How much health
 
         public Player(PlayerType Type, string Name, Map Map, Player[] Enemies)
         {
@@ -25,6 +35,24 @@ namespace StartGame
             type = Type;
             this.Name = Name;
             map = Map;
+
+            strength = 1;
+            agility = 1;
+            endurance = 1;
+            vitality = 10;
+        }
+
+        public void CalculateStats()
+        {
+            maxActionPoints = 4 + endurance / 10;
+
+            int healthDifference = troop.health - troop.maxHealth;
+            troop.maxHealth = vitality;
+            troop.health = troop.maxHealth - healthDifference;
+
+            troop.defense = endurance;
+
+            troop.dodge = troop.baseDodge + agility * 2;
         }
 
         public void PlayTurn(Button actionDescriber, MainGameWindow main)
@@ -53,6 +81,7 @@ namespace StartGame
                 path.Join();
 
                 int damageDealt = 0;
+                int dodged = 0;
 
                 while (actionPoints > 0)
                 {
@@ -65,8 +94,9 @@ namespace StartGame
                         troop.activeWeapon.attacks > 0)
                     {
                         //Attack
-                        var (damage, killed) = main.Attack(this, enemies[0]);
+                        var (damage, killed, hit) = main.Attack(this, enemies[0]);
                         damageDealt += damage;
+                        if (!hit) dodged++;
 
                         if (killed)
                         {
@@ -115,7 +145,10 @@ namespace StartGame
                     distanceGraph.CreateGraph();
                 }
                 if (damageDealt != 0)
-                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
+                else
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
+
                 actionDescriber.Enabled = true;
             }
         }

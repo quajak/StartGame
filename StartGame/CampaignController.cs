@@ -23,7 +23,7 @@ namespace StartGame
             if (player.troop is null)
             {
                 MessageBox.Show("Please design your player, before starting the campaign.");
-                Troop playerTroop = new Troop("Player", 10, new Weapon(5, AttackType.melee, 1, "Punch", 2, false), Resources.playerTroop);
+                Troop playerTroop = new Troop("Player", 10, new Weapon(5, AttackType.melee, 1, "Punch", 2, false), Resources.playerTroop, 0);
                 playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
                 player = new Player(PlayerType.localHuman, Resources.BasePlayerName, null, null)
                 {
@@ -53,6 +53,10 @@ namespace StartGame
                     MessageBox.Show("You have lost the campaign as you have died! Good luck next time!");
                     return;
                 }
+                //Level up
+                LevelUp levelUp = new LevelUp(player, 3);
+                levelUp.ShowDialog();
+
                 //Reset troop stats
                 foreach (Weapon weapon in player.troop.weapons)
                 {

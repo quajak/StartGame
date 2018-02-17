@@ -23,6 +23,7 @@ namespace StartGame
         public Campaign(Player _player, int gameNumber, int Difficulty)
         {
             player = _player;
+            player.CalculateStats();
             numberOfGames = gameNumber;
             difficulty = Difficulty;
             healthRegen = 10 - Difficulty;
@@ -61,7 +62,7 @@ namespace StartGame
                     troop = new Troop(name, 10,
                     new Weapon(4,
                         AttackType.melee, 1, "Fists", 1, true),
-                    Resources.enemyScout)
+                    Resources.enemyScout, 0)
                 });
                 enemies[i].troop.position = spawnPoints[i];
             }
@@ -107,7 +108,7 @@ namespace StartGame
                     troop = new Troop(name, 10 + (difficulty / 2) + (int)(round * 1.5),
                     new Weapon(4 + difficulty / 4 + round,
                         AttackType.melee, 1, "Fists", 1, false),
-                    Resources.enemyScout)
+                    Resources.enemyScout, 0)
                 });
                 enemies[i].troop.position = spawnPoints[i];
             }
