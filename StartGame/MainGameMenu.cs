@@ -37,7 +37,7 @@ namespace StartGame
                     //Start game with random map
                     Random rnd = new Random();
                     map = new Map(10, 10); //TODO set global constant for the size
-                    map.SetupMap(0.1, rnd.NextDouble() * 100, ((double)rnd.Next(8) - 4) / 20, 1);
+                    map.SetupMap(0.1, rnd.NextDouble() * 100, ((double)rnd.Next(8) - 4) / 20);
                 }
                 else
                 {
@@ -49,8 +49,8 @@ namespace StartGame
             if (playerTroop is null)
             {
                 MessageBox.Show("Please create your troop before starting the game!");
-                playerTroop = new Troop("Player", 10, new Weapon(5, AttackType.magic, 1, "Punch"), Resources.playerTroop);
-                playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD"));
+                playerTroop = new Troop(Settings.Default.Name, 10, new Weapon(5, AttackType.magic, 1, "Punch", 2, false), Resources.playerTroop);
+                playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
                 //return;
             }
             Player player = new Player(PlayerType.localHuman, Settings.Default.Name, null, null)
@@ -61,11 +61,15 @@ namespace StartGame
             MainGameWindow mainGameWindow = new MainGameWindow(map, player);
             mainGameWindow.ShowDialog();
             Show();
+
+            //Reset all variables
+            map = null;
+            player = null;
         }
 
         private void PlayerSetup_Click(object sender, EventArgs e)
         {
-            PlayerCreator.PlayerProfile playerProfile = new PlayerCreator.PlayerProfile();
+            PlayerProfile playerProfile = new PlayerCreator.PlayerProfile();
             Hide();
             playerProfile.ShowDialog();
             playerTroop = playerProfile.troop;
@@ -75,6 +79,18 @@ namespace StartGame
         private void Quit_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            Hide();
+            Player player = new Player(PlayerType.localHuman, Settings.Default.Name, null, null)
+            {
+                troop = playerTroop
+            };
+            CampaignController campaignCreator = new CampaignController(player);
+            campaignCreator.ShowDialog();
+            Show();
         }
     }
 }

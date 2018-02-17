@@ -16,7 +16,7 @@ namespace StartGame
         public double actionPoints = 0;
         public int maxActionPoints = 4;
         public bool active = false;
-        private Map map;
+        public Map map;
         private Player[] enemies;
 
         public Player(PlayerType Type, string Name, Map Map, Player[] Enemies)
@@ -29,6 +29,10 @@ namespace StartGame
 
         public void PlayTurn(Button actionDescriber, MainGameWindow main)
         {
+            foreach (Weapon weapon in troop.weapons)
+            {
+                weapon.attacks = weapon.maxAttacks;
+            }
             if (type == PlayerType.localHuman)
             {
                 actionPoints = maxActionPoints;
@@ -48,6 +52,8 @@ namespace StartGame
                 actionDescriber.Text = "Next Turn";
                 path.Join();
 
+                int damageDealt = 0;
+
                 while (actionPoints > 0)
                 {
                     int[] playerPos = new int[2] {
@@ -55,25 +61,25 @@ namespace StartGame
                     //Check if it can attack player
                     int playerDistance = Math.Abs(playerPos[0] - troop.position.X) + Math.Abs(playerPos[1] -
                         troop.position.Y);
-                    if (playerDistance <= troop.activeWeapon.range)
+                    if (playerDistance <= troop.activeWeapon.range &&
+                        troop.activeWeapon.attacks > 0)
                     {
                         //Attack
-                        int damage = enemies[0].troop.health - troop.activeWeapon.attackDamage < 0 ? enemies[0].troop.health : troop.activeWeapon.attackDamage;
-                        enemies[0].troop.health -= damage;
-                        if (enemies[0].troop.health == 0)
+                        var (damage, killed) = main.Attack(this, enemies[0]);
+                        damageDealt += damage;
+
+                        if (killed)
                         {
-                            //TODO: Add reward to player!
-                            map.troops.Remove(enemies[0].troop);
-                            map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damage}"));
-                            main.PlayerDied();
+                            map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
+                            main.PlayerDied($"You have been killed by {Name}!");
                             break;
                         }
-                        map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damage}"));
-                        actionPoints = 0;
+                        actionPoints--;
+                        troop.activeWeapon.attacks--;
                         map.DrawTroops();
                         continue;
                     }
-                    else if (troop.weapons.Exists(t => t.range >= playerDistance))
+                    else if (troop.weapons.Exists(t => t.range >= playerDistance && t.attacks > 0))
                     {
                         //Change weapon
                         Weapon best = troop.weapons.FindAll(t => t.range >= playerDistance)
@@ -98,7 +104,7 @@ namespace StartGame
                             }
                         }
                     }
-                    if (closestDistance >= playerDistance) continue;
+                    if (closestDistance >= playerDistance) break;
                     //Move to closest field
                     troop.position.X = closestField[0];
                     troop.position.Y = closestField[1];
@@ -108,6 +114,8 @@ namespace StartGame
                         playerPos[0], playerPos[1], map);
                     distanceGraph.CreateGraph();
                 }
+                if (damageDealt != 0)
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
                 actionDescriber.Enabled = true;
             }
         }

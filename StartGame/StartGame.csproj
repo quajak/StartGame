@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>StartGame</RootNamespace>
     <AssemblyName>StartGame</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PublishUrl>publish\</PublishUrl>
@@ -26,6 +26,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,6 +37,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -63,6 +65,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Campaign.cs" />
+    <Compile Include="CampaignController.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CampaignController.Designer.cs">
+      <DependentUpon>CampaignController.cs</DependentUpon>
+    </Compile>
     <Compile Include="Extensions.cs" />
     <Compile Include="MainGame.cs">
       <SubType>Form</SubType>
@@ -86,14 +95,11 @@
     <Compile Include="MapParts.cs" />
     <Compile Include="PerlinNoise.cs" />
     <Compile Include="Player.cs" />
-    <Compile Include="PlayerProfile.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PlayerProfile.Designer.cs">
-      <DependentUpon>PlayerProfile.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CampaignController.resx">
+      <DependentUpon>CampaignController.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainGame.resx">
       <DependentUpon>MainGame.cs</DependentUpon>
     </EmbeddedResource>
@@ -102,9 +108,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MapCreator.resx">
       <DependentUpon>MapCreator.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PlayerProfile.resx">
-      <DependentUpon>PlayerProfile.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

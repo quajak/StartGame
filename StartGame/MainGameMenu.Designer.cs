@@ -34,6 +34,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.playerSetup = new System.Windows.Forms.Button();
             this.quit = new System.Windows.Forms.Button();
+            this.startCampaign = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -48,7 +49,7 @@
             // 
             // startGame
             // 
-            this.startGame.Location = new System.Drawing.Point(83, 63);
+            this.startGame.Location = new System.Drawing.Point(83, 92);
             this.startGame.Name = "startGame";
             this.startGame.Size = new System.Drawing.Size(100, 23);
             this.startGame.TabIndex = 1;
@@ -58,7 +59,7 @@
             // 
             // setMap
             // 
-            this.setMap.Location = new System.Drawing.Point(83, 92);
+            this.setMap.Location = new System.Drawing.Point(83, 121);
             this.setMap.Name = "setMap";
             this.setMap.Size = new System.Drawing.Size(100, 23);
             this.setMap.TabIndex = 2;
@@ -77,7 +78,7 @@
             // 
             // playerSetup
             // 
-            this.playerSetup.Location = new System.Drawing.Point(83, 121);
+            this.playerSetup.Location = new System.Drawing.Point(83, 150);
             this.playerSetup.Name = "playerSetup";
             this.playerSetup.Size = new System.Drawing.Size(100, 23);
             this.playerSetup.TabIndex = 4;
@@ -87,7 +88,7 @@
             // 
             // quit
             // 
-            this.quit.Location = new System.Drawing.Point(83, 150);
+            this.quit.Location = new System.Drawing.Point(83, 179);
             this.quit.Name = "quit";
             this.quit.Size = new System.Drawing.Size(100, 23);
             this.quit.TabIndex = 5;
@@ -95,11 +96,22 @@
             this.quit.UseVisualStyleBackColor = true;
             this.quit.Click += new System.EventHandler(this.Quit_Click);
             // 
+            // startCampaign
+            // 
+            this.startCampaign.Location = new System.Drawing.Point(83, 63);
+            this.startCampaign.Name = "startCampaign";
+            this.startCampaign.Size = new System.Drawing.Size(100, 23);
+            this.startCampaign.TabIndex = 6;
+            this.startCampaign.Text = "Start Campaign";
+            this.startCampaign.UseVisualStyleBackColor = true;
+            this.startCampaign.Click += new System.EventHandler(this.Button1_Click);
+            // 
             // MainGameMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.startCampaign);
             this.Controls.Add(this.quit);
             this.Controls.Add(this.playerSetup);
             this.Controls.Add(this.label2);
@@ -122,5 +134,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button playerSetup;
         private System.Windows.Forms.Button quit;
+        private System.Windows.Forms.Button startCampaign;
     }
 }

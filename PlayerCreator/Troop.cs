@@ -51,13 +51,19 @@ namespace PlayerCreator
         public AttackType type;
         public int range;
         public string name;
+        public int attacks;
+        public int maxAttacks;
+        public bool discardeable;
 
-        public Weapon(int AttackDamage, AttackType Type, int Range, string Name)
+        public Weapon(int AttackDamage, AttackType Type, int Range, string Name, int Attacks, bool Discardeable)
         {
+            discardeable = Discardeable;
             name = Name;
             range = Range;
             type = Type;
             attackDamage = AttackDamage;
+            attacks = Attacks;
+            maxAttacks = Attacks;
         }
     }
 }

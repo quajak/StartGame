@@ -2,7 +2,6 @@
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -23,11 +22,98 @@ namespace StartGame
         private Player humanPlayer;
         private int activePlayerCounter = 0;
 
-        private bool dead = false;
+        public bool dead = false;
 
-        public MainGameWindow(Map Map, Player Player)
+        private Campaign campaign;
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="Map">Map must already be initialised</param>
+        /// <param name="Player"></param>
+        /// <param name="PlayerNumber"></param>
+        public MainGameWindow(Map Map, Player Player, int PlayerNumber = 2, Campaign Campaign = null)
+        {
+            campaign = Campaign;
+            map = Map;
+            if (map.map is null)
+                throw new Exception("Map of maptiles can not be undefined when starting the game. Please initialise before calling this function");
+
+            selected = new Point(-1, 0);
+            random = new Random();
+
+            //Setup players
+            players = new List<Player>
+            {
+                //Setup human player
+                Player
+            };
+
+            humanPlayer = Player;
+            map.troops.Add(humanPlayer.troop);
+
+            //Get position for player troops
+            List<Point> startPos = map.DeterminSpawnPoint(1, SpawnType.road);
+            players[0].troop.position = startPos[0];
+
+            //Generate AI
+            //Get name of troop
+            short botNumber = Convert.ToInt16(Resources.BOTAmount);
+            List<string> botNames = new List<string>();
+            for (int i = 0; i < botNumber; i++)
+            {
+                botNames.Add(Resources.ResourceManager.GetString("BOTName" + i));
+            }
+
+            List<Point> spawnPoints = map.DeterminSpawnPoint(PlayerNumber,
+                SpawnType.randomLand);
+
+            for (int i = 0; i < PlayerNumber; i++)
+            {
+                string name = botNames[random.Next(botNames.Count)];
+                botNames.Remove(name);
+                players.Add(new Player(PlayerType.computer, name, map, new Player[] { humanPlayer })
+                {
+                    troop = new Troop(name, 10, new Weapon(4, AttackType.melee, 1, "Fists", 1, false), Resources.enemyScout)
+                });
+                players[i + 1].troop.position = spawnPoints[i];
+                map.troops.Add(players[i + 1].troop);
+            }
+
+            //Setup game
+            activePlayer = players[0];
+
+            InitializeComponent();
+
+            //Start work to update information in GUI
+            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
+            //Add players to list
+            UpdatePlayerList();
+
+            //Initialise information about player
+            ShowPlayerStats();
+            //Initialise information about player weapons
+            int c = 0;
+            foreach (var weapon in humanPlayer.troop.weapons)
+            {
+                playerWeaponList.Items.Add(weapon.name);
+                if (weapon == humanPlayer.troop.activeWeapon) playerWeaponList.SelectedIndex = c;
+                c++;
+            }
+
+            //As it is first turn - set action button to start the game
+            nextAction.Text = "Start game!";
+            changeWeapon.Enabled = false;
+            dumpWeapon.Enabled = false;
+        }
+
+        public MainGameWindow(Map Map, Player Player, List<Player> enemies, Campaign Campaign = null)
         {
             map = Map;
+            if (map.map is null)
+                throw new Exception("Map of maptiles can not be undefined when starting the game. Please initialise before calling this function");
+
+            campaign = Campaign;
 
             selected = new Point(-1, 0);
             random = new Random();
@@ -47,45 +133,31 @@ namespace StartGame
             players[0].troop.position = startPos[0];
 
             //Generate AI
-            //Get name of troop
-            short botNumber = Convert.ToInt16(Resources.BOTAmount);
-            List<string> botNames = new List<string>();
-            for (int i = 0; i < botNumber; i++)
-            {
-                botNames.Add(Resources.ResourceManager.GetString("BOTName" + i));
-            }
-
-            int enemyNumber = 2;
-
-            List<Point> spawnPoints = map.DeterminSpawnPoint(enemyNumber,
+            List<Point> spawnPoints = map.DeterminSpawnPoint(enemies.Count,
                 SpawnType.randomLand);
 
-            for (int i = 0; i < enemyNumber; i++)
+            int c = 0;
+            foreach (Player enemy in enemies)
             {
-                string name = botNames[random.Next(botNames.Count)];
-                botNames.Remove(name);
-                players.Add(new Player(PlayerType.computer, name, map, new Player[] { humanPlayer })
-                {
-                    troop = new Troop(name, 10, new Weapon(4, AttackType.melee, 1, "Fists"), Resources.enemyScout)
-                });
-                players[i + 1].troop.position = spawnPoints[i];
-                map.troops.Add(players[i + 1].troop);
+                map.troops.Add(enemy.troop);
+                enemy.troop.position = spawnPoints[c];
+                c++;
             }
-
+            players.AddRange(enemies);
             //Setup game
             activePlayer = players[0];
 
             InitializeComponent();
 
             //Start work to update information in GUI
-
+            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
             //Add players to list
             UpdatePlayerList();
 
             //Initialise information about player
             ShowPlayerStats();
             //Initialise information about player weapons
-            int c = 0;
+            c = 0;
             foreach (var weapon in humanPlayer.troop.weapons)
             {
                 playerWeaponList.Items.Add(weapon.name);
@@ -96,6 +168,75 @@ namespace StartGame
             //As it is first turn - set action button to start the game
             nextAction.Text = "Start game!";
             changeWeapon.Enabled = false;
+            dumpWeapon.Enabled = false;
+        }
+
+        public void NextTurn()
+        {
+            if (dead)
+            {
+                Close();
+            }
+            if (players.Count == 1 && players.Exists(t => t == humanPlayer))
+            {
+                //Won
+                PlayerWins("You have defeated all the enemies!");
+                return;
+            }
+            canMoveTo.Clear();
+            activePlayer.active = false;
+            activePlayer = players[activePlayerCounter];
+            activePlayer.active = true;
+            activePlayer.PlayTurn(nextAction, this);
+            int activeIndex = players.FindIndex(p => p.Name == activePlayer.Name);
+            activePlayerCounter = activeIndex == players.Count - 1 ?
+                0 : activeIndex + 1;
+            if (dead)
+            {
+                nextAction.Enabled = false;
+                return;
+            }
+            UpdateOverlay();
+            ShowPlayerStats();
+            if (humanPlayer.active)
+            {
+                changeWeapon.Enabled = true;
+                if (humanPlayer.troop.weapons[playerWeaponList.SelectedIndex].discardeable)
+                    dumpWeapon.Enabled = true;
+            }
+            else
+            {
+                changeWeapon.Enabled = false;
+                dumpWeapon.Enabled = false;
+            }
+        }
+
+        #region GUI Updates
+
+        private void ShowWeaponStats()
+        {
+            int pos = playerWeaponList.SelectedIndex;
+            if (pos != -1)
+            {
+                Weapon weapon = humanPlayer.troop.weapons[pos];
+                playerPossibleAttackRange.Text = $"Range: {weapon.range}";
+                playerPossibleWeaponDamage.Text = $"Damage: {weapon.attackDamage}";
+                playerPossibleWeaponName.Text = $"{weapon.name}";
+                playerPossibleWeaponType.Text = $"Type: {weapon.type}";
+                playerPossibleWeaponAttacks.Text = $"Attacks: {weapon.attacks} / {weapon.maxAttacks}";
+                dumpWeapon.Enabled = weapon.discardeable && humanPlayer.active;
+                changeWeapon.Enabled = (weapon != humanPlayer.troop.activeWeapon) && humanPlayer.active;
+            }
+            else
+            {
+                playerPossibleAttackRange.Text = "";
+                playerPossibleWeaponDamage.Text = "";
+                playerPossibleWeaponName.Text = "";
+                playerPossibleWeaponType.Text = "";
+                playerPossibleWeaponAttacks.Text = "";
+                dumpWeapon.Enabled = false;
+                changeWeapon.Enabled = false;
+            }
         }
 
         private void UpdatePlayerList()
@@ -116,11 +257,8 @@ namespace StartGame
             playerAttackType.Text = humanPlayer.troop.activeWeapon.type.ToString();
             playerActionPoints.Text = $"{humanPlayer.actionPoints} / {humanPlayer.maxActionPoints}";
             playerHealth.Text = $"{humanPlayer.troop.health} / {humanPlayer.troop.maxHealth}";
-        }
-
-        private void MainGameWindow_Load(object sender, EventArgs e)
-        {
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
+            playerWeaponAttacks.Text = $"Attacks: {humanPlayer.troop.activeWeapon.attacks} / {humanPlayer.troop.activeWeapon.maxAttacks}";
+            playerHeight.Text = $"{map.map[humanPlayer.troop.position.X, humanPlayer.troop.position.Y].height}";
         }
 
         private void UpdateGameBoard()
@@ -128,43 +266,17 @@ namespace StartGame
             gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
         }
 
-        public void NextTurn()
+        private void UpdateOverlay(bool keepAll = false)
         {
-            if (dead)
+            Image image = new Bitmap(map.background);
+            using (Graphics g = Graphics.FromImage(image))
             {
-                nextAction.Enabled = false;
-                return;
+                g.DrawImage(map.DrawOverlay(gameBoard.Width, gameBoard.Height, keepAll), 0, 0);
             }
-            canMoveTo.Clear();
-            activePlayer.active = false;
-            activePlayer = players[activePlayerCounter];
-            activePlayer.active = true;
-            activePlayer.PlayTurn(nextAction, this);
-            if (dead)
-            {
-                nextAction.Enabled = false;
-                return;
-            }
-            UpdateOverlay();
-            activePlayerCounter = activePlayerCounter == players.Count - 1 ? 0 : activePlayerCounter + 1;
-            ShowPlayerStats();
-            if (humanPlayer.active)
-            {
-                changeWeapon.Enabled = true;
-            }
-            else
-            {
-                changeWeapon.Enabled = false;
-            }
+            gameBoard.Image = image;
         }
 
-        private void NextAction_Click(object sender, EventArgs e)
-        {
-            UpdateOverlay();
-            activePlayer.ActionButtonPressed(this);
-        }
-
-        private void UpdateEnemyPlayerInfo()
+        private void ShowEnemyStats(bool clicked = false)
         {
             if (troopList.SelectedIndex == -1) return;
             Player player = players[troopList.SelectedIndex];
@@ -176,6 +288,8 @@ namespace StartGame
                 enemyAttackRange.Text = "";
                 enemyAttackType.Text = "";
                 enemyHealth.Text = "";
+                enemyPosition.Text = "";
+                enemyHeight.Text = "";
             }
             else
             {
@@ -184,12 +298,53 @@ namespace StartGame
                 enemyAttackRange.Text = player.troop.activeWeapon.range.ToString();
                 enemyAttackType.Text = player.troop.activeWeapon.type.ToString();
                 enemyHealth.Text = $"{player.troop.health} / {player.troop.maxHealth}";
+                enemyPosition.Text = $"{player.troop.position.X} : {player.troop.position.Y}";
+                enemyHeight.Text = $"{map.map[player.troop.position.X, player.troop.position.Y].height}";
             }
+            if (clicked)
+            {
+                map.overlayObjects.Add(new OverlayRectangle(player.troop.position.X * fieldSize,
+                    player.troop.position.Y * fieldSize, fieldSize, fieldSize, Color.Orange, false,
+                    true));
+                UpdateOverlay();
+            }
+        }
+
+        #endregion GUI Updates
+
+        #region Event Handler
+
+        private void DumpWeapon_Click(object sender, EventArgs e)
+        {
+            if (playerWeaponList.SelectedIndex != -1)
+            {
+                Weapon toRemove = humanPlayer.troop.weapons[playerWeaponList.SelectedIndex];
+                humanPlayer.troop.weapons.Remove(toRemove);
+                playerWeaponList.Items.Remove(toRemove.name);
+                UpdateOverlay();
+            }
+        }
+
+        private void ShowHeightDifference_CheckedChanged(object sender, EventArgs e)
+        {
+            if (showHeightDifference.Checked)
+            {
+                gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0, colorAlpha: 50);
+            }
+            else
+            {
+                gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
+            }
+            UpdateOverlay(keepAll: true);
+        }
+
+        private void MainGameWindow_Load(object sender, EventArgs e)
+        {
         }
 
         private void PlayerList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdateEnemyPlayerInfo();
+            ShowEnemyStats(true);
         }
 
         private void MainGameWindow_MouseMove(object sender, MouseEventArgs e)
@@ -198,12 +353,7 @@ namespace StartGame
 
         private void PlayerWeaponList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int pos = playerWeaponList.SelectedIndex;
-            Weapon weapon = humanPlayer.troop.weapons[pos];
-            playerPossibleAttackRange.Text = $"Range: {weapon.range}";
-            playerPossibleWeaponDamage.Text = $"Damage: {weapon.attackDamage}";
-            playerPossibleWeaponName.Text = $"{weapon.name}";
-            playerPossibleWeaponType.Text = $"Type: {weapon.type}";
+            ShowWeaponStats();
         }
 
         private void ChangeWeapon_Click(object sender, EventArgs e)
@@ -213,20 +363,34 @@ namespace StartGame
                 humanPlayer.troop.activeWeapon = humanPlayer.troop.weapons[playerWeaponList.SelectedIndex];
             }
             ShowPlayerStats();
+            UpdateOverlay();
         }
 
         private void GameBoard_Click(object sender, EventArgs e)
         {
         }
 
-        private void UpdateOverlay()
+        private void NextAction_Click(object sender, EventArgs e)
         {
-            Image image = new Bitmap(map.background);
-            using (Graphics g = Graphics.FromImage(image))
+            UpdateOverlay();
+            activePlayer.ActionButtonPressed(this);
+        }
+
+        private void MainGameWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            bool won = players.Count == 1 && players.Exists(t => t == humanPlayer);
+            if (!won && !dead)
             {
-                g.DrawImage(map.DrawOverlay(gameBoard.Width, gameBoard.Height), 0, 0);
+                if (MessageBox.Show("Closing the game, will mean giving up!",
+                    "Do you want to close", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                {
+                    dead = true;
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
             }
-            gameBoard.Image = image;
         }
 
         #region Player Game Board Interaction
@@ -244,8 +408,18 @@ namespace StartGame
             int x = e.X - e.X % fieldSize;
             int y = e.Y - e.Y % fieldSize;
 
-            map.overlayObjects.Add(new OverlayRectangle(x, y, 20, 20, Color.Orange, false));
-            UpdateOverlay();
+            Troop p = map.troops.Find(t => t.position.X == X && t.position.Y == Y);
+            if (p != null)
+            {
+                troopList.SelectedIndex = -1;
+                Player selected = players.Find(P => P.troop == p);
+                troopList.SelectedIndex = troopList.Items.IndexOf(selected.Name);
+            }
+            else
+            {
+                map.overlayObjects.Add(new OverlayRectangle(x, y, 20, 20, Color.Orange, false));
+                UpdateOverlay();
+            }
 
             if (humanPlayer.active)
             {
@@ -253,24 +427,8 @@ namespace StartGame
                 if (canAttack.Count != 0 && canAttack.Exists(m => m.position.X == X
                      && m.position.Y == Y))
                 {
-                    Troop attacked = map.troops.Find(t => t.position.X == X && t.position.Y == Y);
-                    int damage = attacked.health - humanPlayer.troop.activeWeapon.attackDamage < 0 ? attacked.health : humanPlayer.troop.activeWeapon.attackDamage;
-                    attacked.health -= damage;
-                    if (attacked.health == 0)
-                    {
-                        //TODO: Add reward to player!
-                        map.troops.Remove(attacked);
-                        players.Remove(players.Find(p => p.troop == attacked));
-                        UpdatePlayerList();
-                    }
-                    map.overlayObjects.Add(new OverlayText(attacked.position.X * fieldSize, attacked.position.Y * fieldSize, Color.Red, $"-{damage}"));
-                    humanPlayer.actionPoints--;
-                    map.DrawTroops();
-                    UpdateOverlay();
-                    ShowPlayerStats();
-                    canAttack.Clear();
-                    canMoveTo.Clear();
-                    UpdateEnemyPlayerInfo();
+                    Player attacked = players.Find(t => t.troop.position.X == X && t.troop.position.Y == Y);
+                    Attack(humanPlayer, attacked, show: true);
                     return;
                 }
                 canAttack.Clear();
@@ -329,12 +487,16 @@ namespace StartGame
                         }
                     }
                     //Add rectangles foreach to the overlay
-                    possibleFields.ForEach(f => map.overlayObjects.Add(new OverlayRectangle(f.position.X * fieldSize, f.position.Y * fieldSize, fieldSize, fieldSize, Color.Green, false)));
+                    possibleFields.ForEach(f =>
+                        map.overlayObjects.Add(new OverlayRectangle(f.position.X * fieldSize, f.position.Y * fieldSize, fieldSize, fieldSize, Color.Green, false)));
+                    //Add text with cost for each field to overlay
+                    possibleFields.ForEach(f =>
+                        map.overlayObjects.Add(new OverlayText(f.position.X * fieldSize, f.position.Y * fieldSize, Color.DarkGreen, $"{f.leftValue}")));
                     canMoveTo.AddRange(possibleFields);
 
-                    //Show all enemies it might hit
+                    //Show all enemies it might hit and damage dealt
                     Point center = humanPlayer.troop.position;
-                    if (humanPlayer.actionPoints >= 1)
+                    if (humanPlayer.actionPoints >= 1 && humanPlayer.troop.activeWeapon.attacks > 0)
                     {
                         foreach (var troop in map.troops)
                         {
@@ -358,45 +520,121 @@ namespace StartGame
             }
         }
 
-        private void PlayerAttack_Click(object sender, EventArgs e)
-        {
-            UpdateOverlay();
-            //Show all enemies it might hit
-            Point center = humanPlayer.troop.position;
-            if (humanPlayer.actionPoints >= 1)
-            {
-                foreach (var troop in map.troops)
-                {
-                    if (troop.position != center)
-                    {
-                        int distance = Math.Abs(troop.position.X - center.X) + Math.Abs(troop.position.Y - center.Y);
-                        if (distance <= humanPlayer.troop.activeWeapon.range)
-                        {
-                            map.overlayObjects.Add(new OverlayRectangle(troop.position.X * fieldSize,
-                                troop.position.Y * fieldSize, fieldSize, fieldSize,
-                                Color.Red, false));
-                            canAttack.Add(map.map[troop.position.X, troop.position.Y]);
-                        }
-                    }
-                }
-            }
-            UpdateOverlay();
-        }
-
         #endregion Player Game Board Interaction
+
+        #endregion Event Handler
+
+        #region Player Events
 
         public void PlayerDied(string message = "You have died!")
         {
             players.Remove(humanPlayer);
+            map.troops.Remove(humanPlayer.troop);
             UpdatePlayerList();
             UpdateOverlay();
             ShowPlayerStats();
             canAttack.Clear();
-            UpdateEnemyPlayerInfo();
+            ShowEnemyStats();
             nextAction.Text = "Game Over";
-            nextAction.Enabled = false;
             dead = true;
             MessageBox.Show(message);
         }
+
+        public void PlayerWins(string message = "You have won!")
+        {
+            MessageBox.Show(message, "Mission Completed");
+
+            if (campaign != null)
+            {
+                Weapon received = campaign.CalculateReward();
+                WeaponView weaponView = new WeaponView(received, true);
+                weaponView.ShowDialog();
+
+                if (weaponView.decision)
+                {
+                    humanPlayer.troop.weapons.Add(received);
+                }
+            }
+
+            Close();
+        }
+
+        public int CalculateDamage(Player attacking, Player defending, Weapon weapon)
+        {
+            return CalculateDamage(attacking.troop.position, defending, weapon);
+        }
+
+        public int CalculateDamage(Point attacking, Player defending, Weapon weapon)
+        {
+            int damage = weapon.attackDamage;
+
+            //if melee code check for height difference
+            if (weapon.type == AttackType.melee)
+            {
+                double attackingHeight = map.map[attacking.X, attacking.Y].height;
+                double defendingHeight = map.map[defending.troop.position.X, defending.troop.position.Y].height;
+
+                double difference = attackingHeight - defendingHeight;
+
+                damage = damage + (int)Math.Ceiling(difference * damage);
+            }
+
+            damage = defending.troop.health - damage < 0 ? defending.troop.health : damage;
+            return damage;
+        }
+
+        /// <summary>
+        /// Function which handles attacks of different players
+        /// </summary>
+        /// <param name="attacking">Attacking player</param>
+        /// <param name="attacked">Attacked player</param>
+        /// <param name="show">If overlay should instantly be updated</param>
+        /// <returns>Return tuple containg Damage dealt, If attacked troop is dead</returns>
+        public (int damage, bool killed) Attack(Player attacking, Player attacked, bool show = false)
+        {
+            bool killed = false;
+            int damage = CalculateDamage(attacking, attacked, attacking.troop.activeWeapon);
+
+            attacked.troop.health -= damage;
+
+            if (attacked.troop.health == 0)
+            {
+                killed = true;
+                if (attacked.Name == humanPlayer.Name)
+                {
+                    //Do nothing allow player AI code to handle it
+                }
+                else
+                {
+                    //Enemy Died
+                    map.troops.Remove(attacked.troop);
+                    players.Remove(attacked);
+                    UpdatePlayerList();
+                }
+            }
+            attacking.troop.activeWeapon.attacks--;
+            attacking.actionPoints--;
+
+            if (show)
+            {
+                map.overlayObjects.Add(new OverlayText(attacked.troop.position.X * fieldSize, attacked.troop.position.Y * fieldSize, Color.Red, $"-{damage}"));
+                map.DrawTroops();
+                UpdateOverlay();
+                if (attacking == humanPlayer)
+                {
+                    ShowWeaponStats();
+                }
+            }
+
+            canAttack.Clear();
+            canMoveTo.Clear();
+
+            ShowPlayerStats();
+            ShowEnemyStats();
+
+            return (damage, killed);
+        }
+
+        #endregion Player Events
     }
 }

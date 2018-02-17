@@ -28,7 +28,7 @@ namespace PlayerCreator
             }
             Settings.Default.Name = name.Text;
             Settings.Default.Save();
-            troop = new Troop(name.Text, 10, new Weapon(5, AttackType.melee, 1, "Fists"), Resources.playerTroop);
+            troop = new Troop(name.Text, 10, new Weapon(5, AttackType.melee, 1, "Fists", 2, false), Resources.playerTroop);
             UpdatePlayerStats();
             UpdateWeaponStats(troop.WeaponIndex);
             playerStatsPanel.Show();
@@ -67,7 +67,9 @@ namespace PlayerCreator
 
         private void AddNewWeaponClick(object sender, EventArgs e)
         {
-            troop.weapons.Add(new Weapon((int)weaponCreatorDamage.Value, (AttackType)weaponCreatorType.SelectedIndex, (int)weaponCreatorRange.Value, createWeaponName.Text));
+            troop.weapons.Add(new Weapon((int)weaponCreatorDamage.Value,
+                (AttackType)weaponCreatorType.SelectedIndex, (int)weaponCreatorRange.Value,
+                createWeaponName.Text, (int)attacksPerTurn.Value, false)); //TODO: Allow weapon creator to say that a weapon can be discarded
             UpdateWeaponStats(troop.WeaponIndex);
         }
 

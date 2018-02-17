@@ -54,7 +54,13 @@ namespace StartGame
             return $"{averageTile} | {hillTile} | {flatTile} | {waterTile}";
         }
 
-        public void SetupMap(double PerlinDiff, double Seed, double HeightBias, double Zoom)
+        /// <summary>
+        /// Initialises the map
+        /// </summary>
+        /// <param name="PerlinDiff">Determines the magnitude of the change between fields i.e. accuracy. Normally it has a value of 0.1</param>
+        /// <param name="Seed">Determines the seed of the rng</param>
+        /// <param name="HeightBias">Increases all values by this amount</param>
+        public void SetupMap(double PerlinDiff, double Seed, double HeightBias)
         {
             //Reset lists
             goals = new List<MapTile>();
@@ -75,7 +81,7 @@ namespace StartGame
                     double mHeight = p.perlin(x * PerlinDiff, y * PerlinDiff, Seed);
 
                     //Modify perlin value for more extremes
-                    mHeight = mHeight * Zoom - HeightBias;
+                    mHeight = mHeight - HeightBias;
                     mHeight = mHeight < 0 ? 0 : mHeight; //Remove negative values
                     mHeight = mHeight > 1 ? 1 : mHeight; //Remove values larger than 1
 
@@ -135,7 +141,7 @@ namespace StartGame
 
             if (maxContinent.edges is null)
             {
-                SetupMap(PerlinDiff, Seed, HeightBias, Zoom);
+                SetupMap(PerlinDiff, Seed, HeightBias);
                 return;
             }
             //TODO: For edges in continents find all the different zones, not only side
@@ -594,7 +600,19 @@ namespace StartGame
         public Image background;
         private Image rawBackground; //No troops
 
-        public Bitmap DrawMapBackground(int Width, int Height, bool Debug = false, int size = 20, int continentAlpha = 100, int showGoal = 1)
+        /// <summary>
+        /// Function which generates a Bitmap from the map without any troops or overlay
+        /// </summary>
+        /// <param name="Width">Width of the bitmap</param>
+        /// <param name="Height">Height of the bitmap</param>
+        /// <param name="Debug">Will show cost of field from a specific goal</param>
+        /// <param name="size">Size of field in pixel</param>
+        /// <param name="continentAlpha">Sets alpha of continent alpha, if 0 they are not shown</param>
+        /// <param name="showGoal">Which goal will be selected for debug</param>
+        /// <param name="colorAlpha">Sets alpha of field color</param>
+        /// <param name="showInverseHeight">Determine if height should be inversed for grey overlay color</param>
+        /// <returns></returns>
+        public Bitmap DrawMapBackground(int Width, int Height, bool Debug = false, int size = 20, int continentAlpha = 100, int showGoal = 1, int colorAlpha = 255, bool showInverseHeight = false)
         {
             averageTile = 0.5;
             hillTile = 0;
@@ -662,6 +680,13 @@ namespace StartGame
                             {
                                 c = Color.SandyBrown;
                             }
+                            //Adjust alpha of color
+                            if (colorAlpha != 255)
+                                c = Color.FromArgb(colorAlpha, c.R, c.G, c.B);
+
+                            if (showInverseHeight)
+                                b = Color.FromArgb(255 - b.A, 0, 0, 0);
+
                             d = map[x, y].continent.color;
                             d = Color.FromArgb(continentAlpha, d.R, d.G, d.B);
                         }
@@ -678,6 +703,7 @@ namespace StartGame
                         else
                         {
                             g.FillRectangle(new SolidBrush(c), x * size, y * size, size, size);
+                            g.FillRectangle(new SolidBrush(d), x * size, y * size, size, size);
                             g.FillRectangle(new SolidBrush(b), x * size, y * size, size, size);
                         }
                     }
@@ -779,7 +805,9 @@ namespace StartGame
                 while (true)
                 {
                     point = new Point(generic.Next(map.GetUpperBound(0)), generic.Next(map.GetUpperBound(1)));
-                    if (map[point.X, point.Y].type.type == MapTileTypeEnum.land || map[point.X, point.Y].type.type == MapTileTypeEnum.path)
+                    if ((map[point.X, point.Y].type.type == MapTileTypeEnum.land
+                        || map[point.X, point.Y].type.type == MapTileTypeEnum.path) &&
+                        !troops.Exists(t => t.position.X == point.X && t.position.Y == point.Y))
                     {
                         toReturn.Add(point);
                         break;
@@ -792,7 +820,7 @@ namespace StartGame
 
         public List<OverlayObject> overlayObjects = new List<OverlayObject>();
 
-        public Image DrawOverlay(int Width, int Height)
+        public Image DrawOverlay(int Width, int Height, bool keepAll = false)
         {
             Image image = new Bitmap(Width, Height);
             using (Graphics g = Graphics.FromImage(image))
@@ -812,7 +840,8 @@ namespace StartGame
                             new PointF(txt.x, txt.y));
                     }
                 }
-                overlayObjects = overlayObjects.Where(o => !o.once).ToList();
+                if (!keepAll)
+                    overlayObjects = overlayObjects.Where(o => !o.once).ToList();
             }
 
             return image;

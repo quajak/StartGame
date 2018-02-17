@@ -56,6 +56,8 @@
             this.weaponCreatorDamage = new System.Windows.Forms.NumericUpDown();
             this.panel1 = new System.Windows.Forms.Panel();
             this.Finish = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.attacksPerTurn = new System.Windows.Forms.NumericUpDown();
             this.playerStatsPanel.SuspendLayout();
             this.panel2.SuspendLayout();
             this.weaponCreatorPanel.SuspendLayout();
@@ -63,6 +65,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.weaponCreatorRange)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.weaponCreatorDamage)).BeginInit();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.attacksPerTurn)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -229,6 +232,8 @@
             // 
             // panel5
             // 
+            this.panel5.Controls.Add(this.label5);
+            this.panel5.Controls.Add(this.attacksPerTurn);
             this.panel5.Controls.Add(this.weaponcreatornamebox);
             this.panel5.Controls.Add(this.createWeaponName);
             this.panel5.Controls.Add(this.weaponCreatorType);
@@ -261,7 +266,7 @@
             // weaponCreatorType
             // 
             this.weaponCreatorType.FormattingEnabled = true;
-            this.weaponCreatorType.Location = new System.Drawing.Point(192, 88);
+            this.weaponCreatorType.Location = new System.Drawing.Point(192, 136);
             this.weaponCreatorType.Name = "weaponCreatorType";
             this.weaponCreatorType.Size = new System.Drawing.Size(120, 43);
             this.weaponCreatorType.TabIndex = 8;
@@ -269,7 +274,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 102);
+            this.label6.Location = new System.Drawing.Point(6, 136);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(31, 13);
             this.label6.TabIndex = 7;
@@ -337,6 +342,27 @@
             this.Finish.UseVisualStyleBackColor = true;
             this.Finish.Click += new System.EventHandler(this.Finish_Click);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 85);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(87, 13);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "Attacks Per Turn";
+            // 
+            // attacksPerTurn
+            // 
+            this.attacksPerTurn.Location = new System.Drawing.Point(192, 85);
+            this.attacksPerTurn.Name = "attacksPerTurn";
+            this.attacksPerTurn.Size = new System.Drawing.Size(120, 20);
+            this.attacksPerTurn.TabIndex = 11;
+            this.attacksPerTurn.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            // 
             // PlayerProfile
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -362,6 +388,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.weaponCreatorDamage)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.attacksPerTurn)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -396,5 +423,7 @@
         private System.Windows.Forms.Label weaponcreatornamebox;
         private System.Windows.Forms.TextBox createWeaponName;
         private System.Windows.Forms.Button Finish;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.NumericUpDown attacksPerTurn;
     }
 }

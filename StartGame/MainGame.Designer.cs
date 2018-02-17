@@ -31,6 +31,8 @@
             this.gameBoard = new System.Windows.Forms.PictureBox();
             this.troopList = new System.Windows.Forms.ListBox();
             this.enemyInfo = new System.Windows.Forms.Panel();
+            this.playerHeight = new System.Windows.Forms.Label();
+            this.playerWeaponAttacks = new System.Windows.Forms.Label();
             this.playerHealth = new System.Windows.Forms.Label();
             this.playerActionPoints = new System.Windows.Forms.Label();
             this.playerAttackType = new System.Windows.Forms.Label();
@@ -38,6 +40,8 @@
             this.playerAttackDamage = new System.Windows.Forms.Label();
             this.playerName = new System.Windows.Forms.Label();
             this.playerInfo = new System.Windows.Forms.Panel();
+            this.enemyHeight = new System.Windows.Forms.Label();
+            this.enemyPosition = new System.Windows.Forms.Label();
             this.enemyHealth = new System.Windows.Forms.Label();
             this.enemyAttackType = new System.Windows.Forms.Label();
             this.enemyAttackRange = new System.Windows.Forms.Label();
@@ -52,6 +56,9 @@
             this.playerPossibleWeaponDamage = new System.Windows.Forms.Label();
             this.playerPossibleWeaponType = new System.Windows.Forms.Label();
             this.changeWeapon = new System.Windows.Forms.Button();
+            this.playerPossibleWeaponAttacks = new System.Windows.Forms.Label();
+            this.showHeightDifference = new System.Windows.Forms.CheckBox();
+            this.dumpWeapon = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
@@ -78,6 +85,8 @@
             // 
             // enemyInfo
             // 
+            this.enemyInfo.Controls.Add(this.playerHeight);
+            this.enemyInfo.Controls.Add(this.playerWeaponAttacks);
             this.enemyInfo.Controls.Add(this.playerHealth);
             this.enemyInfo.Controls.Add(this.playerActionPoints);
             this.enemyInfo.Controls.Add(this.playerAttackType);
@@ -88,6 +97,24 @@
             this.enemyInfo.Name = "enemyInfo";
             this.enemyInfo.Size = new System.Drawing.Size(202, 212);
             this.enemyInfo.TabIndex = 3;
+            // 
+            // playerHeight
+            // 
+            this.playerHeight.AutoSize = true;
+            this.playerHeight.Location = new System.Drawing.Point(3, 95);
+            this.playerHeight.Name = "playerHeight";
+            this.playerHeight.Size = new System.Drawing.Size(66, 13);
+            this.playerHeight.TabIndex = 10;
+            this.playerHeight.Text = "playerHeight";
+            // 
+            // playerWeaponAttacks
+            // 
+            this.playerWeaponAttacks.AutoSize = true;
+            this.playerWeaponAttacks.Location = new System.Drawing.Point(4, 82);
+            this.playerWeaponAttacks.Name = "playerWeaponAttacks";
+            this.playerWeaponAttacks.Size = new System.Drawing.Size(112, 13);
+            this.playerWeaponAttacks.TabIndex = 9;
+            this.playerWeaponAttacks.Text = "playerWeaponAttacks";
             // 
             // playerHealth
             // 
@@ -145,6 +172,8 @@
             // 
             // playerInfo
             // 
+            this.playerInfo.Controls.Add(this.enemyHeight);
+            this.playerInfo.Controls.Add(this.enemyPosition);
             this.playerInfo.Controls.Add(this.enemyHealth);
             this.playerInfo.Controls.Add(this.enemyAttackType);
             this.playerInfo.Controls.Add(this.enemyAttackRange);
@@ -154,6 +183,24 @@
             this.playerInfo.Name = "playerInfo";
             this.playerInfo.Size = new System.Drawing.Size(178, 182);
             this.playerInfo.TabIndex = 6;
+            // 
+            // enemyHeight
+            // 
+            this.enemyHeight.AutoSize = true;
+            this.enemyHeight.Location = new System.Drawing.Point(3, 79);
+            this.enemyHeight.Name = "enemyHeight";
+            this.enemyHeight.Size = new System.Drawing.Size(69, 13);
+            this.enemyHeight.TabIndex = 12;
+            this.enemyHeight.Text = "enemyHeight";
+            // 
+            // enemyPosition
+            // 
+            this.enemyPosition.AutoSize = true;
+            this.enemyPosition.Location = new System.Drawing.Point(3, 66);
+            this.enemyPosition.Name = "enemyPosition";
+            this.enemyPosition.Size = new System.Drawing.Size(75, 13);
+            this.enemyPosition.TabIndex = 11;
+            this.enemyPosition.Text = "enemyPosition";
             // 
             // enemyHealth
             // 
@@ -281,11 +328,44 @@
             this.changeWeapon.UseVisualStyleBackColor = true;
             this.changeWeapon.Click += new System.EventHandler(this.ChangeWeapon_Click);
             // 
+            // playerPossibleWeaponAttacks
+            // 
+            this.playerPossibleWeaponAttacks.AutoSize = true;
+            this.playerPossibleWeaponAttacks.Location = new System.Drawing.Point(825, 389);
+            this.playerPossibleWeaponAttacks.Name = "playerPossibleWeaponAttacks";
+            this.playerPossibleWeaponAttacks.Size = new System.Drawing.Size(69, 13);
+            this.playerPossibleWeaponAttacks.TabIndex = 16;
+            this.playerPossibleWeaponAttacks.Text = "weaponType";
+            // 
+            // showHeightDifference
+            // 
+            this.showHeightDifference.AutoSize = true;
+            this.showHeightDifference.Location = new System.Drawing.Point(640, 598);
+            this.showHeightDifference.Name = "showHeightDifference";
+            this.showHeightDifference.Size = new System.Drawing.Size(135, 17);
+            this.showHeightDifference.TabIndex = 17;
+            this.showHeightDifference.Text = "Show height difference";
+            this.showHeightDifference.UseVisualStyleBackColor = true;
+            this.showHeightDifference.CheckedChanged += new System.EventHandler(this.ShowHeightDifference_CheckedChanged);
+            // 
+            // dumpWeapon
+            // 
+            this.dumpWeapon.Location = new System.Drawing.Point(951, 383);
+            this.dumpWeapon.Name = "dumpWeapon";
+            this.dumpWeapon.Size = new System.Drawing.Size(75, 31);
+            this.dumpWeapon.TabIndex = 18;
+            this.dumpWeapon.Text = "Dump";
+            this.dumpWeapon.UseVisualStyleBackColor = true;
+            this.dumpWeapon.Click += new System.EventHandler(this.DumpWeapon_Click);
+            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 639);
+            this.Controls.Add(this.dumpWeapon);
+            this.Controls.Add(this.showHeightDifference);
+            this.Controls.Add(this.playerPossibleWeaponAttacks);
             this.Controls.Add(this.changeWeapon);
             this.Controls.Add(this.playerPossibleWeaponType);
             this.Controls.Add(this.playerPossibleWeaponDamage);
@@ -301,6 +381,7 @@
             this.Controls.Add(this.gameBoard);
             this.Name = "MainGameWindow";
             this.Text = "Start Game";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainGameWindow_FormClosing);
             this.Load += new System.EventHandler(this.MainGameWindow_Load);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainGameWindow_MouseMove);
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).EndInit();
@@ -338,6 +419,13 @@
         private System.Windows.Forms.Label playerActionPoints;
         private System.Windows.Forms.Label playerHealth;
         private System.Windows.Forms.Label enemyHealth;
+        private System.Windows.Forms.Label playerWeaponAttacks;
+        private System.Windows.Forms.Label playerPossibleWeaponAttacks;
+        private System.Windows.Forms.Label enemyPosition;
+        private System.Windows.Forms.Label playerHeight;
+        private System.Windows.Forms.Label enemyHeight;
+        private System.Windows.Forms.CheckBox showHeightDifference;
+        private System.Windows.Forms.Button dumpWeapon;
     }
 }
 

@@ -32,7 +32,7 @@ namespace StartGame
 
         private void Recalulate()
         {
-            map.SetupMap(0.1, seed, ((double)heightDifference.Value - 4) / 20, 1);
+            map.SetupMap(0.1, seed, ((double)heightDifference.Value - 4) / 20);
             UpdateMap();
             mapType.Text = map.Stats();
         }
