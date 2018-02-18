@@ -18,7 +18,7 @@ namespace StartGame
         private int flatTile = 0;
         private int waterTile = 0;
 
-        private List<MapTile> goals;
+        public List<MapTile> goals;
 
         public MapTile[,] map;
 

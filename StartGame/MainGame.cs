@@ -17,10 +17,14 @@ namespace StartGame
 
         private Point selected;
 
-        private List<Player> players;
+        public List<Player> players;
         private Player activePlayer;
-        private Player humanPlayer;
+        public Player humanPlayer;
         private int activePlayerCounter = 0;
+
+        private List<WinCheck> winConditions;
+        private List<WinCheck> deathConditions;
+        private bool useWinChecks = false;
 
         public bool dead = false;
 
@@ -174,18 +178,95 @@ namespace StartGame
             dumpWeapon.Enabled = false;
         }
 
+        public MainGameWindow(Map Map, Player player, Mission mission, Campaign Campaign = null)
+        {
+            map = Map;
+            if (map.map is null)
+                throw new Exception("Map of maptiles can not be undefined when starting the game. Please initialise before calling this function");
+
+            campaign = Campaign;
+
+            selected = new Point(-1, 0);
+            random = new Random();
+
+            //Setup mission
+            (players, winConditions, deathConditions) = mission.GenerateMission(campaign, map, player);
+            useWinChecks = true;
+
+            //Setup game
+            humanPlayer = player;
+            activePlayer = players[0];
+
+            players.ForEach(p => map.troops.Add(p.troop));
+            InitializeComponent();
+
+            //Start work to update information in GUI
+            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
+            //Add players to list
+            UpdatePlayerList();
+
+            //Initialise information about player
+            ShowPlayerStats();
+            //Initialise information about player weapons
+            int c = 0;
+            foreach (var weapon in humanPlayer.troop.weapons)
+            {
+                playerWeaponList.Items.Add(weapon.name);
+                if (weapon == humanPlayer.troop.activeWeapon) playerWeaponList.SelectedIndex = c;
+                c++;
+            }
+            //As it is first turn - set action button to start the game
+            nextAction.Text = "Start game!";
+            changeWeapon.Enabled = false;
+
+            ShowPositionStats();
+            dumpWeapon.Enabled = false;
+        }
+
+        public bool DoChecks()
+        {
+            if (useWinChecks)
+            {
+                bool won = false;
+                foreach (var check in winConditions)
+                {
+                    won = check.Invoke(map, this);
+                    if (won)
+                    {
+                        PlayerWins();
+                        return true;
+                    }
+                }
+                bool lost = false;
+                foreach (var check in deathConditions)
+                {
+                    lost = check.Invoke(map, this);
+                    if (lost)
+                    {
+                        dead = true;
+                        Close();
+                    }
+                }
+            }
+            else
+            {
+                if (dead)
+                {
+                    Close();
+                }
+                if (players.Count == 1 && players.Exists(t => t == humanPlayer))
+                {
+                    //Won
+                    PlayerWins("You have defeated all the enemies!");
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public void NextTurn()
         {
-            if (dead)
-            {
-                Close();
-            }
-            if (players.Count == 1 && players.Exists(t => t == humanPlayer))
-            {
-                //Won
-                PlayerWins("You have defeated all the enemies!");
-                return;
-            }
+            if (DoChecks()) return;
             canMoveTo.Clear();
             activePlayer.active = false;
             activePlayer = players[activePlayerCounter];
@@ -194,11 +275,8 @@ namespace StartGame
             int activeIndex = players.FindIndex(p => p.Name == activePlayer.Name);
             activePlayerCounter = activeIndex == players.Count - 1 ?
                 0 : activeIndex + 1;
-            if (dead)
-            {
-                nextAction.Enabled = false;
-                return;
-            }
+
+            if (DoChecks()) return;
 
             UpdateOverlay();
             ShowPlayerStats();

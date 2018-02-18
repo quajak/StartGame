@@ -18,6 +18,7 @@ namespace StartGame
         public MainGameWindow activeGame;
         private Random random = new Random();
         public int difficulty;
+        public int Round { get { return playedGames.Count + 1; } }
 
         public readonly int healthRegen;
 
@@ -53,37 +54,10 @@ namespace StartGame
 
             player.map = map;
 
-            //Level stats
-            int PlayerNumber = 1;
-
-            //Generate enemies
-            List<Player> enemies = new List<Player>();
-            short botNumber = Convert.ToInt16(Resources.BOTAmount);
-            List<string> botNames = new List<string>();
-            for (int i = 0; i < botNumber; i++)
-            {
-                botNames.Add(Resources.ResourceManager.GetString("BOTName" + i));
-            }
-
-            List<Point> spawnPoints = map.DeterminSpawnPoint(PlayerNumber,
-                SpawnType.randomLand);
-
-            for (int i = 0; i < PlayerNumber; i++)
-            {
-                string name = botNames[random.Next(botNames.Count)];
-                botNames.Remove(name);
-                enemies.Add(new Player(PlayerType.computer, name, map, new Player[] { player })
-                {
-                    troop = new Troop(name, 10,
-                    new Weapon(4,
-                        AttackType.melee, 1, "Fists", 1, true),
-                    Resources.enemyScout, 0)
-                });
-                enemies[i].troop.position = spawnPoints[i];
-            }
+            Mission mission = new BanditMission();
 
             //Finish initialisation
-            activeGame = new MainGameWindow(map, player, enemies, this);
+            activeGame = new MainGameWindow(map, player, mission, this);
         }
 
         /// <summary>
@@ -107,8 +81,7 @@ namespace StartGame
             } while (!mapCreator.Join(Map.creationTime));
 
             //Level stats
-            int round = playedGames.Count + 1;
-            int PlayerNumber = round + map.width / 10;
+            int PlayerNumber = Round + map.width / 10;
 
             //Generate enemies
             List<Player> enemies = new List<Player>();
@@ -128,8 +101,8 @@ namespace StartGame
                 botNames.Remove(name);
                 enemies.Add(new Player(PlayerType.computer, name, map, new Player[] { player })
                 {
-                    troop = new Troop(name, 10 + (difficulty / 2) + (int)(round * 1.5) - 4,
-                    new Weapon(4 + difficulty / 4 + round - 1,
+                    troop = new Troop(name, 10 + (difficulty / 2) + (int)(Round * 1.5) - 4,
+                    new Weapon(4 + difficulty / 4 + Round - 1,
                         AttackType.melee, 1, "Fists", 1, false),
                     Resources.enemyScout, 0)
                 });
@@ -167,4 +140,6 @@ namespace StartGame
             return playedGames.Count + 1 == numberOfGames;
         }
     }
+
+    internal delegate bool WinCheck(Map map, MainGameWindow main);
 }

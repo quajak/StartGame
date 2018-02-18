@@ -99,6 +99,7 @@
       <DependentUpon>MapCreator.cs</DependentUpon>
     </Compile>
     <Compile Include="MapParts.cs" />
+    <Compile Include="Mission.cs" />
     <Compile Include="PerlinNoise.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
