@@ -54,7 +54,7 @@ namespace StartGame
                     return;
                 }
                 //Level up
-                LevelUp levelUp = new LevelUp(player, 3);
+                LevelUp levelUp = new LevelUp(player, 3 + campaign.difficulty / 5);
                 levelUp.ShowDialog();
 
                 //Reset troop stats

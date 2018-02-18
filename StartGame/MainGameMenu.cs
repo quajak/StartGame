@@ -2,6 +2,7 @@
 using System;
 using System.Windows.Forms;
 using PlayerCreator;
+using System.Threading;
 
 namespace StartGame
 {
@@ -37,7 +38,15 @@ namespace StartGame
                     //Start game with random map
                     Random rnd = new Random();
                     map = new Map(10, 10); //TODO set global constant for the size
-                    map.SetupMap(0.1, rnd.NextDouble() * 100, ((double)rnd.Next(8) - 4) / 20);
+                    Thread mapThread;
+                    do
+                    {
+                        mapThread = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, rnd.NextDouble() * 100, 0)))
+                        {
+                            Priority = ThreadPriority.Highest
+                        };
+                        mapThread.Start();
+                    } while (!mapThread.Join(TimeSpan.FromSeconds(Map.creationTime)));
                 }
                 else
                 {

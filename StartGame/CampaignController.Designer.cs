@@ -105,7 +105,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.label3.Location = new System.Drawing.Point(13, 113);
+            this.label3.Location = new System.Drawing.Point(242, 113);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(30, 13);
             this.label3.TabIndex = 5;
@@ -125,13 +125,13 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.label5.Location = new System.Drawing.Point(242, 113);
+            this.label5.Location = new System.Drawing.Point(13, 113);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(30, 13);
             this.label5.TabIndex = 7;
             this.label5.Text = "Easy";
             // 
-            // CampaignCreator
+            // CampaignController
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -144,7 +144,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.missionNumber);
-            this.Name = "CampaignCreator";
+            this.Name = "CampaignController";
             this.Text = "CampaignCreator";
             this.Load += new System.EventHandler(this.CampaignCreator_Load);
             ((System.ComponentModel.ISupportInitialize)(this.missionNumber)).EndInit();

@@ -22,6 +22,8 @@ namespace PlayerCreator
             name.Text = $"{weapon.name}";
             range.Text = $"Range: {weapon.range}";
             type.Text = $"Type: {weapon.type}";
+            discardeable.Text = $"{(weapon.discardeable ? "Can" : "Can not")} be discarded!";
+            attackCost.Text = $"{weapon.attackCost} Action {(weapon.attackCost > 1 ? "Points" : "Point")}";
             if (!isQuestion)
             {
                 cancel.Visible = false;

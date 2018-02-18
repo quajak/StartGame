@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -32,7 +33,13 @@ namespace StartGame
 
         private void Recalulate()
         {
-            map.SetupMap(0.1, seed, ((double)heightDifference.Value - 4) / 20);
+            Thread thread;
+            do
+            {
+                thread = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, seed, (heightDifference.Value - 4) / 20)));
+                thread.Start();
+            } while (!thread.Join(Map.creationTime));
+
             UpdateMap();
             mapType.Text = map.Stats();
         }

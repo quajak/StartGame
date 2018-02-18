@@ -28,14 +28,16 @@ namespace PlayerCreator
             player = Player;
             playerName.Text = player.Name;
             points = Points;
+
+            Render();
         }
 
         private void Render()
         {
-            playerStrength.Text = $"Strength: {player.strength} ({StrengthUp})";
-            playerAgiltiy.Text = $"Agility: {player.agility} ({AgilityUp})";
-            playerEndurance.Text = $"Endurance: {player.endurance} ({EnduranceUp})";
-            playerVitality.Text = $"Vitality: {player.vitality} ({VitatlityUp})";
+            playerStrength.Text = $"Strength: {player.strength} ({StrengthUp + player.strength})";
+            playerAgiltiy.Text = $"Agility: {player.agility} ({AgilityUp + player.agility})";
+            playerEndurance.Text = $"Endurance: {player.endurance} ({EnduranceUp + player.endurance})";
+            playerVitality.Text = $"Vitality: {player.vitality} ({VitatlityUp + player.vitality})";
 
             strengthUp.Enabled = points != 0;
             agilityUp.Enabled = points != 0;

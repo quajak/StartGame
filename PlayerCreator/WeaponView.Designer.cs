@@ -35,6 +35,8 @@
             this.type = new System.Windows.Forms.Label();
             this.cancel = new System.Windows.Forms.Button();
             this.ok = new System.Windows.Forms.Button();
+            this.discardeable = new System.Windows.Forms.Label();
+            this.attackCost = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // name
@@ -84,7 +86,7 @@
             // 
             // cancel
             // 
-            this.cancel.Location = new System.Drawing.Point(197, 226);
+            this.cancel.Location = new System.Drawing.Point(205, 277);
             this.cancel.Name = "cancel";
             this.cancel.Size = new System.Drawing.Size(75, 23);
             this.cancel.TabIndex = 5;
@@ -94,7 +96,7 @@
             // 
             // ok
             // 
-            this.ok.Location = new System.Drawing.Point(116, 226);
+            this.ok.Location = new System.Drawing.Point(124, 277);
             this.ok.Name = "ok";
             this.ok.Size = new System.Drawing.Size(75, 23);
             this.ok.TabIndex = 6;
@@ -102,11 +104,31 @@
             this.ok.UseVisualStyleBackColor = true;
             this.ok.Click += new System.EventHandler(this.Ok_Click);
             // 
+            // discardeable
+            // 
+            this.discardeable.AutoSize = true;
+            this.discardeable.Location = new System.Drawing.Point(13, 277);
+            this.discardeable.Name = "discardeable";
+            this.discardeable.Size = new System.Drawing.Size(67, 13);
+            this.discardeable.TabIndex = 7;
+            this.discardeable.Text = "discardeable";
+            // 
+            // attackCost
+            // 
+            this.attackCost.AutoSize = true;
+            this.attackCost.Location = new System.Drawing.Point(12, 222);
+            this.attackCost.Name = "attackCost";
+            this.attackCost.Size = new System.Drawing.Size(58, 13);
+            this.attackCost.TabIndex = 8;
+            this.attackCost.Text = "attackCost";
+            // 
             // WeaponView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(284, 312);
+            this.Controls.Add(this.attackCost);
+            this.Controls.Add(this.discardeable);
             this.Controls.Add(this.ok);
             this.Controls.Add(this.cancel);
             this.Controls.Add(this.type);
@@ -131,5 +153,7 @@
         private System.Windows.Forms.Label type;
         private System.Windows.Forms.Button cancel;
         private System.Windows.Forms.Button ok;
+        private System.Windows.Forms.Label discardeable;
+        private System.Windows.Forms.Label attackCost;
     }
 }

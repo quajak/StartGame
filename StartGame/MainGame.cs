@@ -129,7 +129,8 @@ namespace StartGame
             map.troops.Add(humanPlayer.troop);
 
             //Get position for player troops
-            List<Point> startPos = map.DeterminSpawnPoint(0, SpawnType.road);
+            List<Point> startPos = map.DeterminSpawnPoint(1, SpawnType.road);
+            if (startPos.Count == 0) startPos = map.DeterminSpawnPoint(1, SpawnType.randomLand);
             players[0].troop.position = startPos[0];
 
             //Generate AI
@@ -214,6 +215,7 @@ namespace StartGame
                 changeWeapon.Enabled = false;
                 dumpWeapon.Enabled = false;
             }
+            nextAction.Focus();
         }
 
         #region GUI Updates

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StartGame
@@ -16,7 +17,7 @@ namespace StartGame
         private int numberOfGames;
         public MainGameWindow activeGame;
         private Random random = new Random();
-        private int difficulty;
+        public int difficulty;
 
         public readonly int healthRegen;
 
@@ -27,6 +28,11 @@ namespace StartGame
             numberOfGames = gameNumber;
             difficulty = Difficulty;
             healthRegen = 10 - Difficulty;
+            if (Difficulty < 6)
+            {
+                player.vitality += 6 - Difficulty;
+                player.CalculateStats();
+            }
         }
 
         /// <summary>
@@ -35,7 +41,16 @@ namespace StartGame
         public void Start()
         {
             Map map = new Map(10, 10);
-            map.SetupMap(0.1, random.Next(), 0);
+            Thread mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), 0)));
+            mapCreator.Start();
+            mapCreator.Priority = ThreadPriority.Highest;
+            while (!mapCreator.Join(Map.creationTime))
+            {
+                mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), 0)));
+                mapCreator.Start();
+                mapCreator.Priority = ThreadPriority.Highest;
+            }
+
             player.map = map;
 
             //Level stats
@@ -81,11 +96,19 @@ namespace StartGame
             playedGames.Add(activeGame);
 
             Map map = new Map(10, 10);
-            map.SetupMap(0.1, random.Next(), 0);
+            Thread mapCreator;
+            do
+            {
+                mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), 0)))
+                {
+                    Priority = ThreadPriority.Highest
+                };
+                mapCreator.Start();
+            } while (!mapCreator.Join(Map.creationTime));
 
             //Level stats
             int round = playedGames.Count + 1;
-            int PlayerNumber = round;
+            int PlayerNumber = round + map.width / 10;
 
             //Generate enemies
             List<Player> enemies = new List<Player>();
@@ -105,8 +128,8 @@ namespace StartGame
                 botNames.Remove(name);
                 enemies.Add(new Player(PlayerType.computer, name, map, new Player[] { player })
                 {
-                    troop = new Troop(name, 10 + (difficulty / 2) + (int)(round * 1.5),
-                    new Weapon(4 + difficulty / 4 + round,
+                    troop = new Troop(name, 10 + (difficulty / 2) + (int)(round * 1.5) - 4,
+                    new Weapon(4 + difficulty / 4 + round - 1,
                         AttackType.melee, 1, "Fists", 1, false),
                     Resources.enemyScout, 0)
                 });
@@ -126,11 +149,22 @@ namespace StartGame
                 new Weapon(6, AttackType.melee, 2, "Stick", 2, true),
                 new Weapon(8, AttackType.melee, 1, "Large rock", 1, true),
                 new Weapon(4, AttackType.range, 5, "Rock", 1, true),
+                new Weapon(11, AttackType.melee, 1, "Dagger", 1, true),
                 new Weapon(9, AttackType.melee, 2, "Sword", 2, true),
-                new Weapon(8, AttackType.melee, 3, "Spear", 2, true)
+                new Weapon(8, AttackType.melee, 4, "Spear", 2, true),
+                new Weapon(12, AttackType.melee, 2, "Long sword", 2, true),
+                new Weapon(7, AttackType.melee, 1, "Short Sword", 4, true),
+                new Weapon(15, AttackType.magic, 7, "Firewand", 1, true, 2),
+                new Weapon(11, AttackType.range, 11, "Bow", 8, true, 2),
+                new Weapon(15, AttackType.range, 20, "Long bow", 5, true, 3)
             };
-            weapons.Sort((w1, w2) => (w1.attackDamage * w1.attacks) > (w2.attackDamage * w2.attacks) ? 1 : -1);
+            weapons.Sort((w1, w2) => (w1.attackDamage * w1.attacks * w1.range / 4) > (w2.attackDamage * w2.attacks * w2.range / 4) ? 1 : -1);
             return weapons[random.Next(weapons.Count / numberOfGames * playedGames.Count, weapons.Count / numberOfGames * (playedGames.Count + 1))];
+        }
+
+        public bool IsFinished()
+        {
+            return playedGames.Count + 1 == numberOfGames;
         }
     }
 }

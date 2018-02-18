@@ -8,8 +8,8 @@ namespace StartGame
 {
     internal class Map
     {
-        private int width;
-        private int height;
+        public readonly int width;
+        public readonly int height;
 
         private double pathLength;
 
@@ -28,10 +28,12 @@ namespace StartGame
 
         public List<Troop> troops = new List<Troop>();
 
+        public const int creationTime = 500;
+
         public Map(int Width, int Height)
         {
-            width = Width;
-            height = Height;
+            width = 31;
+            height = 31;
         }
 
         public string Stats()
@@ -60,8 +62,9 @@ namespace StartGame
         /// <param name="PerlinDiff">Determines the magnitude of the change between fields i.e. accuracy. Normally it has a value of 0.1</param>
         /// <param name="Seed">Determines the seed of the rng</param>
         /// <param name="HeightBias">Increases all values by this amount</param>
-        public void SetupMap(double PerlinDiff, double Seed, double HeightBias)
+        public void SetupMap(Tuple<double, double, double> data)
         {
+            (double PerlinDiff, double Seed, double HeightBias) = data;
             //Reset lists
             goals = new List<MapTile>();
             continents = new List<Continent>();
@@ -141,8 +144,10 @@ namespace StartGame
 
             if (maxContinent.edges is null)
             {
-                SetupMap(PerlinDiff, Seed, HeightBias);
-                return;
+                while (true)
+                {
+                    //Wait for thread to end
+                };
             }
             //TODO: For edges in continents find all the different zones, not only side
             //TODO: Create a road between each of the zones
@@ -200,7 +205,10 @@ namespace StartGame
                 else break;
             }
             //Skip code to create path when there are to few goals
-            if (goals.Count <= 1) return;
+            if (goals.Count <= 1) while (true)
+                {
+                    //Wait for thread to end
+                };
             for (int x = 0; x <= map.GetUpperBound(0); x++)
             {
                 for (int y = 0; y <= map.GetUpperBound(1); y++)
@@ -268,6 +276,7 @@ namespace StartGame
 
             //Clean up path
             //CleanPath();
+            return;
         }
 
         private void FindPath(List<MapTile> toDraw, ref MapTile[,] map, ref double pathLength, MapTile[] goals)
@@ -759,13 +768,20 @@ namespace StartGame
                         break;
                     }
                     //Determin which road spawn point to start
-                    MapTile pathPoint = goals[generic.Next(goals.Count)];
-                    while (playerNumber >= 0)
+                    List<MapTile> _goals = new List<MapTile>(goals);
+                    while (_goals.Count != 0 && playerNumber != 0)
                     {
+                        MapTile pathPoint = _goals[generic.Next(_goals.Count)];
+                        _goals.Remove(pathPoint);
                         toReturn.Add(pathPoint.position);
-                        //Find next path point
                         playerNumber--;
-                        if (playerNumber != 0) pathPoint = pathPoint.neighbours.rawMaptiles.Where(m => m.type.type == MapTileTypeEnum.path).First();
+                        if (playerNumber == 0) break;
+                        foreach (MapTile possible in pathPoint.neighbours.rawMaptiles.Where(m => m.type.type == MapTileTypeEnum.path))
+                        {
+                            toReturn.Add(possible.position);
+                            playerNumber--;
+                            if (playerNumber == 0) break;
+                        }
                     }
                     break;
 
