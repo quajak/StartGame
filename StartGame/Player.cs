@@ -62,6 +62,8 @@ namespace StartGame
 
         public MainGameWindow main;
 
+        public List<Tree> trees = new List<Tree>();
+
         public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window) : base(Type, Name, Map, Enemies, 0)
         {
             main = window;

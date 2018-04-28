@@ -31,6 +31,7 @@
             this.gameBoard = new System.Windows.Forms.PictureBox();
             this.troopList = new System.Windows.Forms.ListBox();
             this.enemyInfo = new System.Windows.Forms.Panel();
+            this.playerXP = new System.Windows.Forms.Label();
             this.playerLevel = new System.Windows.Forms.Label();
             this.playerVitatlity = new System.Windows.Forms.Label();
             this.playerEndurance = new System.Windows.Forms.Label();
@@ -71,11 +72,16 @@
             this.fieldPosition = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.levelUpButton = new System.Windows.Forms.Button();
-            this.playerXP = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.treeInformation = new System.Windows.Forms.Label();
+            this.treeName = new System.Windows.Forms.Label();
+            this.treeList = new System.Windows.Forms.ListBox();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // gameBoard
@@ -118,6 +124,15 @@
             this.enemyInfo.Name = "enemyInfo";
             this.enemyInfo.Size = new System.Drawing.Size(202, 212);
             this.enemyInfo.TabIndex = 3;
+            // 
+            // playerXP
+            // 
+            this.playerXP.AutoSize = true;
+            this.playerXP.Location = new System.Drawing.Point(7, 188);
+            this.playerXP.Name = "playerXP";
+            this.playerXP.Size = new System.Drawing.Size(49, 13);
+            this.playerXP.TabIndex = 21;
+            this.playerXP.Text = "playerXP";
             // 
             // playerLevel
             // 
@@ -484,7 +499,7 @@
             // 
             // levelUpButton
             // 
-            this.levelUpButton.Location = new System.Drawing.Point(1059, 598);
+            this.levelUpButton.Location = new System.Drawing.Point(1059, 599);
             this.levelUpButton.Name = "levelUpButton";
             this.levelUpButton.Size = new System.Drawing.Size(77, 28);
             this.levelUpButton.TabIndex = 20;
@@ -492,20 +507,62 @@
             this.levelUpButton.UseVisualStyleBackColor = true;
             this.levelUpButton.Click += new System.EventHandler(this.LevelUpButton_Click);
             // 
-            // playerXP
+            // panel2
             // 
-            this.playerXP.AutoSize = true;
-            this.playerXP.Location = new System.Drawing.Point(7, 188);
-            this.playerXP.Name = "playerXP";
-            this.playerXP.Size = new System.Drawing.Size(49, 13);
-            this.playerXP.TabIndex = 21;
-            this.playerXP.Text = "playerXP";
+            this.panel2.Controls.Add(this.treeInformation);
+            this.panel2.Controls.Add(this.treeName);
+            this.panel2.Controls.Add(this.treeList);
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Location = new System.Drawing.Point(824, 418);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(201, 209);
+            this.panel2.TabIndex = 21;
+            // 
+            // treeInformation
+            // 
+            this.treeInformation.AutoSize = true;
+            this.treeInformation.Location = new System.Drawing.Point(7, 114);
+            this.treeInformation.MaximumSize = new System.Drawing.Size(180, 100);
+            this.treeInformation.Name = "treeInformation";
+            this.treeInformation.Size = new System.Drawing.Size(77, 13);
+            this.treeInformation.TabIndex = 3;
+            this.treeInformation.Text = "treeInformation";
+            // 
+            // treeName
+            // 
+            this.treeName.AutoSize = true;
+            this.treeName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.treeName.Location = new System.Drawing.Point(10, 97);
+            this.treeName.Name = "treeName";
+            this.treeName.Size = new System.Drawing.Size(61, 13);
+            this.treeName.TabIndex = 2;
+            this.treeName.Text = "treeName";
+            // 
+            // treeList
+            // 
+            this.treeList.FormattingEnabled = true;
+            this.treeList.Location = new System.Drawing.Point(7, 34);
+            this.treeList.Name = "treeList";
+            this.treeList.Size = new System.Drawing.Size(183, 56);
+            this.treeList.TabIndex = 1;
+            this.treeList.SelectedIndexChanged += new System.EventHandler(this.TreeList_SelectedIndexChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(10, 10);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(117, 20);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Skills and Titles";
             // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 639);
+            this.Controls.Add(this.panel2);
             this.Controls.Add(this.levelUpButton);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.dumpWeapon);
@@ -537,6 +594,8 @@
             this.playerInfo.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -587,6 +646,11 @@
         private System.Windows.Forms.Button levelUpButton;
         private System.Windows.Forms.Label playerLevel;
         private System.Windows.Forms.Label playerXP;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label treeInformation;
+        private System.Windows.Forms.Label treeName;
+        private System.Windows.Forms.ListBox treeList;
+        private System.Windows.Forms.Label label2;
     }
 }
 

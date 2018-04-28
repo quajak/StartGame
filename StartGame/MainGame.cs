@@ -37,6 +37,9 @@ namespace StartGame
         public int playerDamage;
         public int playerDoged;
 
+        private Sprinter Sprinter;
+        private SpiderKiller SpiderKiller;
+
         public MainGameWindow(Map Map, HumanPlayer player, Mission mission, Campaign Campaign = null)
         {
             player.main = this;
@@ -87,6 +90,18 @@ namespace StartGame
                 if (weapon == humanPlayer.troop.activeWeapon) playerWeaponList.SelectedIndex = c;
                 c++;
             }
+
+            //Initialise trees
+            Sprinter = new Sprinter(this);
+            SpiderKiller = new SpiderKiller(this);
+
+            //Initialise info about player trees
+            UpdateTreeView();
+
+            //Initialse functions
+            PlayerAttack.Add(CalculateDamage);
+            CalculateCost.Add((t, d, cost) => t.Cost);
+
             //As it is first turn - set action button to start the game
             nextAction.Text = "Start game!";
             changeWeapon.Enabled = false;
@@ -96,6 +111,34 @@ namespace StartGame
 
             levelUpButton.Enabled = false;
         }
+
+        #region Game Logic
+
+        #region Game Event Handler
+
+        public class PlayerMovementData : EventArgs
+        {
+            public MapTile start;
+            public MapTile goal;
+            public int distance;
+        }
+
+        public event EventHandler<PlayerMovementData> PlayerMoved = delegate { };
+
+        public class CombatData : EventArgs
+        {
+            public Player attacked;
+            public Player attacker;
+            public Weapon weapon;
+            public int damage;
+            public bool doged;
+            public bool killed;
+            public int range;
+        }
+
+        public event EventHandler<CombatData> Combat = delegate { };
+
+        #endregion Game Event Handler
 
         #region Game Loop
 
@@ -223,7 +266,47 @@ namespace StartGame
 
         #endregion Game Loop
 
+        #endregion Game Logic
+
         #region GUI Updates
+
+        public void UpdateTreeView()
+        {
+            List<string> playerTreeNames = humanPlayer.trees.ConvertAll(t => t.name);
+            List<string> diff = treeList.Items.Cast<string>().Except(playerTreeNames).ToList();
+            foreach (string dif in diff)
+            {
+                treeList.Items.Remove(dif);
+            }
+
+            diff = playerTreeNames.Except(treeList.Items.Cast<string>()).ToList();
+            foreach (string dif in diff)
+            {
+                treeList.Items.Add(dif);
+            }
+
+            UpdateSelectedTreeInformation();
+        }
+
+        public void TreeGained(Tree tree)
+        {
+            MessageBox.Show($"You have gained the {tree.GetType().BaseType.Name} {tree.name}! \n {tree.description} \n Unlocked by: {tree.reason}", "Tree gained!");
+        }
+
+        private void UpdateSelectedTreeInformation()
+        {
+            int selected = treeList.SelectedIndex;
+            if (selected == -1)
+            {
+                treeName.Text = "";
+                treeInformation.Text = "";
+            }
+            else
+            {
+                treeName.Text = humanPlayer.trees[selected].name;
+                treeInformation.Text = humanPlayer.trees[selected].description + " \n " + "Found by " + humanPlayer.trees[selected].reason;
+            }
+        }
 
         public void SetUpdateState(bool active)
         {
@@ -399,6 +482,11 @@ namespace StartGame
             }
         }
 
+        private void TreeList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateSelectedTreeInformation();
+        }
+
         private void ShowHeightDifference_CheckedChanged(object sender, EventArgs e)
         {
             if (showHeightDifference.Checked)
@@ -524,24 +612,26 @@ namespace StartGame
                 }
                 canAttack.Clear();
 
-                //try to move player
+                //move player
                 if (canMoveTo.Count != 0)
                 {
-                    try
+                    MapTile start = map.map[humanPlayer.troop.position.X, humanPlayer.troop.position.Y];
+                    if (canMoveTo.Exists(f => f.position.X == X && Y == f.position.Y))
                     {
                         MapTile moveTo = canMoveTo.Find(f => f.position.X == X
                             && Y == f.position.Y);
                         humanPlayer.actionPoints = moveTo.leftValue;
                         humanPlayer.troop.position.X = moveTo.position.X;
                         humanPlayer.troop.position.Y = moveTo.position.Y;
+
+                        MapTile end = map.map[humanPlayer.troop.position.X, humanPlayer.troop.position.Y];
+                        PlayerMoved(this, new PlayerMovementData() { start = start, distance = AIUtility.Distance(start.position, end.position), goal = end });
+
                         map.DrawTroops();
                         UpdateOverlay();
                         canMoveTo.Clear();
                         ShowPlayerStats();
                         return;
-                    }
-                    catch (Exception)
-                    {
                     }
                 }
                 canMoveTo.Clear();
@@ -573,7 +663,15 @@ namespace StartGame
 
                             List<MapTile> sorroundingTiles = new SorroundingTiles(checking.position, map).rawMaptiles.ToList();
                             sorroundingTiles = sorroundingTiles.Where(t => t.leftValue == -1 || t.leftValue < checking.leftValue - t.MovementCost).ToList();
-                            sorroundingTiles.ForEach(t => t.leftValue = checking.leftValue - t.MovementCost);
+                            sorroundingTiles.ForEach(t =>
+                            {
+                                double cost = 0;
+                                foreach (var func in CalculateCost)
+                                {
+                                    cost = func(t, AIUtility.Distance(t.position, humanPlayer.troop.position), cost);
+                                }
+                                t.leftValue = checking.leftValue - cost;
+                            });
                             toCheck.AddRange(sorroundingTiles);
                         }
                     }
@@ -593,7 +691,7 @@ namespace StartGame
                         {
                             if (troop.position != center)
                             {
-                                int distance = Math.Abs(troop.position.X - center.X) + Math.Abs(troop.position.Y - center.Y);
+                                int distance = AIUtility.Distance(troop.position, center);
                                 if (distance <= humanPlayer.troop.activeWeapon.range)
                                 {
                                     map.overlayObjects.Add(new OverlayRectangle(troop.position.X * fieldSize,
@@ -610,6 +708,13 @@ namespace StartGame
                 }
             }
         }
+
+        /// <summary>
+        /// Function list used to calculate cost to move to certain field.
+        /// Input: Maptile, Distance moved, Cost of movement
+        /// Ouput: Cost
+        /// </summary>
+        public List<Func<MapTile, int, double, double>> CalculateCost = new List<Func<MapTile, int, double, double>>();
 
         #endregion Player Game Board Interaction
 
@@ -652,6 +757,11 @@ namespace StartGame
             Close();
         }
 
+        public int CalculateDamage(CombatData data)
+        {
+            return CalculateDamage(data.attacker.troop.position, data.attacker, data.attacked, data.weapon);
+        }
+
         public int CalculateDamage(Player attacking, Player defending, Weapon weapon)
         {
             return CalculateDamage(attacking.troop.position, attacking, defending, weapon);
@@ -678,6 +788,11 @@ namespace StartGame
         }
 
         /// <summary>
+        /// List of all functions used to calculate player damage
+        /// </summary>
+        public List<Func<CombatData, int>> PlayerAttack = new List<Func<CombatData, int>>();
+
+        /// <summary>
         /// Function which handles attacks of different players
         /// </summary>
         /// <param name="attacking">Attacking player</param>
@@ -689,7 +804,31 @@ namespace StartGame
             if (humanPlayer is null) return (0, true, true);
 
             bool killed = false;
-            int damage = CalculateDamage(attacking, attacked, attacking.troop.activeWeapon);
+
+            int damage = 0;
+            if (attacking.Name == humanPlayer.Name)
+            {
+                CombatData combatData = new CombatData()
+                {
+                    attacked = attacked,
+                    attacker = attacking,
+                    damage = 0,
+                    doged = false,
+                    killed = false,
+                    range = AIUtility.Distance(attacked.troop.position, attacking.troop.position),
+                    weapon = attacked.troop.activeWeapon
+                };
+
+                foreach (var func in PlayerAttack)
+                {
+                    combatData.damage = func(combatData);
+                }
+                damage = combatData.damage;
+            }
+            else
+            {
+                damage = CalculateDamage(attacking, attacked, attacking.troop.activeWeapon);
+            }
 
             attacking.troop.activeWeapon.attacks--;
             attacking.actionPoints -= attacking.troop.activeWeapon.attackCost;
@@ -700,6 +839,7 @@ namespace StartGame
                 if (show)
                     map.overlayObjects.Add(new OverlayText(attacked.troop.position.X * fieldSize, attacked.troop.position.Y * fieldSize, Color.Red, "Dodged!"));
                 UpdateOverlay();
+                Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = true, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.position, attacked.troop.position), weapon = attacking.troop.activeWeapon });
                 return (0, false, false);
             } //TODO: Add scraping hit
 
@@ -719,9 +859,15 @@ namespace StartGame
                     players.Remove(attacked);
                     UpdatePlayerList();
 
+                    Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = true, range = AIUtility.Distance(attacking.troop.position, attacked.troop.position), weapon = attacking.troop.activeWeapon });
+
                     //Let player gain xp
                     humanPlayer.GainXP(attacked.XP);
                 }
+            }
+            else
+            {
+                Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.position, attacked.troop.position), weapon = attacking.troop.activeWeapon });
             }
 
             if (show)
