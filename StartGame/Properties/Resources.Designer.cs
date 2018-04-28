@@ -61,65 +61,11 @@ namespace StartGame.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Player.
+        ///   Looks up a localized string similar to Alex.
         /// </summary>
         internal static string BasePlayerName {
             get {
                 return ResourceManager.GetString("BasePlayerName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 5.
-        /// </summary>
-        internal static string BOTAmount {
-            get {
-                return ResourceManager.GetString("BOTAmount", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Frodo.
-        /// </summary>
-        internal static string BOTName0 {
-            get {
-                return ResourceManager.GetString("BOTName0", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Test.
-        /// </summary>
-        internal static string BOTName1 {
-            get {
-                return ResourceManager.GetString("BOTName1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Bob.
-        /// </summary>
-        internal static string BOTName2 {
-            get {
-                return ResourceManager.GetString("BOTName2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Steve.
-        /// </summary>
-        internal static string BOTName3 {
-            get {
-                return ResourceManager.GetString("BOTName3", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Hal.
-        /// </summary>
-        internal static string BOTName4 {
-            get {
-                return ResourceManager.GetString("BOTName4", resourceCulture);
             }
         }
         
@@ -139,6 +85,26 @@ namespace StartGame.Properties {
         internal static System.Drawing.Bitmap playerTroop {
             get {
                 object obj = ResourceManager.GetObject("playerTroop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap spiderNest {
+            get {
+                object obj = ResourceManager.GetObject("spiderNest", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap spiderWarrior {
+            get {
+                object obj = ResourceManager.GetObject("spiderWarrior", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

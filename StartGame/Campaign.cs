@@ -12,7 +12,7 @@ namespace StartGame
 {
     internal class Campaign
     {
-        public Player player;
+        public HumanPlayer player;
         private List<MainGameWindow> playedGames = new List<MainGameWindow>();
         private int numberOfGames;
         public MainGameWindow activeGame;
@@ -22,7 +22,7 @@ namespace StartGame
 
         public readonly int healthRegen;
 
-        public Campaign(Player _player, int gameNumber, int Difficulty)
+        public Campaign(HumanPlayer _player, int gameNumber, int Difficulty)
         {
             player = _player;
             player.CalculateStats();
@@ -41,6 +41,7 @@ namespace StartGame
         /// </summary>
         public void Start()
         {
+            //Setup map
             Map map = new Map(10, 10);
             Thread mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), 0)));
             mapCreator.Start();
@@ -54,7 +55,7 @@ namespace StartGame
 
             player.map = map;
 
-            Mission mission = new BanditMission();
+            Mission mission = new SpiderNestMission();
 
             //Finish initialisation
             activeGame = new MainGameWindow(map, player, mission, this);
@@ -69,6 +70,7 @@ namespace StartGame
             if (activeGame is null) throw new Exception();
             playedGames.Add(activeGame);
 
+            //Setup map
             Map map = new Map(10, 10);
             Thread mapCreator;
             do
@@ -80,37 +82,11 @@ namespace StartGame
                 mapCreator.Start();
             } while (!mapCreator.Join(Map.creationTime));
 
-            //Level stats
-            int PlayerNumber = Round + map.width / 10;
+            Mission mission = new BanditMission();
 
-            //Generate enemies
-            List<Player> enemies = new List<Player>();
-            short botNumber = Convert.ToInt16(Resources.BOTAmount);
-            List<string> botNames = new List<string>();
-            for (int i = 0; i < botNumber; i++)
-            {
-                botNames.Add(Resources.ResourceManager.GetString("BOTName" + i));
-            }
-
-            List<Point> spawnPoints = map.DeterminSpawnPoint(PlayerNumber,
-                SpawnType.randomLand);
-
-            for (int i = 0; i < PlayerNumber; i++)
-            {
-                string name = botNames[random.Next(botNames.Count)];
-                botNames.Remove(name);
-                enemies.Add(new Player(PlayerType.computer, name, map, new Player[] { player })
-                {
-                    troop = new Troop(name, 10 + (difficulty / 2) + (int)(Round * 1.5) - 4,
-                    new Weapon(4 + difficulty / 4 + Round - 1,
-                        AttackType.melee, 1, "Fists", 1, false),
-                    Resources.enemyScout, 0)
-                });
-                enemies[i].troop.position = spawnPoints[i];
-            }
             //Finish initialisation
             player.active = false;
-            activeGame = new MainGameWindow(map, player, enemies, this);
+            activeGame = new MainGameWindow(map, player, mission, this);
 
             return true;
         }

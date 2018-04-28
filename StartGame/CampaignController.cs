@@ -14,10 +14,10 @@ namespace StartGame
 {
     partial class CampaignController : Form
     {
-        private Player player;
+        private HumanPlayer player;
         private Campaign campaign;
 
-        public CampaignController(Player _player)
+        public CampaignController(HumanPlayer _player)
         {
             player = _player;
             if (player.troop is null)
@@ -25,7 +25,7 @@ namespace StartGame
                 MessageBox.Show("Please design your player, before starting the campaign.");
                 Troop playerTroop = new Troop("Player", 10, new Weapon(5, AttackType.melee, 1, "Punch", 2, false), Resources.playerTroop, 0);
                 playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
-                player = new Player(PlayerType.localHuman, Resources.BasePlayerName, null, null)
+                player = new HumanPlayer(PlayerType.localHuman, Resources.BasePlayerName, null, null, null)
                 {
                     troop = playerTroop
                 };
@@ -53,9 +53,6 @@ namespace StartGame
                     MessageBox.Show("You have lost the campaign as you have died! Good luck next time!");
                     return;
                 }
-                //Level up
-                LevelUp levelUp = new LevelUp(player, 3 + campaign.difficulty / 5);
-                levelUp.ShowDialog();
 
                 //Reset troop stats
                 foreach (Weapon weapon in player.troop.weapons)

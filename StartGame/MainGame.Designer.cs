@@ -31,6 +31,11 @@
             this.gameBoard = new System.Windows.Forms.PictureBox();
             this.troopList = new System.Windows.Forms.ListBox();
             this.enemyInfo = new System.Windows.Forms.Panel();
+            this.playerLevel = new System.Windows.Forms.Label();
+            this.playerVitatlity = new System.Windows.Forms.Label();
+            this.playerEndurance = new System.Windows.Forms.Label();
+            this.playerAgility = new System.Windows.Forms.Label();
+            this.playerStrength = new System.Windows.Forms.Label();
             this.playerDefense = new System.Windows.Forms.Label();
             this.playerHeight = new System.Windows.Forms.Label();
             this.playerWeaponAttacks = new System.Windows.Forms.Label();
@@ -65,10 +70,8 @@
             this.fieldHeight = new System.Windows.Forms.Label();
             this.fieldPosition = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.playerStrength = new System.Windows.Forms.Label();
-            this.playerAgility = new System.Windows.Forms.Label();
-            this.playerEndurance = new System.Windows.Forms.Label();
-            this.playerVitatlity = new System.Windows.Forms.Label();
+            this.levelUpButton = new System.Windows.Forms.Button();
+            this.playerXP = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
@@ -96,6 +99,8 @@
             // 
             // enemyInfo
             // 
+            this.enemyInfo.Controls.Add(this.playerXP);
+            this.enemyInfo.Controls.Add(this.playerLevel);
             this.enemyInfo.Controls.Add(this.playerVitatlity);
             this.enemyInfo.Controls.Add(this.playerEndurance);
             this.enemyInfo.Controls.Add(this.playerAgility);
@@ -113,6 +118,51 @@
             this.enemyInfo.Name = "enemyInfo";
             this.enemyInfo.Size = new System.Drawing.Size(202, 212);
             this.enemyInfo.TabIndex = 3;
+            // 
+            // playerLevel
+            // 
+            this.playerLevel.AutoSize = true;
+            this.playerLevel.Location = new System.Drawing.Point(7, 171);
+            this.playerLevel.Name = "playerLevel";
+            this.playerLevel.Size = new System.Drawing.Size(61, 13);
+            this.playerLevel.TabIndex = 17;
+            this.playerLevel.Text = "playerLevel";
+            // 
+            // playerVitatlity
+            // 
+            this.playerVitatlity.AutoSize = true;
+            this.playerVitatlity.Location = new System.Drawing.Point(115, 43);
+            this.playerVitatlity.Name = "playerVitatlity";
+            this.playerVitatlity.Size = new System.Drawing.Size(65, 13);
+            this.playerVitatlity.TabIndex = 15;
+            this.playerVitatlity.Text = "playerVitality";
+            // 
+            // playerEndurance
+            // 
+            this.playerEndurance.AutoSize = true;
+            this.playerEndurance.Location = new System.Drawing.Point(115, 30);
+            this.playerEndurance.Name = "playerEndurance";
+            this.playerEndurance.Size = new System.Drawing.Size(87, 13);
+            this.playerEndurance.TabIndex = 14;
+            this.playerEndurance.Text = "playerEndurance";
+            // 
+            // playerAgility
+            // 
+            this.playerAgility.AutoSize = true;
+            this.playerAgility.Location = new System.Drawing.Point(115, 17);
+            this.playerAgility.Name = "playerAgility";
+            this.playerAgility.Size = new System.Drawing.Size(62, 13);
+            this.playerAgility.TabIndex = 13;
+            this.playerAgility.Text = "playerAgility";
+            // 
+            // playerStrength
+            // 
+            this.playerStrength.AutoSize = true;
+            this.playerStrength.Location = new System.Drawing.Point(115, 4);
+            this.playerStrength.Name = "playerStrength";
+            this.playerStrength.Size = new System.Drawing.Size(75, 13);
+            this.playerStrength.TabIndex = 12;
+            this.playerStrength.Text = "playerStrength";
             // 
             // playerDefense
             // 
@@ -432,47 +482,31 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Field Info";
             // 
-            // playerStrength
+            // levelUpButton
             // 
-            this.playerStrength.AutoSize = true;
-            this.playerStrength.Location = new System.Drawing.Point(115, 4);
-            this.playerStrength.Name = "playerStrength";
-            this.playerStrength.Size = new System.Drawing.Size(75, 13);
-            this.playerStrength.TabIndex = 12;
-            this.playerStrength.Text = "playerStrength";
+            this.levelUpButton.Location = new System.Drawing.Point(1059, 598);
+            this.levelUpButton.Name = "levelUpButton";
+            this.levelUpButton.Size = new System.Drawing.Size(77, 28);
+            this.levelUpButton.TabIndex = 20;
+            this.levelUpButton.Text = "Level Up";
+            this.levelUpButton.UseVisualStyleBackColor = true;
+            this.levelUpButton.Click += new System.EventHandler(this.LevelUpButton_Click);
             // 
-            // playerAgility
+            // playerXP
             // 
-            this.playerAgility.AutoSize = true;
-            this.playerAgility.Location = new System.Drawing.Point(115, 17);
-            this.playerAgility.Name = "playerAgility";
-            this.playerAgility.Size = new System.Drawing.Size(62, 13);
-            this.playerAgility.TabIndex = 13;
-            this.playerAgility.Text = "playerAgility";
-            // 
-            // playerEndurance
-            // 
-            this.playerEndurance.AutoSize = true;
-            this.playerEndurance.Location = new System.Drawing.Point(115, 30);
-            this.playerEndurance.Name = "playerEndurance";
-            this.playerEndurance.Size = new System.Drawing.Size(87, 13);
-            this.playerEndurance.TabIndex = 14;
-            this.playerEndurance.Text = "playerEndurance";
-            // 
-            // playerVitatlity
-            // 
-            this.playerVitatlity.AutoSize = true;
-            this.playerVitatlity.Location = new System.Drawing.Point(115, 43);
-            this.playerVitatlity.Name = "playerVitatlity";
-            this.playerVitatlity.Size = new System.Drawing.Size(65, 13);
-            this.playerVitatlity.TabIndex = 15;
-            this.playerVitatlity.Text = "playerVitality";
+            this.playerXP.AutoSize = true;
+            this.playerXP.Location = new System.Drawing.Point(7, 188);
+            this.playerXP.Name = "playerXP";
+            this.playerXP.Size = new System.Drawing.Size(49, 13);
+            this.playerXP.TabIndex = 21;
+            this.playerXP.Text = "playerXP";
             // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 639);
+            this.Controls.Add(this.levelUpButton);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.dumpWeapon);
             this.Controls.Add(this.showHeightDifference);
@@ -494,6 +528,7 @@
             this.Text = "Start Game";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainGameWindow_FormClosing);
             this.Load += new System.EventHandler(this.MainGameWindow_Load);
+            this.Shown += new System.EventHandler(this.MainGameWindow_Shown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainGameWindow_MouseMove);
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).EndInit();
             this.enemyInfo.ResumeLayout(false);
@@ -549,6 +584,9 @@
         private System.Windows.Forms.Label playerEndurance;
         private System.Windows.Forms.Label playerAgility;
         private System.Windows.Forms.Label playerStrength;
+        private System.Windows.Forms.Button levelUpButton;
+        private System.Windows.Forms.Label playerLevel;
+        private System.Windows.Forms.Label playerXP;
     }
 }
 

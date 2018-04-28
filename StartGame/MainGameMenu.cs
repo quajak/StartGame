@@ -62,12 +62,16 @@ namespace StartGame
                 playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
                 //return;
             }
-            Player player = new Player(PlayerType.localHuman, Settings.Default.Name, null, null)
+            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null)
             {
                 troop = playerTroop
             };
             Hide();
-            MainGameWindow mainGameWindow = new MainGameWindow(map, player);
+            //TODO: Make form to allow use to choose mission and difficulty
+
+            Mission mission = new BanditMission();
+
+            MainGameWindow mainGameWindow = new MainGameWindow(map, player, mission);
             mainGameWindow.ShowDialog();
             Show();
 
@@ -93,7 +97,7 @@ namespace StartGame
         private void Button1_Click(object sender, EventArgs e)
         {
             Hide();
-            Player player = new Player(PlayerType.localHuman, Settings.Default.Name, null, null)
+            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null)
             {
                 troop = playerTroop
             };

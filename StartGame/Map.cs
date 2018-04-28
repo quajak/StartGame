@@ -250,7 +250,7 @@ namespace StartGame
                 {
                     for (int y = 0; y <= map.GetUpperBound(1); y++)
                     {
-                        localMap[x, y] = (MapTile)map[x, y].Clone();
+                        localMap[x, y] = map[x, y].Clone() as MapTile;
                     }
                 }
 
@@ -304,6 +304,9 @@ namespace StartGame
                         }
                         //Check if neighbour is cheaper
                         int index = Array.IndexOf(neighbour.GoalIDs, goal.id);
+                        if (index == -1)
+                            //TODO: Find reason for this to occur
+                            continue;
                         if (neighbour.Costs[index] != -1 && (cost > neighbour.Costs[index]))
                         {
                             cost = neighbour.Costs[index];
@@ -586,6 +589,11 @@ namespace StartGame
                 if (neighbour.type.type != MapTileTypeEnum.path && neighbour.type.type != MapTileTypeEnum.land) continue;
                 //If already has value
                 int index = Array.IndexOf(map[neighbour.position.X, neighbour.position.Y].GoalIDs, id);
+                if(index == -1)
+                {
+                    //TODO: How can this be
+                    continue;
+                }
                 double disCost = map[neighbour.position.X, neighbour.position.Y].Costs[index];
                 if (disCost != -1)
                 {

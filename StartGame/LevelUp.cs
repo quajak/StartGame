@@ -13,7 +13,7 @@ namespace PlayerCreator
 {
     partial class LevelUp : Form
     {
-        private Player player;
+        private HumanPlayer player;
 
         private int StrengthUp = 0;
         private int AgilityUp = 0;
@@ -22,7 +22,7 @@ namespace PlayerCreator
 
         private int points;
 
-        public LevelUp(Player Player, int Points)
+        public LevelUp(HumanPlayer Player, int Points)
         {
             InitializeComponent();
             player = Player;
@@ -49,7 +49,7 @@ namespace PlayerCreator
             enduranceDown.Enabled = EnduranceUp != 0;
             vitalityDown.Enabled = VitatlityUp != 0;
 
-            playerMaxHealth.Text = $"Max Health: {player.troop.maxHealth} ({VitatlityUp + player.vitality})";
+            playerMaxHealth.Text = $"Max Health: {player.troop.maxHealth} ({2 * (VitatlityUp + player.vitality)})";
             playerActionPoints.Text = $"Action Points: {player.maxActionPoints} ({4 + (player.endurance + EnduranceUp) / 10})";
             playerDefense.Text = $"Defense: {player.troop.defense} ({player.endurance + EnduranceUp})";
             playerDodge.Text = $"Dodge: {player.troop.dodge} ({player.troop.baseDodge + (player.agility + AgilityUp) * 2})";
