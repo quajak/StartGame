@@ -36,6 +36,12 @@ namespace StartGame
             }
         }
 
+        private Mission DecideMission()
+        {
+            List<Mission> missions = new List<Mission> { new SpiderNestMission(), new BanditMission() };
+            return missions[random.Next(missions.Count - 1)];
+        }
+
         /// <summary>
         /// Initialises campaign and generates map and enemies for first mission
         /// </summary>

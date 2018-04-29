@@ -176,10 +176,9 @@ namespace StartGame
 
             List<WinCheck> wins = new List<WinCheck>
             {
-                deathCheck,
                 nestState
             };
-            desc += "Kill all the enemies. Destroy the spider nest. ";
+            desc += "Destroy the spider nest. ";
 
             #endregion WinCodition Creation
 

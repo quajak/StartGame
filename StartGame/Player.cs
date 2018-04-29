@@ -57,7 +57,7 @@ namespace StartGame
 
         public int level = 1;
         public int xp = 0;
-        public int levelXP = 10;
+        public int levelXP = 5;
         public int storedLevelUps = 0;
 
         public MainGameWindow main;
@@ -93,10 +93,14 @@ namespace StartGame
             {
                 xp -= levelXP;
                 storedLevelUps += 1;
-                levelXP = (int)(1.1 * levelXP);
+                levelXP = Math.Max((int)(1.1 * levelXP), levelXP + 1);
 
                 //Set Level up
                 main.SetUpdateState(storedLevelUps > 0);
+
+                //Immediate effect
+                troop.health = troop.maxHealth;
+                main.WriteConsole("Level Up! Healing to max hp!");
             }
         }
 
@@ -453,8 +457,8 @@ namespace StartGame
 
                     foreach (int[] field in sorrounding)
                     {
-                        if (!allowWater && map.map[field[0], field[1]].type.type == MapTileTypeEnum.deepWater
-                                || map.map[field[0], field[1]].type.type == MapTileTypeEnum.shallowWater)
+                        if (!allowWater && (map.map[field[0], field[1]].type.type == MapTileTypeEnum.deepWater
+                                || map.map[field[0], field[1]].type.type == MapTileTypeEnum.shallowWater))
                             graph[field[0], field[1]] = 20;
                         else
                             graph[field[0], field[1]] = graph[checking[0], checking[1]] + mapValues[field[0], field[1]];

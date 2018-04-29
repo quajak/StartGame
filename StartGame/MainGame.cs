@@ -39,6 +39,7 @@ namespace StartGame
 
         private Sprinter Sprinter;
         private SpiderKiller SpiderKiller;
+        private Rampage Rampage;
 
         public MainGameWindow(Map Map, HumanPlayer player, Mission mission, Campaign Campaign = null)
         {
@@ -75,8 +76,16 @@ namespace StartGame
             players.ForEach(p => map.troops.Add(p.troop));
             InitializeComponent();
 
+            //Initialse functions
+            PlayerAttack.Add(CalculateDamage);
+            CalculateCost.Add((t, d, cost) => t.Cost);
+
             //Start work to update information in GUI
             gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
+
+            //GUI Work
+            console.Text = "Starting game ... \n";
+
             //Add players to list
             UpdatePlayerList();
 
@@ -94,13 +103,13 @@ namespace StartGame
             //Initialise trees
             Sprinter = new Sprinter(this);
             SpiderKiller = new SpiderKiller(this);
+            Rampage = new Rampage(this);
 
             //Initialise info about player trees
             UpdateTreeView();
 
-            //Initialse functions
-            PlayerAttack.Add(CalculateDamage);
-            CalculateCost.Add((t, d, cost) => t.Cost);
+            //Activate players tress
+            humanPlayer.trees.ForEach(t => t.Activate());
 
             //As it is first turn - set action button to start the game
             nextAction.Text = "Start game!";
@@ -137,6 +146,13 @@ namespace StartGame
         }
 
         public event EventHandler<CombatData> Combat = delegate { };
+
+        public class TurnData : EventArgs
+        {
+            public Player active;
+        }
+
+        public event EventHandler<TurnData> Turn = delegate { };
 
         #endregion Game Event Handler
 
@@ -196,6 +212,8 @@ namespace StartGame
             activePlayer.active = false;
             activePlayer = players[activePlayerCounter];
             activePlayer.active = true;
+
+            Turn(this, new TurnData() { active = activePlayer });
 
             //Reset the status of the player
             activePlayer.actionPoints = activePlayer.maxActionPoints;
@@ -308,6 +326,12 @@ namespace StartGame
             }
         }
 
+        public void WriteConsole(string text)
+        {
+            console.AppendText(text);
+            console.AppendText(Environment.NewLine);
+        }
+
         public void SetUpdateState(bool active)
         {
             levelUpButton.Enabled = active;
@@ -374,7 +398,7 @@ namespace StartGame
             troopList.SelectedIndex = 0;
         }
 
-        private void ShowPlayerStats()
+        public void ShowPlayerStats()
         {
             if (humanPlayer != null)
             {
@@ -461,7 +485,7 @@ namespace StartGame
         private void LevelUpButton_Click(object sender, EventArgs e)
         {
             //Level up
-            LevelUp levelUp = new LevelUp(humanPlayer, humanPlayer.storedLevelUps * 2);
+            LevelUp levelUp = new LevelUp(humanPlayer, humanPlayer.storedLevelUps);
             levelUp.ShowDialog();
 
             humanPlayer.level += humanPlayer.storedLevelUps;
@@ -587,7 +611,11 @@ namespace StartGame
 
             int x = e.X - e.X % fieldSize;
             int y = e.Y - e.Y % fieldSize;
+            FocusField(X, Y);
+        }
 
+        private void FocusField(int X, int Y)
+        {
             Troop p = map.troops.Find(t => t.position.X == X && t.position.Y == Y);
             if (p != null)
             {
@@ -631,6 +659,7 @@ namespace StartGame
                         UpdateOverlay();
                         canMoveTo.Clear();
                         ShowPlayerStats();
+                        FocusField(X, Y);
                         return;
                     }
                 }
@@ -816,7 +845,7 @@ namespace StartGame
                     doged = false,
                     killed = false,
                     range = AIUtility.Distance(attacked.troop.position, attacking.troop.position),
-                    weapon = attacked.troop.activeWeapon
+                    weapon = attacking.troop.activeWeapon
                 };
 
                 foreach (var func in PlayerAttack)
@@ -845,7 +874,7 @@ namespace StartGame
 
             attacked.troop.health -= damage;
 
-            if (attacked.troop.health == 0)
+            if (attacked.troop.health <= 0)
             {
                 killed = true;
                 if (attacked.Name == humanPlayer.Name)
@@ -877,6 +906,7 @@ namespace StartGame
                 UpdateOverlay();
                 if (attacking == humanPlayer)
                 {
+                    WriteConsole($"You have attacked {attacked.Name} for {damage}");
                     ShowWeaponStats();
                 }
             }

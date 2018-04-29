@@ -28,6 +28,8 @@ namespace StartGame
 
         public List<Troop> troops = new List<Troop>();
 
+        public bool created = false;
+
         public const int creationTime = 500;
 
         public Map(int Width, int Height)
@@ -144,11 +146,10 @@ namespace StartGame
 
             if (maxContinent.edges is null)
             {
-                while (true)
-                {
-                    //Wait for thread to end
-                };
+                created = false;
+                return;
             }
+
             //TODO: For edges in continents find all the different zones, not only side
             //TODO: Create a road between each of the zones
             goals = new List<MapTile>();
@@ -205,10 +206,11 @@ namespace StartGame
                 else break;
             }
             //Skip code to create path when there are to few goals
-            if (goals.Count <= 1) while (true)
-                {
-                    //Wait for thread to end
-                };
+            if (goals.Count <= 1)
+            {
+                created = false;
+                return;
+            }
             for (int x = 0; x <= map.GetUpperBound(0); x++)
             {
                 for (int y = 0; y <= map.GetUpperBound(1); y++)
@@ -276,6 +278,7 @@ namespace StartGame
 
             //Clean up path
             //CleanPath();
+            created = true;
             return;
         }
 
@@ -589,7 +592,7 @@ namespace StartGame
                 if (neighbour.type.type != MapTileTypeEnum.path && neighbour.type.type != MapTileTypeEnum.land) continue;
                 //If already has value
                 int index = Array.IndexOf(map[neighbour.position.X, neighbour.position.Y].GoalIDs, id);
-                if(index == -1)
+                if (index == -1)
                 {
                     //TODO: How can this be
                     continue;

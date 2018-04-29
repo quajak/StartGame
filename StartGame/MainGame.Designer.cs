@@ -77,6 +77,7 @@
             this.treeName = new System.Windows.Forms.Label();
             this.treeList = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.console = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
@@ -557,11 +558,23 @@
             this.label2.TabIndex = 0;
             this.label2.Text = "Skills and Titles";
             // 
+            // console
+            // 
+            this.console.BackColor = System.Drawing.SystemColors.Control;
+            this.console.Location = new System.Drawing.Point(1030, 418);
+            this.console.Multiline = true;
+            this.console.Name = "console";
+            this.console.ReadOnly = true;
+            this.console.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.console.Size = new System.Drawing.Size(202, 147);
+            this.console.TabIndex = 22;
+            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 639);
+            this.Controls.Add(this.console);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.levelUpButton);
             this.Controls.Add(this.panel1);
@@ -651,6 +664,7 @@
         private System.Windows.Forms.Label treeName;
         private System.Windows.Forms.ListBox treeList;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox console;
     }
 }
 
