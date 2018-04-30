@@ -9,7 +9,9 @@ namespace StartGame
 {
     internal abstract class Tree
     {
+        //TODO: Save tree improvements between levels
         public string name;
+
         public readonly string description;
         public readonly string reason;
 

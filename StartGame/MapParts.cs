@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 
 namespace StartGame
 {
     [DebuggerDisplay("X:{position.X} Y:{position.Y} Type:{type.type.ToString()}")]
-    internal class MapTile : ICloneable
+    public class MapTile : ICloneable
     {
         public Point position;
         public MapTileType type;
@@ -20,6 +21,7 @@ namespace StartGame
         public string[] GoalIDs;
         public string id;
         public double leftValue = -1;
+        public bool free = true;
 
         public MapTile(Point Position, MapTileType Type, double Height)
         {
@@ -86,7 +88,7 @@ namespace StartGame
         }
     }
 
-    internal class SorroundingTiles : ICloneable
+    public class SorroundingTiles : ICloneable
     {
         public MapTile top;
         public MapTile left;
@@ -151,16 +153,48 @@ namespace StartGame
         }
     }
 
-    internal enum MapTileTypeEnum
+    public enum MapTileTypeEnum
     { land, mountain, hill, shallowWater, deepWater, path }
 
+    public enum FieldType { water, land, mountain }
+
     [DebuggerDisplay("Type: {type}")]
-    internal struct MapTileType
+    public struct MapTileType
     {
         public MapTileTypeEnum type;
+
+        public FieldType FType
+        {
+            get
+            {
+                switch (type)
+                {
+                    case MapTileTypeEnum.land:
+                        return FieldType.land;
+
+                    case MapTileTypeEnum.mountain:
+                        return FieldType.mountain;
+
+                    case MapTileTypeEnum.hill:
+                        return FieldType.mountain;
+
+                    case MapTileTypeEnum.shallowWater:
+                        return FieldType.water;
+
+                    case MapTileTypeEnum.deepWater:
+                        return FieldType.water;
+
+                    case MapTileTypeEnum.path:
+                        return FieldType.land;
+
+                    default:
+                        throw new Exception();
+                }
+            }
+        }
     }
 
-    internal class EdgeArray
+    public class EdgeArray
     {
         public List<MapTile> top;
         public List<MapTile> bottom;
@@ -176,7 +210,7 @@ namespace StartGame
         }
     }
 
-    internal class Continent
+    public class Continent
     {
         public List<MapTile> tiles;
         public MapTileTypeEnum Type { get; private set; }

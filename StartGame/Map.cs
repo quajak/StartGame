@@ -6,8 +6,11 @@ using PlayerCreator;
 
 namespace StartGame
 {
-    internal class Map
+    public class Map
     {
+        public const int Width = 31;
+        public const int Height = 31;
+
         public readonly int width;
         public readonly int height;
 
@@ -28,14 +31,16 @@ namespace StartGame
 
         public List<Troop> troops = new List<Troop>();
 
+        public List<Entity> entites = new List<Entity>();
+
         public bool created = false;
 
         public const int creationTime = 500;
 
-        public Map(int Width, int Height)
+        public Map()
         {
-            width = 31;
-            height = 31;
+            width = Width;
+            height = Height;
         }
 
         public string Stats()
@@ -60,10 +65,10 @@ namespace StartGame
 
         /// <summary>
         /// Initialises the map
+        /// PerlinDiff Determines the magnitude of the change between fields i.e. accuracy. Normally it has a value of 0.1
+        /// Seed Determines the seed of the rng
+        /// HeightBias Increases all values by this amount
         /// </summary>
-        /// <param name="PerlinDiff">Determines the magnitude of the change between fields i.e. accuracy. Normally it has a value of 0.1</param>
-        /// <param name="Seed">Determines the seed of the rng</param>
-        /// <param name="HeightBias">Increases all values by this amount</param>
         public void SetupMap(Tuple<double, double, double> data)
         {
             (double PerlinDiff, double Seed, double HeightBias) = data;
@@ -150,8 +155,8 @@ namespace StartGame
                 return;
             }
 
-            //TODO: For edges in continents find all the different zones, not only side
-            //TODO: Create a road between each of the zones
+            //Long termm: For edges in continents find all the different zones, not only side
+            //Long term: Create a road between each of the zones
             goals = new List<MapTile>();
             while (true)
             {
@@ -252,7 +257,8 @@ namespace StartGame
                 {
                     for (int y = 0; y <= map.GetUpperBound(1); y++)
                     {
-                        localMap[x, y] = map[x, y].Clone() as MapTile;
+                        MapTile copy = map[x, y].Clone() as MapTile;
+                        localMap[x, y] = copy;
                     }
                 }
 
@@ -308,7 +314,7 @@ namespace StartGame
                         //Check if neighbour is cheaper
                         int index = Array.IndexOf(neighbour.GoalIDs, goal.id);
                         if (index == -1)
-                            //TODO: Find reason for this to occur
+                            //Bug: Find reason for this to occur
                             continue;
                         if (neighbour.Costs[index] != -1 && (cost > neighbour.Costs[index]))
                         {
@@ -594,7 +600,7 @@ namespace StartGame
                 int index = Array.IndexOf(map[neighbour.position.X, neighbour.position.Y].GoalIDs, id);
                 if (index == -1)
                 {
-                    //TODO: How can this be
+                    //Bug: How can this be
                     continue;
                 }
                 double disCost = map[neighbour.position.X, neighbour.position.Y].Costs[index];
@@ -734,9 +740,9 @@ namespace StartGame
             using (Graphics g = Graphics.FromImage(mapBackground))
             {
                 //Draw troops
-                foreach (Troop troop in troops)
+                foreach (Entity entity in entites)
                 {
-                    g.DrawImage(troop.image, troop.position.X * size, troop.position.Y * size, 20, 20);
+                    g.DrawImage(entity.image, entity.Position.X * size, entity.Position.Y * size, 20, 20);
                 }
             }
 
@@ -744,14 +750,14 @@ namespace StartGame
             return mapBackground;
         }
 
-        public Image DrawTroops(int size = 20)
+        public Image DrawEntities(int size = 20)
         {
             Image img = new Bitmap(rawBackground);
             using (Graphics g = Graphics.FromImage(img))
             {
-                foreach (Troop troop in troops)
+                foreach (Entity entity in entites)
                 {
-                    g.DrawImage(troop.image, troop.position.X * size, troop.position.Y * size, 20, 20);
+                    g.DrawImage(entity.image, entity.Position.X * size, entity.Position.Y * size, 20, 20);
                 }
             }
             background = img;
@@ -805,8 +811,8 @@ namespace StartGame
                             p = new Point(generic.Next(map.GetUpperBound(0),
                             generic.Next(map.GetUpperBound(1))));
                             //Determine is viable
-                            if (!troops.Exists(t => t.position.X == p.X &&
-                                 t.position.Y == p.Y) &&
+                            if (!troops.Exists(t => t.Position.X == p.X &&
+                                 t.Position.Y == p.Y) &&
                                  !toReturn.Exists(c => c.X == p.X && c.Y == p.Y))
                                 break;
                         }
@@ -834,7 +840,7 @@ namespace StartGame
                     point = new Point(generic.Next(map.GetUpperBound(0)), generic.Next(map.GetUpperBound(1)));
                     if ((map[point.X, point.Y].type.type == MapTileTypeEnum.land
                         || map[point.X, point.Y].type.type == MapTileTypeEnum.path) &&
-                        !troops.Exists(t => t.position.X == point.X && t.position.Y == point.Y))
+                        !troops.Exists(t => t.Position.X == point.X && t.Position.Y == point.Y))
                     {
                         toReturn.Add(point);
                         break;
@@ -858,7 +864,9 @@ namespace StartGame
                     if (obj is OverlayRectangle)
                     {
                         OverlayRectangle rect = obj as OverlayRectangle;
-                        g.DrawRectangle(new Pen(rect.color), rect.x, rect.y, rect.width, rect.height);
+                        if (rect.filled)
+                            g.FillRectangle(new SolidBrush(rect.fillColor), rect.x, rect.y, rect.width, rect.height);
+                        g.DrawRectangle(new Pen(rect.borderColor), rect.x, rect.y, rect.width, rect.height);
                     }
                     else if (obj is OverlayText)
                     {
@@ -877,10 +885,10 @@ namespace StartGame
         #endregion Overlay
     }
 
-    internal enum SpawnType
+    public enum SpawnType
     { road, random, randomLand };
 
-    internal class OverlayObject
+    public class OverlayObject
     {
         public int x;
         public int y;
@@ -898,16 +906,18 @@ namespace StartGame
     {
         public int width;
         public int height;
-        public Color color;
+        public readonly Color borderColor;
         public bool filled;
+        public readonly Color fillColor;
 
-        public OverlayRectangle(int X, int Y, int Width, int Height, Color Color,
-            bool Filled, bool Once = true) : base(X, Y, Once)
+        public OverlayRectangle(int X, int Y, int Width, int Height, Color BorderColor,
+            bool Filled = false, Color FillColor = new Color(), bool Once = true) : base(X, Y, Once)
         {
             width = Width;
             height = Height;
-            color = Color;
+            borderColor = BorderColor;
             filled = Filled;
+            fillColor = FillColor;
         }
     }
 

@@ -23,13 +23,12 @@ namespace StartGame
             if (player.troop is null)
             {
                 MessageBox.Show("Please design your player, before starting the campaign.");
-                Troop playerTroop = new Troop("Player", 10, new Weapon(5, AttackType.melee, 1, "Punch", 2, false), Resources.playerTroop, 0);
+                Troop playerTroop = new Troop("Player", 10, new Weapon(5, AttackType.melee, 1, "Punch", 2, false), Resources.playerTroop, 0, null);
                 playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
                 player = new HumanPlayer(PlayerType.localHuman, Resources.BasePlayerName, null, null, null)
                 {
                     troop = playerTroop
                 };
-                //return;
             }
             InitializeComponent();
         }

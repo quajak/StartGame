@@ -39,7 +39,7 @@ namespace StartGame
 
         private void MapCreator_Load(object sender, EventArgs e)
         {
-            map = new Map(gameBoard.Width / fieldSize, gameBoard.Height / fieldSize);
+            map = new Map();
             Recalulate(true);
         }
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace StartGame
 {
@@ -38,8 +39,10 @@ namespace StartGame
 
         private Mission DecideMission()
         {
-            List<Mission> missions = new List<Mission> { new SpiderNestMission(), new BanditMission() };
-            return missions[random.Next(missions.Count - 1)];
+            List<Mission> missions = new List<Mission> { new AttackCampMission()//, new SpiderNestMission(), new BanditMission()
+            };
+            int id = random.Next(missions.Count);
+            return missions[id];
         }
 
         /// <summary>
@@ -48,20 +51,25 @@ namespace StartGame
         public void Start()
         {
             //Setup map
-            Map map = new Map(10, 10);
-            Thread mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), 0)));
+            Mission mission = DecideMission();
+            Map map = new Map();
+            Thread mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), mission.heightDiff)));
             mapCreator.Start();
             mapCreator.Priority = ThreadPriority.Highest;
-            while (!mapCreator.Join(Map.creationTime))
+            bool validMap = false;
+            bool finished = mapCreator.Join(Map.creationTime);
+            while (!(finished && validMap))
             {
-                mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), 0)));
+                int seed = random.Next();
+                mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, seed, mission.heightDiff)));
                 mapCreator.Start();
                 mapCreator.Priority = ThreadPriority.Highest;
+                finished = mapCreator.Join(Map.creationTime);
+                validMap = mission.MapValidity(map);
             }
 
             player.map = map;
-
-            Mission mission = new SpiderNestMission();
+            player.troop.Map = map;
 
             //Finish initialisation
             activeGame = new MainGameWindow(map, player, mission, this);
@@ -76,8 +84,10 @@ namespace StartGame
             if (activeGame is null) throw new Exception();
             playedGames.Add(activeGame);
 
+            Mission mission = DecideMission();
+
             //Setup map
-            Map map = new Map(10, 10);
+            Map map = new Map();
             Thread mapCreator;
             do
             {
@@ -86,9 +96,10 @@ namespace StartGame
                     Priority = ThreadPriority.Highest
                 };
                 mapCreator.Start();
-            } while (!mapCreator.Join(Map.creationTime));
+            } while (!mapCreator.Join(Map.creationTime) && !mission.MapValidity(map));
 
-            Mission mission = new BanditMission();
+            player.map = map;
+            player.troop.Map = map;
 
             //Finish initialisation
             player.active = false;
@@ -97,8 +108,10 @@ namespace StartGame
             return true;
         }
 
-        public Weapon CalculateReward()
+        public Weapon CalculateReward(WeaponReward weaponReward)
         {
+            if (!weaponReward.random) return weaponReward.reward;
+
             List<Weapon> weapons = new List<Weapon>
             {
                 new Weapon(6, AttackType.melee, 2, "Stick", 2, true),
@@ -114,7 +127,7 @@ namespace StartGame
                 new Weapon(15, AttackType.range, 20, "Long bow", 5, true, 3)
             };
             weapons.Sort((w1, w2) => (w1.attackDamage * w1.attacks * w1.range / 4) > (w2.attackDamage * w2.attacks * w2.range / 4) ? 1 : -1);
-            return weapons[random.Next(weapons.Count / numberOfGames * playedGames.Count, weapons.Count / numberOfGames * (playedGames.Count + 1))];
+            return weapons[random.Next(weapons.Count / numberOfGames * playedGames.Count + weaponReward.rarity, Math.Min(weapons.Count / numberOfGames * (playedGames.Count + 1) + weaponReward.rarity, weapons.Count))];
         }
 
         public bool IsFinished()

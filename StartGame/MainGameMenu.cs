@@ -31,13 +31,14 @@ namespace StartGame
 
         private void StartGame_Click(object sender, EventArgs e)
         {
+            //Long term: allow map selection
             if (map == null)
             {
                 if (MessageBox.Show("You have no map selected! \n Starting now will mean using a random map!", "Alert", MessageBoxButtons.OKCancel) == DialogResult.OK)
                 {
                     //Start game with random map
                     Random rnd = new Random();
-                    map = new Map(10, 10); //TODO set global constant for the size
+                    map = new Map();
                     Thread mapThread;
                     do
                     {
@@ -58,7 +59,7 @@ namespace StartGame
             if (playerTroop is null)
             {
                 MessageBox.Show("Please create your troop before starting the game!");
-                playerTroop = new Troop(Settings.Default.Name, 10, new Weapon(5, AttackType.magic, 1, "Punch", 2, false), Resources.playerTroop, 0);
+                playerTroop = new Troop(Settings.Default.Name, 10, new Weapon(5, AttackType.magic, 1, "Punch", 2, false), Resources.playerTroop, 0, map);
                 playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
                 //return;
             }
@@ -67,7 +68,7 @@ namespace StartGame
                 troop = playerTroop
             };
             Hide();
-            //TODO: Make form to allow use to choose mission and difficulty
+            //Long term: Make form to allow use to choose mission and difficulty
 
             Mission mission = new BanditMission();
 

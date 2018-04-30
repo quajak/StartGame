@@ -78,6 +78,8 @@
             this.treeList = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.console = new System.Windows.Forms.TextBox();
+            this.ShowBlockedFields = new System.Windows.Forms.Button();
+            this.enemyMovement = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
@@ -569,11 +571,33 @@
             this.console.Size = new System.Drawing.Size(202, 147);
             this.console.TabIndex = 22;
             // 
+            // ShowBlockedFields
+            // 
+            this.ShowBlockedFields.Location = new System.Drawing.Point(640, 491);
+            this.ShowBlockedFields.Name = "ShowBlockedFields";
+            this.ShowBlockedFields.Size = new System.Drawing.Size(135, 23);
+            this.ShowBlockedFields.TabIndex = 23;
+            this.ShowBlockedFields.Text = "Show blocked fields";
+            this.ShowBlockedFields.UseVisualStyleBackColor = true;
+            this.ShowBlockedFields.Click += new System.EventHandler(this.ShowBlockedFields_Click);
+            // 
+            // enemyMovement
+            // 
+            this.enemyMovement.AutoSize = true;
+            this.enemyMovement.Location = new System.Drawing.Point(640, 575);
+            this.enemyMovement.Name = "enemyMovement";
+            this.enemyMovement.Size = new System.Drawing.Size(147, 17);
+            this.enemyMovement.TabIndex = 24;
+            this.enemyMovement.Text = "All enemies move at once";
+            this.enemyMovement.UseVisualStyleBackColor = true;
+            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 639);
+            this.Controls.Add(this.enemyMovement);
+            this.Controls.Add(this.ShowBlockedFields);
             this.Controls.Add(this.console);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.levelUpButton);
@@ -665,6 +689,8 @@
         private System.Windows.Forms.ListBox treeList;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox console;
+        private System.Windows.Forms.Button ShowBlockedFields;
+        private System.Windows.Forms.CheckBox enemyMovement;
     }
 }
 

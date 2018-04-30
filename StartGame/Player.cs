@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using PlayerCreator;
 using StartGame;
 using StartGame.Properties;
+using static StartGame.MainGameWindow;
 
 namespace StartGame
 {
@@ -26,19 +27,20 @@ namespace StartGame
 
         public Troop troop;
 
-        public bool singleTurn;
-
-        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, bool SingleTurn = true)
+        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP)
         {
             this.XP = XP;
             enemies = Enemies;
             type = Type;
             Name = name;
             map = Map;
-            singleTurn = SingleTurn;
         }
 
-        public abstract void PlayTurn(MainGameWindow main);
+        public abstract void PlayTurn(MainGameWindow main, bool singleTurn);
+
+        public virtual void Initialise(MainGameWindow main)
+        {
+        }
 
         public void ActionButtonPressed(MainGameWindow mainGameWindow)
         {
@@ -104,7 +106,7 @@ namespace StartGame
             }
         }
 
-        public override void PlayTurn(MainGameWindow main)
+        public override void PlayTurn(MainGameWindow main, bool SingleTurn)
         {
         }
     }
@@ -115,10 +117,10 @@ namespace StartGame
         {
         }
 
-        public override void PlayTurn(MainGameWindow main)
+        public override void PlayTurn(MainGameWindow main, bool SingleTurn)
         {
-            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(troop.position.X, troop.position.Y, enemies[0].troop.position.X,
-                enemies[0].troop.position.Y, map, true);
+            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y, enemies[0].troop.Position.X,
+                enemies[0].troop.Position.Y, map, true);
             Thread path = new Thread(distanceGraph.CreateGraph);
             path.Start();
             path.Join();
@@ -128,10 +130,10 @@ namespace StartGame
 
             while (actionPoints > 0)
             {
-                Point playerPos = enemies[0].troop.position;
+                Point playerPos = enemies[0].troop.Position;
 
                 //Check if it can attack player
-                int playerDistance = AIUtility.Distance(playerPos, troop.position);
+                int playerDistance = AIUtility.Distance(playerPos, troop.Position);
                 if (playerDistance <= troop.activeWeapon.range &&
                     troop.activeWeapon.attacks > 0)
                 {
@@ -142,13 +144,13 @@ namespace StartGame
 
                     if (killed)
                     {
-                        map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
+                        map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
                         main.PlayerDied($"You have been killed by {Name}!");
                         break;
                     }
                     actionPoints--;
                     troop.activeWeapon.attacks--;
-                    map.DrawTroops();
+                    map.DrawEntities();
                     continue;
                 }
                 else if (troop.weapons.Exists(t => t.range >= playerDistance && t.attacks > 0))
@@ -185,30 +187,176 @@ namespace StartGame
                 //Move to closest field
                 int closestDistance = AIUtility.Distance(closestField, playerPos);
                 if (closestDistance >= playerDistance) break;
-                troop.position.X = closestField.X;
-                troop.position.Y = closestField.Y;
+                Point troopP = troop.Position;
+                troopP.X = closestField.X;
+                troopP.Y = closestField.Y;
+                troop.Position = troopP;
                 actionPoints -= closestDistance;
-                map.DrawTroops();
-                distanceGraph = new DistanceGraphCreator(troop.position.X, troop.position.Y,
+                map.DrawEntities();
+                distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y,
                     playerPos.X, playerPos.Y, map, true);
                 distanceGraph.CreateGraph();
             }
-            if (damageDealt != 0)
-                map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
-            else if (dodged != 0)
-                map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
+            if (SingleTurn)
+            {
+                if (damageDealt != 0)
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
+                else if (dodged != 0)
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
+            }
+            else
+            {
+                main.playerDamage += damageDealt;
+                main.playerDoged += dodged;
+            }
+        }
+    }
+
+    internal class DefensiveBanditAI : Player
+    {
+        private readonly Point camp;
+        private bool enraged = false;
+
+        private MainGameWindow main;
+
+        public DefensiveBanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies, Point Camp) : base(Type, Name, Map, Enemies, 3)
+        {
+            camp = Camp;
+        }
+
+        public override void Initialise(MainGameWindow Main)
+        {
+            main = Main;
+            main.Combat += Update;
+        }
+
+        private void Update(object sender, CombatData combatData)
+        {
+            main.Combat -= Update;
+            enraged = true;
+            main.WriteConsole($"{Name} has become enraged!");
+        }
+
+        public override void PlayTurn(MainGameWindow main, bool SingleTurn)
+        {
+            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y, enemies[0].troop.Position.X,
+                enemies[0].troop.Position.Y, map, true);
+            Thread path = new Thread(distanceGraph.CreateGraph);
+            path.Start();
+            DistanceGraphCreator campGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y, camp.X,
+                camp.Y, map, true);
+            Thread campPath = new Thread(campGraph.CreateGraph);
+            campPath.Start();
+            path.Join();
+            campPath.Join();
+
+            int damageDealt = 0;
+            int dodged = 0;
+
+            while (actionPoints > 0)
+            {
+                Point playerPos = enemies[0].troop.Position;
+
+                int playerDistance = AIUtility.Distance(playerPos, troop.Position);
+                if (enraged)
+                {
+                    //Check if it can attack player
+                    if (playerDistance <= troop.activeWeapon.range &&
+                        troop.activeWeapon.attacks > 0)
+                    {
+                        //Attack
+                        var (damage, killed, hit) = main.Attack(this, enemies[0]);
+                        damageDealt += damage;
+                        if (!hit) dodged++;
+
+                        if (killed)
+                        {
+                            map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
+                            main.PlayerDied($"You have been killed by {Name}!");
+                            break;
+                        }
+                        actionPoints--;
+                        troop.activeWeapon.attacks--;
+                        map.DrawEntities();
+                        continue;
+                    }
+                    else if (troop.weapons.Exists(t => t.range >= playerDistance && t.attacks > 0))
+                    {
+                        //Change weapon
+                        Weapon best = troop.weapons.FindAll(t => t.range >= playerDistance)
+                            .Aggregate((t1, t2) => t1.range > t2.range ? t1 : t2);
+                        troop.activeWeapon = best;
+                        continue;
+                    }
+                }
+
+                //Find field to move to
+                //If enraged go to player
+                //If player is close to camp go to player
+                //Else stay around camp
+                Point closestField;
+                DistanceGraphCreator graph = enraged || AIUtility.Distance(camp, playerPos) < 8 ? distanceGraph : campGraph;
+                Point goalPos = enraged || AIUtility.Distance(camp, playerPos) < 8 ? playerPos : camp;
+
+                closestField = AIUtility.FindClosestField(graph, goalPos, actionPoints, map,
+                    (List<(Point point, double cost, double height)> list) =>
+                    {
+                        list.Sort((o1, o2) =>
+                        {
+                            double diffCost = o1.cost - o2.cost;
+                            double heightDiff = o1.height - o2.height;
+                            if (Math.Abs(diffCost) >= 1) //assume that using the weapon costs 1 action point
+                            {
+                                return diffCost < 0 ? -1 : 1;
+                            }
+                            else if (heightDiff != 0)
+                            {
+                                return diffCost < 0 ? -1 : 1;
+                            }
+                            return 0;
+                        });
+                        return list.First().point;
+                    });
+
+                //Move to closest field
+                int closestDistance = AIUtility.Distance(closestField, goalPos);
+                if (closestDistance >= AIUtility.Distance(troop.Position, goalPos)) break;
+                Point troopP = troop.Position;
+                troopP.X = closestField.X;
+                troopP.Y = closestField.Y;
+                troop.Position = troopP;
+                actionPoints -= closestDistance; //Easy: Calculate actual cost
+                map.DrawEntities();
+                campGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y, camp.X, camp.Y, map, true);
+                campGraph.CreateGraph();
+                distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y,
+                    playerPos.X, playerPos.Y, map, true);
+                distanceGraph.CreateGraph();
+            }
+            if (SingleTurn)
+            {
+                if (damageDealt != 0)
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
+                else if (dodged != 0)
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
+            }
+            else
+            {
+                main.playerDamage += damageDealt;
+                main.playerDoged += dodged;
+            }
         }
     }
 
     internal class WarriorSpiderAI : Player
     {
-        public WarriorSpiderAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 1, false)
+        public WarriorSpiderAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 1)
         {
         }
 
-        public override void PlayTurn(MainGameWindow main)
+        public override void PlayTurn(MainGameWindow main, bool SingleTurn)
         {
-            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(troop.position.X, troop.position.Y, enemies[0].troop.position.X, enemies[0].troop.position.Y, map, false);
+            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y, enemies[0].troop.Position.X, enemies[0].troop.Position.Y, map, false);
             Thread path = new Thread(distanceGraph.CreateGraph);
             path.Start();
             path.Join();
@@ -218,10 +366,10 @@ namespace StartGame
 
             while (actionPoints > 0)
             {
-                Point playerPos = enemies[0].troop.position;
+                Point playerPos = enemies[0].troop.Position;
 
                 //Check if it can attack player
-                int playerDistance = AIUtility.Distance(playerPos, troop.position);
+                int playerDistance = AIUtility.Distance(playerPos, troop.Position);
                 if (playerDistance <= troop.activeWeapon.range &&
                     troop.activeWeapon.attacks > 0)
                 {
@@ -232,13 +380,13 @@ namespace StartGame
 
                     if (killed)
                     {
-                        map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
+                        map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
                         main.PlayerDied($"You have been killed by {Name}!");
                         break;
                     }
                     actionPoints--;
                     troop.activeWeapon.attacks--;
-                    map.DrawTroops();
+                    map.DrawEntities();
                     continue;
                 }
                 else if (troop.weapons.Exists(t => t.range >= playerDistance && t.attacks > 0))
@@ -275,20 +423,22 @@ namespace StartGame
                 //Move to closest field
                 int closestDistance = AIUtility.Distance(closestField, playerPos);
                 if (closestDistance >= playerDistance) break;
-                troop.position.X = closestField.X;
-                troop.position.Y = closestField.Y;
+                Point troopP = troop.Position;
+                troopP.X = closestField.X;
+                troopP.Y = closestField.Y;
+                troop.Position = troopP;
                 actionPoints -= closestDistance;
-                map.DrawTroops();
-                distanceGraph = new DistanceGraphCreator(troop.position.X, troop.position.Y,
+                map.DrawEntities();
+                distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y,
                     playerPos.X, playerPos.Y, map, false);
                 distanceGraph.CreateGraph();
             }
-            if (singleTurn)
+            if (SingleTurn)
             {
                 if (damageDealt != 0)
-                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
                 else if (dodged != 0)
-                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.position.X * MapCreator.fieldSize, enemies[0].troop.position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
             }
             else
             {
@@ -303,27 +453,29 @@ namespace StartGame
         private int numSpawned = 0;
         private int difficulty;
         private int turn;
+        private int maxSpawned;
         private readonly int round;
 
-        public SpiderNestAI(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 5, false)
+        public SpiderNestAI(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 5)
         {
             map = Map;
             turn = 7 - (Difficulty / 2);
             round = Round;
             difficulty = Difficulty;
+            maxSpawned = 5 + Difficulty + Round;
         }
 
-        public override void PlayTurn(MainGameWindow main)
+        public override void PlayTurn(MainGameWindow main, bool singleTurn)
         {
             turn = turn == 0 ? 0 : turn - 1;
-            if (turn == 0)
+            if (turn == 0 && numSpawned < maxSpawned)
             {
                 //Find the position for the new spider to spawn
                 Point pos = new Point(-1, -1);
-                foreach (MapTile tile in map.map[troop.position.X, troop.position.Y].neighbours.rawMaptiles)
+                foreach (MapTile tile in map.map[troop.Position.X, troop.Position.Y].neighbours.rawMaptiles)
                 {
                     //Check if empty and not water
-                    if (tile.type.type != MapTileTypeEnum.deepWater || tile.type.type != MapTileTypeEnum.shallowWater && !map.troops.Exists(t => t.position.X == tile.position.X && t.position.Y == tile.position.Y))
+                    if (tile.type.type != MapTileTypeEnum.deepWater || tile.type.type != MapTileTypeEnum.shallowWater && !map.troops.Exists(t => t.Position.X == tile.position.X && t.Position.Y == tile.position.Y))
                     {
                         pos = tile.position;
                         break;
@@ -338,9 +490,9 @@ namespace StartGame
                 WarriorSpiderAI spider = new WarriorSpiderAI(PlayerType.computer, "Spider Spawn " + numSpawned, map, main.players.ToArray())
                 {
                     troop = new Troop("Spider Spawn " + numSpawned, (difficulty / 3) + (int)(round * 1.5) + 1, new Weapon(1 + difficulty / 5 + round / 2,
-                        AttackType.melee, 1, "Fangs", 1, false), Resources.spiderWarrior, 0, 25)
+                        AttackType.melee, 1, "Fangs", 1, false), Resources.spiderWarrior, 0, map, 25)
                     {
-                        position = pos
+                        Position = pos
                     }
                 };
 
@@ -370,7 +522,7 @@ namespace StartGame
                 {
                     int playerDis = Math.Abs(A.X - x) + Math.Abs(A.Y - y);
                     if (distanceGraph.graph[x, y] <= actionPoints
-                        && !map.troops.Exists(t => t.position.X == x && t.position.Y == y))
+                        && !map.troops.Exists(t => t.Position.X == x && t.Position.Y == y))
                     {
                         if (playerDis < closestDistance)
                         {
@@ -416,17 +568,20 @@ namespace StartGame
         public void CreateGraph()
         {
             double[,] mapValues;
+            bool[,] free;
             lock (this)
             {
                 lock (map)
                 {
                     graph = new double[map.map.GetUpperBound(0) + 1, map.map.GetUpperBound(1) + 1];
                     mapValues = new double[map.map.GetUpperBound(0) + 1, map.map.GetUpperBound(1) + 1];
+                    free = new bool[map.map.GetUpperBound(0) + 1, map.map.GetUpperBound(1) + 1];
                     for (int x = 0; x <= mapValues.GetUpperBound(0); x++)
                     {
                         for (int y = 0; y <= mapValues.GetUpperBound(1); y++)
                         {
                             mapValues[x, y] = map.map[x, y].MovementCost;
+                            free[x, y] = map.map[x, y].free;
                         }
                     }
                 }
@@ -460,6 +615,10 @@ namespace StartGame
                         if (!allowWater && (map.map[field[0], field[1]].type.type == MapTileTypeEnum.deepWater
                                 || map.map[field[0], field[1]].type.type == MapTileTypeEnum.shallowWater))
                             graph[field[0], field[1]] = 20;
+                        else if (!free[field[0], field[1]])
+                        {
+                            graph[field[0], field[1]] = 20;
+                        }
                         else
                             graph[field[0], field[1]] = graph[checking[0], checking[1]] + mapValues[field[0], field[1]];
                     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using StartGame;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace PlayerCreator
@@ -9,22 +10,46 @@ namespace PlayerCreator
     public abstract class Entity
     {
         public readonly string name;
-        public Point position;
+        private Point position;
         public readonly Bitmap image;
         public readonly bool blocking;
+        private Map map;
 
-        public Entity(string Name, Point Position, Bitmap Image, bool Blocking)
+        public Point Position
+        {
+            get => position; set
+            {
+                if (Map != null)
+                    Map.map[position.X, position.Y].free = true;
+                position = value;
+                if (Map != null)
+                    Map.map[position.X, position.Y].free = false;
+            }
+        }
+
+        public Map Map
+        {
+            get => map; set
+            {
+                map = value;
+                if (map != null)
+                    map.map[position.X, position.Y].free = false;
+            }
+        }
+
+        public Entity(string Name, Point Position, Bitmap Image, bool Blocking, Map map)
         {
             name = Name;
-            position = Position;
+            this.Position = Position;
             image = Image;
             blocking = Blocking;
+            Map = map;
         }
     }
 
     public class Building : Entity
     {
-        public Building(string Name, Point Position, Bitmap Image, bool Blocking = true) : base(Name, Position, Image, Blocking)
+        public Building(string Name, Point Position, Bitmap Image, Map map, bool Blocking = true) : base(Name, Position, Image, Blocking, map)
         {
         }
     }
@@ -52,7 +77,7 @@ namespace PlayerCreator
             }
         }
 
-        public Troop(string Name, int Health, Weapon Weapon, Bitmap Image, int Defense, int Dodge = 10) : base(Name, new Point(0, 0), Image, true)
+        public Troop(string Name, int Health, Weapon Weapon, Bitmap Image, int Defense, Map map, int Dodge = 10) : base(Name, new Point(0, 0), Image, true, map)
         {
             maxHealth = Health;
             health = Health;
@@ -65,7 +90,12 @@ namespace PlayerCreator
 
         public void Spawn(Point point)
         {
-            position = point;
+            Position = point;
+        }
+
+        public void Die()
+        {
+            Map.map[Position.X, Position.Y].free = true;
         }
     }
 

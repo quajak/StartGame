@@ -11,7 +11,13 @@ namespace StartGame
 {
     partial class MainGameWindow : Form
     {
+        //Long term: Add dialog
+        //Long term: Add save feature
+        //Long term: Add debug features
+        //Long term: Add magic system
+
         private const int fieldSize = MapCreator.fieldSize;
+
         private Random random;
 
         private Map map;
@@ -21,6 +27,7 @@ namespace StartGame
         public List<Player> players;
         private Player activePlayer;
         public HumanPlayer humanPlayer;
+        private readonly Mission mission;
         private int activePlayerCounter = 0;
 
         private List<WinCheck> winConditions;
@@ -33,7 +40,6 @@ namespace StartGame
 
         private Campaign campaign;
 
-        private bool multiTurn = false;
         public int playerDamage;
         public int playerDoged;
 
@@ -66,14 +72,27 @@ namespace StartGame
             else
                 round = 0;
 
-            (players, winConditions, deathConditions, description) = mission.GenerateMission(difficulty, round, map, player);
+            bool first = true;
+            do
+            {
+                if (!first)
+                {
+                    map = new Map();
+                }
+                else
+                    first = false;
+                (players, winConditions, deathConditions, description) = mission.GenerateMission(difficulty, round, map, player);
+            } while (players is null);
+
             useWinChecks = true;
 
             //Setup game
             humanPlayer = player;
+            this.mission = mission;
             activePlayer = players[0];
 
             players.ForEach(p => map.troops.Add(p.troop));
+            players.ForEach(p => map.entites.Add(p.troop));
             InitializeComponent();
 
             //Initialse functions
@@ -85,6 +104,7 @@ namespace StartGame
 
             //GUI Work
             console.Text = "Starting game ... \n";
+            enemyMovement.Checked = mission != null ? mission.EnemyMoveTogether : false;
 
             //Add players to list
             UpdatePlayerList();
@@ -111,6 +131,9 @@ namespace StartGame
             //Activate players tress
             humanPlayer.trees.ForEach(t => t.Activate());
 
+            //Activate all players
+            players.ForEach(p => p.Initialise(this));
+
             //As it is first turn - set action button to start the game
             nextAction.Text = "Start game!";
             changeWeapon.Enabled = false;
@@ -118,7 +141,8 @@ namespace StartGame
             ShowPositionStats();
             dumpWeapon.Enabled = false;
 
-            levelUpButton.Enabled = false;
+            //Set level up button correctly
+            levelUpButton.Enabled = humanPlayer.storedLevelUps != 0;
         }
 
         #region Game Logic
@@ -230,29 +254,28 @@ namespace StartGame
             }
 
             if (humanPlayer is null) return;
-            activePlayer.PlayTurn(this);
+            activePlayer.PlayTurn(this, enemyMovement.Checked);
 
             if (DoChecks()) return;
-
-            if (activePlayer.singleTurn && multiTurn)
+            if (humanPlayer is null) return;
+            //If end of mutli turn
+            if (activePlayer.Name == humanPlayer.Name || !enemyMovement.Checked)
             {
                 if (playerDamage != 0 || playerDoged != 0)
                 {
-                    map.overlayObjects.Add(new OverlayText(humanPlayer.troop.position.X * fieldSize, humanPlayer.troop.position.Y * fieldSize, Color.Red,
+                    map.overlayObjects.Add(new OverlayText(humanPlayer.troop.Position.X * fieldSize, humanPlayer.troop.Position.Y * fieldSize, Color.Red,
                         $"{(playerDamage != 0 ? $"-{playerDamage}" : "")} {(playerDoged != 0 && playerDamage != 0 ? "and" : "")}" +
                         $" {(playerDoged != 0 ? $"Doged {playerDoged} {(playerDoged != 1 ? "times" : "time")}" : "")}"));
                     playerDamage = 0;
                     playerDoged = 0;
                 }
-
-                multiTurn = false;
             }
-            else if (!activePlayer.singleTurn) multiTurn = true;
 
             UpdateOverlay();
             ShowPlayerStats();
 
-            if (!activePlayer.singleTurn)
+            //Goto next turn
+            if (enemyMovement.Checked && activePlayer.Name != humanPlayer.Name)
             {
                 NextTurn();
                 return;
@@ -409,7 +432,7 @@ namespace StartGame
                 playerActionPoints.Text = $"{humanPlayer.actionPoints} / {humanPlayer.maxActionPoints}";
                 playerHealth.Text = $"{humanPlayer.troop.health} / {humanPlayer.troop.maxHealth}";
                 playerWeaponAttacks.Text = $"Attacks: {humanPlayer.troop.activeWeapon.attacks} / {humanPlayer.troop.activeWeapon.maxAttacks}";
-                playerHeight.Text = $"{map.map[humanPlayer.troop.position.X, humanPlayer.troop.position.Y].height.ToString("0.##")}";
+                playerHeight.Text = $"{map.map[humanPlayer.troop.Position.X, humanPlayer.troop.Position.Y].height.ToString("0.##")}";
                 playerDefense.Text = $"Defense: {humanPlayer.troop.defense}";
                 playerStrength.Text = $"Strength: {humanPlayer.strength}";
                 playerAgility.Text = $"Agility: {humanPlayer.agility}";
@@ -427,13 +450,26 @@ namespace StartGame
 
         private void UpdateOverlay(bool keepAll = false)
         {
-            keepAll = !activePlayer.singleTurn;
+            keepAll = enemyMovement.Checked && activePlayer.Name != humanPlayer.Name;
             Image image = new Bitmap(map.background);
             using (Graphics g = Graphics.FromImage(image))
             {
                 g.DrawImage(map.DrawOverlay(gameBoard.Width, gameBoard.Height, keepAll), 0, 0);
             }
             gameBoard.Image = image;
+        }
+
+        private void ShowEntityData(Entity entity)
+        {
+            troopList.SelectedIndex = -1;
+            enemyName.Text = entity.name;
+            enemyAttackDamage.Text = "";
+            enemyAttackRange.Text = "";
+            enemyAttackType.Text = "";
+            enemyHealth.Text = "";
+            enemyPosition.Text = "";
+            enemyHeight.Text = "";
+            enemyDefense.Text = "";
         }
 
         private void ShowEnemyStats(bool clicked = false)
@@ -468,13 +504,13 @@ namespace StartGame
                     enemyAttackType.Text = player.troop.activeWeapon.type.ToString();
                 }
                 enemyHealth.Text = $"{player.troop.health} / {player.troop.maxHealth}";
-                enemyPosition.Text = $"{player.troop.position.X} : {player.troop.position.Y}";
-                enemyHeight.Text = $"{map.map[player.troop.position.X, player.troop.position.Y].height.ToString("0.##")}";
+                enemyPosition.Text = $"{player.troop.Position.X} : {player.troop.Position.Y}";
+                enemyHeight.Text = $"{map.map[player.troop.Position.X, player.troop.Position.Y].height.ToString("0.##")}";
                 enemyDefense.Text = $"Defense: {player.troop.defense}";
             }
             if (clicked)
             {
-                SelectField(player.troop.position.X, player.troop.position.Y);
+                SelectField(player.troop.Position.X, player.troop.Position.Y);
             }
         }
 
@@ -482,17 +518,23 @@ namespace StartGame
 
         #region Event Handler
 
+        private void ShowBlockedFields_Click(object sender, EventArgs e)
+        {
+            Color fill = Color.FromArgb(120, Color.Brown);
+            for (int x = 0; x <= map.map.GetUpperBound(0); x++)
+            {
+                for (int y = 0; y <= map.map.GetUpperBound(1); y++)
+                {
+                    if (!map.map[x, y].free)
+                        map.overlayObjects.Add(new OverlayRectangle(x * MapCreator.fieldSize, y * MapCreator.fieldSize, MapCreator.fieldSize, MapCreator.fieldSize, Color.Brown, true, FillColor: fill));
+                }
+            }
+            UpdateOverlay();
+        }
+
         private void LevelUpButton_Click(object sender, EventArgs e)
         {
-            //Level up
-            LevelUp levelUp = new LevelUp(humanPlayer, humanPlayer.storedLevelUps);
-            levelUp.ShowDialog();
-
-            humanPlayer.level += humanPlayer.storedLevelUps;
-            humanPlayer.storedLevelUps = 0;
-
-            ShowPlayerStats();
-            levelUpButton.Enabled = false;
+            LevelUp();
         }
 
         private void DumpWeapon_Click(object sender, EventArgs e)
@@ -616,7 +658,9 @@ namespace StartGame
 
         private void FocusField(int X, int Y)
         {
-            Troop p = map.troops.Find(t => t.position.X == X && t.position.Y == Y);
+            SelectField(X, Y);
+
+            Troop p = map.troops.Find(t => t.Position.X == X && t.Position.Y == Y);
             if (p != null)
             {
                 troopList.SelectedIndex = -1;
@@ -625,7 +669,12 @@ namespace StartGame
             }
             else
             {
-                SelectField(X, Y);
+                //Check if any entity has been clicked
+                if (map.entites.Exists(t => t.Position.X == X && t.Position.Y == Y))
+                {
+                    Entity e = map.entites.Find(t => t.Position.X == X && t.Position.Y == Y);
+                    ShowEntityData(e);
+                }
             }
 
             if (humanPlayer.active)
@@ -634,7 +683,7 @@ namespace StartGame
                 if (canAttack.Count != 0 && canAttack.Exists(m => m.position.X == X
                      && m.position.Y == Y))
                 {
-                    Player attacked = players.Find(t => t.troop.position.X == X && t.troop.position.Y == Y);
+                    Player attacked = players.Find(t => t.troop.Position.X == X && t.troop.Position.Y == Y);
                     Attack(humanPlayer, attacked, show: true);
                     return;
                 }
@@ -643,19 +692,22 @@ namespace StartGame
                 //move player
                 if (canMoveTo.Count != 0)
                 {
-                    MapTile start = map.map[humanPlayer.troop.position.X, humanPlayer.troop.position.Y];
+                    MapTile start = map.map[humanPlayer.troop.Position.X, humanPlayer.troop.Position.Y];
                     if (canMoveTo.Exists(f => f.position.X == X && Y == f.position.Y))
                     {
                         MapTile moveTo = canMoveTo.Find(f => f.position.X == X
                             && Y == f.position.Y);
                         humanPlayer.actionPoints = moveTo.leftValue;
-                        humanPlayer.troop.position.X = moveTo.position.X;
-                        humanPlayer.troop.position.Y = moveTo.position.Y;
 
-                        MapTile end = map.map[humanPlayer.troop.position.X, humanPlayer.troop.position.Y];
+                        Point humanPos = humanPlayer.troop.Position;
+                        humanPos.X = moveTo.position.X;
+                        humanPos.Y = moveTo.position.Y;
+                        humanPlayer.troop.Position = humanPos;
+
+                        MapTile end = map.map[humanPlayer.troop.Position.X, humanPlayer.troop.Position.Y];
                         PlayerMoved(this, new PlayerMovementData() { start = start, distance = AIUtility.Distance(start.position, end.position), goal = end });
 
-                        map.DrawTroops();
+                        map.DrawEntities();
                         UpdateOverlay();
                         canMoveTo.Clear();
                         ShowPlayerStats();
@@ -665,7 +717,7 @@ namespace StartGame
                 }
                 canMoveTo.Clear();
                 //Find fields the player can move to
-                if (humanPlayer.troop.position.X == X && humanPlayer.troop.position.Y == Y)
+                if (humanPlayer.troop.Position.X == X && humanPlayer.troop.Position.Y == Y)
                 {
                     //Reset movement cost
                     for (int _x = 0; _x <= map.map.GetUpperBound(0); _x++)
@@ -685,25 +737,24 @@ namespace StartGame
                         toCheck.Remove(checking);
                         if (checking.leftValue >= 0)
                         {
-                            if (!map.troops.Exists(t =>
-                                checking.position.X == t.position.X &&
-                                checking.position.Y == t.position.Y))
-                                possibleFields.Add(checking);
-
+                            possibleFields.Add(checking);
                             List<MapTile> sorroundingTiles = new SorroundingTiles(checking.position, map).rawMaptiles.ToList();
-                            sorroundingTiles = sorroundingTiles.Where(t => t.leftValue == -1 || t.leftValue < checking.leftValue - t.MovementCost).ToList();
+                            sorroundingTiles = sorroundingTiles.Where(t => (t.leftValue == -1 || t.leftValue < checking.leftValue - t.MovementCost) && t.free).ToList();
                             sorroundingTiles.ForEach(t =>
                             {
                                 double cost = 0;
                                 foreach (var func in CalculateCost)
                                 {
-                                    cost = func(t, AIUtility.Distance(t.position, humanPlayer.troop.position), cost);
+                                    cost = func(t, AIUtility.Distance(t.position, humanPlayer.troop.Position), cost);
                                 }
                                 t.leftValue = checking.leftValue - cost;
                             });
                             toCheck.AddRange(sorroundingTiles);
                         }
                     }
+                    //Remove field where player is standing
+                    possibleFields.RemoveAll(m => m.position.X == humanPlayer.troop.Position.X && m.position.Y == humanPlayer.troop.Position.Y);
+
                     //Add rectangles foreach to the overlay
                     possibleFields.ForEach(f =>
                         map.overlayObjects.Add(new OverlayRectangle(f.position.X * fieldSize, f.position.Y * fieldSize, fieldSize, fieldSize, Color.Green, false)));
@@ -713,20 +764,20 @@ namespace StartGame
                     canMoveTo.AddRange(possibleFields);
 
                     //Show all enemies it might hit and damage dealt
-                    Point center = humanPlayer.troop.position;
+                    Point center = humanPlayer.troop.Position;
                     if (humanPlayer.actionPoints >= 1 && humanPlayer.troop.activeWeapon.attacks > 0)
                     {
                         foreach (var troop in map.troops)
                         {
-                            if (troop.position != center)
+                            if (troop.Position != center)
                             {
-                                int distance = AIUtility.Distance(troop.position, center);
+                                int distance = AIUtility.Distance(troop.Position, center);
                                 if (distance <= humanPlayer.troop.activeWeapon.range)
                                 {
-                                    map.overlayObjects.Add(new OverlayRectangle(troop.position.X * fieldSize,
-                                        troop.position.Y * fieldSize, fieldSize, fieldSize,
+                                    map.overlayObjects.Add(new OverlayRectangle(troop.Position.X * fieldSize,
+                                        troop.Position.Y * fieldSize, fieldSize, fieldSize,
                                         Color.Red, false));
-                                    canAttack.Add(map.map[troop.position.X, troop.position.Y]);
+                                    canAttack.Add(map.map[troop.Position.X, troop.Position.Y]);
                                 }
                             }
                         }
@@ -751,11 +802,25 @@ namespace StartGame
 
         #region Player Events
 
+        private void LevelUp()
+        {
+            //Level up
+            LevelUp levelUp = new LevelUp(humanPlayer, humanPlayer.storedLevelUps);
+            levelUp.ShowDialog();
+
+            humanPlayer.level += humanPlayer.storedLevelUps;
+            humanPlayer.storedLevelUps = 0;
+
+            ShowPlayerStats();
+            levelUpButton.Enabled = false;
+        }
+
         public void PlayerDied(string message = "You have died!")
         {
             if (humanPlayer is null) return;
             players.Remove(humanPlayer);
             map.troops.Remove(humanPlayer.troop);
+            map.entites.Remove(humanPlayer.troop);
             UpdatePlayerList();
             UpdateOverlay();
             ShowPlayerStats();
@@ -773,7 +838,14 @@ namespace StartGame
 
             if (campaign != null)
             {
-                Weapon received = campaign.CalculateReward();
+                var (reward, xp) = mission.Reward();
+                humanPlayer.GainXP(xp);
+                DialogResult result = MessageBox.Show($"You have gained {xp} xp. {(humanPlayer.storedLevelUps != 0 ? $"You have {humanPlayer.storedLevelUps} level ups stored. Would you like to level up?" : "")}", "XP gained", humanPlayer.storedLevelUps != 0 ? MessageBoxButtons.YesNo : MessageBoxButtons.OK);
+                if (humanPlayer.storedLevelUps != 0 && result == DialogResult.Yes)
+                {
+                    LevelUp();
+                }
+                Weapon received = campaign.CalculateReward(reward);
                 WeaponView weaponView = new WeaponView(received, true);
                 weaponView.ShowDialog();
 
@@ -788,12 +860,12 @@ namespace StartGame
 
         public int CalculateDamage(CombatData data)
         {
-            return CalculateDamage(data.attacker.troop.position, data.attacker, data.attacked, data.weapon);
+            return CalculateDamage(data.attacker.troop.Position, data.attacker, data.attacked, data.weapon);
         }
 
         public int CalculateDamage(Player attacking, Player defending, Weapon weapon)
         {
-            return CalculateDamage(attacking.troop.position, attacking, defending, weapon);
+            return CalculateDamage(attacking.troop.Position, attacking, defending, weapon);
         }
 
         public int CalculateDamage(Point attackingPosition, Player attacking, Player defending, Weapon weapon)
@@ -805,7 +877,7 @@ namespace StartGame
             if (weapon.type == AttackType.melee)
             {
                 double attackingHeight = map.map[attackingPosition.X, attackingPosition.Y].height;
-                double defendingHeight = map.map[defending.troop.position.X, defending.troop.position.Y].height;
+                double defendingHeight = map.map[defending.troop.Position.X, defending.troop.Position.Y].height;
 
                 double difference = attackingHeight - defendingHeight;
 
@@ -844,7 +916,7 @@ namespace StartGame
                     damage = 0,
                     doged = false,
                     killed = false,
-                    range = AIUtility.Distance(attacked.troop.position, attacking.troop.position),
+                    range = AIUtility.Distance(attacked.troop.Position, attacking.troop.Position),
                     weapon = attacking.troop.activeWeapon
                 };
 
@@ -866,11 +938,11 @@ namespace StartGame
             {
                 //dodged
                 if (show)
-                    map.overlayObjects.Add(new OverlayText(attacked.troop.position.X * fieldSize, attacked.troop.position.Y * fieldSize, Color.Red, "Dodged!"));
+                    map.overlayObjects.Add(new OverlayText(attacked.troop.Position.X * fieldSize, attacked.troop.Position.Y * fieldSize, Color.Red, "Dodged!"));
                 UpdateOverlay();
-                Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = true, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.position, attacked.troop.position), weapon = attacking.troop.activeWeapon });
+                Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = true, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon });
                 return (0, false, false);
-            } //TODO: Add scraping hit
+            } //Long term: Add scraping hit
 
             attacked.troop.health -= damage;
 
@@ -884,11 +956,13 @@ namespace StartGame
                 else
                 {
                     //Enemy Died
+                    attacked.troop.Die();
                     map.troops.Remove(attacked.troop);
+                    map.entites.Remove(attacked.troop);
                     players.Remove(attacked);
                     UpdatePlayerList();
 
-                    Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = true, range = AIUtility.Distance(attacking.troop.position, attacked.troop.position), weapon = attacking.troop.activeWeapon });
+                    Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = true, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon });
 
                     //Let player gain xp
                     humanPlayer.GainXP(attacked.XP);
@@ -896,13 +970,13 @@ namespace StartGame
             }
             else
             {
-                Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.position, attacked.troop.position), weapon = attacking.troop.activeWeapon });
+                Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon });
             }
 
             if (show)
             {
-                map.overlayObjects.Add(new OverlayText(attacked.troop.position.X * fieldSize, attacked.troop.position.Y * fieldSize, Color.Red, $"-{damage}"));
-                map.DrawTroops();
+                map.overlayObjects.Add(new OverlayText(attacked.troop.Position.X * fieldSize, attacked.troop.Position.Y * fieldSize, Color.Red, $"-{damage}"));
+                map.DrawEntities();
                 UpdateOverlay();
                 if (attacking == humanPlayer)
                 {
@@ -928,6 +1002,7 @@ namespace StartGame
         {
             players.Add(player);
             map.troops.Add(player.troop);
+            map.entites.Add(player.troop);
             UpdatePlayerList();
         }
 
