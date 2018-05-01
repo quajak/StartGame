@@ -43,11 +43,7 @@ namespace StartGame
         public int playerDamage;
         public int playerDoged;
 
-        private Sprinter Sprinter;
-        private SpiderKiller SpiderKiller;
-        private Rampage Rampage;
-
-        public MainGameWindow(Map Map, HumanPlayer player, Mission mission, Campaign Campaign = null)
+        public MainGameWindow(Map Map, HumanPlayer player, Mission mission, List<Tree> trees, Campaign Campaign = null)
         {
             player.main = this;
             map = Map;
@@ -96,7 +92,7 @@ namespace StartGame
             InitializeComponent();
 
             //Initialse functions
-            PlayerAttack.Add(CalculateDamage);
+            CalculatePlayerAttackDamage.Add(CalculateDamage);
             CalculateCost.Add((t, d, cost) => t.Cost);
 
             //Start work to update information in GUI
@@ -121,9 +117,7 @@ namespace StartGame
             }
 
             //Initialise trees
-            Sprinter = new Sprinter(this);
-            SpiderKiller = new SpiderKiller(this);
-            Rampage = new Rampage(this);
+            trees.ForEach(t => t.Initialise(this));
 
             //Initialise info about player trees
             UpdateTreeView();
@@ -891,7 +885,7 @@ namespace StartGame
         /// <summary>
         /// List of all functions used to calculate player damage
         /// </summary>
-        public List<Func<CombatData, int>> PlayerAttack = new List<Func<CombatData, int>>();
+        public List<Func<CombatData, int>> CalculatePlayerAttackDamage = new List<Func<CombatData, int>>();
 
         /// <summary>
         /// Function which handles attacks of different players
@@ -920,7 +914,7 @@ namespace StartGame
                     weapon = attacking.troop.activeWeapon
                 };
 
-                foreach (var func in PlayerAttack)
+                foreach (var func in CalculatePlayerAttackDamage)
                 {
                     combatData.damage = func(combatData);
                 }

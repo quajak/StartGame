@@ -23,6 +23,8 @@ namespace StartGame
 
         public readonly int healthRegen;
 
+        public List<Tree> trees = Tree.GenerateTrees();
+
         public Campaign(HumanPlayer _player, int gameNumber, int Difficulty)
         {
             player = _player;
@@ -39,7 +41,7 @@ namespace StartGame
 
         private Mission DecideMission()
         {
-            List<Mission> missions = new List<Mission> { new AttackCampMission()//, new SpiderNestMission(), new BanditMission()
+            List<Mission> missions = new List<Mission> { new AttackCampMission(), new SpiderNestMission(), new BanditMission()
             };
             int id = random.Next(missions.Count);
             return missions[id];
@@ -72,7 +74,7 @@ namespace StartGame
             player.troop.Map = map;
 
             //Finish initialisation
-            activeGame = new MainGameWindow(map, player, mission, this);
+            activeGame = new MainGameWindow(map, player, mission, trees, this);
         }
 
         /// <summary>
@@ -103,7 +105,7 @@ namespace StartGame
 
             //Finish initialisation
             player.active = false;
-            activeGame = new MainGameWindow(map, player, mission, this);
+            activeGame = new MainGameWindow(map, player, mission, trees, this);
 
             return true;
         }

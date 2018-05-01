@@ -9,7 +9,6 @@ namespace StartGame
 {
     internal abstract class Tree
     {
-        //TODO: Save tree improvements between levels
         public string name;
 
         public readonly string description;
@@ -22,7 +21,20 @@ namespace StartGame
             reason = Reason;
         }
 
+        public abstract void Initialise(MainGameWindow mainGame);
+
         public abstract void Activate();
+
+        public static List<Tree> GenerateTrees()
+        {
+            return new List<Tree>()
+            {
+                new Sprinter(),
+                new Rampage(),
+                new SpiderKiller(),
+                new Fighter()
+            };
+        }
     }
 
     internal abstract class Skill : Tree
@@ -41,13 +53,17 @@ namespace StartGame
 
     internal class Rampage : Skill
     {
-        private readonly MainGameWindow mainGame;
+        private MainGameWindow mainGame;
         private int succesiveTurns = 0;
         private int goal = 3;
         private bool hasKilled = false;
         private bool active = false;
 
-        public Rampage(MainGameWindow mainGame) : base("Rampage", "Get an action point back when killing an enemy.", "Kil enemies on 3 succesive turns.")
+        public Rampage() : base("Rampage", "Get an action point back when killing an enemy.", "Kil enemies on 3 succesive turns.")
+        {
+        }
+
+        public override void Initialise(MainGameWindow mainGame)
         {
             this.mainGame = mainGame;
             if (!mainGame.humanPlayer.trees.Exists(t => t.name == name))
@@ -108,10 +124,14 @@ namespace StartGame
 
     internal class SpiderKiller : Title
     {
-        private readonly MainGameWindow mainGame;
+        private MainGameWindow mainGame;
         private int toKill = 5;
 
-        public SpiderKiller(MainGameWindow mainGame) : base("Spider Killer", "Do 1 extra damage against spiders.", "Kill 5 spiders.")
+        public SpiderKiller() : base("Spider Killer", "Do 1 extra damage against spiders.", "Kill 5 spiders.")
+        {
+        }
+
+        public override void Initialise(MainGameWindow mainGame)
         {
             this.mainGame = mainGame;
             if (!mainGame.humanPlayer.trees.Exists(t => t.name == name))
@@ -142,7 +162,7 @@ namespace StartGame
         public override void Activate()
         {
             //Add effect
-            mainGame.PlayerAttack.Add((da) => (da.attacked.GetType() == typeof(WarriorSpiderAI) ? da.damage + 1 : da.damage));
+            mainGame.CalculatePlayerAttackDamage.Add((da) => (da.attacked.GetType() == typeof(WarriorSpiderAI) ? da.damage + 1 : da.damage));
         }
     }
 
@@ -152,7 +172,11 @@ namespace StartGame
         private int totalDistance = 0;
         private MainGameWindow MainGame;
 
-        public Sprinter(MainGameWindow mainGame) : base("Sprinter", "Improved ability to run long distances. When moving longer than 4 squares, move one extra.", $"Moving {distanceNeeded} fields!")
+        public Sprinter() : base("Sprinter", "Improved ability to run long distances. When moving longer than 4 squares, move one extra.", $"Moving {distanceNeeded} fields!")
+        {
+        }
+
+        public override void Initialise(MainGameWindow mainGame)
         {
             MainGame = mainGame;
             if (!mainGame.humanPlayer.trees.Exists(t => t.name == name))
@@ -181,6 +205,51 @@ namespace StartGame
         {
             //Add effect
             MainGame.CalculateCost.Add((m, d, c) => (d == 5) ? 0 : c);
+        }
+    }
+
+    internal class Fighter : Skill
+    {
+        private static int DamageNeeded = 40;
+        private int damageDealt = 0;
+        private MainGameWindow MainGame;
+
+        public Fighter() : base("Fighter", "Deal more damage against all enemies.", $"Deal {DamageNeeded} damage.")
+        {
+        }
+
+        public override void Initialise(MainGameWindow mainGame)
+        {
+            MainGame = mainGame;
+            if (!MainGame.humanPlayer.trees.Exists(t => t.name == name))
+                MainGame.Combat += Combat;
+        }
+
+        private void Combat(object sender, CombatData e)
+        {
+            if (e.attacker.Name == MainGame.humanPlayer.Name)
+            {
+                MainGame.WriteConsole("HUman player dealt " + e.damage + " damage");
+                damageDealt += e.damage;
+                if (damageDealt >= DamageNeeded)
+                {
+                    MainGame.humanPlayer.trees.Add(this);
+                    MainGame.UpdateTreeView();
+
+                    //remove listener
+                    MainGame.Combat -= Combat;
+
+                    //Pop up
+                    MainGame.TreeGained(this);
+
+                    Activate();
+                }
+            }
+        }
+
+        public override void Activate()
+        {
+            MainGame.CalculatePlayerAttackDamage.Add((cd) => cd.damage++);
         }
     }
 }

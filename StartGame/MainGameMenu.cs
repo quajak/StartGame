@@ -3,6 +3,7 @@ using System;
 using System.Windows.Forms;
 using PlayerCreator;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace StartGame
 {
@@ -72,7 +73,9 @@ namespace StartGame
 
             Mission mission = new BanditMission();
 
-            MainGameWindow mainGameWindow = new MainGameWindow(map, player, mission);
+            List<Tree> trees = Tree.GenerateTrees();
+
+            MainGameWindow mainGameWindow = new MainGameWindow(map, player, mission, trees);
             mainGameWindow.ShowDialog();
             Show();
 

@@ -31,7 +31,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.startGame = new System.Windows.Forms.Button();
             this.setMap = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
             this.playerSetup = new System.Windows.Forms.Button();
             this.quit = new System.Windows.Forms.Button();
             this.startCampaign = new System.Windows.Forms.Button();
@@ -66,15 +65,6 @@
             this.setMap.Text = "Set Map";
             this.setMap.UseVisualStyleBackColor = true;
             this.setMap.Click += new System.EventHandler(this.SetMap_Click);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 239);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(82, 13);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Made by Jasper";
             // 
             // playerSetup
             // 
@@ -114,7 +104,6 @@
             this.Controls.Add(this.startCampaign);
             this.Controls.Add(this.quit);
             this.Controls.Add(this.playerSetup);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.setMap);
             this.Controls.Add(this.startGame);
             this.Controls.Add(this.label1);
@@ -131,7 +120,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button startGame;
         private System.Windows.Forms.Button setMap;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button playerSetup;
         private System.Windows.Forms.Button quit;
         private System.Windows.Forms.Button startCampaign;
