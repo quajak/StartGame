@@ -72,6 +72,7 @@
     <Compile Include="CampaignController.Designer.cs">
       <DependentUpon>CampaignController.cs</DependentUpon>
     </Compile>
+    <Compile Include="Effects.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="LevelUp.cs">
       <SubType>Form</SubType>
@@ -110,6 +111,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Spell.cs" />
     <Compile Include="Trees.cs" />
     <Compile Include="Troop.cs" />
     <Compile Include="WeaponView.cs">
@@ -187,10 +189,10 @@
     <None Include="Resources\spiderNest.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\firePlace.bmp" />
+    <None Include="Resources\firePlace.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\firePlace.png" />
+    <None Include="Resources\Fire.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -39,10 +39,11 @@ namespace StartGame
             }
         }
 
-        private Mission DecideMission()
+        private Mission DecideMission(int Round)
         {
-            List<Mission> missions = new List<Mission> { new AttackCampMission(), new SpiderNestMission(), new BanditMission()
+            List<Mission> missions = new List<Mission> { new ElementalWizardFight(), new AttackCampMission(), new SpiderNestMission(), new BanditMission()
             };
+            missions = missions.Where(m => m.MissionAllowed(Round)).ToList();
             int id = random.Next(missions.Count);
             return missions[id];
         }
@@ -53,7 +54,7 @@ namespace StartGame
         public void Start()
         {
             //Setup map
-            Mission mission = DecideMission();
+            Mission mission = DecideMission(Round);
             Map map = new Map();
             Thread mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), mission.heightDiff)));
             mapCreator.Start();
@@ -86,7 +87,7 @@ namespace StartGame
             if (activeGame is null) throw new Exception();
             playedGames.Add(activeGame);
 
-            Mission mission = DecideMission();
+            Mission mission = DecideMission(Round);
 
             //Setup map
             Map map = new Map();

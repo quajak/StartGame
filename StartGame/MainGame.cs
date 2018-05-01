@@ -101,6 +101,7 @@ namespace StartGame
             //GUI Work
             console.Text = "Starting game ... \n";
             enemyMovement.Checked = mission != null ? mission.EnemyMoveTogether : false;
+            UpdateStatusList();
 
             //Add players to list
             UpdatePlayerList();
@@ -145,6 +146,7 @@ namespace StartGame
 
         public class PlayerMovementData : EventArgs
         {
+            public Player player;
             public MapTile start;
             public MapTile goal;
             public int distance;
@@ -276,8 +278,10 @@ namespace StartGame
             }
 
             //GUI Updates
+
             if (humanPlayer.active)
             {
+                UpdateStatusInfo();
                 if (humanPlayer.troop.activeWeapon != humanPlayer.troop.weapons[playerWeaponList.SelectedIndex])
                     changeWeapon.Enabled = true;
                 if (humanPlayer.troop.weapons[playerWeaponList.SelectedIndex].discardeable)
@@ -407,12 +411,45 @@ namespace StartGame
 
         private void UpdatePlayerList()
         {
+            //Easy: Don't readd everything, only the things which change
             troopList.Items.Clear();
             for (int i = 0; i < players.Count; i++)
             {
                 troopList.Items.Add(players[i].troop.name);
             }
             troopList.SelectedIndex = 0;
+        }
+
+        private void UpdateStatusInfo()
+        {
+            if (statusList.SelectedIndex != -1)
+            {
+                statusTitle.Text = humanPlayer.troop.statuses[statusList.SelectedIndex].name;
+                statusDescription.Text = humanPlayer.troop.statuses[statusList.SelectedIndex].Description();
+            }
+            else
+            {
+                statusTitle.Text = "";
+                statusDescription.Text = "";
+            }
+        }
+
+        public void UpdateStatusList()
+        {
+            List<string> playerStatusNames = humanPlayer.troop.statuses.ConvertAll(t => t.name);
+            List<string> diff = statusList.Items.Cast<string>().Except(playerStatusNames).ToList();
+            foreach (string dif in diff)
+            {
+                statusList.Items.Remove(dif);
+            }
+
+            diff = playerStatusNames.Except(statusList.Items.Cast<string>()).ToList();
+            foreach (string dif in diff)
+            {
+                statusList.Items.Add(dif);
+            }
+
+            UpdateStatusInfo();
         }
 
         public void ShowPlayerStats()
@@ -437,7 +474,7 @@ namespace StartGame
             }
         }
 
-        private void UpdateGameBoard()
+        public void UpdateGameBoard()
         {
             gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
         }
@@ -511,6 +548,11 @@ namespace StartGame
         #endregion GUI Updates
 
         #region Event Handler
+
+        private void StatusList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateStatusInfo();
+        }
 
         private void ShowBlockedFields_Click(object sender, EventArgs e)
         {
@@ -699,7 +741,7 @@ namespace StartGame
                         humanPlayer.troop.Position = humanPos;
 
                         MapTile end = map.map[humanPlayer.troop.Position.X, humanPlayer.troop.Position.Y];
-                        PlayerMoved(this, new PlayerMovementData() { start = start, distance = AIUtility.Distance(start.position, end.position), goal = end });
+                        PlayerMoved(this, new PlayerMovementData() { player = humanPlayer, start = start, distance = AIUtility.Distance(start.position, end.position), goal = end });
 
                         map.DrawEntities();
                         UpdateOverlay();
@@ -795,6 +837,57 @@ namespace StartGame
         #endregion Event Handler
 
         #region Player Events
+
+        public void DamageAtField(int damage, Point point)
+        {
+            if (players.Exists(p => p.troop.Position == point))
+            {
+                DamagePlayer(damage, players.First(p => p.troop.Position == point));
+            }
+        }
+
+        /// <summary>
+        /// Damage player is used to damage players due to enviromental(statuses) causes
+        /// </summary>
+        /// <param name="damage"> Damage dealt </param>
+        /// <param name="player"> Player damaged </param>
+        public void DamagePlayer(int damage, Player player)
+        {
+            damage = Math.Min(player.troop.health, damage);
+            player.troop.health -= damage;
+
+            if (player.troop.health <= 0)
+            {
+                if (player.Name == humanPlayer.Name)
+                {
+                    PlayerDied();
+                    return;
+                }
+                else
+                {
+                    //Enemy Died
+                    player.troop.Die();
+                    map.troops.Remove(player.troop);
+                    map.entites.Remove(player.troop);
+                    players.Remove(player);
+                    UpdatePlayerList();
+
+                    //Let player gain xp
+                    humanPlayer.GainXP(player.XP);
+                }
+            }
+
+            if (player.Name == humanPlayer.Name)
+            {
+                playerDamage += damage;
+            }
+            else
+            {
+                map.overlayObjects.Add(new OverlayText(player.troop.Position.X * fieldSize, player.troop.Position.Y * fieldSize, Color.Red, $"-{damage}"));
+            }
+
+            UpdateOverlay();
+        }
 
         private void LevelUp()
         {
@@ -998,6 +1091,21 @@ namespace StartGame
             map.troops.Add(player.troop);
             map.entites.Add(player.troop);
             UpdatePlayerList();
+        }
+
+        public void MovePlayer(Point end, Point start, Player player, bool CostActionPoints = true)
+        {
+            Point troopP = player.troop.Position;
+            troopP.X = end.X;
+            troopP.Y = end.Y;
+            player.troop.Position = troopP;
+            int distance = AIUtility.Distance(start, end);
+            if (CostActionPoints)
+                player.actionPoints -= distance; //Bug: Non human players should still move correctly
+
+            PlayerMoved(this, new PlayerMovementData() { player = player, start = map.map[start.X, start.Y], goal = map.map[end.X, end.Y], distance = distance });
+
+            map.DrawEntities();
         }
 
         #endregion Program Interaction

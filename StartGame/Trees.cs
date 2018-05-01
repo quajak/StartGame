@@ -41,6 +41,7 @@ namespace StartGame
     {
         public Skill(string Name, string Description, string Reason) : base(Name, Description, Reason)
         {
+            //TODO: Allow skills to gain levels
         }
     }
 
@@ -185,19 +186,22 @@ namespace StartGame
 
         public void Update(object sender, PlayerMovementData e)
         {
-            totalDistance += e.distance;
-            if (totalDistance > distanceNeeded)
+            if (e.player.Name == MainGame.humanPlayer.Name)
             {
-                MainGame.humanPlayer.trees.Add(this);
-                MainGame.UpdateTreeView();
+                totalDistance += e.distance;
+                if (totalDistance > distanceNeeded)
+                {
+                    MainGame.humanPlayer.trees.Add(this);
+                    MainGame.UpdateTreeView();
 
-                //Remove listener
-                MainGame.PlayerMoved -= Update;
+                    //Remove listener
+                    MainGame.PlayerMoved -= Update;
 
-                //Pop uo for skill notice
-                MainGame.TreeGained(this);
+                    //Pop uo for skill notice
+                    MainGame.TreeGained(this);
 
-                Activate();
+                    Activate();
+                }
             }
         }
 
@@ -227,9 +231,8 @@ namespace StartGame
 
         private void Combat(object sender, CombatData e)
         {
-            if (e.attacker.Name == MainGame.humanPlayer.Name)
+            if (e.attacker.Name == MainGame.humanPlayer.Name && e.doged != false)
             {
-                MainGame.WriteConsole("HUman player dealt " + e.damage + " damage");
                 damageDealt += e.damage;
                 if (damageDealt >= DamageNeeded)
                 {

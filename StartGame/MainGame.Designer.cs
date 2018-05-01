@@ -80,11 +80,17 @@
             this.console = new System.Windows.Forms.TextBox();
             this.ShowBlockedFields = new System.Windows.Forms.Button();
             this.enemyMovement = new System.Windows.Forms.CheckBox();
+            this.statsPanel = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.statusList = new System.Windows.Forms.ListBox();
+            this.statusTitle = new System.Windows.Forms.Label();
+            this.statusDescription = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.statsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // gameBoard
@@ -354,16 +360,16 @@
             // 
             this.spellList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.spellList.FormattingEnabled = true;
-            this.spellList.Location = new System.Drawing.Point(1030, 13);
+            this.spellList.Location = new System.Drawing.Point(1030, 231);
             this.spellList.Name = "spellList";
-            this.spellList.Size = new System.Drawing.Size(202, 212);
+            this.spellList.Size = new System.Drawing.Size(202, 95);
             this.spellList.TabIndex = 7;
             // 
             // spellInfo
             // 
-            this.spellInfo.Location = new System.Drawing.Point(1030, 232);
+            this.spellInfo.Location = new System.Drawing.Point(1030, 333);
             this.spellInfo.Name = "spellInfo";
-            this.spellInfo.Size = new System.Drawing.Size(202, 182);
+            this.spellInfo.Size = new System.Drawing.Size(202, 81);
             this.spellInfo.TabIndex = 7;
             // 
             // nextAction
@@ -591,11 +597,62 @@
             this.enemyMovement.Text = "All enemies move at once";
             this.enemyMovement.UseVisualStyleBackColor = true;
             // 
+            // statsPanel
+            // 
+            this.statsPanel.Controls.Add(this.statusDescription);
+            this.statsPanel.Controls.Add(this.statusTitle);
+            this.statsPanel.Controls.Add(this.statusList);
+            this.statsPanel.Controls.Add(this.label3);
+            this.statsPanel.Location = new System.Drawing.Point(1033, 15);
+            this.statsPanel.Name = "statsPanel";
+            this.statsPanel.Size = new System.Drawing.Size(198, 209);
+            this.statsPanel.TabIndex = 25;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.label3.Location = new System.Drawing.Point(59, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(73, 20);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Statuses";
+            // 
+            // statusList
+            // 
+            this.statusList.FormattingEnabled = true;
+            this.statusList.Location = new System.Drawing.Point(4, 23);
+            this.statusList.Name = "statusList";
+            this.statusList.Size = new System.Drawing.Size(191, 82);
+            this.statusList.TabIndex = 1;
+            this.statusList.SelectedIndexChanged += new System.EventHandler(this.StatusList_SelectedIndexChanged);
+            // 
+            // statusTitle
+            // 
+            this.statusTitle.AutoSize = true;
+            this.statusTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.statusTitle.Location = new System.Drawing.Point(4, 112);
+            this.statusTitle.Name = "statusTitle";
+            this.statusTitle.Size = new System.Drawing.Size(66, 13);
+            this.statusTitle.TabIndex = 2;
+            this.statusTitle.Text = "statusTitle";
+            // 
+            // statusDescription
+            // 
+            this.statusDescription.AutoSize = true;
+            this.statusDescription.Location = new System.Drawing.Point(7, 129);
+            this.statusDescription.MaximumSize = new System.Drawing.Size(190, 100);
+            this.statusDescription.Name = "statusDescription";
+            this.statusDescription.Size = new System.Drawing.Size(88, 13);
+            this.statusDescription.TabIndex = 3;
+            this.statusDescription.Text = "statusDescription";
+            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 639);
+            this.Controls.Add(this.statsPanel);
             this.Controls.Add(this.enemyMovement);
             this.Controls.Add(this.ShowBlockedFields);
             this.Controls.Add(this.console);
@@ -633,6 +690,8 @@
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.statsPanel.ResumeLayout(false);
+            this.statsPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -691,6 +750,11 @@
         private System.Windows.Forms.TextBox console;
         private System.Windows.Forms.Button ShowBlockedFields;
         private System.Windows.Forms.CheckBox enemyMovement;
+        private System.Windows.Forms.Panel statsPanel;
+        private System.Windows.Forms.Label statusDescription;
+        private System.Windows.Forms.Label statusTitle;
+        private System.Windows.Forms.ListBox statusList;
+        private System.Windows.Forms.Label label3;
     }
 }
 

@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace PlayerCreator
 {
-    public partial class PlayerProfile : Form
+    internal partial class PlayerProfile : Form
     {
         public Troop troop;
 

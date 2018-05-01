@@ -30,6 +30,8 @@ namespace StartGame
         public abstract bool MapValidity(Map map);
 
         public abstract (WeaponReward weapon, int xp) Reward();
+
+        public abstract bool MissionAllowed(int Round);
     }
 
     internal class BanditMission : Mission
@@ -105,7 +107,7 @@ namespace StartGame
                 {
                     desc += $"You can also reach the field [{goal.X}, {goal.Y}] to win.";
                     //Make the player go somewhere
-                    map.overlayObjects.Add(new OverlayRectangle(goal.X * MapCreator.fieldSize, goal.Y * MapCreator.fieldSize, MapCreator.fieldSize, MapCreator.fieldSize, Color.Gold, Once: true));
+                    map.overlayObjects.Add(new OverlayRectangle(goal.X * MapCreator.fieldSize, goal.Y * MapCreator.fieldSize, MapCreator.fieldSize, MapCreator.fieldSize, Color.Gold, Once: false));
                     wins.Add((_map, main) => goal == main.humanPlayer.troop.Position);
                 }
             }
@@ -135,6 +137,11 @@ namespace StartGame
         public override (WeaponReward weapon, int xp) Reward()
         {
             return (new WeaponReward() { random = true, rarity = 0, reward = null }, 5);
+        }
+
+        public override bool MissionAllowed(int Round)
+        {
+            return Round < 5;
         }
     }
 
@@ -233,6 +240,88 @@ namespace StartGame
         public override (WeaponReward weapon, int xp) Reward()
         {
             return (new WeaponReward() { random = true, rarity = 0, reward = null }, 2);
+        }
+
+        public override bool MissionAllowed(int Round)
+        {
+            return Round > 1;
+        }
+    }
+
+    internal class ElementalWizardFight : Mission
+    {
+        public ElementalWizardFight()
+        {
+        }
+
+        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description)
+            GenerateMission(int difficulty, int Round, Map map, Player player)
+        {
+            Random rng = new Random();
+            rng.Next();
+
+            string desc = "Welcome to the mission. ";
+
+            #region Player Creation
+
+            List<Player> players = new List<Player>() { player };
+
+            //Find position of player
+            players[0].troop.Position = map.DeterminSpawnPoint(1, SpawnType.road)[0];
+
+            List<Point> startPos = map.DeterminSpawnPoint(1, SpawnType.heighestField);
+            string name = $"Elemental Wizard";
+            players.Add(new ElementalWizard(PlayerType.computer, name, map, new Player[] { player }, difficulty, Round)
+            {
+                troop = new Troop(name, (difficulty / 3) + (int)(Round * 1.5) + 5,
+                new Weapon(3 + difficulty / 5 + Round / 2,
+                    AttackType.melee, 1, "Dagger", 2, false),
+                Resources.enemyScout, 0, map, Dodge: 25)
+            });
+            players[1].troop.Position = startPos[0];
+
+            #endregion Player Creation
+
+            #region WinCodition Creation
+
+            //Must kill spider nest to win
+
+            List<WinCheck> wins = new List<WinCheck>
+            {
+                deathCheck
+            };
+            desc += "Kill the wizard to survive. ";
+
+            #endregion WinCodition Creation
+
+            #region DeathCondition Creation
+
+            List<WinCheck> deaths = new List<WinCheck>
+            {
+                playerDeath
+            };
+
+            desc += "Do not die. ";
+
+            #endregion DeathCondition Creation
+
+            desc += "Good luck! ";
+            return (players, wins, deaths, desc);
+        }
+
+        public override bool MapValidity(Map map)
+        {
+            return true;
+        }
+
+        public override (WeaponReward weapon, int xp) Reward()
+        {
+            return (new WeaponReward() { random = true, rarity = 3, reward = null }, 5);
+        }
+
+        public override bool MissionAllowed(int Round)
+        {
+            return Round > 3;
         }
     }
 
@@ -351,6 +440,11 @@ namespace StartGame
         public override (WeaponReward weapon, int xp) Reward()
         {
             return (new WeaponReward() { random = true, rarity = 3, reward = null }, 5);
+        }
+
+        public override bool MissionAllowed(int Round)
+        {
+            return Round > 2;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using StartGame;
+using StartGame.Properties;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -7,7 +8,7 @@ namespace PlayerCreator
     public enum AttackType
     { melee, range, magic };
 
-    public abstract class Entity
+    internal abstract class Entity
     {
         public readonly string name;
         private Point position;
@@ -47,14 +48,14 @@ namespace PlayerCreator
         }
     }
 
-    public class Building : Entity
+    internal class Building : Entity
     {
         public Building(string Name, Point Position, Bitmap Image, Map map, bool Blocking = true) : base(Name, Position, Image, Blocking, map)
         {
         }
     }
 
-    public class Troop : Entity
+    internal class Troop : Entity
     {
         public Weapon activeWeapon;
         public List<Weapon> weapons = new List<Weapon>();
@@ -66,6 +67,8 @@ namespace PlayerCreator
         public int dodge;
 
         private int weaponIndex = 0;
+
+        public List<Status> statuses = new List<Status>();
 
         public int WeaponIndex
         {

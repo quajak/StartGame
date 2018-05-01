@@ -6,7 +6,7 @@ using PlayerCreator;
 
 namespace StartGame
 {
-    public class Map
+    internal class Map
     {
         public const int Width = 31;
         public const int Height = 31;
@@ -824,6 +824,14 @@ namespace StartGame
                     FindRandomLandTile(playerNumber, ref toReturn);
                     break;
 
+                case SpawnType.heighestField:
+
+                    var ordered = from field in map.Cast<MapTile>()
+                                  orderby field.height descending
+                                  select field;
+                    toReturn = ordered.Take(playerNumber).ToList().ConvertAll(f => f.position);
+                    break;
+
                 default:
                     break;
             }
@@ -886,7 +894,7 @@ namespace StartGame
     }
 
     public enum SpawnType
-    { road, random, randomLand };
+    { road, random, randomLand, heighestField };
 
     public class OverlayObject
     {

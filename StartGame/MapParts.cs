@@ -7,7 +7,7 @@ using System.Linq;
 namespace StartGame
 {
     [DebuggerDisplay("X:{position.X} Y:{position.Y} Type:{type.type.ToString()}")]
-    public class MapTile : ICloneable
+    internal class MapTile : ICloneable
     {
         public Point position;
         public MapTileType type;
@@ -88,7 +88,7 @@ namespace StartGame
         }
     }
 
-    public class SorroundingTiles : ICloneable
+    internal class SorroundingTiles : ICloneable
     {
         public MapTile top;
         public MapTile left;
@@ -194,7 +194,7 @@ namespace StartGame
         }
     }
 
-    public class EdgeArray
+    internal class EdgeArray
     {
         public List<MapTile> top;
         public List<MapTile> bottom;
@@ -210,7 +210,7 @@ namespace StartGame
         }
     }
 
-    public class Continent
+    internal class Continent
     {
         public List<MapTile> tiles;
         public MapTileTypeEnum Type { get; private set; }

@@ -21,15 +21,24 @@ namespace StartGame
         public Map map;
         internal Player[] enemies;
         public int XP;
+        internal readonly List<Spell> spells;
 
         //Derived stats
         public int maxActionPoints = 4;
 
         public Troop troop;
 
-        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP)
+        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, List<Spell> spells = null)
         {
             this.XP = XP;
+            if (spells != null)
+            {
+                this.spells = spells;
+            }
+            else
+            {
+                this.spells = new List<Spell>();
+            }
             enemies = Enemies;
             type = Type;
             Name = name;
@@ -187,12 +196,9 @@ namespace StartGame
                 //Move to closest field
                 int closestDistance = AIUtility.Distance(closestField, playerPos);
                 if (closestDistance >= playerDistance) break;
-                Point troopP = troop.Position;
-                troopP.X = closestField.X;
-                troopP.Y = closestField.Y;
-                troop.Position = troopP;
-                actionPoints -= closestDistance;
-                map.DrawEntities();
+
+                main.MovePlayer(closestField, playerPos, this);
+
                 distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y,
                     playerPos.X, playerPos.Y, map, true);
                 distanceGraph.CreateGraph();
@@ -321,12 +327,9 @@ namespace StartGame
                 //Move to closest field
                 int closestDistance = AIUtility.Distance(closestField, goalPos);
                 if (closestDistance >= AIUtility.Distance(troop.Position, goalPos)) break;
-                Point troopP = troop.Position;
-                troopP.X = closestField.X;
-                troopP.Y = closestField.Y;
-                troop.Position = troopP;
-                actionPoints -= closestDistance; //Easy: Calculate actual cost
-                map.DrawEntities();
+
+                main.MovePlayer(closestField, playerPos, this);
+
                 campGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y, camp.X, camp.Y, map, true);
                 campGraph.CreateGraph();
                 distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y,
@@ -423,12 +426,9 @@ namespace StartGame
                 //Move to closest field
                 int closestDistance = AIUtility.Distance(closestField, playerPos);
                 if (closestDistance >= playerDistance) break;
-                Point troopP = troop.Position;
-                troopP.X = closestField.X;
-                troopP.Y = closestField.Y;
-                troop.Position = troopP;
-                actionPoints -= closestDistance;
-                map.DrawEntities();
+
+                main.MovePlayer(closestField, playerPos, this);
+
                 distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y,
                     playerPos.X, playerPos.Y, map, false);
                 distanceGraph.CreateGraph();
@@ -499,6 +499,70 @@ namespace StartGame
                 main.AddPlayer(spider);
 
                 turn = 5 - (difficulty / 2);
+            }
+        }
+    }
+
+    internal class ElementalWizard : Player
+    {
+        //TODO: Make the AI more difficult by adding more spells, or making him move
+        private readonly int difficulty;
+
+        private int lastHealth;
+        private readonly int round;
+
+        public ElementalWizard(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 10
+            , new List<Spell>() { new FireBall(Difficulty / 2 + Round + 1, Difficulty / 3 + 1 ,6 - Difficulty / 2, 0)
+                , new TeleportSpell(8- Difficulty/2, 0)
+            })
+        {
+            map = Map;
+            round = Round;
+            difficulty = Difficulty;
+        }
+
+        public override void Initialise(MainGameWindow main)
+        {
+            spells.ForEach(s => s.Initialise(main, map));
+            lastHealth = troop.health;
+        }
+
+        public override void PlayTurn(MainGameWindow main, bool singleTurn)
+        {
+            //Decrease spell cooldown
+            foreach (Spell spell in spells)
+            {
+                spell.coolDown = spell.coolDown == 0 ? 0 : spell.coolDown - 1;
+            }
+
+            //Panic if he has been hit or player is close and he is on low health
+            if (troop.health != lastHealth || (AIUtility.Distance(troop.Position, enemies[0].troop.Position) < 4 && troop.health != troop.maxHealth))
+            {
+                lastHealth = troop.health;
+                //If teleport spell is ready
+                if (spells[1].Ready)
+                {
+                    //Find heighest free space
+                    var HeightSorted = from field in map.map.Cast<MapTile>()
+                                       where field.free
+                                       where AIUtility.Distance(field.position, enemies[0].troop.Position) > 10
+                                       orderby field.height descending
+                                       select field;
+                    //Teleport
+                    spells[1].Activate(new SpellInformation() { positions = new List<Point>() { troop.Position, HeightSorted.Take(1).ToList()[0].position } });
+                    return; //Finish turn
+                }
+                else
+                {
+                    main.WriteConsole("The wizard wimpers");
+                    return;
+                }
+            }
+
+            //Attack
+            if (spells[0].Ready)
+            {
+                spells[0].Activate(new SpellInformation() { positions = new List<Point> { enemies[0].troop.Position } });
             }
         }
     }
