@@ -65,6 +65,11 @@ namespace StartGame
         public int agility; //Chance to dodge
         public int endurance; //How many action points + defense
         public int vitality; //How much health
+        public int wisdom; //how much mana
+        public int intelligence; //improves the effectivness of spells
+
+        public int mana;
+        public int maxMana;
 
         public int level = 1;
         public int xp = 0;
@@ -82,6 +87,8 @@ namespace StartGame
             agility = 1;
             endurance = 1;
             vitality = 10;
+            wisdom = 1;
+            intelligence = 1;
         }
 
         public void CalculateStats()
@@ -95,6 +102,10 @@ namespace StartGame
             troop.defense = endurance / 5;
 
             troop.dodge = troop.baseDodge + agility * 2;
+
+            int manaDifference = mana - maxMana;
+            maxMana = wisdom * 2 + 10;
+            mana = maxMana - manaDifference;
         }
 
         public void GainXP(int XP)

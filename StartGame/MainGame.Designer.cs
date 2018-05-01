@@ -31,6 +31,9 @@
             this.gameBoard = new System.Windows.Forms.PictureBox();
             this.troopList = new System.Windows.Forms.ListBox();
             this.enemyInfo = new System.Windows.Forms.Panel();
+            this.playerMana = new System.Windows.Forms.Label();
+            this.playerIntelligence = new System.Windows.Forms.Label();
+            this.playerWisdom = new System.Windows.Forms.Label();
             this.playerXP = new System.Windows.Forms.Label();
             this.playerLevel = new System.Windows.Forms.Label();
             this.playerVitatlity = new System.Windows.Forms.Label();
@@ -57,6 +60,9 @@
             this.enemyName = new System.Windows.Forms.Label();
             this.spellList = new System.Windows.Forms.ListBox();
             this.spellInfo = new System.Windows.Forms.Panel();
+            this.castSpell = new System.Windows.Forms.Button();
+            this.spellDescription = new System.Windows.Forms.Label();
+            this.spellName = new System.Windows.Forms.Label();
             this.nextAction = new System.Windows.Forms.Button();
             this.playerWeaponList = new System.Windows.Forms.ListBox();
             this.playerPossibleWeaponName = new System.Windows.Forms.Label();
@@ -81,13 +87,16 @@
             this.ShowBlockedFields = new System.Windows.Forms.Button();
             this.enemyMovement = new System.Windows.Forms.CheckBox();
             this.statsPanel = new System.Windows.Forms.Panel();
-            this.label3 = new System.Windows.Forms.Label();
-            this.statusList = new System.Windows.Forms.ListBox();
-            this.statusTitle = new System.Windows.Forms.Label();
             this.statusDescription = new System.Windows.Forms.Label();
+            this.statusTitle = new System.Windows.Forms.Label();
+            this.statusList = new System.Windows.Forms.ListBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.debugButton = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
+            this.spellInfo.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.statsPanel.SuspendLayout();
@@ -114,6 +123,9 @@
             // 
             // enemyInfo
             // 
+            this.enemyInfo.Controls.Add(this.playerMana);
+            this.enemyInfo.Controls.Add(this.playerIntelligence);
+            this.enemyInfo.Controls.Add(this.playerWisdom);
             this.enemyInfo.Controls.Add(this.playerXP);
             this.enemyInfo.Controls.Add(this.playerLevel);
             this.enemyInfo.Controls.Add(this.playerVitatlity);
@@ -133,6 +145,33 @@
             this.enemyInfo.Name = "enemyInfo";
             this.enemyInfo.Size = new System.Drawing.Size(202, 212);
             this.enemyInfo.TabIndex = 3;
+            // 
+            // playerMana
+            // 
+            this.playerMana.AutoSize = true;
+            this.playerMana.Location = new System.Drawing.Point(3, 121);
+            this.playerMana.Name = "playerMana";
+            this.playerMana.Size = new System.Drawing.Size(62, 13);
+            this.playerMana.TabIndex = 24;
+            this.playerMana.Text = "playerMana";
+            // 
+            // playerIntelligence
+            // 
+            this.playerIntelligence.AutoSize = true;
+            this.playerIntelligence.Location = new System.Drawing.Point(115, 69);
+            this.playerIntelligence.Name = "playerIntelligence";
+            this.playerIntelligence.Size = new System.Drawing.Size(89, 13);
+            this.playerIntelligence.TabIndex = 23;
+            this.playerIntelligence.Text = "playerIntelligence";
+            // 
+            // playerWisdom
+            // 
+            this.playerWisdom.AutoSize = true;
+            this.playerWisdom.Location = new System.Drawing.Point(115, 56);
+            this.playerWisdom.Name = "playerWisdom";
+            this.playerWisdom.Size = new System.Drawing.Size(73, 13);
+            this.playerWisdom.TabIndex = 22;
+            this.playerWisdom.Text = "playerWisdom";
             // 
             // playerXP
             // 
@@ -360,17 +399,49 @@
             // 
             this.spellList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.spellList.FormattingEnabled = true;
-            this.spellList.Location = new System.Drawing.Point(1030, 231);
+            this.spellList.Location = new System.Drawing.Point(1030, 244);
             this.spellList.Name = "spellList";
-            this.spellList.Size = new System.Drawing.Size(202, 95);
+            this.spellList.Size = new System.Drawing.Size(202, 82);
             this.spellList.TabIndex = 7;
+            this.spellList.SelectedIndexChanged += new System.EventHandler(this.SpellList_SelectedIndexChanged);
             // 
             // spellInfo
             // 
+            this.spellInfo.Controls.Add(this.castSpell);
+            this.spellInfo.Controls.Add(this.spellDescription);
+            this.spellInfo.Controls.Add(this.spellName);
             this.spellInfo.Location = new System.Drawing.Point(1030, 333);
             this.spellInfo.Name = "spellInfo";
             this.spellInfo.Size = new System.Drawing.Size(202, 81);
             this.spellInfo.TabIndex = 7;
+            // 
+            // castSpell
+            // 
+            this.castSpell.Location = new System.Drawing.Point(7, 56);
+            this.castSpell.Name = "castSpell";
+            this.castSpell.Size = new System.Drawing.Size(77, 23);
+            this.castSpell.TabIndex = 2;
+            this.castSpell.Text = "Cast Spell";
+            this.castSpell.UseVisualStyleBackColor = true;
+            this.castSpell.Click += new System.EventHandler(this.CastSpell_Click);
+            // 
+            // spellDescription
+            // 
+            this.spellDescription.AutoSize = true;
+            this.spellDescription.Location = new System.Drawing.Point(4, 21);
+            this.spellDescription.Name = "spellDescription";
+            this.spellDescription.Size = new System.Drawing.Size(81, 13);
+            this.spellDescription.TabIndex = 1;
+            this.spellDescription.Text = "spellDescription";
+            // 
+            // spellName
+            // 
+            this.spellName.AutoSize = true;
+            this.spellName.Location = new System.Drawing.Point(4, 4);
+            this.spellName.Name = "spellName";
+            this.spellName.Size = new System.Drawing.Size(56, 13);
+            this.spellName.TabIndex = 0;
+            this.spellName.Text = "spellName";
             // 
             // nextAction
             // 
@@ -608,24 +679,15 @@
             this.statsPanel.Size = new System.Drawing.Size(198, 209);
             this.statsPanel.TabIndex = 25;
             // 
-            // label3
+            // statusDescription
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.label3.Location = new System.Drawing.Point(59, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(73, 20);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Statuses";
-            // 
-            // statusList
-            // 
-            this.statusList.FormattingEnabled = true;
-            this.statusList.Location = new System.Drawing.Point(4, 23);
-            this.statusList.Name = "statusList";
-            this.statusList.Size = new System.Drawing.Size(191, 82);
-            this.statusList.TabIndex = 1;
-            this.statusList.SelectedIndexChanged += new System.EventHandler(this.StatusList_SelectedIndexChanged);
+            this.statusDescription.AutoSize = true;
+            this.statusDescription.Location = new System.Drawing.Point(7, 129);
+            this.statusDescription.MaximumSize = new System.Drawing.Size(190, 100);
+            this.statusDescription.Name = "statusDescription";
+            this.statusDescription.Size = new System.Drawing.Size(88, 13);
+            this.statusDescription.TabIndex = 3;
+            this.statusDescription.Text = "statusDescription";
             // 
             // statusTitle
             // 
@@ -637,21 +699,52 @@
             this.statusTitle.TabIndex = 2;
             this.statusTitle.Text = "statusTitle";
             // 
-            // statusDescription
+            // statusList
             // 
-            this.statusDescription.AutoSize = true;
-            this.statusDescription.Location = new System.Drawing.Point(7, 129);
-            this.statusDescription.MaximumSize = new System.Drawing.Size(190, 100);
-            this.statusDescription.Name = "statusDescription";
-            this.statusDescription.Size = new System.Drawing.Size(88, 13);
-            this.statusDescription.TabIndex = 3;
-            this.statusDescription.Text = "statusDescription";
+            this.statusList.FormattingEnabled = true;
+            this.statusList.Location = new System.Drawing.Point(4, 23);
+            this.statusList.Name = "statusList";
+            this.statusList.Size = new System.Drawing.Size(191, 82);
+            this.statusList.TabIndex = 1;
+            this.statusList.SelectedIndexChanged += new System.EventHandler(this.StatusList_SelectedIndexChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.label3.Location = new System.Drawing.Point(59, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(73, 20);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Statuses";
+            // 
+            // debugButton
+            // 
+            this.debugButton.Location = new System.Drawing.Point(1030, 599);
+            this.debugButton.Name = "debugButton";
+            this.debugButton.Size = new System.Drawing.Size(23, 23);
+            this.debugButton.TabIndex = 26;
+            this.debugButton.Text = "D";
+            this.debugButton.UseVisualStyleBackColor = true;
+            this.debugButton.Click += new System.EventHandler(this.debugButton_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.label4.Location = new System.Drawing.Point(1105, 221);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(52, 20);
+            this.label4.TabIndex = 4;
+            this.label4.Text = "Spells";
             // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1241, 639);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.debugButton);
             this.Controls.Add(this.statsPanel);
             this.Controls.Add(this.enemyMovement);
             this.Controls.Add(this.ShowBlockedFields);
@@ -686,6 +779,8 @@
             this.enemyInfo.PerformLayout();
             this.playerInfo.ResumeLayout(false);
             this.playerInfo.PerformLayout();
+            this.spellInfo.ResumeLayout(false);
+            this.spellInfo.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -755,6 +850,14 @@
         private System.Windows.Forms.Label statusTitle;
         private System.Windows.Forms.ListBox statusList;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button debugButton;
+        private System.Windows.Forms.Label playerIntelligence;
+        private System.Windows.Forms.Label playerWisdom;
+        private System.Windows.Forms.Label playerMana;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label spellDescription;
+        private System.Windows.Forms.Label spellName;
+        private System.Windows.Forms.Button castSpell;
     }
 }
 

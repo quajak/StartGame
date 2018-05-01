@@ -43,6 +43,13 @@ namespace StartGame
         public int playerDamage;
         public int playerDoged;
 
+        private Spell activeSpell;
+        private List<Point> spellPoints = new List<Point>();
+        private bool castingspell;
+
+        private DebugEditor debug;
+        public bool forceWin = false;
+
         public MainGameWindow(Map Map, HumanPlayer player, Mission mission, List<Tree> trees, Campaign Campaign = null)
         {
             player.main = this;
@@ -138,6 +145,14 @@ namespace StartGame
 
             //Set level up button correctly
             levelUpButton.Enabled = humanPlayer.storedLevelUps != 0;
+
+            //DEBUG
+            debug = new DebugEditor(this);
+
+            humanPlayer.spells.Add(new FireBall(10, 2, 2, 0));
+            humanPlayer.spells.ForEach(s => s.Initialise(this, map));
+
+            UpdateSpellList();
         }
 
         #region Game Logic
@@ -232,6 +247,7 @@ namespace StartGame
             activePlayer.active = false;
             activePlayer = players[activePlayerCounter];
             activePlayer.active = true;
+            activePlayer.spells.ForEach(s => s.coolDown--);
 
             Turn(this, new TurnData() { active = activePlayer });
 
@@ -344,6 +360,40 @@ namespace StartGame
             {
                 treeName.Text = humanPlayer.trees[selected].name;
                 treeInformation.Text = humanPlayer.trees[selected].description + " \n " + "Found by " + humanPlayer.trees[selected].reason;
+            }
+        }
+
+        private void UpdateSpellList()
+        {
+            List<string> spellNames = humanPlayer.spells.ConvertAll(t => t.name);
+            List<string> diff = spellList.Items.Cast<string>().Except(spellNames).ToList();
+            foreach (string dif in diff)
+            {
+                spellList.Items.Remove(dif);
+            }
+
+            diff = spellNames.Except(spellList.Items.Cast<string>()).ToList();
+            foreach (string dif in diff)
+            {
+                spellList.Items.Add(dif);
+            }
+
+            UpdateSpellInfo();
+        }
+
+        private void UpdateSpellInfo()
+        {
+            int index = spellList.SelectedIndex;
+            if (index != -1)
+            {
+                Spell spell = humanPlayer.spells[index];
+                spellName.Text = spell.name;
+                spellDescription.Text = $"Mana: {spell.manaCost} Cooldown: {spell.coolDown} / {spell.MaxCoolDown}";
+            }
+            else
+            {
+                spellName.Text = "";
+                spellDescription.Text = "";
             }
         }
 
@@ -471,6 +521,9 @@ namespace StartGame
                 playerVitatlity.Text = $"Vitality: {humanPlayer.vitality}";
                 playerLevel.Text = $"Level: {humanPlayer.level} + ({humanPlayer.storedLevelUps})";
                 playerXP.Text = $"XP: {humanPlayer.xp} / {humanPlayer.levelXP}";
+                playerMana.Text = $"Mana: {humanPlayer.mana} / {humanPlayer.maxMana}";
+                playerWisdom.Text = $"Wisdom: {humanPlayer.wisdom}";
+                playerIntelligence.Text = $"Intelligence: {humanPlayer.intelligence}";
             }
         }
 
@@ -620,6 +673,24 @@ namespace StartGame
             ShowWeaponStats();
         }
 
+        private void debugButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                debug.Show();
+            }
+            catch (Exception)
+            {
+                debug = new DebugEditor(this);
+                debug.Show();
+            }
+        }
+
+        private void SpellList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateSpellInfo();
+        }
+
         private void ChangeWeapon_Click(object sender, EventArgs e)
         {
             if (playerWeaponList.SelectedIndex >= 0)
@@ -641,8 +712,27 @@ namespace StartGame
             activePlayer.ActionButtonPressed(this);
         }
 
+        private void CastSpell_Click(object sender, EventArgs e)
+        {
+            if (spellList.SelectedIndex != -1)
+            {
+                activeSpell = humanPlayer.spells[spellList.SelectedIndex];
+                if (activeSpell.Ready && humanPlayer.mana >= activeSpell.manaCost)
+                {
+                    humanPlayer.mana -= activeSpell.manaCost;
+                    if (activeSpell.format.Positions != 0)
+                    {
+                        castingspell = true;
+                        castSpell.Text = "Select position on map";
+                    }
+                }
+            }
+        }
+
         private void MainGameWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
+            debug.Close();
+            if (forceWin) return;
             bool won = false;
             if (useWinChecks)
             {
@@ -689,7 +779,25 @@ namespace StartGame
 
             int x = e.X - e.X % fieldSize;
             int y = e.Y - e.Y % fieldSize;
-            FocusField(X, Y);
+            if (castingspell)
+            {
+                spellPoints.Add(new Point(X, Y));
+                map.overlayObjects.Add(new OverlayRectangle(x, y, 20, 20, Color.Orange));
+                if (spellPoints.Count == activeSpell.format.Positions)
+                {
+                    //Now cast
+                    activeSpell.Activate(new SpellInformation() { positions = spellPoints });
+
+                    spellPoints.Clear();
+                    castSpell.Text = "Cast spell";
+                    activeSpell = null;
+                    castingspell = false;
+                }
+            }
+            else
+            {
+                FocusField(X, Y);
+            }
         }
 
         private void FocusField(int X, int Y)

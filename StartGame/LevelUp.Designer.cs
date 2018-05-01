@@ -46,6 +46,13 @@
             this.playerActionPoints = new System.Windows.Forms.Label();
             this.ok = new System.Windows.Forms.Button();
             this.playerDodge = new System.Windows.Forms.Label();
+            this.wisdomDown = new System.Windows.Forms.Button();
+            this.wisdomUp = new System.Windows.Forms.Button();
+            this.playerWisdom = new System.Windows.Forms.Label();
+            this.intelligenceDown = new System.Windows.Forms.Button();
+            this.intelligenceUp = new System.Windows.Forms.Button();
+            this.playerIntelligence = new System.Windows.Forms.Label();
+            this.playerMana = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // playerName
@@ -176,7 +183,7 @@
             // playerMaxHealth
             // 
             this.playerMaxHealth.AutoSize = true;
-            this.playerMaxHealth.Location = new System.Drawing.Point(15, 153);
+            this.playerMaxHealth.Location = new System.Drawing.Point(186, 49);
             this.playerMaxHealth.Name = "playerMaxHealth";
             this.playerMaxHealth.Size = new System.Drawing.Size(86, 13);
             this.playerMaxHealth.TabIndex = 15;
@@ -185,7 +192,7 @@
             // playerDefense
             // 
             this.playerDefense.AutoSize = true;
-            this.playerDefense.Location = new System.Drawing.Point(15, 171);
+            this.playerDefense.Location = new System.Drawing.Point(186, 71);
             this.playerDefense.Name = "playerDefense";
             this.playerDefense.Size = new System.Drawing.Size(75, 13);
             this.playerDefense.TabIndex = 16;
@@ -194,7 +201,7 @@
             // playerActionPoints
             // 
             this.playerActionPoints.AutoSize = true;
-            this.playerActionPoints.Location = new System.Drawing.Point(15, 191);
+            this.playerActionPoints.Location = new System.Drawing.Point(186, 92);
             this.playerActionPoints.Name = "playerActionPoints";
             this.playerActionPoints.Size = new System.Drawing.Size(94, 13);
             this.playerActionPoints.TabIndex = 17;
@@ -213,17 +220,91 @@
             // playerDodge
             // 
             this.playerDodge.AutoSize = true;
-            this.playerDodge.Location = new System.Drawing.Point(18, 208);
+            this.playerDodge.Location = new System.Drawing.Point(186, 115);
             this.playerDodge.Name = "playerDodge";
             this.playerDodge.Size = new System.Drawing.Size(67, 13);
             this.playerDodge.TabIndex = 19;
             this.playerDodge.Text = "playerDodge";
+            // 
+            // wisdomDown
+            // 
+            this.wisdomDown.Location = new System.Drawing.Point(144, 138);
+            this.wisdomDown.Name = "wisdomDown";
+            this.wisdomDown.Size = new System.Drawing.Size(26, 23);
+            this.wisdomDown.TabIndex = 22;
+            this.wisdomDown.Text = "-";
+            this.wisdomDown.UseVisualStyleBackColor = true;
+            this.wisdomDown.Click += new System.EventHandler(this.WisdomDown_Click);
+            // 
+            // wisdomUp
+            // 
+            this.wisdomUp.Location = new System.Drawing.Point(118, 138);
+            this.wisdomUp.Name = "wisdomUp";
+            this.wisdomUp.Size = new System.Drawing.Size(26, 23);
+            this.wisdomUp.TabIndex = 21;
+            this.wisdomUp.Text = "+";
+            this.wisdomUp.UseVisualStyleBackColor = true;
+            this.wisdomUp.Click += new System.EventHandler(this.WisdomUp_Click);
+            // 
+            // playerWisdom
+            // 
+            this.playerWisdom.AutoSize = true;
+            this.playerWisdom.Location = new System.Drawing.Point(12, 139);
+            this.playerWisdom.Name = "playerWisdom";
+            this.playerWisdom.Size = new System.Drawing.Size(73, 13);
+            this.playerWisdom.TabIndex = 20;
+            this.playerWisdom.Text = "playerWisdom";
+            // 
+            // intelligenceDown
+            // 
+            this.intelligenceDown.Location = new System.Drawing.Point(144, 163);
+            this.intelligenceDown.Name = "intelligenceDown";
+            this.intelligenceDown.Size = new System.Drawing.Size(26, 23);
+            this.intelligenceDown.TabIndex = 25;
+            this.intelligenceDown.Text = "-";
+            this.intelligenceDown.UseVisualStyleBackColor = true;
+            this.intelligenceDown.Click += new System.EventHandler(this.IntelligenceDown_Click);
+            // 
+            // intelligenceUp
+            // 
+            this.intelligenceUp.Location = new System.Drawing.Point(118, 163);
+            this.intelligenceUp.Name = "intelligenceUp";
+            this.intelligenceUp.Size = new System.Drawing.Size(26, 23);
+            this.intelligenceUp.TabIndex = 24;
+            this.intelligenceUp.Text = "+";
+            this.intelligenceUp.UseVisualStyleBackColor = true;
+            this.intelligenceUp.Click += new System.EventHandler(this.IntelligenceUp_Click);
+            // 
+            // playerIntelligence
+            // 
+            this.playerIntelligence.AutoSize = true;
+            this.playerIntelligence.Location = new System.Drawing.Point(12, 164);
+            this.playerIntelligence.Name = "playerIntelligence";
+            this.playerIntelligence.Size = new System.Drawing.Size(89, 13);
+            this.playerIntelligence.TabIndex = 23;
+            this.playerIntelligence.Text = "playerIntelligence";
+            // 
+            // playerMana
+            // 
+            this.playerMana.AutoSize = true;
+            this.playerMana.Location = new System.Drawing.Point(186, 138);
+            this.playerMana.Name = "playerMana";
+            this.playerMana.Size = new System.Drawing.Size(62, 13);
+            this.playerMana.TabIndex = 26;
+            this.playerMana.Text = "playerMana";
             // 
             // LevelUp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Controls.Add(this.playerMana);
+            this.Controls.Add(this.intelligenceDown);
+            this.Controls.Add(this.intelligenceUp);
+            this.Controls.Add(this.playerIntelligence);
+            this.Controls.Add(this.wisdomDown);
+            this.Controls.Add(this.wisdomUp);
+            this.Controls.Add(this.playerWisdom);
             this.Controls.Add(this.playerDodge);
             this.Controls.Add(this.ok);
             this.Controls.Add(this.playerActionPoints);
@@ -269,5 +350,12 @@
         private System.Windows.Forms.Label playerActionPoints;
         private System.Windows.Forms.Button ok;
         private System.Windows.Forms.Label playerDodge;
+        private System.Windows.Forms.Button wisdomDown;
+        private System.Windows.Forms.Button wisdomUp;
+        private System.Windows.Forms.Label playerWisdom;
+        private System.Windows.Forms.Button intelligenceDown;
+        private System.Windows.Forms.Button intelligenceUp;
+        private System.Windows.Forms.Label playerIntelligence;
+        private System.Windows.Forms.Label playerMana;
     }
 }

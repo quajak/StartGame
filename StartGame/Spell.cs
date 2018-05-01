@@ -18,10 +18,13 @@ namespace StartGame
         internal MainGameWindow main;
         internal Map map;
 
+        public int manaCost;
+
         public bool Ready { get => coolDown == 0; set => coolDown = value ? 0 : coolDown; }
 
-        public Spell(string name, int MaxCoolDown, int? InitialCoolDown, SpellInformationFormat format)
+        public Spell(string name, int MaxCoolDown, int? InitialCoolDown, SpellInformationFormat format, int manaCost)
         {
+            this.manaCost = manaCost;
             this.name = name;
             this.MaxCoolDown = MaxCoolDown;
             coolDown = InitialCoolDown ?? MaxCoolDown;
@@ -60,7 +63,7 @@ namespace StartGame
         private readonly int turns;
 
         public FireBall(int damage, int turns, int MaxCoolDown, int? intialCoolDown) : base("Fireball", MaxCoolDown, intialCoolDown,
-            new SpellInformationFormat() { Positions = 1 })
+            new SpellInformationFormat() { Positions = 1 }, 5)
         {
             this.damage = damage;
             this.turns = turns;
@@ -89,7 +92,7 @@ namespace StartGame
     internal class TeleportSpell : Spell
     {
         public TeleportSpell(int MaxCoolDown, int? initalCoolDown) : base("Teleport", MaxCoolDown, initalCoolDown,
-            new SpellInformationFormat() { Positions = 2 })
+            new SpellInformationFormat() { Positions = 2 }, 10)
         {
         }
 
