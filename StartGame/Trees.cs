@@ -186,7 +186,7 @@ namespace StartGame
 
         public void Update(object sender, PlayerMovementData e)
         {
-            if (e.player.Name == MainGame.humanPlayer.Name)
+            if (e.player.Name == MainGame.humanPlayer.Name && e.movementType == MovementType.walk)
             {
                 totalDistance += e.distance;
                 if (totalDistance > distanceNeeded)

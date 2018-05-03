@@ -9,6 +9,18 @@ using System.Threading.Tasks;
 
 namespace StartGame
 {
+    internal struct Reward
+    {
+        public WeaponReward? weaponReward;
+        public int XP;
+        public SpellReward? spellReward;
+    }
+
+    internal struct SpellReward
+    {
+        public Spell spell;
+    }
+
     internal struct WeaponReward
     {
         public bool random;
@@ -29,7 +41,7 @@ namespace StartGame
 
         public abstract bool MapValidity(Map map);
 
-        public abstract (WeaponReward weapon, int xp) Reward();
+        public abstract Reward Reward();
 
         public abstract bool MissionAllowed(int Round);
     }
@@ -134,9 +146,15 @@ namespace StartGame
             return true;
         }
 
-        public override (WeaponReward weapon, int xp) Reward()
+        public override Reward Reward()
         {
-            return (new WeaponReward() { random = true, rarity = 0, reward = null }, 5);
+            return new Reward()
+            {
+                weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null }
+                ,
+                XP = 5,
+                spellReward = new SpellReward() { spell = new TeleportSpell(2, 0) }
+            };
         }
 
         public override bool MissionAllowed(int Round)
@@ -237,9 +255,14 @@ namespace StartGame
             return true;
         }
 
-        public override (WeaponReward weapon, int xp) Reward()
+        public override Reward Reward()
         {
-            return (new WeaponReward() { random = true, rarity = 0, reward = null }, 2);
+            return new Reward()
+            {
+                weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null },
+                XP = 2,
+                spellReward = null
+            };
         }
 
         public override bool MissionAllowed(int Round)
@@ -314,9 +337,14 @@ namespace StartGame
             return true;
         }
 
-        public override (WeaponReward weapon, int xp) Reward()
+        public override Reward Reward()
         {
-            return (new WeaponReward() { random = true, rarity = 3, reward = null }, 5);
+            return new Reward()
+            {
+                weaponReward = new WeaponReward() { random = true, rarity = 3, reward = null },
+                XP = 5,
+                spellReward = new SpellReward() { spell = new FireBall(10, 2, 3, 0) }
+            };
         }
 
         public override bool MissionAllowed(int Round)
@@ -437,9 +465,14 @@ namespace StartGame
             return map.goals.Count > 1 && map.map.Cast<MapTile>().ToList().Exists(t => t.neighbours.rawMaptiles.Count(n => n.type.FType == FieldType.land) == 4);
         }
 
-        public override (WeaponReward weapon, int xp) Reward()
+        public override Reward Reward()
         {
-            return (new WeaponReward() { random = true, rarity = 3, reward = null }, 5);
+            return new Reward()
+            {
+                weaponReward = new WeaponReward() { random = true, rarity = 3, reward = null },
+                XP = 5,
+                spellReward = null
+            };
         }
 
         public override bool MissionAllowed(int Round)

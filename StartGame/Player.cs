@@ -208,7 +208,7 @@ namespace StartGame
                 int closestDistance = AIUtility.Distance(closestField, playerPos);
                 if (closestDistance >= playerDistance) break;
 
-                main.MovePlayer(closestField, playerPos, this);
+                main.MovePlayer(closestField, playerPos, this, MovementType.walk);
 
                 distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y,
                     playerPos.X, playerPos.Y, map, true);
@@ -339,7 +339,7 @@ namespace StartGame
                 int closestDistance = AIUtility.Distance(closestField, goalPos);
                 if (closestDistance >= AIUtility.Distance(troop.Position, goalPos)) break;
 
-                main.MovePlayer(closestField, playerPos, this);
+                main.MovePlayer(closestField, playerPos, this, MovementType.walk);
 
                 campGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y, camp.X, camp.Y, map, true);
                 campGraph.CreateGraph();
@@ -438,7 +438,7 @@ namespace StartGame
                 int closestDistance = AIUtility.Distance(closestField, playerPos);
                 if (closestDistance >= playerDistance) break;
 
-                main.MovePlayer(closestField, playerPos, this);
+                main.MovePlayer(closestField, playerPos, this, MovementType.walk);
 
                 distanceGraph = new DistanceGraphCreator(troop.Position.X, troop.Position.Y,
                     playerPos.X, playerPos.Y, map, false);

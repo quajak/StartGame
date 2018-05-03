@@ -14,7 +14,6 @@ namespace StartGame
         //Long term: Add dialog
         //Long term: Add save feature
         //Long term: Add debug features
-        //Long term: Add magic system
 
         private const int fieldSize = MapCreator.fieldSize;
 
@@ -29,6 +28,7 @@ namespace StartGame
         public HumanPlayer humanPlayer;
         private readonly Mission mission;
         private int activePlayerCounter = 0;
+        private bool gameStarted = false;
 
         private List<WinCheck> winConditions;
         private List<WinCheck> deathConditions;
@@ -165,7 +165,10 @@ namespace StartGame
             public MapTile start;
             public MapTile goal;
             public int distance;
+            public MovementType movementType;
         }
+
+        public enum MovementType { walk, teleport };
 
         public event EventHandler<PlayerMovementData> PlayerMoved = delegate { };
 
@@ -236,6 +239,8 @@ namespace StartGame
 
         public void NextTurn()
         {
+            if (!gameStarted) StartGame();
+
             if (DoChecks()) return;
             canMoveTo.Clear();
 
@@ -247,7 +252,7 @@ namespace StartGame
             activePlayer.active = false;
             activePlayer = players[activePlayerCounter];
             activePlayer.active = true;
-            activePlayer.spells.ForEach(s => s.coolDown--);
+            activePlayer.spells.ForEach(s => s.coolDown = s.coolDown == 0 ? 0 : s.coolDown - 1);
 
             Turn(this, new TurnData() { active = activePlayer });
 
@@ -297,6 +302,7 @@ namespace StartGame
 
             if (humanPlayer.active)
             {
+                UpdateSpellInfo();
                 UpdateStatusInfo();
                 if (humanPlayer.troop.activeWeapon != humanPlayer.troop.weapons[playerWeaponList.SelectedIndex])
                     changeWeapon.Enabled = true;
@@ -395,12 +401,19 @@ namespace StartGame
                 spellName.Text = "";
                 spellDescription.Text = "";
             }
+            castSpell.Enabled = index != -1 && activePlayer.Name == humanPlayer.Name && gameStarted;
         }
 
         public void WriteConsole(string text)
         {
             console.AppendText(text);
             console.AppendText(Environment.NewLine);
+        }
+
+        public void StartGame()
+        {
+            gameStarted = true;
+            UpdateSpellInfo();
         }
 
         public void SetUpdateState(bool active)
@@ -534,7 +547,6 @@ namespace StartGame
 
         private void UpdateOverlay(bool keepAll = false)
         {
-            keepAll = enemyMovement.Checked && activePlayer.Name != humanPlayer.Name;
             Image image = new Bitmap(map.background);
             using (Graphics g = Graphics.FromImage(image))
             {
@@ -708,7 +720,7 @@ namespace StartGame
         private void NextAction_Click(object sender, EventArgs e)
         {
             if (humanPlayer is null) Close();
-            UpdateOverlay();
+            UpdateOverlay(enemyMovement.Checked && activePlayer.Name != humanPlayer.Name);
             activePlayer.ActionButtonPressed(this);
         }
 
@@ -786,12 +798,13 @@ namespace StartGame
                 if (spellPoints.Count == activeSpell.format.Positions)
                 {
                     //Now cast
-                    activeSpell.Activate(new SpellInformation() { positions = spellPoints });
+                    WriteConsole(activeSpell.Activate(new SpellInformation() { positions = spellPoints }));
 
                     spellPoints.Clear();
                     castSpell.Text = "Cast spell";
                     activeSpell = null;
                     castingspell = false;
+                    UpdateSpellInfo();
                 }
             }
             else
@@ -849,7 +862,7 @@ namespace StartGame
                         humanPlayer.troop.Position = humanPos;
 
                         MapTile end = map.map[humanPlayer.troop.Position.X, humanPlayer.troop.Position.Y];
-                        PlayerMoved(this, new PlayerMovementData() { player = humanPlayer, start = start, distance = AIUtility.Distance(start.position, end.position), goal = end });
+                        PlayerMoved(this, new PlayerMovementData() { player = humanPlayer, start = start, distance = AIUtility.Distance(start.position, end.position), goal = end, movementType = MovementType.walk });
 
                         map.DrawEntities();
                         UpdateOverlay();
@@ -1033,20 +1046,35 @@ namespace StartGame
 
             if (campaign != null)
             {
-                var (reward, xp) = mission.Reward();
-                humanPlayer.GainXP(xp);
-                DialogResult result = MessageBox.Show($"You have gained {xp} xp. {(humanPlayer.storedLevelUps != 0 ? $"You have {humanPlayer.storedLevelUps} level ups stored. Would you like to level up?" : "")}", "XP gained", humanPlayer.storedLevelUps != 0 ? MessageBoxButtons.YesNo : MessageBoxButtons.OK);
+                Reward reward = mission.Reward();
+                humanPlayer.GainXP(reward.XP);
+                DialogResult result = MessageBox.Show($"You have gained {reward.XP} xp. {(humanPlayer.storedLevelUps != 0 ? $"You have {humanPlayer.storedLevelUps} level ups stored. Would you like to level up?" : "")}", "XP gained", humanPlayer.storedLevelUps != 0 ? MessageBoxButtons.YesNo : MessageBoxButtons.OK);
                 if (humanPlayer.storedLevelUps != 0 && result == DialogResult.Yes)
                 {
                     LevelUp();
                 }
-                Weapon received = campaign.CalculateReward(reward);
-                WeaponView weaponView = new WeaponView(received, true);
-                weaponView.ShowDialog();
-
-                if (weaponView.decision)
+                if (reward.weaponReward != null)
                 {
-                    humanPlayer.troop.weapons.Add(received);
+                    Weapon received = campaign.CalculateReward(((WeaponReward)reward.weaponReward));
+                    WeaponView weaponView = new WeaponView(received, true);
+                    weaponView.ShowDialog();
+                    if (weaponView.decision)
+                    {
+                        humanPlayer.troop.weapons.Add(received);
+                    }
+                }
+
+                if (reward.spellReward != null)
+                {
+                    Spell spell = ((SpellReward)reward.spellReward).spell;
+                    if (!humanPlayer.spells.Exists(s => spell.name == s.name))
+                    {
+                        if (MessageBox.Show($"You have the ability to gain the spell {spell.name}. Do you want to gain it?", "Spell Gained", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        {
+                            humanPlayer.spells.Add(spell);
+                            UpdateSpellList();
+                        }
+                    }
                 }
             }
 
@@ -1201,7 +1229,7 @@ namespace StartGame
             UpdatePlayerList();
         }
 
-        public void MovePlayer(Point end, Point start, Player player, bool CostActionPoints = true)
+        public void MovePlayer(Point end, Point start, Player player, MovementType movementType, bool CostActionPoints = true)
         {
             Point troopP = player.troop.Position;
             troopP.X = end.X;
@@ -1211,7 +1239,7 @@ namespace StartGame
             if (CostActionPoints)
                 player.actionPoints -= distance; //Bug: Non human players should still move correctly
 
-            PlayerMoved(this, new PlayerMovementData() { player = player, start = map.map[start.X, start.Y], goal = map.map[end.X, end.Y], distance = distance });
+            PlayerMoved(this, new PlayerMovementData() { player = player, start = map.map[start.X, start.Y], goal = map.map[end.X, end.Y], distance = distance, movementType = movementType });
 
             map.DrawEntities();
         }

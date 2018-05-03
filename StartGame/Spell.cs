@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static StartGame.MainGameWindow;
 
 namespace StartGame
 {
@@ -103,8 +104,16 @@ namespace StartGame
 
             coolDown = MaxCoolDown;
 
-            main.MovePlayer(information.positions[1], information.positions[0], main.players.Find(p => p.troop.Position == information.positions[0]), false);
-            return $"Teleported {map.troops.Find(t => t.Position == information.positions[1]).name} from {information.positions[0]} to {information.positions[1]}";
+            if (main.players.Exists(p => p.troop.Position == information.positions[0]))
+            {
+                main.MovePlayer(information.positions[1], information.positions[0], main.players.Find(p => p.troop.Position == information.positions[0]), MovementType.teleport, false);
+                main.UpdateGameBoard();
+                return $"Teleported {map.troops.Find(t => t.Position == information.positions[1]).name} from {information.positions[0]} to {information.positions[1]}";
+            }
+            else
+            {
+                return "The teleport spell failed as there was nothign to teleport!";
+            }
         }
     }
 }

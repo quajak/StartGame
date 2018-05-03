@@ -397,7 +397,6 @@
             // 
             // spellList
             // 
-            this.spellList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.spellList.FormattingEnabled = true;
             this.spellList.Location = new System.Drawing.Point(1030, 244);
             this.spellList.Name = "spellList";
