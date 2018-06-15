@@ -24,6 +24,8 @@ namespace StartGame
         public int XP;
         internal readonly List<Spell> spells;
 
+        public int intelligence; //improves the effectivness of spells
+
         //Derived stats
         public int maxActionPoints = 4;
 
@@ -31,9 +33,10 @@ namespace StartGame
 
         public bool Dead { get => troop.health == 0; }
 
-        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, List<Spell> spells = null)
+        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, int Intelligence, List<Spell> spells = null)
         {
             this.XP = XP;
+            intelligence = Intelligence;
             if (spells != null)
             {
                 this.spells = spells;
@@ -57,6 +60,16 @@ namespace StartGame
         public void ActionButtonPressed(MainGameWindow mainGameWindow)
         {
             mainGameWindow.NextTurn();
+        }
+
+        /// <summary>
+        /// Called when turn starts used to set action points
+        /// </summary>
+        public event EventHandler InitialiseTurnHandler = (sender, e) => (sender as Player).actionPoints = (sender as Player).maxActionPoints;
+
+        public void NextTurn()
+        {
+            InitialiseTurnHandler(this, null);
         }
 
         /// <summary>
@@ -130,7 +143,6 @@ namespace StartGame
         public int endurance; //How many action points + defense
         public int vitality; //How much health
         public int wisdom; //how much mana
-        public int intelligence; //improves the effectivness of spells
 
         public int mana;
         public int maxMana;
@@ -144,7 +156,7 @@ namespace StartGame
 
         public List<Tree> trees = new List<Tree>();
 
-        public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window) : base(Type, Name, Map, Enemies, 0)
+        public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window) : base(Type, Name, Map, Enemies, 0, 1)
         {
             main = window;
             strength = 1;
@@ -152,7 +164,6 @@ namespace StartGame
             endurance = 1;
             vitality = 10;
             wisdom = 1;
-            intelligence = 1;
         }
 
         public void CalculateStats()
@@ -197,7 +208,7 @@ namespace StartGame
 
     internal class BanditAI : Player
     {
-        public BanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 3)
+        public BanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 3, 0)
         {
         }
 
@@ -326,7 +337,7 @@ namespace StartGame
 
         private MainGameWindow main;
 
-        public DefensiveBanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies, Point Camp) : base(Type, Name, Map, Enemies, 3)
+        public DefensiveBanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies, Point Camp) : base(Type, Name, Map, Enemies, 3, 0)
         {
             camp = Camp;
         }
@@ -489,7 +500,7 @@ namespace StartGame
 
         private MainGameWindow main;
 
-        public DragonMotherAI(PlayerType Type, string Name, Map Map, Player[] Enemies, Point Camp) : base(Type, Name, Map, Enemies, 3)
+        public DragonMotherAI(PlayerType Type, string Name, Map Map, Player[] Enemies, Point Camp, int Round, int Difficulty) : base(Type, Name, Map, Enemies, 3, 5 + Difficulty + Round / 2)
         {
             egg = Camp;
         }
@@ -780,7 +791,7 @@ namespace StartGame
 
     internal class WarriorSpiderAI : Player
     {
-        public WarriorSpiderAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 1)
+        public WarriorSpiderAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 1, 0)
         {
         }
 
@@ -899,7 +910,7 @@ namespace StartGame
         private int maxSpawned;
         private readonly int round;
 
-        public SpiderNestAI(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 5)
+        public SpiderNestAI(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 5, 0)
         {
             map = Map;
             turn = 7 - (Difficulty / 2);
@@ -954,7 +965,7 @@ namespace StartGame
         private int lastHealth;
         private readonly int round;
 
-        public ElementalWizard(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 10
+        public ElementalWizard(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 10, 3 + Round + Difficulty / 2
             , new List<Spell>() { new FireBall(Difficulty / 2 + Round + 1, Difficulty / 3 + 1 ,6 - Difficulty / 2, 0)
                 , new TeleportSpell(8- Difficulty/2, 0)
             })
@@ -1153,6 +1164,7 @@ namespace StartGame
 
         public void CreateGraph()
         {
+            //TODO: Slowly create a graph of the difference costs
             lock (this) lock (map)
                 {
                     graph = new double[map.map.GetUpperBound(0) + 1, map.map.GetUpperBound(1) + 1];

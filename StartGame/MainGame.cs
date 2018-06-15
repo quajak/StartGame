@@ -152,6 +152,7 @@ namespace StartGame
             humanPlayer.spells.Add(new HealingSpell(5));
             humanPlayer.spells.Add(new EarthQuakeSpell(5, 5));
             humanPlayer.spells.Add(new LightningBoltSpell(15));
+            humanPlayer.spells.Add(new DebuffSpell(2, 1, 5, 0));
             humanPlayer.spells.ForEach(s => s.Initialise(this, map));
 
             UpdateSpellList();
@@ -296,10 +297,10 @@ namespace StartGame
             activePlayer.active = true;
             activePlayer.spells.ForEach(s => s.coolDown = s.coolDown == 0 ? 0 : s.coolDown - 1);
 
+            //Reset the status of the player
+            activePlayer.NextTurn();
             Turn(this, new TurnData() { active = activePlayer });
 
-            //Reset the status of the player
-            activePlayer.actionPoints = activePlayer.maxActionPoints;
             foreach (Weapon weapon in activePlayer.troop.weapons)
             {
                 if (weapon is null)
@@ -1453,6 +1454,8 @@ namespace StartGame
         {
             return players.FirstOrDefault(p => p.troop == troop);
         }
+
+        public Player GetPlayer(Point point) => players.FirstOrDefault(p => p.troop.Position == point);
 
         #endregion Helper Functions
     }

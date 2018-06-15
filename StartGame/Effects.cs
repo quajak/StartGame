@@ -169,6 +169,51 @@ namespace StartGame
         public abstract string Description();
     }
 
+    internal class DebuffStatus : Status
+    {
+        private readonly int strength;
+        private readonly MainGameWindow main;
+        private readonly Player player;
+
+        public DebuffStatus(int Turns, int Strength, MainGameWindow main, Player player) : base("Debuff", Turns, player)
+        {
+            strength = Strength;
+            this.main = main;
+            this.player = player;
+            this.main.Turn += Main_Turn;
+            player.InitialiseTurnHandler += Player_InitialiseTurnHandler;
+            player.troop.statuses.Add(this);
+            main.UpdateStatusList();
+        }
+
+        private void Player_InitialiseTurnHandler(object sender, EventArgs e)
+        {
+            (sender as Player).actionPoints -= strength;
+        }
+
+        private void Main_Turn(object sender, MainGameWindow.TurnData e)
+        {
+            var main = sender as MainGameWindow;
+            if (e.active.Name != player.Name) return;
+
+            //Handle turn countdown
+            if (turns == null) return;
+
+            turns--;
+            if (turns == 0)
+            {
+                player.InitialiseTurnHandler -= Player_InitialiseTurnHandler;
+                player.troop.statuses.Remove(this);
+                main.UpdateStatusList();
+            }
+        }
+
+        public override string Description()
+        {
+            return $" You have been debuffed and have {strength} action points less every turn!";
+        }
+    }
+
     internal class FireStatus : Status
     {
         private readonly int damage;

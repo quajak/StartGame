@@ -1,6 +1,7 @@
 ﻿using StartGame.Properties;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -16,8 +17,6 @@ namespace StartGame
     {
         //Long term: Add spell shop
         //Long term: Add: Spells have a chance to fail
-        //TODO: Make intelligence effect is somehow
-        //BUG: Fix that all spells depend on human intelligence
         internal readonly string name;
 
         internal int coolDown;
@@ -49,6 +48,12 @@ namespace StartGame
 
         public bool CheckFormat(SpellInformation information)
         {
+            if (information.mage is null)
+            {
+                StackTrace stackTrace = new StackTrace();
+                Trace.TraceError($"Mage was not set for spell! {stackTrace.GetFrame(2).GetMethod().Name}");
+                return false;
+            }
             if (information.positions is null && format.Positions == 0)
             {
                 return true;
@@ -85,7 +90,7 @@ namespace StartGame
 
             coolDown = MaxCoolDown;
 
-            main.humanPlayer.troop.health = Math.Min(main.humanPlayer.intelligence + gainHealth + main.humanPlayer.troop.health, main.humanPlayer.troop.maxHealth);
+            main.humanPlayer.troop.health = Math.Min(information.mage.intelligence + gainHealth + main.humanPlayer.troop.health, main.humanPlayer.troop.maxHealth);
             return $"{main.humanPlayer.Name} has healed for {gainHealth}";
         }
     }
@@ -108,7 +113,7 @@ namespace StartGame
 
             Point hit = information.positions[0];
 
-            int appliedDamage = damage + main.humanPlayer.intelligence / 2;
+            int appliedDamage = damage + information.mage.intelligence / 2;
             if (map.map.Get(hit).type.FType == FieldType.water) appliedDamage *= 2;
 
             new LightningBolt(1, hit, map, main);
@@ -142,8 +147,8 @@ namespace StartGame
 
             coolDown = MaxCoolDown;
 
-            int appliedDamage = damage + main.humanPlayer.intelligence / 4;
-            int appliedRadius = radius + main.humanPlayer.intelligence / 7;
+            int appliedDamage = damage + information.mage.intelligence / 4;
+            int appliedRadius = radius + information.mage.intelligence / 7;
 
             Point hit = information.positions[0];
 
@@ -172,12 +177,42 @@ namespace StartGame
         }
     }
 
-    //TODO: Spell that decreases you action points
     //TODO: Blindness spell + effect - Eneies are unable to attack
+
+    internal class DebuffSpell : Spell
+    {
+        private readonly int turns;
+        private readonly int strength;
+
+        public DebuffSpell(int turns, int strength, int MaxCooldDown, int? initialCoolDown) : base("Debuff", MaxCooldDown, initialCoolDown, new SpellInformationFormat() { Positions = 1 }, 4)
+        {
+            this.turns = turns;
+            this.strength = strength;
+        }
+
+        public override string Activate(SpellInformation information)
+        {
+            if (!Ready) throw new Exception("Spell is not ready");
+            if (!CheckFormat(information)) throw new Exception("Information is incomplete!");
+
+            coolDown = MaxCoolDown;
+
+            Player player = main.GetPlayer(information.positions[0]);
+            if (player is null)
+            {
+                return $"There is nothing to debuff!";
+            }
+            else
+            {
+                int effectiveStrength = strength + information.mage.intelligence / 10;
+                new DebuffStatus(turns, effectiveStrength, main, player);
+                return $"{player.Name} has been debuffed for {effectiveStrength}!";
+            }
+        }
+    }
 
     internal class FireBall : Spell
     {
-        //TODO: Initial animation from player to enemy
         //TODO: Calculate damage using function list
         private readonly int damage;
 
@@ -196,8 +231,8 @@ namespace StartGame
             if (!CheckFormat(information)) throw new Exception("Information is incomplete!");
 
             coolDown = MaxCoolDown;
-            int appliedDamage = damage + main.humanPlayer.intelligence / 2;
-            int appliedTurns = turns + main.humanPlayer.intelligence / 10;
+            int appliedDamage = damage + information.mage.intelligence / 2;
+            int appliedTurns = turns + information.mage.intelligence / 10;
 
             if (map.map[information.positions[0].X, information.positions[0].Y].type.FType != FieldType.water)
             {

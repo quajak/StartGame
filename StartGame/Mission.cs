@@ -153,7 +153,7 @@ namespace StartGame
                 { DamageType.fire, 0 }
             };
 
-            players.Add(new DragonMotherAI(PlayerType.computer, "Dragon", map, new Player[] { player }, peak)
+            players.Add(new DragonMotherAI(PlayerType.computer, "Dragon", map, new Player[] { player }, peak, Round, difficulty)
             {
                 troop = new Troop("Dragon", 100 + (difficulty / 2) + (int)(Round * 1.5) - 4,
                     new Weapon(8 + difficulty / 4 + Round - 1,
