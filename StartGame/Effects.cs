@@ -2,6 +2,7 @@
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -9,17 +10,32 @@ using System.Threading.Tasks;
 
 namespace StartGame
 {
+    [DebuggerDisplay("Effect - {name}")]
     internal abstract class Effect : Entity
     {
         private readonly Map map;
         internal int turns;
         internal readonly MainGameWindow main;
+        private readonly int ID;
 
-        public Effect(string Name, Point Position, Bitmap Image, Map Map, int Turns, MainGameWindow main, bool Blocking = false) : base(Name, Position, Image, Blocking, Map)
+        public static int IDcounter = 0; //The id of an effect is used to identify the render object it is linked to
+
+        public Effect(string Name, Point Position, Bitmap Image, Map Map, int Turns, MainGameWindow main, bool Blocking = false, bool render = true) : base(Name + IDcounter.ToString(), Position, Image, Blocking, Map)
         {
-            Map.entites.Add(this);
-            main.UpdateGameBoard();
+            ID = IDcounter;
+            IDcounter++;
+            //DEBUG Test -- check that there is no race condition occuring and that names are being set correctly
+            if (Name + ID.ToString() != name) throw new Exception("Setting of effect name went wrong!");
+
             map = Map;
+            map.entites.Add(this);
+
+            lock (map.RenderController)
+            {
+                map.renderObjects.Add(new EntityRenderObject(this, new TeleportPointAnimation(new Point(0, 0), Position)));
+            }
+            if (render)
+                main.RenderMap();
             turns = Turns;
             this.main = main;
             main.Turn += Main_Turn;
@@ -31,10 +47,41 @@ namespace StartGame
             if (turns <= 0)
             {
                 //Delete
-                map.entites.Remove(this);
-
-                main.Turn -= Main_Turn;
+                BaseDelete();
+                Delete();
             }
+        }
+
+        internal void BaseDelete()
+        {
+            map.entites.Remove(this);
+            map.RemoveEntityRenderObject(name);
+
+            main.Turn -= Main_Turn;
+        }
+
+        internal abstract void Delete();
+    }
+
+    internal class EarthQuakeField : Effect
+    {
+        public EarthQuakeField(int Turns, Point point, Map map, MainGameWindow main) : base("EarthQuakeField", point, Resources.EarthQuake, map, Turns, main, render: false)
+        {
+        }
+
+        internal override void Delete()
+        {
+        }
+    }
+
+    internal class LightningBolt : Effect
+    {
+        public LightningBolt(int Turns, Point point, Map map, MainGameWindow main) : base("LightningBolt", point, Resources.LightningBolt, map, Turns, main, render: false)
+        {
+        }
+
+        internal override void Delete()
+        {
         }
     }
 
@@ -42,8 +89,21 @@ namespace StartGame
     {
         private readonly int damage;
 
-        public Fire(int Turns, int Damage, Point Position, Map Map, MainGameWindow main) : base("Fire", Position, Resources.Fire, Map, Turns, main)
+        public Fire(int Turns, int Damage, Point Position, Point SpawnPosition, Map Map, MainGameWindow main) : base("Fire", SpawnPosition, Resources.Fire, Map, Turns, main, render: false)
         {
+            //Can it actually exist?
+            if (Map.map.Get(Position).type.FType == FieldType.water)
+            {
+                //Destroy it
+                BaseDelete();
+                Delete();
+                return;
+            }
+
+            //Set position to actual position - to create effect that the mage created the fireball
+            this.Position = Position;
+            main.RenderMap();
+
             damage = Damage;
             this.main.PlayerMoved += Main_PlayerMoved;
 
@@ -62,22 +122,33 @@ namespace StartGame
 
         private void Main_PlayerMoved(object sender, MainGameWindow.PlayerMovementData e)
         {
-            if (e.goal.position == Position)
+            Point humanPoint = e.start.position;
+
+            foreach (Point point in e.path)
             {
-                if (!e.player.troop.statuses.Exists(s => s.name == name))
+                humanPoint = humanPoint.Add(point);
+                if (humanPoint == Position)
                 {
-                    main.WriteConsole($"{e.player.Name} has been put on fire!");
-                    e.player.troop.statuses.Add(new FireStatus(turns + 1, damage, main, e.player));
-                    if (e.player.Name == main.humanPlayer.Name)
+                    if (!e.player.troop.statuses.Exists(s => s.name == name))
                     {
-                        main.UpdateStatusList();
+                        main.WriteConsole($"{e.player.Name} has been put on fire!");
+                        e.player.troop.statuses.Add(new FireStatus(turns + 1, damage, main, e.player));
+                        if (e.player.Name == main.humanPlayer.Name)
+                        {
+                            main.UpdateStatusList();
+                        }
+                    }
+                    else
+                    {
+                        e.player.troop.statuses.Find(s => s.name == name).turns = turns + 1;
                     }
                 }
-                else
-                {
-                    e.player.troop.statuses.Find(s => s.name == name).turns = turns + 1;
-                }
             }
+        }
+
+        internal override void Delete()
+        {
+            main.PlayerMoved -= Main_PlayerMoved;
         }
     }
 
@@ -111,9 +182,19 @@ namespace StartGame
 
         private void Main_PlayerMoved(object sender, MainGameWindow.PlayerMovementData e)
         {
+            var main = sender as MainGameWindow;
             if (e.player.Name == player.Name && e.goal.type.FType == FieldType.water)
             {
-                RemoveEffect(sender as MainGameWindow);
+                Point start = e.start.position;
+                foreach (var field in e.path)
+                {
+                    start = start.Add(field);
+                    if (main.map.map.Get(start).type.FType == FieldType.water)
+                    {
+                        RemoveEffect(sender as MainGameWindow);
+                        return;
+                    }
+                }
             }
         }
 
@@ -123,7 +204,7 @@ namespace StartGame
             if (e.active.Name != player.Name) return;
 
             //Do effect
-            main.DamagePlayer(damage, player);
+            main.DamagePlayer(damage, DamageType.fire, player);
 
             //Handle turn countdown
             if (turns == null) return;

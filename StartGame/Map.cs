@@ -6,7 +6,7 @@ using PlayerCreator;
 
 namespace StartGame
 {
-    internal class Map
+    internal partial class Map
     {
         public const int Width = 31;
         public const int Height = 31;
@@ -288,6 +288,45 @@ namespace StartGame
             return;
         }
 
+        public void SetupMap()
+        {
+            map = new MapTile[width, height];
+
+            for (int x = 0; x <= map.GetUpperBound(0); x++)
+            {
+                for (int y = 0; y <= map.GetUpperBound(1); y++)
+                {
+                    map[x, y] = new MapTile(new Point(x, y), new MapTileType() { type = MapTileTypeEnum.land }, 0.5);
+                }
+            }
+
+            //Add neighbours as they are now initialised
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    map[x, y].GetNeighbours(this);
+                }
+            }
+
+            //Generate continents
+            int counter = 0;
+            Random colorGenerator = new Random();
+            continents = new List<Continent>();
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    if (map[x, y].continent == null)
+                    {
+                        Continent continent = new Continent();
+                        map = continent.NewContinent(this, new Point(x, y), counter++.ToString(), colorGenerator).map;
+                        continents.Add(continent);
+                    }
+                }
+            }
+        }
+
         private void FindPath(List<MapTile> toDraw, ref MapTile[,] map, ref double pathLength, MapTile[] goals)
         {
             //Set goal of path
@@ -314,7 +353,7 @@ namespace StartGame
                         //Check if neighbour is cheaper
                         int index = Array.IndexOf(neighbour.GoalIDs, goal.id);
                         if (index == -1)
-                            //Bug: Find reason for this to occur
+                            //Bug: Map - Find reason for this to occur
                             continue;
                         if (neighbour.Costs[index] != -1 && (cost > neighbour.Costs[index]))
                         {
@@ -600,7 +639,7 @@ namespace StartGame
                 int index = Array.IndexOf(map[neighbour.position.X, neighbour.position.Y].GoalIDs, id);
                 if (index == -1)
                 {
-                    //Bug: How can this be
+                    //Bug: Map - How can this be
                     continue;
                 }
                 double disCost = map[neighbour.position.X, neighbour.position.Y].Costs[index];
@@ -620,151 +659,6 @@ namespace StartGame
                 }
             }
         }
-
-        #region Drawing
-
-        public Image background;
-        private Image rawBackground; //No troops
-
-        /// <summary>
-        /// Function which generates a Bitmap from the map without any troops or overlay
-        /// </summary>
-        /// <param name="Width">Width of the bitmap</param>
-        /// <param name="Height">Height of the bitmap</param>
-        /// <param name="Debug">Will show cost of field from a specific goal</param>
-        /// <param name="size">Size of field in pixel</param>
-        /// <param name="continentAlpha">Sets alpha of continent alpha, if 0 they are not shown</param>
-        /// <param name="showGoal">Which goal will be selected for debug</param>
-        /// <param name="colorAlpha">Sets alpha of field color</param>
-        /// <param name="showInverseHeight">Determine if height should be inversed for grey overlay color</param>
-        /// <returns></returns>
-        public Bitmap DrawMapBackground(int Width, int Height, bool Debug = false, int size = 20, int continentAlpha = 100, int showGoal = 1, int colorAlpha = 255, bool showInverseHeight = false)
-        {
-            averageTile = 0.5;
-            hillTile = 0;
-            flatTile = 0;
-            waterTile = 0;
-            Font font = new Font(FontFamily.GenericSansSerif, 8);
-            Bitmap mapBackground = new Bitmap(Width, Height);
-            using (Graphics g = Graphics.FromImage(mapBackground))
-            {
-                g.Clear(Color.Transparent);
-                for (int x = 0; x < Math.Sqrt(map.Length); x++)
-                {
-                    for (int y = 0; y < Math.Sqrt(map.Length); y++)
-                    {
-                        //Average tile
-                        averageTile = (averageTile + map[x, y].height) / 2;
-
-                        Color b = Color.Black;
-                        Color c = Color.Black;
-                        Color d = Color.Black;
-                        if (Debug)
-                        {
-                            c = Color.FromArgb((int)(map[x, y].height * 255), 0, 0, 0);
-                        }
-                        else
-                        {
-                            //The five different types of land are cut of evenly - due to the fact that perlin has gaussian distribution
-                            //there will be a higher amount of flat land
-                            if (map[x, y].height < 0.2)
-                            {
-                                //Deep water
-                                b = Color.FromArgb((int)((1 - map[x, y].height) * 255), 0, 0, 0);
-                                c = Color.MediumBlue;
-                                waterTile += 2;
-                            }
-                            else if (map[x, y].height < 0.4)
-                            {
-                                //Shallow water
-                                b = Color.FromArgb((int)((1 - map[x, y].height) * 255), 0, 0, 0);
-                                c = Color.Blue;
-                                waterTile++;
-                            }
-                            else if (map[x, y].height < 0.6)
-                            {
-                                //Flat land
-                                b = Color.FromArgb((int)(map[x, y].height * 255), 0, 0, 0);
-                                c = Color.Green;
-                                flatTile++;
-                            }
-                            else if (map[x, y].height < 0.8)
-                            {
-                                //Hills
-                                b = Color.FromArgb((int)(map[x, y].height * 255), 0, 0, 0);
-                                c = Color.LightGray;
-                                hillTile++;
-                            }
-                            else if (map[x, y].height <= 1)
-                            {
-                                //Mountains
-                                b = Color.FromArgb((int)(map[x, y].height * 255), 0, 0, 0);
-                                c = Color.DarkGray;
-                                hillTile += 2;
-                            }
-                            if (map[x, y].type.type == MapTileTypeEnum.path)
-                            {
-                                c = Color.SandyBrown;
-                            }
-                            //Adjust alpha of color
-                            if (colorAlpha != 255)
-                                c = Color.FromArgb(colorAlpha, c.R, c.G, c.B);
-
-                            if (showInverseHeight)
-                                b = Color.FromArgb(255 - b.A, 0, 0, 0);
-
-                            d = map[x, y].continent.color;
-                            d = Color.FromArgb(continentAlpha, d.R, d.G, d.B);
-                        }
-
-                        if (Debug)
-                        {
-                            if (!(map[x, y].Costs is null) && map[x, y].Costs.Length > showGoal)
-                            {
-                                string s = map[x, y].Costs[showGoal].ToString();
-                                g.FillRectangle(Brushes.Black, x * size, y * size, size, size);
-                                g.DrawString(s, font, Brushes.White, new Point(x * size, y * size));
-                            }
-                        }
-                        else
-                        {
-                            g.FillRectangle(new SolidBrush(c), x * size, y * size, size, size);
-                            g.FillRectangle(new SolidBrush(d), x * size, y * size, size, size);
-                            g.FillRectangle(new SolidBrush(b), x * size, y * size, size, size);
-                        }
-                    }
-                }
-                rawBackground = mapBackground;
-            }
-            mapBackground = new Bitmap(rawBackground);
-            using (Graphics g = Graphics.FromImage(mapBackground))
-            {
-                //Draw troops
-                foreach (Entity entity in entites)
-                {
-                    g.DrawImage(entity.image, entity.Position.X * size, entity.Position.Y * size, 20, 20);
-                }
-            }
-
-            background = mapBackground;
-            return mapBackground;
-        }
-
-        public Image DrawEntities(int size = 20)
-        {
-            Image img = new Bitmap(rawBackground);
-            using (Graphics g = Graphics.FromImage(img))
-            {
-                foreach (Entity entity in entites)
-                {
-                    g.DrawImage(entity.image, entity.Position.X * size, entity.Position.Y * size, 20, 20);
-                }
-            }
-            background = img;
-            return img;
-        }
-
-        #endregion Drawing
 
         /// <summary>
         /// Function which finds spawnpoints for one or more troops
@@ -856,41 +750,6 @@ namespace StartGame
                 }
             }
         }
-
-        #region Overlay
-
-        public List<OverlayObject> overlayObjects = new List<OverlayObject>();
-
-        public Image DrawOverlay(int Width, int Height, bool keepAll = false)
-        {
-            Image image = new Bitmap(Width, Height);
-            using (Graphics g = Graphics.FromImage(image))
-            {
-                g.Clear(Color.Transparent);
-                foreach (var obj in overlayObjects)
-                {
-                    if (obj is OverlayRectangle)
-                    {
-                        OverlayRectangle rect = obj as OverlayRectangle;
-                        if (rect.filled)
-                            g.FillRectangle(new SolidBrush(rect.fillColor), rect.x, rect.y, rect.width, rect.height);
-                        g.DrawRectangle(new Pen(rect.borderColor), rect.x, rect.y, rect.width, rect.height);
-                    }
-                    else if (obj is OverlayText)
-                    {
-                        OverlayText txt = obj as OverlayText;
-                        g.DrawString(txt.text, SystemFonts.DefaultFont, new SolidBrush(txt.color),
-                            new PointF(txt.x, txt.y));
-                    }
-                }
-                if (!keepAll)
-                    overlayObjects = overlayObjects.Where(o => !o.once).ToList();
-            }
-
-            return image;
-        }
-
-        #endregion Overlay
     }
 
     public enum SpawnType

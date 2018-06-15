@@ -725,7 +725,7 @@
             this.debugButton.TabIndex = 26;
             this.debugButton.Text = "D";
             this.debugButton.UseVisualStyleBackColor = true;
-            this.debugButton.Click += new System.EventHandler(this.debugButton_Click);
+            this.debugButton.Click += new System.EventHandler(this.DebugButton_Click);
             // 
             // label4
             // 

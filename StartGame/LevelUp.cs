@@ -62,6 +62,8 @@ namespace PlayerCreator
             playerDefense.Text = $"Defense: {player.troop.defense} ({player.endurance + EnduranceUp / 5})";
             playerDodge.Text = $"Dodge: {player.troop.dodge} ({player.troop.baseDodge + (player.agility + AgilityUp) * 2})";
             playerMana.Text = $"Mana: {player.maxMana} ({player.maxMana + WisdomUp * 2})";
+
+            ok.Enabled = points == 0;
         }
 
         private void StrengthUp_Click(object sender, EventArgs e)
@@ -120,8 +122,16 @@ namespace PlayerCreator
             Render();
         }
 
+        private bool finished = false;
+
         private void Ok_Click(object sender, EventArgs e)
         {
+            DistributePoints();
+        }
+
+        private void DistributePoints()
+        {
+            finished = true;
             player.strength += StrengthUp;
             player.agility += AgilityUp;
             player.endurance += EnduranceUp;
@@ -158,6 +168,29 @@ namespace PlayerCreator
             IntelligenceUp--;
             points++;
             Render();
+        }
+
+        private void LevelUp_Load(object sender, EventArgs e)
+        {
+        }
+
+        private void LevelUp_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (points != 0)
+            {
+                MessageBox.Show("You cannot stop before you have distributed all your points");
+                e.Cancel = true;
+            }
+            else
+            {
+                if (finished)
+                {
+                }
+                else
+                {
+                    DistributePoints();
+                }
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ namespace StartGame
 
         private Mission DecideMission(int Round)
         {
-            List<Mission> missions = new List<Mission> { new ElementalWizardFight(), new AttackCampMission(), new SpiderNestMission(), new BanditMission()
+            List<Mission> missions = new List<Mission> { new ElementalWizardFight(), new AttackCampMission(), new SpiderNestMission(), new BanditMission(), new DragonFight()
             };
             missions = missions.Where(m => m.MissionAllowed(Round)).ToList();
             int id = random.Next(missions.Count);
@@ -104,6 +104,9 @@ namespace StartGame
             player.map = map;
             player.troop.Map = map;
 
+            //TODO: Where do we reset health
+            player.mana = player.maxMana;
+
             //Finish initialisation
             player.active = false;
             activeGame = new MainGameWindow(map, player, mission, trees, this);
@@ -121,6 +124,7 @@ namespace StartGame
                 new Weapon(8, AttackType.melee, 1, "Large rock", 1, true),
                 new Weapon(4, AttackType.range, 5, "Rock", 1, true),
                 new Weapon(11, AttackType.melee, 1, "Dagger", 1, true),
+                new Weapon(12, AttackType.melee, 2, "Axe", 1, true, 2),
                 new Weapon(9, AttackType.melee, 2, "Sword", 2, true),
                 new Weapon(8, AttackType.melee, 4, "Spear", 2, true),
                 new Weapon(12, AttackType.melee, 2, "Long sword", 2, true),

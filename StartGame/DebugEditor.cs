@@ -38,7 +38,7 @@ namespace StartGame
             {
                 if (p.Name != main.humanPlayer.Name)
                 {
-                    main.DamagePlayer(100, p);
+                    main.DamagePlayer(100, DamageType.unblockable, p);
                 }
             });
         }
@@ -49,9 +49,27 @@ namespace StartGame
             main.PlayerWins();
         }
 
-        private void gainXP_Click(object sender, EventArgs e)
+        private void GainXP_Click(object sender, EventArgs e)
         {
             main.humanPlayer.GainXP(10);
+            main.ShowPlayerStats();
+        }
+
+        private void GainHealth_Click(object sender, EventArgs e)
+        {
+            main.humanPlayer.troop.health += 10;
+            main.ShowPlayerStats();
+        }
+
+        private void CooldownDec_Click(object sender, EventArgs e)
+        {
+            main.humanPlayer.spells.ForEach(s => s.coolDown = 0);
+            main.UpdateSpellInfo();
+        }
+
+        private void GainMana_Click(object sender, EventArgs e)
+        {
+            main.humanPlayer.mana += 10;
             main.ShowPlayerStats();
         }
     }

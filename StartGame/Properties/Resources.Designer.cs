@@ -72,6 +72,46 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Dragon {
+            get {
+                object obj = ResourceManager.GetObject("Dragon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap DragonEggNest {
+            get {
+                object obj = ResourceManager.GetObject("DragonEggNest", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap EarthQuake {
+            get {
+                object obj = ResourceManager.GetObject("EarthQuake", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap elementalWizard {
+            get {
+                object obj = ResourceManager.GetObject("elementalWizard", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap enemyScout {
             get {
                 object obj = ResourceManager.GetObject("enemyScout", resourceCulture);
@@ -95,6 +135,16 @@ namespace StartGame.Properties {
         internal static System.Drawing.Bitmap firePlace {
             get {
                 object obj = ResourceManager.GetObject("firePlace", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LightningBolt {
+            get {
+                object obj = ResourceManager.GetObject("LightningBolt", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

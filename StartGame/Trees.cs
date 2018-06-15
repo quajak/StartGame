@@ -208,7 +208,7 @@ namespace StartGame
         public override void Activate()
         {
             //Add effect
-            MainGame.CalculateCost.Add((m, d, c) => (d == 5) ? 0 : c);
+            MainGame.humanPlayer.CalculateStepCost.Add((m, a, n, d, c, type) => (d == 4 && type == MovementType.walk) ? 0 : c);
         }
     }
 

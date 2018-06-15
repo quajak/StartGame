@@ -325,6 +325,8 @@
             this.Controls.Add(this.playerName);
             this.Name = "LevelUp";
             this.Text = "LevelUp";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.LevelUp_FormClosing);
+            this.Load += new System.EventHandler(this.LevelUp_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

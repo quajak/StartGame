@@ -32,6 +32,9 @@
             this.killAllEnemies = new System.Windows.Forms.Button();
             this.winMission = new System.Windows.Forms.Button();
             this.gainXP = new System.Windows.Forms.Button();
+            this.GainHealth = new System.Windows.Forms.Button();
+            this.CooldownDec = new System.Windows.Forms.Button();
+            this.GainMana = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // incActionPoints
@@ -72,13 +75,46 @@
             this.gainXP.TabIndex = 3;
             this.gainXP.Text = "Gain 10 XP";
             this.gainXP.UseVisualStyleBackColor = true;
-            this.gainXP.Click += new System.EventHandler(this.gainXP_Click);
+            this.gainXP.Click += new System.EventHandler(this.GainXP_Click);
+            // 
+            // GainHealth
+            // 
+            this.GainHealth.Location = new System.Drawing.Point(12, 113);
+            this.GainHealth.Name = "GainHealth";
+            this.GainHealth.Size = new System.Drawing.Size(95, 21);
+            this.GainHealth.TabIndex = 4;
+            this.GainHealth.Text = "Gain 10 Health";
+            this.GainHealth.UseVisualStyleBackColor = true;
+            this.GainHealth.Click += new System.EventHandler(this.GainHealth_Click);
+            // 
+            // CooldownDec
+            // 
+            this.CooldownDec.Location = new System.Drawing.Point(13, 140);
+            this.CooldownDec.Name = "CooldownDec";
+            this.CooldownDec.Size = new System.Drawing.Size(95, 21);
+            this.CooldownDec.TabIndex = 5;
+            this.CooldownDec.Text = "Cooldown dec";
+            this.CooldownDec.UseVisualStyleBackColor = true;
+            this.CooldownDec.Click += new System.EventHandler(this.CooldownDec_Click);
+            // 
+            // GainMana
+            // 
+            this.GainMana.Location = new System.Drawing.Point(10, 167);
+            this.GainMana.Name = "GainMana";
+            this.GainMana.Size = new System.Drawing.Size(95, 21);
+            this.GainMana.TabIndex = 6;
+            this.GainMana.Text = "Gain 10 Mana";
+            this.GainMana.UseVisualStyleBackColor = true;
+            this.GainMana.Click += new System.EventHandler(this.GainMana_Click);
             // 
             // DebugEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(211, 294);
+            this.Controls.Add(this.GainMana);
+            this.Controls.Add(this.CooldownDec);
+            this.Controls.Add(this.GainHealth);
             this.Controls.Add(this.gainXP);
             this.Controls.Add(this.winMission);
             this.Controls.Add(this.killAllEnemies);
@@ -96,5 +132,8 @@
         private System.Windows.Forms.Button killAllEnemies;
         private System.Windows.Forms.Button winMission;
         private System.Windows.Forms.Button gainXP;
+        private System.Windows.Forms.Button GainHealth;
+        private System.Windows.Forms.Button CooldownDec;
+        private System.Windows.Forms.Button GainMana;
     }
 }

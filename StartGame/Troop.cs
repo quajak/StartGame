@@ -20,11 +20,33 @@ namespace PlayerCreator
         {
             get => position; set
             {
-                if (Map != null)
+                if (Map != null && blocking)
                     Map.map[position.X, position.Y].free = true;
                 position = value;
-                if (Map != null)
+                if (Map != null && blocking)
                     Map.map[position.X, position.Y].free = false;
+
+                //Update the position of the render entity
+                if (Map != null)
+                {
+                    lock (Map.RenderController)
+                    {
+                        EntityRenderObject entity = Map.EntityRenderObjects.Find(o => o.Name == name);
+                        if (entity != null)
+                        {
+                            //If an objects position is changed two or more times between two animations, the object will do the last animation
+                            if (entity.toRender != entity.position)
+                            {
+                                entity.SetPosition(entity.toRender, PositionSetType.absolute);
+                            }
+
+                            entity.SetPosition(value, PositionSetType.goal);
+                            //TODO: Generate a path not just set goal
+                            entity.Animation = new LinearPointAnimation(entity.position, entity.toRender);
+                            entity.movementAnimationPoints = (entity.Animation as LinearPointAnimation).Animate().GetEnumerator();
+                        }
+                    }
+                }
             }
         }
 
@@ -33,7 +55,7 @@ namespace PlayerCreator
             get => map; set
             {
                 map = value;
-                if (map != null)
+                if (map != null && blocking)
                     map.map[position.X, position.Y].free = false;
             }
         }
@@ -41,10 +63,10 @@ namespace PlayerCreator
         public Entity(string Name, Point Position, Bitmap Image, bool Blocking, Map map)
         {
             name = Name;
+            Map = map;
+            blocking = Blocking;
             this.Position = Position;
             image = Image;
-            blocking = Blocking;
-            Map = map;
         }
     }
 
@@ -80,8 +102,10 @@ namespace PlayerCreator
             }
         }
 
-        public Troop(string Name, int Health, Weapon Weapon, Bitmap Image, int Defense, Map map, int Dodge = 10) : base(Name, new Point(0, 0), Image, true, map)
+        public Troop(string Name, int Health, Weapon Weapon, Bitmap Image, int Defense, Map map, int Dodge = 10
+            , Dictionary<DamageType, double> Vurneabilities = null) : base(Name, new Point(0, 0), Image, true, map)
         {
+            vurneabilites = Vurneabilities ?? new Dictionary<DamageType, double>();
             maxHealth = Health;
             health = Health;
             weapons.Add(Weapon);
@@ -89,6 +113,20 @@ namespace PlayerCreator
             defense = Defense;
             dodge = Dodge;
             baseDodge = Dodge;
+        }
+
+        private Dictionary<DamageType, double> vurneabilites;
+
+        public double GetVurneability(DamageType damageType)
+        {
+            if (vurneabilites.TryGetValue(damageType, out double vurn))
+            {
+                return vurn;
+            }
+            else
+            {
+                return 1;
+            }
         }
 
         public void Spawn(Point point)

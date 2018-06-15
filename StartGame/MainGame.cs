@@ -2,6 +2,7 @@
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -13,13 +14,12 @@ namespace StartGame
     {
         //Long term: Add dialog
         //Long term: Add save feature
-        //Long term: Add debug features
 
         private const int fieldSize = MapCreator.fieldSize;
 
         private Random random;
 
-        private Map map;
+        public Map map;
 
         private Point selected;
 
@@ -96,15 +96,15 @@ namespace StartGame
 
             players.ForEach(p => map.troops.Add(p.troop));
             players.ForEach(p => map.entites.Add(p.troop));
+            players.ForEach(p => map.renderObjects.Add(new EntityRenderObject(p.troop, new TeleportPointAnimation(new Point(0, 0), p.troop.Position))));
+
             InitializeComponent();
 
             //Initialse functions
             CalculatePlayerAttackDamage.Add(CalculateDamage);
-            CalculateCost.Add((t, d, cost) => t.Cost);
 
             //Start work to update information in GUI
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
-
+            RenderMap();
             //GUI Work
             console.Text = "Starting game ... \n";
             enemyMovement.Checked = mission != null ? mission.EnemyMoveTogether : false;
@@ -149,7 +149,9 @@ namespace StartGame
             //DEBUG
             debug = new DebugEditor(this);
 
-            humanPlayer.spells.Add(new FireBall(10, 2, 2, 0));
+            humanPlayer.spells.Add(new HealingSpell(5));
+            humanPlayer.spells.Add(new EarthQuakeSpell(5, 5));
+            humanPlayer.spells.Add(new LightningBoltSpell(15));
             humanPlayer.spells.ForEach(s => s.Initialise(this, map));
 
             UpdateSpellList();
@@ -166,11 +168,49 @@ namespace StartGame
             public MapTile goal;
             public int distance;
             public MovementType movementType;
+            public Map map;
+            public Point[] path;
         }
 
         public enum MovementType { walk, teleport };
 
-        public event EventHandler<PlayerMovementData> PlayerMoved = delegate { };
+        //Initial handler is used to set animation
+        public event EventHandler<PlayerMovementData> PlayerMoved = (sender, data) =>
+        {
+            EntityRenderObject entity = data.map.EntityRenderObjects.FirstOrDefault(e => e.Name == data.player.troop.name);
+
+            if (data.player.troop.health == 0)
+            {//Player has died
+                return;
+            }
+
+            if (entity is null)
+            {
+                Trace.TraceError($"Player Move was called with no rendering entity attached to the player!");
+                throw new Exception("Player must have an entity to be moved!");
+            }
+
+            if (data.path is null || data.path.Length == 0) //No path has been generated
+            {
+                switch (data.movementType)
+                {
+                    case MovementType.walk:
+                        entity.Animation = new LinearPointAnimation(data.start.position, data.goal.position);
+                        break;
+
+                    case MovementType.teleport:
+                        entity.Animation = new TeleportPointAnimation(data.start.position, data.goal.position);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                entity.Animation = new ListPointAnimation(data.path.ToList(), data.start.position);
+            }
+        };
 
         public class CombatData : EventArgs
         {
@@ -200,16 +240,6 @@ namespace StartGame
         {
             if (useWinChecks)
             {
-                bool won = false;
-                foreach (var check in winConditions)
-                {
-                    won = check.Invoke(map, this);
-                    if (won)
-                    {
-                        PlayerWins();
-                        return true;
-                    }
-                }
                 bool lost = false;
                 foreach (var check in deathConditions)
                 {
@@ -218,6 +248,19 @@ namespace StartGame
                     {
                         dead = true;
                         Close();
+                    }
+                }
+                if (!lost)
+                {
+                    bool won = false;
+                    foreach (var check in winConditions)
+                    {
+                        won = check.Invoke(map, this);
+                        if (won)
+                        {
+                            PlayerWins();
+                            return true;
+                        }
                     }
                 }
             }
@@ -244,7 +287,6 @@ namespace StartGame
             if (DoChecks()) return;
             canMoveTo.Clear();
 
-            //Change active player
             int activeIndex = players.FindIndex(p => p.Name == activePlayer.Name);
             activePlayerCounter = activeIndex == players.Count - 1 ?
                 0 : activeIndex + 1;
@@ -270,13 +312,12 @@ namespace StartGame
                 }
             }
 
-            if (humanPlayer is null) return;
+            if (DoChecks()) return;
             activePlayer.PlayTurn(this, enemyMovement.Checked);
 
             if (DoChecks()) return;
-            if (humanPlayer is null) return;
             //If end of mutli turn
-            if (activePlayer.Name == humanPlayer.Name || !enemyMovement.Checked)
+            if (humanPlayer != null && activePlayer.Name == humanPlayer.Name || !enemyMovement.Checked)
             {
                 if (playerDamage != 0 || playerDoged != 0)
                 {
@@ -286,21 +327,22 @@ namespace StartGame
                     playerDamage = 0;
                     playerDoged = 0;
                 }
-            }
-
-            UpdateOverlay();
-            ShowPlayerStats();
-
-            //Goto next turn
-            if (enemyMovement.Checked && activePlayer.Name != humanPlayer.Name)
+                actionOccuring = false;
+                RenderMap();
+                ShowPlayerStats();
+                nextAction.Enabled = true;
+            } //Goto next turn in multiturn
+            else if (humanPlayer != null && enemyMovement.Checked && activePlayer.Name != humanPlayer.Name)
             {
+                nextAction.Enabled = false;
+                actionOccuring = true;
                 NextTurn();
                 return;
             }
 
             //GUI Updates
 
-            if (humanPlayer.active)
+            if (humanPlayer != null && humanPlayer.active)
             {
                 UpdateSpellInfo();
                 UpdateStatusInfo();
@@ -310,7 +352,6 @@ namespace StartGame
                     dumpWeapon.Enabled = true;
                 nextAction.Enabled = false;
                 nextAction.Text = "End turn";
-                MessageBox.Show("It is your turn!");
                 nextAction.Enabled = true;
             }
             else
@@ -319,7 +360,6 @@ namespace StartGame
                 dumpWeapon.Enabled = false;
                 nextAction.Enabled = false;
                 nextAction.Text = "Next turn!";
-                MessageBox.Show($"It is {activePlayer.Name}'s turn!");
                 nextAction.Enabled = true;
             }
             nextAction.Focus();
@@ -387,7 +427,7 @@ namespace StartGame
             UpdateSpellInfo();
         }
 
-        private void UpdateSpellInfo()
+        public void UpdateSpellInfo()
         {
             int index = spellList.SelectedIndex;
             if (index != -1)
@@ -395,13 +435,14 @@ namespace StartGame
                 Spell spell = humanPlayer.spells[index];
                 spellName.Text = spell.name;
                 spellDescription.Text = $"Mana: {spell.manaCost} Cooldown: {spell.coolDown} / {spell.MaxCoolDown}";
+                castSpell.Enabled = activePlayer.Name == humanPlayer.Name && gameStarted && spell.manaCost <= humanPlayer.mana && spell.Ready;
             }
             else
             {
                 spellName.Text = "";
                 spellDescription.Text = "";
+                castSpell.Enabled = false;
             }
-            castSpell.Enabled = index != -1 && activePlayer.Name == humanPlayer.Name && gameStarted;
         }
 
         public void WriteConsole(string text)
@@ -416,6 +457,65 @@ namespace StartGame
             UpdateSpellInfo();
         }
 
+        private List<Bitmap> frames = new List<Bitmap>();
+        private Thread animator;
+        private bool animating = false;
+        public bool actionOccuring = false;
+
+        public void RenderMap(bool forceEntityRedrawing = false)
+        {
+            if (!animating && !actionOccuring)
+            {
+                StackTrace stackTrace = new StackTrace();
+                Trace.TraceInformation($"Rendering - Called from {stackTrace.GetFrame(1).GetMethod().Name}");
+                animating = true;
+                frames = new List<Bitmap>();
+                animator = new Thread(() => map.Render(gameBoard, frames, forceEntityRedrawing, frameTime: 100, debug: false, colorAlpha: showHeightDifference.Checked ? 50 : 255, showInverseHeight: showHeightDifference.Checked))
+                {
+                    Name = "Animator Thread"
+                };
+                animator.Start();
+                System.Timers.Timer timer = new System.Timers.Timer(100)
+                {
+                    Enabled = true
+                };
+                timer.Elapsed += ChangeImage;
+                timer.Start();
+            }
+            else
+            {
+                StackTrace stackTrace = new StackTrace();
+                Trace.TraceInformation($"Skipped: {animating} Animating - {actionOccuring} Action Occuring - Called from {stackTrace.GetFrame(1).GetMethod().Name}");
+            }
+        }
+
+        private void ChangeImage(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            Bitmap newFrame = null;
+            lock (frames)
+            {
+                Bitmap loc = frames.FirstOrDefault();
+                if (loc is null) return;
+                lock (loc)
+                {
+                    frames.Remove(loc);
+                    if (loc is null)
+                        newFrame = null;
+                    else
+                        newFrame = new Bitmap(loc);
+                }
+            }
+            if (newFrame != null)
+            {
+                gameBoard.Image = newFrame;
+            }
+            if (!(animator.IsAlive || frames.Count != 0))
+            {
+                animating = false;
+                (sender as System.Timers.Timer).Stop();
+            }
+        }
+
         public void SetUpdateState(bool active)
         {
             levelUpButton.Enabled = active;
@@ -424,7 +524,7 @@ namespace StartGame
         private void SelectField(int X, int Y)
         {
             map.overlayObjects.Add(new OverlayRectangle(X * fieldSize, Y * fieldSize, fieldSize, fieldSize, Color.Orange, false));
-            UpdateOverlay();
+            RenderMap(); //TODO: Check if this is necessary right now all calls are being skipped
 
             position = new Point(X, Y);
             ShowPositionStats();
@@ -474,12 +574,19 @@ namespace StartGame
 
         private void UpdatePlayerList()
         {
-            //Easy: Don't readd everything, only the things which change
-            troopList.Items.Clear();
-            for (int i = 0; i < players.Count; i++)
+            List<string> playerNames = players.ConvertAll(t => t.troop.name);
+            List<string> diff = troopList.Items.Cast<string>().Except(playerNames).ToList();
+            foreach (string dif in diff)
             {
-                troopList.Items.Add(players[i].troop.name);
+                troopList.Items.Remove(dif);
             }
+
+            diff = playerNames.Except(troopList.Items.Cast<string>()).ToList();
+            foreach (string dif in diff)
+            {
+                troopList.Items.Add(dif);
+            }
+
             troopList.SelectedIndex = 0;
         }
 
@@ -499,6 +606,7 @@ namespace StartGame
 
         public void UpdateStatusList()
         {
+            if (humanPlayer is null) return;
             List<string> playerStatusNames = humanPlayer.troop.statuses.ConvertAll(t => t.name);
             List<string> diff = statusList.Items.Cast<string>().Except(playerStatusNames).ToList();
             foreach (string dif in diff)
@@ -538,21 +646,6 @@ namespace StartGame
                 playerWisdom.Text = $"Wisdom: {humanPlayer.wisdom}";
                 playerIntelligence.Text = $"Intelligence: {humanPlayer.intelligence}";
             }
-        }
-
-        public void UpdateGameBoard()
-        {
-            gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
-        }
-
-        private void UpdateOverlay(bool keepAll = false)
-        {
-            Image image = new Bitmap(map.background);
-            using (Graphics g = Graphics.FromImage(image))
-            {
-                g.DrawImage(map.DrawOverlay(gameBoard.Width, gameBoard.Height, keepAll), 0, 0);
-            }
-            gameBoard.Image = image;
         }
 
         private void ShowEntityData(Entity entity)
@@ -630,7 +723,7 @@ namespace StartGame
                         map.overlayObjects.Add(new OverlayRectangle(x * MapCreator.fieldSize, y * MapCreator.fieldSize, MapCreator.fieldSize, MapCreator.fieldSize, Color.Brown, true, FillColor: fill));
                 }
             }
-            UpdateOverlay();
+            RenderMap();
         }
 
         private void LevelUpButton_Click(object sender, EventArgs e)
@@ -645,7 +738,7 @@ namespace StartGame
                 Weapon toRemove = humanPlayer.troop.weapons[playerWeaponList.SelectedIndex];
                 humanPlayer.troop.weapons.Remove(toRemove);
                 playerWeaponList.Items.Remove(toRemove.name);
-                UpdateOverlay();
+                RenderMap();
             }
         }
 
@@ -656,15 +749,7 @@ namespace StartGame
 
         private void ShowHeightDifference_CheckedChanged(object sender, EventArgs e)
         {
-            if (showHeightDifference.Checked)
-            {
-                gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0, colorAlpha: 50);
-            }
-            else
-            {
-                gameBoard.Image = map.DrawMapBackground(gameBoard.Width, gameBoard.Height, continentAlpha: 0);
-            }
-            UpdateOverlay(keepAll: true);
+            RenderMap();
         }
 
         private void MainGameWindow_Load(object sender, EventArgs e)
@@ -685,7 +770,7 @@ namespace StartGame
             ShowWeaponStats();
         }
 
-        private void debugButton_Click(object sender, EventArgs e)
+        private void DebugButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -709,8 +794,9 @@ namespace StartGame
             {
                 humanPlayer.troop.activeWeapon = humanPlayer.troop.weapons[playerWeaponList.SelectedIndex];
             }
+            ShowWeaponStats();
             ShowPlayerStats();
-            UpdateOverlay();
+            RenderMap();
         }
 
         private void GameBoard_Click(object sender, EventArgs e)
@@ -720,7 +806,6 @@ namespace StartGame
         private void NextAction_Click(object sender, EventArgs e)
         {
             if (humanPlayer is null) Close();
-            UpdateOverlay(enemyMovement.Checked && activePlayer.Name != humanPlayer.Name);
             activePlayer.ActionButtonPressed(this);
         }
 
@@ -736,6 +821,19 @@ namespace StartGame
                     {
                         castingspell = true;
                         castSpell.Text = "Select position on map";
+                    }
+                    else //Instantly cast
+                    {
+                        //TODO: Extract as method
+                        //Now cast
+                        WriteConsole(activeSpell.Activate(new SpellInformation() { positions = spellPoints, mage = humanPlayer }));
+
+                        spellPoints.Clear();
+                        castSpell.Text = "Cast spell";
+                        activeSpell = null;
+                        castingspell = false;
+                        UpdateSpellInfo();
+                        ShowPlayerStats();
                     }
                 }
             }
@@ -781,6 +879,7 @@ namespace StartGame
 
         private List<MapTile> canMoveTo = new List<MapTile>();
         private List<MapTile> canAttack = new List<MapTile>();
+        private bool forceEntityRedraw = false;
 
         private void GameBoard_MouseClick(object sender, MouseEventArgs e)
         {
@@ -791,6 +890,9 @@ namespace StartGame
 
             int x = e.X - e.X % fieldSize;
             int y = e.Y - e.Y % fieldSize;
+
+            if (animating) return;
+
             if (castingspell)
             {
                 spellPoints.Add(new Point(X, Y));
@@ -798,18 +900,23 @@ namespace StartGame
                 if (spellPoints.Count == activeSpell.format.Positions)
                 {
                     //Now cast
-                    WriteConsole(activeSpell.Activate(new SpellInformation() { positions = spellPoints }));
+                    WriteConsole(activeSpell.Activate(new SpellInformation() { positions = spellPoints, mage = humanPlayer }));
 
                     spellPoints.Clear();
                     castSpell.Text = "Cast spell";
                     activeSpell = null;
                     castingspell = false;
                     UpdateSpellInfo();
+                    ShowPlayerStats();
                 }
             }
             else
             {
+                actionOccuring = true;
                 FocusField(X, Y);
+                actionOccuring = false;
+                RenderMap(forceEntityRedraw);
+                forceEntityRedraw = false;
             }
         }
 
@@ -822,7 +929,10 @@ namespace StartGame
             {
                 troopList.SelectedIndex = -1;
                 Player selected = players.Find(P => P.troop == p);
-                troopList.SelectedIndex = troopList.Items.IndexOf(selected.Name);
+                if (troopList.SelectedIndex != troopList.Items.IndexOf(selected.Name))
+                {
+                    troopList.SelectedIndex = troopList.Items.IndexOf(selected.Name);
+                }
             }
             else
             {
@@ -842,6 +952,7 @@ namespace StartGame
                 {
                     Player attacked = players.Find(t => t.troop.Position.X == X && t.troop.Position.Y == Y);
                     Attack(humanPlayer, attacked, show: true);
+                    forceEntityRedraw = true; //In case enemy is killed
                     return;
                 }
                 canAttack.Clear();
@@ -854,21 +965,28 @@ namespace StartGame
                     {
                         MapTile moveTo = canMoveTo.Find(f => f.position.X == X
                             && Y == f.position.Y);
-                        humanPlayer.actionPoints = moveTo.leftValue;
 
-                        Point humanPos = humanPlayer.troop.Position;
-                        humanPos.X = moveTo.position.X;
-                        humanPos.Y = moveTo.position.Y;
-                        humanPlayer.troop.Position = humanPos;
+                        //Generate path of movement
+                        DistanceGraphCreator movementGraph = new DistanceGraphCreator(humanPlayer, humanPlayer.troop.Position.X, humanPlayer.troop.Position.Y, moveTo.position.X, moveTo.position.Y, map, true, true);
+                        movementGraph.CreateGraph();
 
-                        MapTile end = map.map[humanPlayer.troop.Position.X, humanPlayer.troop.Position.Y];
-                        PlayerMoved(this, new PlayerMovementData() { player = humanPlayer, start = start, distance = AIUtility.Distance(start.position, end.position), goal = end, movementType = MovementType.walk });
+                        List<Point> movement = new List<Point>() { };
+                        Point pointer = moveTo.position;
+                        Point last = pointer;
+                        //Easy: Use newer methods
+                        while (pointer != humanPlayer.troop.Position)
+                        {
+                            pointer = AIUtility.GetFields(pointer, movementGraph).Aggregate((min, point) => movementGraph.graph.Get(point) < movementGraph.graph.Get(min) ? point : min);
+                            movement.Add(last.Sub(pointer)); //Opposite order as we will reverse the array later
+                            last = pointer;
+                            if (movement.Count > 100) throw new Exception();
+                        }
+                        movement.Reverse();
 
-                        map.DrawEntities();
-                        UpdateOverlay();
+                        MovePlayer(moveTo.position, humanPlayer.troop.Position, humanPlayer, MovementType.walk, true, movement);
+
                         canMoveTo.Clear();
                         ShowPlayerStats();
-                        FocusField(X, Y);
                         return;
                     }
                 }
@@ -887,25 +1005,21 @@ namespace StartGame
                     //Find all fields it can move to
                     List<MapTile> possibleFields = new List<MapTile>();
                     List<MapTile> toCheck = new List<MapTile> { map.map[X, Y] };
-                    map.map[X, Y].leftValue = humanPlayer.actionPoints;
+                    DistanceGraphCreator distanceGraph = new DistanceGraphCreator(humanPlayer, X, Y, X, Y, map, true); //Set start location at the same position so that is expands outwards
+                    distanceGraph.CreateGraph();
                     while (toCheck.Count != 0)
                     {
                         MapTile checking = toCheck[0];
                         toCheck.Remove(checking);
-                        if (checking.leftValue >= 0)
+                        if (distanceGraph.graph.Get(checking.position) >= 0)
                         {
                             possibleFields.Add(checking);
-                            List<MapTile> sorroundingTiles = new SorroundingTiles(checking.position, map).rawMaptiles.ToList();
-                            sorroundingTiles = sorroundingTiles.Where(t => (t.leftValue == -1 || t.leftValue < checking.leftValue - t.MovementCost) && t.free).ToList();
+                            List<MapTile> sorroundingTiles = new SorroundingTiles<MapTile>(checking.position, map.map).rawMaptiles.ToList();
                             sorroundingTiles.ForEach(t =>
                             {
-                                double cost = 0;
-                                foreach (var func in CalculateCost)
-                                {
-                                    cost = func(t, AIUtility.Distance(t.position, humanPlayer.troop.Position), cost);
-                                }
-                                t.leftValue = checking.leftValue - cost;
+                                t.leftValue = distanceGraph.graph.Get(t.position);
                             });
+                            sorroundingTiles = sorroundingTiles.Where(t => t.leftValue <= humanPlayer.actionPoints && t.free && !possibleFields.Exists(f => f.position == t.position)).ToList();
                             toCheck.AddRange(sorroundingTiles);
                         }
                     }
@@ -939,19 +1053,10 @@ namespace StartGame
                             }
                         }
                     }
-
-                    UpdateOverlay();
                     return;
                 }
             }
         }
-
-        /// <summary>
-        /// Function list used to calculate cost to move to certain field.
-        /// Input: Maptile, Distance moved, Cost of movement
-        /// Ouput: Cost
-        /// </summary>
-        public List<Func<MapTile, int, double, double>> CalculateCost = new List<Func<MapTile, int, double, double>>();
 
         #endregion Player Game Board Interaction
 
@@ -959,12 +1064,14 @@ namespace StartGame
 
         #region Player Events
 
-        public void DamageAtField(int damage, Point point)
+        public bool DamageAtField(int damage, DamageType damageType, Point point)
         {
             if (players.Exists(p => p.troop.Position == point))
             {
-                DamagePlayer(damage, players.First(p => p.troop.Position == point));
+                DamagePlayer(damage, damageType, players.First(p => p.troop.Position == point));
+                return true;
             }
+            return false;
         }
 
         /// <summary>
@@ -972,9 +1079,11 @@ namespace StartGame
         /// </summary>
         /// <param name="damage"> Damage dealt </param>
         /// <param name="player"> Player damaged </param>
-        public void DamagePlayer(int damage, Player player)
+        public void DamagePlayer(int damage, DamageType damageType, Player player)
         {
-            damage = Math.Min(player.troop.health, damage);
+            if (humanPlayer is null) return;
+
+            damage = Math.Min(player.troop.health, (int)(damage * player.troop.GetVurneability(damageType)));
             player.troop.health -= damage;
 
             if (player.troop.health <= 0)
@@ -990,6 +1099,8 @@ namespace StartGame
                     player.troop.Die();
                     map.troops.Remove(player.troop);
                     map.entites.Remove(player.troop);
+                    map.RemoveEntityRenderObject(player.troop.name);
+
                     players.Remove(player);
                     UpdatePlayerList();
 
@@ -1007,7 +1118,7 @@ namespace StartGame
                 map.overlayObjects.Add(new OverlayText(player.troop.Position.X * fieldSize, player.troop.Position.Y * fieldSize, Color.Red, $"-{damage}"));
             }
 
-            UpdateOverlay();
+            RenderMap();
         }
 
         private void LevelUp()
@@ -1029,8 +1140,9 @@ namespace StartGame
             players.Remove(humanPlayer);
             map.troops.Remove(humanPlayer.troop);
             map.entites.Remove(humanPlayer.troop);
+            map.RemoveEntityRenderObject(humanPlayer.troop.name);
             UpdatePlayerList();
-            UpdateOverlay();
+            RenderMap();
             ShowPlayerStats();
             canAttack.Clear();
             ShowEnemyStats();
@@ -1162,7 +1274,7 @@ namespace StartGame
                 //dodged
                 if (show)
                     map.overlayObjects.Add(new OverlayText(attacked.troop.Position.X * fieldSize, attacked.troop.Position.Y * fieldSize, Color.Red, "Dodged!"));
-                UpdateOverlay();
+                RenderMap();
                 Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = true, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon });
                 return (0, false, false);
             } //Long term: Add scraping hit
@@ -1182,6 +1294,7 @@ namespace StartGame
                     attacked.troop.Die();
                     map.troops.Remove(attacked.troop);
                     map.entites.Remove(attacked.troop);
+                    map.RemoveEntityRenderObject(attacked.troop.name);
                     players.Remove(attacked);
                     UpdatePlayerList();
 
@@ -1199,8 +1312,7 @@ namespace StartGame
             if (show)
             {
                 map.overlayObjects.Add(new OverlayText(attacked.troop.Position.X * fieldSize, attacked.troop.Position.Y * fieldSize, Color.Red, $"-{damage}"));
-                map.DrawEntities();
-                UpdateOverlay();
+                RenderMap();
                 if (attacking == humanPlayer)
                 {
                     WriteConsole($"You have attacked {attacked.Name} for {damage}");
@@ -1226,24 +1338,122 @@ namespace StartGame
             players.Add(player);
             map.troops.Add(player.troop);
             map.entites.Add(player.troop);
+            map.renderObjects.Add(new EntityRenderObject(player.troop, new TeleportPointAnimation(new Point(0, 0), player.troop.Position)));
             UpdatePlayerList();
         }
 
-        public void MovePlayer(Point end, Point start, Player player, MovementType movementType, bool CostActionPoints = true)
+        //TODO: HAndle all movement through move player, even when using graphs
+        public void MovePlayer(Point end, Point start, Player player, MovementType movementType, bool CostActionPoints = true, List<Point> path = null)
         {
+            bool render = false;
+            if (path is null)
+            {
+                path = new List<Point>() { end.Sub(start) };
+            }
+            int distance = 0;
+
+            switch (movementType)
+            {
+                case MovementType.walk:
+                    distance = path.Count;
+                    if (CostActionPoints)
+                    {
+                        Point pointer = new Point(start.X, start.Y);
+                        for (int i = 0; i < path.Count; i++)
+                        {
+                            Point next = new Point(pointer.X + path[i].X, pointer.Y + path[i].Y);
+                            player.actionPoints -= player.CalculateStep(map.map.Get(start), map.map.Get(pointer), map.map.Get(next), i + 1, MovementType.walk);
+                        }
+                    }
+                    break;
+
+                case MovementType.teleport:
+                    distance = AIUtility.Distance(start, end);
+                    if (CostActionPoints)
+                        player.actionPoints -= 1;
+                    break;
+
+                default:
+                    break;
+            }
+            //If end position is blocked, take damage and go to a close tile
+            if (!map.map[end.X, end.Y].free)
+            {
+                actionOccuring = true;
+                DamagePlayer(10, DamageType.earth, player);
+                WriteConsole($"{player.troop.name} takes 10 damage as he is in an object!");
+                if (player.troop.health == 0)
+                {
+                    actionOccuring = false;
+                    RenderMap();
+                    return;
+                }
+                Troop receiving = map.troops.FirstOrDefault(t => t.Position == end);
+                bool free = false;
+                if (receiving != null)
+                {
+                    Player recPlayer = GetPlayer(receiving);
+                    DamagePlayer(10, DamageType.earth, recPlayer);
+                    WriteConsole($"{receiving.name} has been daamaged as {player.troop.name} has teleported into it!");
+                    if (recPlayer is null || recPlayer.Dead)
+                    {
+                        free = true;
+                    }
+                }
+                if (!free)
+                {
+                    //Find neighbour field which is free else kill the entity
+                    MapTile escape = map.map.Get(end).neighbours.rawMaptiles.FirstOrDefault(m => m.free);
+                    if (escape is null)
+                    {
+                        DamagePlayer(player.troop.health + 2, DamageType.unblockable, player); //Should kill him
+                        return;
+                    }
+                    else
+                    {
+                        end = escape.position;
+                        path.Add(end);
+                        render = true;
+                    }
+                    actionOccuring = false;
+                }
+            }
+
             Point troopP = player.troop.Position;
             troopP.X = end.X;
             troopP.Y = end.Y;
             player.troop.Position = troopP;
-            int distance = AIUtility.Distance(start, end);
-            if (CostActionPoints)
-                player.actionPoints -= distance; //Bug: Non human players should still move correctly
 
-            PlayerMoved(this, new PlayerMovementData() { player = player, start = map.map[start.X, start.Y], goal = map.map[end.X, end.Y], distance = distance, movementType = movementType });
-
-            map.DrawEntities();
+            PlayerMoved(this, new PlayerMovementData()
+            {
+                player = player,
+                start = map.map[start.X, start.Y],
+                goal = map.map[end.X, end.Y],
+                distance = distance,
+                movementType = movementType,
+                map = map,
+                path = path.ToArray()
+            }); //Actually add path
+            if (render)
+            {
+                RenderMap();
+            }
         }
 
         #endregion Program Interaction
+
+        #region Helper Functions
+
+        /// <summary>
+        /// Finds player for a specific troop
+        /// </summary>
+        /// <param name="troop"></param>
+        /// <returns></returns>
+        public Player GetPlayer(Troop troop)
+        {
+            return players.FirstOrDefault(p => p.troop == troop);
+        }
+
+        #endregion Helper Functions
     }
 }

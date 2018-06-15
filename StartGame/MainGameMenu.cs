@@ -4,11 +4,16 @@ using System.Windows.Forms;
 using PlayerCreator;
 using System.Threading;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace StartGame
 {
     public partial class MainGameMenu : Form
     {
+        //TODO: Add try catch block around MaiNGame to catch errors and log them
+        //Logger
+        public static TraceSource log = new TraceSource("MainLog");
+
         private Map map;
         private Troop playerTroop;
 
@@ -43,7 +48,7 @@ namespace StartGame
                     Thread mapThread;
                     do
                     {
-                        mapThread = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, rnd.NextDouble() * 100, 0)))
+                        mapThread = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, rnd.Next(), -0.2)))
                         {
                             Priority = ThreadPriority.Highest
                         };
@@ -68,10 +73,19 @@ namespace StartGame
             {
                 troop = playerTroop
             };
+
+            player.agility = 5;
+            player.strength = 5;
+            player.vitality = 20;
+            player.intelligence = 5;
+            player.wisdom = 5;
+            player.endurance = 5;
+
+            player.CalculateStats();
             Hide();
             //Long term: Make form to allow use to choose mission and difficulty
 
-            Mission mission = new BanditMission();
+            Mission mission = new DragonFight();
 
             List<Tree> trees = Tree.GenerateTrees();
 

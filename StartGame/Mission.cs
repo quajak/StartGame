@@ -46,7 +46,178 @@ namespace StartGame
         public abstract bool MissionAllowed(int Round);
     }
 
+    //TODO: Underwater mission
+
+    internal class DebugMission : Mission
+    {
+        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description) GenerateMission(int difficulty, int Round, Map map, Player player)
+        {
+            Random rng = new Random();
+            rng.Next();
+
+            string desc = "Debug mission ";
+
+            #region Player Creation
+
+            List<Player> players = new List<Player>() { player };
+
+            //Set player position
+            players[0].troop.Position = new Point(0, 1);
+
+            #endregion Player Creation
+
+            #region WinCodition Creation
+
+            List<WinCheck> wins = new List<WinCheck>
+            {
+            };
+            WinCheck fail = ((_map, main) => false);
+            wins.Add(fail);
+
+            #endregion WinCodition Creation
+
+            #region DeathCondition Creation
+
+            List<WinCheck> deaths = new List<WinCheck>
+            {
+                playerDeath
+            };
+
+            desc += "Do not die. ";
+
+            #endregion DeathCondition Creation
+
+            desc += "Good luck! ";
+            return (players, wins, deaths, desc);
+        }
+
+        public override bool MapValidity(Map map)
+        {
+            return true;
+        }
+
+        public override Reward Reward()
+        {
+            return new Reward()
+            {
+                weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null }
+                ,
+                XP = 5,
+                spellReward = new SpellReward() { spell = new TeleportSpell(2, 0) }
+            };
+        }
+
+        public override bool MissionAllowed(int Round)
+        {
+            return true;
+        }
+    }
+
+    internal class DragonFight : Mission
+    {
+        private int xp;
+
+        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description) GenerateMission(int difficulty, int Round, Map map, Player player)
+        {
+            Random rng = new Random();
+            rng.Next();
+
+            string desc = "Welcome to an epic dragon fight! Reach the dragons nest to win! ";
+
+            #region Player Creation
+
+            List<Player> players = new List<Player>() { player };
+            xp = (int)((player as HumanPlayer).levelXP * (rng.NextDouble() + 2));
+
+            //Set player position
+            players[0].troop.Position = map.DeterminSpawnPoint(1, SpawnType.road)[0];
+
+            //Find highest peak
+            Point peak = map.DeterminSpawnPoint(1, SpawnType.heighestField)[0];
+
+            //Create the nest
+            Building egg = new Building("Nest", peak, Resources.DragonEggNest, map, true);
+            map.entites.Add(egg);
+            map.renderObjects.Add(new EntityRenderObject(egg, new TeleportPointAnimation(new Point(0, 0), egg.Position)));
+
+            //Spawn dragon close to the highest peak
+            Point dragonSpawn = new Point(peak.X + rng.Next(3), peak.Y + rng.Next(3));
+            while (dragonSpawn.X >= map.map.GetUpperBound(0) && dragonSpawn.Y >= map.map.GetUpperBound(1))
+            {
+                dragonSpawn.X = dragonSpawn.X >= map.map.GetUpperBound(0) ? dragonSpawn.X - 1 : dragonSpawn.X;
+                dragonSpawn.Y = dragonSpawn.Y >= map.map.GetUpperBound(1) ? dragonSpawn.Y - 1 : dragonSpawn.Y;
+            }
+
+            Dictionary<DamageType, double> vurn = new Dictionary<DamageType, double>
+            {
+                { DamageType.fire, 0 }
+            };
+
+            players.Add(new DragonMotherAI(PlayerType.computer, "Dragon", map, new Player[] { player }, peak)
+            {
+                troop = new Troop("Dragon", 100 + (difficulty / 2) + (int)(Round * 1.5) - 4,
+                    new Weapon(8 + difficulty / 4 + Round - 1,
+                        AttackType.melee, 3, "Claw", 1, false),
+                    Resources.Dragon, 0, map, Vurneabilities: vurn)
+            });
+            players[1].troop.Position = dragonSpawn;
+            players[1].troop.weapons.Add(new Weapon(6 + difficulty / 3 + Round, AttackType.magic, 6, "Tail", 1, false, 1));
+
+            #endregion Player Creation
+
+            #region WinCodition Creation
+
+            List<WinCheck> wins = new List<WinCheck>
+            {
+                deathCheck,
+                (_map, _main) =>
+                {
+                    return AIUtility.Distance(_main.humanPlayer.troop.Position, peak) == 1;
+                }
+            };
+            WinCheck fail = ((_map, main) => false);
+            wins.Add(fail);
+
+            #endregion WinCodition Creation
+
+            #region DeathCondition Creation
+
+            List<WinCheck> deaths = new List<WinCheck>
+            {
+                playerDeath
+            };
+
+            desc += "Do not die. ";
+
+            #endregion DeathCondition Creation
+
+            desc += "Good luck! ";
+            return (players, wins, deaths, desc);
+        }
+
+        public override bool MapValidity(Map map)
+        {
+            return true;
+        }
+
+        public override Reward Reward()
+        {
+            return new Reward()
+            {
+                weaponReward = new WeaponReward() { random = true, rarity = 2, reward = null },
+                XP = xp,
+                spellReward = new SpellReward() { spell = new FireBall(8, 3, 4, 0) }
+            };
+        }
+
+        public override bool MissionAllowed(int Round)
+        {
+            return Round > 7;
+        }
+    }
+
     internal class BanditMission : Mission
+
     {
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description) GenerateMission(int difficulty, int Round, Map map, Player player)
         {
@@ -120,7 +291,7 @@ namespace StartGame
                     desc += $"You can also reach the field [{goal.X}, {goal.Y}] to win.";
                     //Make the player go somewhere
                     map.overlayObjects.Add(new OverlayRectangle(goal.X * MapCreator.fieldSize, goal.Y * MapCreator.fieldSize, MapCreator.fieldSize, MapCreator.fieldSize, Color.Gold, Once: false));
-                    wins.Add((_map, main) => goal == main.humanPlayer.troop.Position);
+                    wins.Add((_map, main) => main.humanPlayer != null && goal == main.humanPlayer.troop.Position);
                 }
             }
 
@@ -299,7 +470,7 @@ namespace StartGame
                 troop = new Troop(name, (difficulty / 3) + (int)(Round * 1.5) + 5,
                 new Weapon(3 + difficulty / 5 + Round / 2,
                     AttackType.melee, 1, "Dagger", 2, false),
-                Resources.enemyScout, 0, map, Dodge: 25)
+                Resources.elementalWizard, 0, map, Dodge: 25)
             });
             players[1].troop.Position = startPos[0];
 
@@ -355,6 +526,7 @@ namespace StartGame
 
     internal class AttackCampMission : Mission
     {
+        //TODO: Trigger aggresive AI when casting spell to hurt bandit
         public AttackCampMission()
         {
             heightDiff = -0.2;
@@ -379,7 +551,9 @@ namespace StartGame
             Point camp;
             camp = map.map.Cast<MapTile>().ToList().Where(t => t.neighbours.rawMaptiles.Count(n => n.type.FType == FieldType.land) == 4).OrderByDescending(m => AIUtility.Distance(m.position, player.troop.Position)).First().position;
             //Make camp fire
-            map.entites.Add(new Building("Fireplace", camp, Resources.firePlace, map));
+            Building fireplace = new Building("Fireplace", camp, Resources.firePlace, map);
+            map.entites.Add(fireplace);
+            map.renderObjects.Add(new EntityRenderObject(fireplace, new TeleportPointAnimation(new Point(0, 0), fireplace.Position)));
 
             int enemyNumber = Round / 5 + 2 * difficulty / 3;
             List<Point> startPos = new List<Point>();

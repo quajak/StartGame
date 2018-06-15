@@ -13,7 +13,7 @@ namespace StartGame
         public MapTileType type;
         public double height;
         public Continent continent;
-        public SorroundingTiles neighbours;
+        public SorroundingTiles<MapTile> neighbours;
         public bool isBeingChecked;
         public double Cost { set; get; }
         public double MovementCost;
@@ -70,7 +70,7 @@ namespace StartGame
 
         public void GetNeighbours(Map map)
         {
-            neighbours = new SorroundingTiles(position, map);
+            neighbours = new SorroundingTiles<MapTile>(position, map.map);
         }
 
         public object Clone()
@@ -81,75 +81,84 @@ namespace StartGame
                 Cost = Cost,
                 Costs = Costs,
                 continent = continent,
-                neighbours = (SorroundingTiles)neighbours.Clone(),
+                neighbours = (SorroundingTiles<MapTile>)neighbours.Clone(),
                 isBeingChecked = isBeingChecked,
                 GoalIDs = GoalIDs
             };
         }
     }
 
-    internal class SorroundingTiles : ICloneable
+    internal class SorroundingTiles<T> : ICloneable
     {
-        public MapTile top;
-        public MapTile left;
-        public MapTile bottom;
-        public MapTile right;
-        public MapTile[] rawMaptiles;
+        public T top;
+        public T left;
+        public T bottom;
+        public T right;
+        public T[] rawMaptiles;
 
-        public SorroundingTiles(Point pos, Map map)
+        public SorroundingTiles(Point pos, T[,] map)
         {
-            List<MapTile> rawData = new List<MapTile>();
+            if (default(T) != null) throw new Exception("This class can only be used with nullable types!");
+            List<T> rawData = new List<T>();
             if (pos.Y != 0)
             {
-                top = map.map[pos.X, pos.Y - 1];
+                top = map[pos.X, pos.Y - 1];
                 rawData.Add(top);
             }
-            else top = null;
+            else top = default;
             if (pos.X != 0)
             {
-                left = map.map[pos.X - 1, pos.Y];
+                left = map[pos.X - 1, pos.Y];
                 rawData.Add(left);
             }
-            else left = null;
-            if (pos.X != map.map.GetUpperBound(0))
+            else left = default;
+            if (pos.X != map.GetUpperBound(0))
             {
-                right = map.map[pos.X + 1, pos.Y];
+                right = map[pos.X + 1, pos.Y];
                 rawData.Add(right);
             }
-            else right = null;
-            if (pos.Y != map.map.GetUpperBound(1))
+            else right = default;
+            if (pos.Y != map.GetUpperBound(1))
             {
-                bottom = map.map[pos.X, pos.Y + 1];
+                bottom = map[pos.X, pos.Y + 1];
                 rawData.Add(bottom);
             }
-            else bottom = null;
+            else bottom = default;
             rawMaptiles = rawData.ToArray();
         }
 
-        public SorroundingTiles(MapTile Top, MapTile Bottom, MapTile Left, MapTile Right)
+        public SorroundingTiles(T Top, T Bottom, T Left, T Right)
         {
             top = Top;
             bottom = Bottom;
             left = Left;
             right = Right;
-            rawMaptiles = new MapTile[] { top, bottom, left, right };
+            rawMaptiles = new T[] { top, bottom, left, right };
         }
 
         public object Clone()
         {
-            return new SorroundingTiles(top, bottom, left, right);
+            return new SorroundingTiles<T>(top, bottom, left, right);
         }
 
         public List<MapTile> GetSameType(MapTileTypeEnum type)
         {
-            List<MapTile> sameType = new List<MapTile>();
+            if ((top == null || top is MapTile) && (bottom == null || bottom is MapTile) && (right == null || right is MapTile) && (left == null || left is MapTile))
+            {
+                MapTile _top = top as MapTile;
+                MapTile _bottom = bottom as MapTile;
+                MapTile _right = right as MapTile;
+                MapTile _left = left as MapTile;
+                List<MapTile> sameType = new List<MapTile>();
 
-            if (top != null && top.type.type == type && top.continent == null && !top.isBeingChecked) sameType.Add(top);
-            if (bottom != null && bottom.type.type == type && bottom.continent == null && !bottom.isBeingChecked) sameType.Add(bottom);
-            if (right != null && right.type.type == type && right.continent == null && !right.isBeingChecked) sameType.Add(right);
-            if (left != null && left.type.type == type && left.continent == null && !left.isBeingChecked) sameType.Add(left);
+                if (top != null && _top.type.type == type && _top.continent == null && !_top.isBeingChecked) sameType.Add(_top);
+                if (bottom != null && _bottom.type.type == type && _bottom.continent == null && !_bottom.isBeingChecked) sameType.Add(_bottom);
+                if (right != null && _right.type.type == type && _right.continent == null && !_right.isBeingChecked) sameType.Add(_right);
+                if (left != null && _left.type.type == type && _left.continent == null && !_left.isBeingChecked) sameType.Add(_left);
 
-            return sameType;
+                return sameType;
+            }
+            throw new NotImplementedException();
         }
     }
 
@@ -194,19 +203,19 @@ namespace StartGame
         }
     }
 
-    internal class EdgeArray
+    internal class EdgeArray<T>
     {
-        public List<MapTile> top;
-        public List<MapTile> bottom;
-        public List<MapTile> right;
-        public List<MapTile> left;
+        public List<T> top;
+        public List<T> bottom;
+        public List<T> right;
+        public List<T> left;
 
-        public EdgeArray(MapTile[] Top, MapTile[] Bottom, MapTile[] Left, MapTile[] Right)
+        public EdgeArray(T[] Top, T[] Bottom, T[] Left, T[] Right)
         {
-            top = new List<MapTile>(Top);
-            bottom = new List<MapTile>(Bottom);
-            right = new List<MapTile>(Right);
-            left = new List<MapTile>(Left);
+            top = new List<T>(Top);
+            bottom = new List<T>(Bottom);
+            right = new List<T>(Right);
+            left = new List<T>(Left);
         }
     }
 
@@ -215,7 +224,7 @@ namespace StartGame
         public List<MapTile> tiles;
         public MapTileTypeEnum Type { get; private set; }
         private string id;
-        public EdgeArray edges;
+        public EdgeArray<MapTile> edges;
         public Color color;
 
         //Internal
@@ -272,7 +281,7 @@ namespace StartGame
                 if (tile.position.Y == 0) top.Add(tile);
                 if (tile.position.Y == map.map.GetUpperBound(1)) bottom.Add(tile);
             }
-            edges = new EdgeArray(top.ToArray(), bottom.ToArray(), left.ToArray(), right.ToArray());
+            edges = new EdgeArray<MapTile>(top.ToArray(), bottom.ToArray(), left.ToArray(), right.ToArray());
 
             return map;
         }

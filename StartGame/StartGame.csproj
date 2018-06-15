@@ -11,6 +11,8 @@
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,10 +25,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,6 +38,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>7.2</LangVersion>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -65,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Animations.cs" />
     <Compile Include="Campaign.cs" />
     <Compile Include="CampaignController.cs">
       <SubType>Form</SubType>
@@ -106,6 +109,7 @@
       <DependentUpon>MapCreator.cs</DependentUpon>
     </Compile>
     <Compile Include="MapParts.cs" />
+    <Compile Include="MapRenderer.cs" />
     <Compile Include="Mission.cs" />
     <Compile Include="PerlinNoise.cs" />
     <Compile Include="Player.cs" />
@@ -202,6 +206,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Fire.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\elementalWizard.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EarthQuake.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\LightningBolt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Dragon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DragonEggNest.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
