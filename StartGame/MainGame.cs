@@ -390,11 +390,6 @@ namespace StartGame
             UpdateSelectedTreeInformation();
         }
 
-        public void TreeGained(Tree tree)
-        {
-            MessageBox.Show($"You have gained the {tree.GetType().BaseType.Name} {tree.name}! \n {tree.description} \n Unlocked by: {tree.reason}", "Tree gained!");
-        }
-
         private void UpdateSelectedTreeInformation()
         {
             int selected = treeList.SelectedIndex;
@@ -402,11 +397,21 @@ namespace StartGame
             {
                 treeName.Text = "";
                 treeInformation.Text = "";
+                skillLevel.Text = "";
             }
             else
             {
-                treeName.Text = humanPlayer.trees[selected].name;
-                treeInformation.Text = humanPlayer.trees[selected].description + " \n " + "Found by " + humanPlayer.trees[selected].reason;
+                Tree tree = humanPlayer.trees[selected];
+                treeName.Text = tree.name;
+                treeInformation.Text = tree.description + " \n " + "Found by " + tree.reason;
+                if (tree is Skill skill)
+                {
+                    skillLevel.Text = $"Level {skill.level}: {skill.Xp}/{skill.maxXP}";
+                }
+                else
+                {
+                    skillLevel.Text = "";
+                }
             }
         }
 
@@ -971,19 +976,16 @@ namespace StartGame
                         DistanceGraphCreator movementGraph = new DistanceGraphCreator(humanPlayer, humanPlayer.troop.Position.X, humanPlayer.troop.Position.Y, moveTo.position.X, moveTo.position.Y, map, true, true);
                         movementGraph.CreateGraph();
 
-                        List<Point> movement = new List<Point>() { };
-                        Point pointer = moveTo.position;
-                        Point last = pointer;
-                        //Easy: Use newer methods
-                        while (pointer != humanPlayer.troop.Position)
+                        List<Point> movement = movementGraph.GeneratePath(moveTo.position, humanPlayer.troop.Position, map).ToList().ConvertAll(m => m.position);
+                        for (int i = 0; i < movement.Count; i++)
                         {
-                            pointer = AIUtility.GetFields(pointer, movementGraph).Aggregate((min, point) => movementGraph.graph.Get(point) < movementGraph.graph.Get(min) ? point : min);
-                            movement.Add(last.Sub(pointer)); //Opposite order as we will reverse the array later
-                            last = pointer;
-                            if (movement.Count > 100) throw new Exception();
+                            if (movement.Count - i - 1 != 0)
+                                movement[movement.Count - i - 1] = movement[movement.Count - i - 2].Sub(movement[movement.Count - i - 1]);
+                            else
+                                movement[movement.Count - i - 1] = moveTo.position.Sub(movement[movement.Count - i - 1]);
                         }
+                        movement.Remove(movement[0]);
                         movement.Reverse();
-
                         MovePlayer(moveTo.position, humanPlayer.troop.Position, humanPlayer, MovementType.walk, true, movement);
 
                         canMoveTo.Clear();
@@ -1032,7 +1034,7 @@ namespace StartGame
                         map.overlayObjects.Add(new OverlayRectangle(f.position.X * fieldSize, f.position.Y * fieldSize, fieldSize, fieldSize, Color.Green, false)));
                     //Add text with cost for each field to overlay
                     possibleFields.ForEach(f =>
-                        map.overlayObjects.Add(new OverlayText(f.position.X * fieldSize, f.position.Y * fieldSize, Color.DarkGreen, $"{f.leftValue}")));
+                        map.overlayObjects.Add(new OverlayText(f.position.X * fieldSize, f.position.Y * fieldSize, Color.DarkGreen, $"{humanPlayer.actionPoints - f.leftValue}")));
                     canMoveTo.AddRange(possibleFields);
 
                     //Show all enemies it might hit and damage dealt
@@ -1328,6 +1330,16 @@ namespace StartGame
             ShowEnemyStats();
 
             return (damage, killed, true);
+        }
+
+        public void TreeGained(Tree tree)
+        {
+            MessageBox.Show($"You have gained the {tree.GetType().BaseType.Name} {tree.name}! \n {tree.description} \n Unlocked by: {tree.reason}", "Tree gained!");
+        }
+
+        public void SkillLevelUp(Skill skill)
+        {
+            MessageBox.Show($"The skill {skill.name} has leveled up to level {skill.level}!");
         }
 
         #endregion Player Events

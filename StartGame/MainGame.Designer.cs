@@ -93,6 +93,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.debugButton = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
+            this.skillLevel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
@@ -588,6 +589,7 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.skillLevel);
             this.panel2.Controls.Add(this.treeInformation);
             this.panel2.Controls.Add(this.treeName);
             this.panel2.Controls.Add(this.treeList);
@@ -737,6 +739,15 @@
             this.label4.TabIndex = 4;
             this.label4.Text = "Spells";
             // 
+            // skillLevel
+            // 
+            this.skillLevel.AutoSize = true;
+            this.skillLevel.Location = new System.Drawing.Point(4, 190);
+            this.skillLevel.Name = "skillLevel";
+            this.skillLevel.Size = new System.Drawing.Size(50, 13);
+            this.skillLevel.TabIndex = 4;
+            this.skillLevel.Text = "skillLevel";
+            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -857,6 +868,7 @@
         private System.Windows.Forms.Label spellDescription;
         private System.Windows.Forms.Label spellName;
         private System.Windows.Forms.Button castSpell;
+        private System.Windows.Forms.Label skillLevel;
     }
 }
 

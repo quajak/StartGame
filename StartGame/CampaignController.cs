@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -45,7 +46,15 @@ namespace StartGame
 
             do
             {
-                campaign.activeGame.ShowDialog();
+                try
+                {
+                    campaign.activeGame.ShowDialog();
+                }
+                catch (Exception f)
+                {
+                    Trace.TraceError(f.ToString());
+                    MessageBox.Show(f.ToString());
+                }
 
                 if (campaign.activeGame.dead)
                 {

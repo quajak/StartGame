@@ -39,8 +39,39 @@ namespace StartGame
 
     internal abstract class Skill : Tree
     {
-        public Skill(string Name, string Description, string Reason) : base(Name, Description, Reason)
+        private readonly int minGrowth;
+        public int level;
+        private int xp;
+        public int maxXP;
+        internal MainGameWindow main;
+        private double growthFactor;
+
+        public int Xp
         {
+            get => xp;
+            set
+            {
+                xp = value;
+                bool levelup = false;
+                while (xp >= maxXP)
+                {
+                    levelup = true;
+                    xp -= maxXP;
+                    level++;
+                    maxXP = (int)Math.Max(maxXP + minGrowth, maxXP * growthFactor);
+                }
+                if (!(main is null)) main.UpdateTreeView();
+                if (levelup) main.SkillLevelUp(this);
+            }
+        }
+
+        public Skill(string Name, string Description, string Reason, double growthFactor, int maxXP, int minGrowth = 1) : base(Name, Description, Reason)
+        {
+            this.growthFactor = growthFactor;
+            this.maxXP = maxXP;
+            Xp = 0;
+            level = 0;
+            this.minGrowth = minGrowth;
             //TODO: Allow skills to gain levels
         }
     }
@@ -54,37 +85,32 @@ namespace StartGame
 
     internal class Rampage : Skill
     {
-        private MainGameWindow mainGame;
         private int succesiveTurns = 0;
         private int goal = 3;
         private bool hasKilled = false;
         private bool active = false;
 
-        public Rampage() : base("Rampage", "Get an action point back when killing an enemy.", "Kil enemies on 3 succesive turns.")
+        public Rampage() : base("Rampage", "Get an action point back when killing an enemy.", "Kill enemies on 3 succesive turns.", 2, 2)
         {
         }
 
         public override void Initialise(MainGameWindow mainGame)
         {
-            this.mainGame = mainGame;
-            if (!mainGame.humanPlayer.trees.Exists(t => t.name == name))
-            {
-                mainGame.Turn += TurnUpdate;
-                mainGame.Combat += CombatUpdate;
-            }
+            main = mainGame;
+            main.Turn += TurnUpdate;
+            main.Combat += CombatUpdate;
         }
 
         public void CombatUpdate(object sender, CombatData data)
         {
-            if (data.killed && mainGame.humanPlayer.Name == data.attacker.Name)
+            if (data.killed && main.humanPlayer.Name == data.attacker.Name)
             {
                 if (active)
                 {
-                    mainGame.humanPlayer.actionPoints++;
-                    mainGame.ShowPlayerStats();
+                    main.humanPlayer.actionPoints += level;
+                    main.ShowPlayerStats();
                 }
-                else
-                    hasKilled = true;
+                hasKilled = true;
             }
         }
 
@@ -92,26 +118,29 @@ namespace StartGame
         {
             //Add effect
             active = true;
-            mainGame.UpdateTreeView();
+            main.UpdateTreeView();
+            level = level == 0 ? 1 : level;
         }
 
-        public void TurnUpdate(object sneder, TurnData data)
+        public void TurnUpdate(object sender, TurnData data)
         {
-            if (mainGame.humanPlayer != null && data.active.Name == mainGame.humanPlayer.Name)
+            if (main.humanPlayer != null && data.active.Name == main.humanPlayer.Name)
             {
                 if (hasKilled)
                 {
                     succesiveTurns++;
-                    if (succesiveTurns == goal)
+                    if (succesiveTurns == goal && level == 0)
                     {
+                        level = 1;
                         //pop up
-                        mainGame.TreeGained(this);
+                        main.TreeGained(this);
 
-                        mainGame.humanPlayer.trees.Add(this);
+                        main.humanPlayer.trees.Add(this);
                         Activate();
-
-                        //Remove useless handler
-                        mainGame.Turn -= TurnUpdate;
+                    }
+                    else if (succesiveTurns >= goal)
+                    {
+                        Xp += succesiveTurns - goal;
                     }
                     hasKilled = false;
                 }
@@ -169,38 +198,38 @@ namespace StartGame
 
     internal class Sprinter : Skill
     {
-        private static int distanceNeeded = 20;
+        private static int distanceNeeded = 1;
         private int totalDistance = 0;
-        private MainGameWindow MainGame;
 
-        public Sprinter() : base("Sprinter", "Improved ability to run long distances. When moving longer than 4 squares, move one extra.", $"Moving {distanceNeeded} fields!")
+        public Sprinter() : base("Sprinter", "Improved ability to run long distances. When moving longer than 4 squares, move one extra.", $"Moving {distanceNeeded} fields!", 2, 20, 10)
         {
         }
 
         public override void Initialise(MainGameWindow mainGame)
         {
-            MainGame = mainGame;
-            if (!mainGame.humanPlayer.trees.Exists(t => t.name == name))
-                mainGame.PlayerMoved += Update;
+            main = mainGame;
+            main.PlayerMoved += Update;
         }
 
         public void Update(object sender, PlayerMovementData e)
         {
-            if (e.player.Name == MainGame.humanPlayer.Name && e.movementType == MovementType.walk)
+            if (e.player.Name == main.humanPlayer.Name && e.movementType == MovementType.walk)
             {
                 totalDistance += e.distance;
-                if (totalDistance > distanceNeeded)
+                if (totalDistance > distanceNeeded && level == 0)
                 {
-                    MainGame.humanPlayer.trees.Add(this);
-                    MainGame.UpdateTreeView();
+                    level = 1;
+                    main.humanPlayer.trees.Add(this);
+                    main.UpdateTreeView();
 
-                    //Remove listener
-                    MainGame.PlayerMoved -= Update;
-
-                    //Pop uo for skill notice
-                    MainGame.TreeGained(this);
+                    //Pop up for skill notice
+                    main.TreeGained(this);
 
                     Activate();
+                }
+                else
+                {
+                    Xp += e.distance;
                 }
             }
         }
@@ -208,7 +237,7 @@ namespace StartGame
         public override void Activate()
         {
             //Add effect
-            MainGame.humanPlayer.CalculateStepCost.Add((m, a, n, d, c, type) => (d == 4 && type == MovementType.walk) ? 0 : c);
+            main.humanPlayer.CalculateStepCost.Add((m, a, n, d, c, type) => ((d >= 4 && d <= 4 + level - 1) && type == MovementType.walk) ? 0 : c);
         }
     }
 
@@ -216,43 +245,43 @@ namespace StartGame
     {
         private static int DamageNeeded = 40;
         private int damageDealt = 0;
-        private MainGameWindow MainGame;
 
-        public Fighter() : base("Fighter", "Deal more damage against all enemies.", $"Deal {DamageNeeded} damage.")
+        public Fighter() : base("Fighter", "Deal more damage against all enemies.", $"Deal {DamageNeeded} damage.", 1.2, 40, 5)
         {
         }
 
         public override void Initialise(MainGameWindow mainGame)
         {
-            MainGame = mainGame;
-            if (!MainGame.humanPlayer.trees.Exists(t => t.name == name))
-                MainGame.Combat += Combat;
+            main = mainGame;
+            main.Combat += Combat;
         }
 
         private void Combat(object sender, CombatData e)
         {
-            if (e.attacker.Name == MainGame.humanPlayer.Name && e.doged != false)
+            if (e.attacker.Name == main.humanPlayer.Name && e.doged != false)
             {
                 damageDealt += e.damage;
-                if (damageDealt >= DamageNeeded)
+                if (damageDealt >= DamageNeeded && level == 0)
                 {
-                    MainGame.humanPlayer.trees.Add(this);
-                    MainGame.UpdateTreeView();
-
-                    //remove listener
-                    MainGame.Combat -= Combat;
+                    level = 1;
+                    main.humanPlayer.trees.Add(this);
+                    main.UpdateTreeView();
 
                     //Pop up
-                    MainGame.TreeGained(this);
+                    main.TreeGained(this);
 
                     Activate();
+                }
+                else
+                {
+                    Xp += e.damage;
                 }
             }
         }
 
         public override void Activate()
         {
-            MainGame.CalculatePlayerAttackDamage.Add((cd) => cd.damage++);
+            main.CalculatePlayerAttackDamage.Add((cd) => cd.damage += level);
         }
     }
 }

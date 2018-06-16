@@ -1215,7 +1215,7 @@ namespace StartGame
                             else if (!free[field[0], field[1]])
                             {
                             }
-                            else
+                            else if (graph[field[0], field[1]] > 0)
                             {
                                 MapTile[] path = GeneratePath(new Point(field[0], field[1]), start, map);
 
@@ -1253,14 +1253,15 @@ namespace StartGame
                 List<Point> fields = AIUtility.GetFields(active, this);
                 active = fields.Aggregate((best, field) =>
                 {
+                    if (path.Exists(f => f.position == field)) return best;
                     double b = graph[best.X, best.Y]; //Do not use Get method for optimization
                     double n = graph[field.X, field.Y];
                     if (n == b)
                     {
                         int bestDistance = AIUtility.Distance(best, end);
                         int fieldDistance = AIUtility.Distance(field, end);
-                        //if they have the same cost take the one which is closer
-                        return bestDistance > fieldDistance ? field : best;
+                        //if they have the same cost take the one which is closer if they are the same distance take the newer
+                        return bestDistance >= fieldDistance ? field : best;
                     }
                     else
                     {

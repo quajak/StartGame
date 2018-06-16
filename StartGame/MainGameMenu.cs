@@ -90,7 +90,15 @@ namespace StartGame
             List<Tree> trees = Tree.GenerateTrees();
 
             MainGameWindow mainGameWindow = new MainGameWindow(map, player, mission, trees);
-            mainGameWindow.ShowDialog();
+            try
+            {
+                mainGameWindow.ShowDialog();
+            }
+            catch (Exception f)
+            {
+                Trace.TraceError(f.ToString());
+                MessageBox.Show(f.ToString());
+            }
             Show();
 
             //Reset all variables

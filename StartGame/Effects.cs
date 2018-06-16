@@ -173,13 +173,11 @@ namespace StartGame
     {
         private readonly int strength;
         private readonly MainGameWindow main;
-        private readonly Player player;
 
         public DebuffStatus(int Turns, int Strength, MainGameWindow main, Player player) : base("Debuff", Turns, player)
         {
             strength = Strength;
             this.main = main;
-            this.player = player;
             this.main.Turn += Main_Turn;
             player.InitialiseTurnHandler += Player_InitialiseTurnHandler;
             player.troop.statuses.Add(this);
