@@ -140,22 +140,20 @@ namespace PlayerCreator
         }
     }
 
-    public class Weapon
+    internal class Weapon : Item
     {
         public int attackDamage;
         public AttackType type;
         public int range;
-        public string name;
         public int attacks;
         public int maxAttacks;
         public bool discardeable;
         public int attackCost;
 
-        public Weapon(int AttackDamage, AttackType Type, int Range, string Name, int Attacks, bool Discardeable, int AttackCost = 1)
+        public Weapon(int AttackDamage, AttackType Type, int Range, string Name, int Attacks, bool Discardeable, int AttackCost = 1) : base(Name)
         {
             attackCost = AttackCost;
             discardeable = Discardeable;
-            name = Name;
             range = Range;
             type = Type;
             attackDamage = AttackDamage;

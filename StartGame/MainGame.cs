@@ -24,11 +24,11 @@ namespace StartGame
         private Point selected;
 
         public List<Player> players;
-        private Player activePlayer;
+        public Player activePlayer;
         public HumanPlayer humanPlayer;
         private readonly Mission mission;
         private int activePlayerCounter = 0;
-        private bool gameStarted = false;
+        public bool gameStarted = false;
 
         private List<WinCheck> winConditions;
         private List<WinCheck> deathConditions;
@@ -108,27 +108,16 @@ namespace StartGame
             //GUI Work
             console.Text = "Starting game ... \n";
             enemyMovement.Checked = mission != null ? mission.EnemyMoveTogether : false;
-            UpdateStatusList();
 
             //Add players to list
             UpdatePlayerList();
 
             //Initialise information about player
+            playerView.Activate(humanPlayer, this, true);
             ShowPlayerStats();
-            //Initialise information about player weapons
-            int c = 0;
-            foreach (var weapon in humanPlayer.troop.weapons)
-            {
-                playerWeaponList.Items.Add(weapon.name);
-                if (weapon == humanPlayer.troop.activeWeapon) playerWeaponList.SelectedIndex = c;
-                c++;
-            }
 
             //Initialise trees
             trees.ForEach(t => t.Initialise(this));
-
-            //Initialise info about player trees
-            UpdateTreeView();
 
             //Activate players tress
             humanPlayer.trees.ForEach(t => t.Activate());
@@ -138,10 +127,8 @@ namespace StartGame
 
             //As it is first turn - set action button to start the game
             nextAction.Text = "Start game!";
-            changeWeapon.Enabled = false;
 
             ShowPositionStats();
-            dumpWeapon.Enabled = false;
 
             //Set level up button correctly
             levelUpButton.Enabled = humanPlayer.storedLevelUps != 0;
@@ -149,10 +136,6 @@ namespace StartGame
             //DEBUG
             debug = new DebugEditor(this);
 
-            humanPlayer.spells.Add(new HealingSpell(5));
-            humanPlayer.spells.Add(new EarthQuakeSpell(5, 5));
-            humanPlayer.spells.Add(new LightningBoltSpell(15));
-            humanPlayer.spells.Add(new DebuffSpell(2, 1, 5, 0));
             humanPlayer.spells.ForEach(s => s.Initialise(this, map));
 
             UpdateSpellList();
@@ -345,20 +328,11 @@ namespace StartGame
 
             if (humanPlayer != null && humanPlayer.active)
             {
-                UpdateSpellInfo();
-                UpdateStatusInfo();
-                if (humanPlayer.troop.activeWeapon != humanPlayer.troop.weapons[playerWeaponList.SelectedIndex])
-                    changeWeapon.Enabled = true;
-                if (humanPlayer.troop.weapons[playerWeaponList.SelectedIndex].discardeable)
-                    dumpWeapon.Enabled = true;
-                nextAction.Enabled = false;
                 nextAction.Text = "End turn";
                 nextAction.Enabled = true;
             }
             else
             {
-                changeWeapon.Enabled = false;
-                dumpWeapon.Enabled = false;
                 nextAction.Enabled = false;
                 nextAction.Text = "Next turn!";
                 nextAction.Enabled = true;
@@ -372,83 +346,13 @@ namespace StartGame
 
         #region GUI Updates
 
-        public void UpdateTreeView()
-        {
-            List<string> playerTreeNames = humanPlayer.trees.ConvertAll(t => t.name);
-            List<string> diff = treeList.Items.Cast<string>().Except(playerTreeNames).ToList();
-            foreach (string dif in diff)
-            {
-                treeList.Items.Remove(dif);
-            }
-
-            diff = playerTreeNames.Except(treeList.Items.Cast<string>()).ToList();
-            foreach (string dif in diff)
-            {
-                treeList.Items.Add(dif);
-            }
-
-            UpdateSelectedTreeInformation();
-        }
-
-        private void UpdateSelectedTreeInformation()
-        {
-            int selected = treeList.SelectedIndex;
-            if (selected == -1)
-            {
-                treeName.Text = "";
-                treeInformation.Text = "";
-                skillLevel.Text = "";
-            }
-            else
-            {
-                Tree tree = humanPlayer.trees[selected];
-                treeName.Text = tree.name;
-                treeInformation.Text = tree.description + " \n " + "Found by " + tree.reason;
-                if (tree is Skill skill)
-                {
-                    skillLevel.Text = $"Level {skill.level}: {skill.Xp}/{skill.maxXP}";
-                }
-                else
-                {
-                    skillLevel.Text = "";
-                }
-            }
-        }
-
         private void UpdateSpellList()
         {
-            List<string> spellNames = humanPlayer.spells.ConvertAll(t => t.name);
-            List<string> diff = spellList.Items.Cast<string>().Except(spellNames).ToList();
-            foreach (string dif in diff)
-            {
-                spellList.Items.Remove(dif);
-            }
-
-            diff = spellNames.Except(spellList.Items.Cast<string>()).ToList();
-            foreach (string dif in diff)
-            {
-                spellList.Items.Add(dif);
-            }
-
             UpdateSpellInfo();
         }
 
         public void UpdateSpellInfo()
         {
-            int index = spellList.SelectedIndex;
-            if (index != -1)
-            {
-                Spell spell = humanPlayer.spells[index];
-                spellName.Text = spell.name;
-                spellDescription.Text = $"Mana: {spell.manaCost} Cooldown: {spell.coolDown} / {spell.MaxCoolDown}";
-                castSpell.Enabled = activePlayer.Name == humanPlayer.Name && gameStarted && spell.manaCost <= humanPlayer.mana && spell.Ready;
-            }
-            else
-            {
-                spellName.Text = "";
-                spellDescription.Text = "";
-                castSpell.Enabled = false;
-            }
         }
 
         public void WriteConsole(string text)
@@ -522,6 +426,11 @@ namespace StartGame
             }
         }
 
+        public void UpdatePlayerView()
+        {
+            playerView.Render();
+        }
+
         public void SetUpdateState(bool active)
         {
             levelUpButton.Enabled = active;
@@ -552,32 +461,6 @@ namespace StartGame
             }
         }
 
-        private void ShowWeaponStats()
-        {
-            int pos = playerWeaponList.SelectedIndex;
-            if (pos != -1)
-            {
-                Weapon weapon = humanPlayer.troop.weapons[pos];
-                playerPossibleAttackRange.Text = $"Range: {weapon.range}";
-                playerPossibleWeaponDamage.Text = $"Damage: {weapon.attackDamage}";
-                playerPossibleWeaponName.Text = $"{weapon.name}";
-                playerPossibleWeaponType.Text = $"Type: {weapon.type}";
-                playerPossibleWeaponAttacks.Text = $"Attacks: {weapon.attacks} / {weapon.maxAttacks}";
-                dumpWeapon.Enabled = weapon.discardeable && humanPlayer.active;
-                changeWeapon.Enabled = (weapon != humanPlayer.troop.activeWeapon) && humanPlayer.active;
-            }
-            else
-            {
-                playerPossibleAttackRange.Text = "";
-                playerPossibleWeaponDamage.Text = "";
-                playerPossibleWeaponName.Text = "";
-                playerPossibleWeaponType.Text = "";
-                playerPossibleWeaponAttacks.Text = "";
-                dumpWeapon.Enabled = false;
-                changeWeapon.Enabled = false;
-            }
-        }
-
         private void UpdatePlayerList()
         {
             List<string> playerNames = players.ConvertAll(t => t.troop.name);
@@ -596,62 +479,9 @@ namespace StartGame
             troopList.SelectedIndex = 0;
         }
 
-        private void UpdateStatusInfo()
-        {
-            if (statusList.SelectedIndex != -1)
-            {
-                statusTitle.Text = humanPlayer.troop.statuses[statusList.SelectedIndex].name;
-                statusDescription.Text = humanPlayer.troop.statuses[statusList.SelectedIndex].Description();
-            }
-            else
-            {
-                statusTitle.Text = "";
-                statusDescription.Text = "";
-            }
-        }
-
-        public void UpdateStatusList()
-        {
-            if (humanPlayer is null) return;
-            List<string> playerStatusNames = humanPlayer.troop.statuses.ConvertAll(t => t.name);
-            List<string> diff = statusList.Items.Cast<string>().Except(playerStatusNames).ToList();
-            foreach (string dif in diff)
-            {
-                statusList.Items.Remove(dif);
-            }
-
-            diff = playerStatusNames.Except(statusList.Items.Cast<string>()).ToList();
-            foreach (string dif in diff)
-            {
-                statusList.Items.Add(dif);
-            }
-
-            UpdateStatusInfo();
-        }
-
         public void ShowPlayerStats()
         {
-            if (humanPlayer != null)
-            {
-                playerName.Text = humanPlayer.Name;
-                playerAttackDamage.Text = humanPlayer.troop.activeWeapon.attackDamage.ToString();
-                playerAttackRange.Text = humanPlayer.troop.activeWeapon.range.ToString();
-                playerAttackType.Text = humanPlayer.troop.activeWeapon.type.ToString();
-                playerActionPoints.Text = $"{humanPlayer.actionPoints} / {humanPlayer.maxActionPoints}";
-                playerHealth.Text = $"{humanPlayer.troop.health} / {humanPlayer.troop.maxHealth}";
-                playerWeaponAttacks.Text = $"Attacks: {humanPlayer.troop.activeWeapon.attacks} / {humanPlayer.troop.activeWeapon.maxAttacks}";
-                playerHeight.Text = $"{map.map[humanPlayer.troop.Position.X, humanPlayer.troop.Position.Y].height.ToString("0.##")}";
-                playerDefense.Text = $"Defense: {humanPlayer.troop.defense}";
-                playerStrength.Text = $"Strength: {humanPlayer.strength}";
-                playerAgility.Text = $"Agility: {humanPlayer.agility}";
-                playerEndurance.Text = $"Endurance: {humanPlayer.endurance}";
-                playerVitatlity.Text = $"Vitality: {humanPlayer.vitality}";
-                playerLevel.Text = $"Level: {humanPlayer.level} + ({humanPlayer.storedLevelUps})";
-                playerXP.Text = $"XP: {humanPlayer.xp} / {humanPlayer.levelXP}";
-                playerMana.Text = $"Mana: {humanPlayer.mana} / {humanPlayer.maxMana}";
-                playerWisdom.Text = $"Wisdom: {humanPlayer.wisdom}";
-                playerIntelligence.Text = $"Intelligence: {humanPlayer.intelligence}";
-            }
+            playerView.Render();
         }
 
         private void ShowEntityData(Entity entity)
@@ -713,11 +543,6 @@ namespace StartGame
 
         #region Event Handler
 
-        private void StatusList_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UpdateStatusInfo();
-        }
-
         private void ShowBlockedFields_Click(object sender, EventArgs e)
         {
             Color fill = Color.FromArgb(120, Color.Brown);
@@ -735,22 +560,6 @@ namespace StartGame
         private void LevelUpButton_Click(object sender, EventArgs e)
         {
             LevelUp();
-        }
-
-        private void DumpWeapon_Click(object sender, EventArgs e)
-        {
-            if (playerWeaponList.SelectedIndex != -1)
-            {
-                Weapon toRemove = humanPlayer.troop.weapons[playerWeaponList.SelectedIndex];
-                humanPlayer.troop.weapons.Remove(toRemove);
-                playerWeaponList.Items.Remove(toRemove.name);
-                RenderMap();
-            }
-        }
-
-        private void TreeList_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UpdateSelectedTreeInformation();
         }
 
         private void ShowHeightDifference_CheckedChanged(object sender, EventArgs e)
@@ -771,11 +580,6 @@ namespace StartGame
         {
         }
 
-        private void PlayerWeaponList_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ShowWeaponStats();
-        }
-
         private void DebugButton_Click(object sender, EventArgs e)
         {
             try
@@ -789,20 +593,13 @@ namespace StartGame
             }
         }
 
+        private void PlayerView1_Load(object sender, EventArgs e)
+        {
+        }
+
         private void SpellList_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateSpellInfo();
-        }
-
-        private void ChangeWeapon_Click(object sender, EventArgs e)
-        {
-            if (playerWeaponList.SelectedIndex >= 0)
-            {
-                humanPlayer.troop.activeWeapon = humanPlayer.troop.weapons[playerWeaponList.SelectedIndex];
-            }
-            ShowWeaponStats();
-            ShowPlayerStats();
-            RenderMap();
         }
 
         private void GameBoard_Click(object sender, EventArgs e)
@@ -815,32 +612,28 @@ namespace StartGame
             activePlayer.ActionButtonPressed(this);
         }
 
-        private void CastSpell_Click(object sender, EventArgs e)
+        private void CastSpell_Click(Spell activeSpell, Button castSpell)
         {
-            if (spellList.SelectedIndex != -1)
+            if (activeSpell.Ready && humanPlayer.mana >= activeSpell.manaCost)
             {
-                activeSpell = humanPlayer.spells[spellList.SelectedIndex];
-                if (activeSpell.Ready && humanPlayer.mana >= activeSpell.manaCost)
+                humanPlayer.mana -= activeSpell.manaCost;
+                if (activeSpell.format.Positions != 0)
                 {
-                    humanPlayer.mana -= activeSpell.manaCost;
-                    if (activeSpell.format.Positions != 0)
-                    {
-                        castingspell = true;
-                        castSpell.Text = "Select position on map";
-                    }
-                    else //Instantly cast
-                    {
-                        //TODO: Extract as method
-                        //Now cast
-                        WriteConsole(activeSpell.Activate(new SpellInformation() { positions = spellPoints, mage = humanPlayer }));
+                    castingspell = true;
+                    castSpell.Text = "Select position on map";
+                }
+                else //Instantly cast
+                {
+                    //TODO: Extract as method
+                    //Now cast
+                    WriteConsole(activeSpell.Activate(new SpellInformation() { positions = spellPoints, mage = humanPlayer }));
 
-                        spellPoints.Clear();
-                        castSpell.Text = "Cast spell";
-                        activeSpell = null;
-                        castingspell = false;
-                        UpdateSpellInfo();
-                        ShowPlayerStats();
-                    }
+                    spellPoints.Clear();
+                    castSpell.Text = "Cast spell";
+                    activeSpell = null;
+                    castingspell = false;
+                    UpdateSpellInfo();
+                    ShowPlayerStats();
                 }
             }
         }
@@ -909,7 +702,7 @@ namespace StartGame
                     WriteConsole(activeSpell.Activate(new SpellInformation() { positions = spellPoints, mage = humanPlayer }));
 
                     spellPoints.Clear();
-                    castSpell.Text = "Cast spell";
+                    playerView.Render();
                     activeSpell = null;
                     castingspell = false;
                     UpdateSpellInfo();
@@ -1159,40 +952,6 @@ namespace StartGame
         {
             MessageBox.Show(message, "Mission Completed");
 
-            if (campaign != null)
-            {
-                Reward reward = mission.Reward();
-                humanPlayer.GainXP(reward.XP);
-                DialogResult result = MessageBox.Show($"You have gained {reward.XP} xp. {(humanPlayer.storedLevelUps != 0 ? $"You have {humanPlayer.storedLevelUps} level ups stored. Would you like to level up?" : "")}", "XP gained", humanPlayer.storedLevelUps != 0 ? MessageBoxButtons.YesNo : MessageBoxButtons.OK);
-                if (humanPlayer.storedLevelUps != 0 && result == DialogResult.Yes)
-                {
-                    LevelUp();
-                }
-                if (reward.weaponReward != null)
-                {
-                    Weapon received = campaign.CalculateReward(((WeaponReward)reward.weaponReward));
-                    WeaponView weaponView = new WeaponView(received, true);
-                    weaponView.ShowDialog();
-                    if (weaponView.decision)
-                    {
-                        humanPlayer.troop.weapons.Add(received);
-                    }
-                }
-
-                if (reward.spellReward != null)
-                {
-                    Spell spell = ((SpellReward)reward.spellReward).spell;
-                    if (!humanPlayer.spells.Exists(s => spell.name == s.name))
-                    {
-                        if (MessageBox.Show($"You have the ability to gain the spell {spell.name}. Do you want to gain it?", "Spell Gained", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                        {
-                            humanPlayer.spells.Add(spell);
-                            UpdateSpellList();
-                        }
-                    }
-                }
-            }
-
             Close();
         }
 
@@ -1319,7 +1078,6 @@ namespace StartGame
                 if (attacking == humanPlayer)
                 {
                     WriteConsole($"You have attacked {attacked.Name} for {damage}");
-                    ShowWeaponStats();
                 }
             }
 

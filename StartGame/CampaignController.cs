@@ -26,7 +26,7 @@ namespace StartGame
                 MessageBox.Show("Please design your player, before starting the campaign.");
                 Troop playerTroop = new Troop("Player", 10, new Weapon(5, AttackType.melee, 1, "Punch", 2, false), Resources.playerTroop, 0, null);
                 playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
-                player = new HumanPlayer(PlayerType.localHuman, Resources.BasePlayerName, null, null, null)
+                player = new HumanPlayer(PlayerType.localHuman, Resources.BasePlayerName, null, null, null, 0)
                 {
                     troop = playerTroop
                 };
@@ -71,6 +71,10 @@ namespace StartGame
 
                 player.troop.health += campaign.healthRegen;
                 player.troop.health = player.troop.health > player.troop.maxHealth ? player.troop.maxHealth : player.troop.health;
+
+                //Show world map
+                WorldView worldView = new WorldView(player, this, campaign, campaign.mission);
+                worldView.ShowDialog();
             } while (campaign.Next());
 
             MessageBox.Show("You have won!");

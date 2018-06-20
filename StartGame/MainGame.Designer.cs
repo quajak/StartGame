@@ -30,25 +30,6 @@
         {
             this.gameBoard = new System.Windows.Forms.PictureBox();
             this.troopList = new System.Windows.Forms.ListBox();
-            this.enemyInfo = new System.Windows.Forms.Panel();
-            this.playerMana = new System.Windows.Forms.Label();
-            this.playerIntelligence = new System.Windows.Forms.Label();
-            this.playerWisdom = new System.Windows.Forms.Label();
-            this.playerXP = new System.Windows.Forms.Label();
-            this.playerLevel = new System.Windows.Forms.Label();
-            this.playerVitatlity = new System.Windows.Forms.Label();
-            this.playerEndurance = new System.Windows.Forms.Label();
-            this.playerAgility = new System.Windows.Forms.Label();
-            this.playerStrength = new System.Windows.Forms.Label();
-            this.playerDefense = new System.Windows.Forms.Label();
-            this.playerHeight = new System.Windows.Forms.Label();
-            this.playerWeaponAttacks = new System.Windows.Forms.Label();
-            this.playerHealth = new System.Windows.Forms.Label();
-            this.playerActionPoints = new System.Windows.Forms.Label();
-            this.playerAttackType = new System.Windows.Forms.Label();
-            this.playerAttackRange = new System.Windows.Forms.Label();
-            this.playerAttackDamage = new System.Windows.Forms.Label();
-            this.playerName = new System.Windows.Forms.Label();
             this.playerInfo = new System.Windows.Forms.Panel();
             this.enemyDefense = new System.Windows.Forms.Label();
             this.enemyHeight = new System.Windows.Forms.Label();
@@ -58,49 +39,21 @@
             this.enemyAttackRange = new System.Windows.Forms.Label();
             this.enemyAttackDamage = new System.Windows.Forms.Label();
             this.enemyName = new System.Windows.Forms.Label();
-            this.spellList = new System.Windows.Forms.ListBox();
-            this.spellInfo = new System.Windows.Forms.Panel();
-            this.castSpell = new System.Windows.Forms.Button();
-            this.spellDescription = new System.Windows.Forms.Label();
-            this.spellName = new System.Windows.Forms.Label();
             this.nextAction = new System.Windows.Forms.Button();
-            this.playerWeaponList = new System.Windows.Forms.ListBox();
-            this.playerPossibleWeaponName = new System.Windows.Forms.Label();
-            this.playerPossibleAttackRange = new System.Windows.Forms.Label();
-            this.playerPossibleWeaponDamage = new System.Windows.Forms.Label();
-            this.playerPossibleWeaponType = new System.Windows.Forms.Label();
-            this.changeWeapon = new System.Windows.Forms.Button();
-            this.playerPossibleWeaponAttacks = new System.Windows.Forms.Label();
             this.showHeightDifference = new System.Windows.Forms.CheckBox();
-            this.dumpWeapon = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.fieldHeight = new System.Windows.Forms.Label();
             this.fieldPosition = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.levelUpButton = new System.Windows.Forms.Button();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.treeInformation = new System.Windows.Forms.Label();
-            this.treeName = new System.Windows.Forms.Label();
-            this.treeList = new System.Windows.Forms.ListBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.console = new System.Windows.Forms.TextBox();
             this.ShowBlockedFields = new System.Windows.Forms.Button();
             this.enemyMovement = new System.Windows.Forms.CheckBox();
-            this.statsPanel = new System.Windows.Forms.Panel();
-            this.statusDescription = new System.Windows.Forms.Label();
-            this.statusTitle = new System.Windows.Forms.Label();
-            this.statusList = new System.Windows.Forms.ListBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.debugButton = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
-            this.skillLevel = new System.Windows.Forms.Label();
+            this.playerView = new StartGame.PlayerView();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
-            this.enemyInfo.SuspendLayout();
             this.playerInfo.SuspendLayout();
-            this.spellInfo.SuspendLayout();
             this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
-            this.statsPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // gameBoard
@@ -121,193 +74,6 @@
             this.troopList.Size = new System.Drawing.Size(178, 212);
             this.troopList.TabIndex = 2;
             this.troopList.SelectedIndexChanged += new System.EventHandler(this.PlayerList_SelectedIndexChanged);
-            // 
-            // enemyInfo
-            // 
-            this.enemyInfo.Controls.Add(this.playerMana);
-            this.enemyInfo.Controls.Add(this.playerIntelligence);
-            this.enemyInfo.Controls.Add(this.playerWisdom);
-            this.enemyInfo.Controls.Add(this.playerXP);
-            this.enemyInfo.Controls.Add(this.playerLevel);
-            this.enemyInfo.Controls.Add(this.playerVitatlity);
-            this.enemyInfo.Controls.Add(this.playerEndurance);
-            this.enemyInfo.Controls.Add(this.playerAgility);
-            this.enemyInfo.Controls.Add(this.playerStrength);
-            this.enemyInfo.Controls.Add(this.playerDefense);
-            this.enemyInfo.Controls.Add(this.playerHeight);
-            this.enemyInfo.Controls.Add(this.playerWeaponAttacks);
-            this.enemyInfo.Controls.Add(this.playerHealth);
-            this.enemyInfo.Controls.Add(this.playerActionPoints);
-            this.enemyInfo.Controls.Add(this.playerAttackType);
-            this.enemyInfo.Controls.Add(this.playerAttackRange);
-            this.enemyInfo.Controls.Add(this.playerAttackDamage);
-            this.enemyInfo.Controls.Add(this.playerName);
-            this.enemyInfo.Location = new System.Drawing.Point(824, 13);
-            this.enemyInfo.Name = "enemyInfo";
-            this.enemyInfo.Size = new System.Drawing.Size(202, 212);
-            this.enemyInfo.TabIndex = 3;
-            // 
-            // playerMana
-            // 
-            this.playerMana.AutoSize = true;
-            this.playerMana.Location = new System.Drawing.Point(3, 121);
-            this.playerMana.Name = "playerMana";
-            this.playerMana.Size = new System.Drawing.Size(62, 13);
-            this.playerMana.TabIndex = 24;
-            this.playerMana.Text = "playerMana";
-            // 
-            // playerIntelligence
-            // 
-            this.playerIntelligence.AutoSize = true;
-            this.playerIntelligence.Location = new System.Drawing.Point(115, 69);
-            this.playerIntelligence.Name = "playerIntelligence";
-            this.playerIntelligence.Size = new System.Drawing.Size(89, 13);
-            this.playerIntelligence.TabIndex = 23;
-            this.playerIntelligence.Text = "playerIntelligence";
-            // 
-            // playerWisdom
-            // 
-            this.playerWisdom.AutoSize = true;
-            this.playerWisdom.Location = new System.Drawing.Point(115, 56);
-            this.playerWisdom.Name = "playerWisdom";
-            this.playerWisdom.Size = new System.Drawing.Size(73, 13);
-            this.playerWisdom.TabIndex = 22;
-            this.playerWisdom.Text = "playerWisdom";
-            // 
-            // playerXP
-            // 
-            this.playerXP.AutoSize = true;
-            this.playerXP.Location = new System.Drawing.Point(7, 188);
-            this.playerXP.Name = "playerXP";
-            this.playerXP.Size = new System.Drawing.Size(49, 13);
-            this.playerXP.TabIndex = 21;
-            this.playerXP.Text = "playerXP";
-            // 
-            // playerLevel
-            // 
-            this.playerLevel.AutoSize = true;
-            this.playerLevel.Location = new System.Drawing.Point(7, 171);
-            this.playerLevel.Name = "playerLevel";
-            this.playerLevel.Size = new System.Drawing.Size(61, 13);
-            this.playerLevel.TabIndex = 17;
-            this.playerLevel.Text = "playerLevel";
-            // 
-            // playerVitatlity
-            // 
-            this.playerVitatlity.AutoSize = true;
-            this.playerVitatlity.Location = new System.Drawing.Point(115, 43);
-            this.playerVitatlity.Name = "playerVitatlity";
-            this.playerVitatlity.Size = new System.Drawing.Size(65, 13);
-            this.playerVitatlity.TabIndex = 15;
-            this.playerVitatlity.Text = "playerVitality";
-            // 
-            // playerEndurance
-            // 
-            this.playerEndurance.AutoSize = true;
-            this.playerEndurance.Location = new System.Drawing.Point(115, 30);
-            this.playerEndurance.Name = "playerEndurance";
-            this.playerEndurance.Size = new System.Drawing.Size(87, 13);
-            this.playerEndurance.TabIndex = 14;
-            this.playerEndurance.Text = "playerEndurance";
-            // 
-            // playerAgility
-            // 
-            this.playerAgility.AutoSize = true;
-            this.playerAgility.Location = new System.Drawing.Point(115, 17);
-            this.playerAgility.Name = "playerAgility";
-            this.playerAgility.Size = new System.Drawing.Size(62, 13);
-            this.playerAgility.TabIndex = 13;
-            this.playerAgility.Text = "playerAgility";
-            // 
-            // playerStrength
-            // 
-            this.playerStrength.AutoSize = true;
-            this.playerStrength.Location = new System.Drawing.Point(115, 4);
-            this.playerStrength.Name = "playerStrength";
-            this.playerStrength.Size = new System.Drawing.Size(75, 13);
-            this.playerStrength.TabIndex = 12;
-            this.playerStrength.Text = "playerStrength";
-            // 
-            // playerDefense
-            // 
-            this.playerDefense.AutoSize = true;
-            this.playerDefense.Location = new System.Drawing.Point(4, 108);
-            this.playerDefense.Name = "playerDefense";
-            this.playerDefense.Size = new System.Drawing.Size(75, 13);
-            this.playerDefense.TabIndex = 11;
-            this.playerDefense.Text = "playerDefense";
-            // 
-            // playerHeight
-            // 
-            this.playerHeight.AutoSize = true;
-            this.playerHeight.Location = new System.Drawing.Point(3, 95);
-            this.playerHeight.Name = "playerHeight";
-            this.playerHeight.Size = new System.Drawing.Size(66, 13);
-            this.playerHeight.TabIndex = 10;
-            this.playerHeight.Text = "playerHeight";
-            // 
-            // playerWeaponAttacks
-            // 
-            this.playerWeaponAttacks.AutoSize = true;
-            this.playerWeaponAttacks.Location = new System.Drawing.Point(4, 82);
-            this.playerWeaponAttacks.Name = "playerWeaponAttacks";
-            this.playerWeaponAttacks.Size = new System.Drawing.Size(112, 13);
-            this.playerWeaponAttacks.TabIndex = 9;
-            this.playerWeaponAttacks.Text = "playerWeaponAttacks";
-            // 
-            // playerHealth
-            // 
-            this.playerHealth.AutoSize = true;
-            this.playerHealth.Location = new System.Drawing.Point(4, 69);
-            this.playerHealth.Name = "playerHealth";
-            this.playerHealth.Size = new System.Drawing.Size(66, 13);
-            this.playerHealth.TabIndex = 8;
-            this.playerHealth.Text = "playerHealth";
-            // 
-            // playerActionPoints
-            // 
-            this.playerActionPoints.AutoSize = true;
-            this.playerActionPoints.Location = new System.Drawing.Point(3, 56);
-            this.playerActionPoints.Name = "playerActionPoints";
-            this.playerActionPoints.Size = new System.Drawing.Size(94, 13);
-            this.playerActionPoints.TabIndex = 6;
-            this.playerActionPoints.Text = "playerActionPoints";
-            // 
-            // playerAttackType
-            // 
-            this.playerAttackType.AutoSize = true;
-            this.playerAttackType.Location = new System.Drawing.Point(4, 43);
-            this.playerAttackType.Name = "playerAttackType";
-            this.playerAttackType.Size = new System.Drawing.Size(90, 13);
-            this.playerAttackType.TabIndex = 5;
-            this.playerAttackType.Text = "playerAttackType";
-            // 
-            // playerAttackRange
-            // 
-            this.playerAttackRange.AutoSize = true;
-            this.playerAttackRange.Location = new System.Drawing.Point(4, 30);
-            this.playerAttackRange.Name = "playerAttackRange";
-            this.playerAttackRange.Size = new System.Drawing.Size(101, 13);
-            this.playerAttackRange.TabIndex = 4;
-            this.playerAttackRange.Text = "playerAtttackRange";
-            // 
-            // playerAttackDamage
-            // 
-            this.playerAttackDamage.AutoSize = true;
-            this.playerAttackDamage.Location = new System.Drawing.Point(4, 17);
-            this.playerAttackDamage.Name = "playerAttackDamage";
-            this.playerAttackDamage.Size = new System.Drawing.Size(77, 13);
-            this.playerAttackDamage.TabIndex = 3;
-            this.playerAttackDamage.Text = "attackDamage";
-            // 
-            // playerName
-            // 
-            this.playerName.AutoSize = true;
-            this.playerName.Location = new System.Drawing.Point(4, 4);
-            this.playerName.Name = "playerName";
-            this.playerName.Size = new System.Drawing.Size(69, 13);
-            this.playerName.TabIndex = 0;
-            this.playerName.Text = "_playerName";
             // 
             // playerInfo
             // 
@@ -396,126 +162,15 @@
             this.enemyName.TabIndex = 1;
             this.enemyName.Text = "_enemyName";
             // 
-            // spellList
-            // 
-            this.spellList.FormattingEnabled = true;
-            this.spellList.Location = new System.Drawing.Point(1030, 244);
-            this.spellList.Name = "spellList";
-            this.spellList.Size = new System.Drawing.Size(202, 82);
-            this.spellList.TabIndex = 7;
-            this.spellList.SelectedIndexChanged += new System.EventHandler(this.SpellList_SelectedIndexChanged);
-            // 
-            // spellInfo
-            // 
-            this.spellInfo.Controls.Add(this.castSpell);
-            this.spellInfo.Controls.Add(this.spellDescription);
-            this.spellInfo.Controls.Add(this.spellName);
-            this.spellInfo.Location = new System.Drawing.Point(1030, 333);
-            this.spellInfo.Name = "spellInfo";
-            this.spellInfo.Size = new System.Drawing.Size(202, 81);
-            this.spellInfo.TabIndex = 7;
-            // 
-            // castSpell
-            // 
-            this.castSpell.Location = new System.Drawing.Point(7, 56);
-            this.castSpell.Name = "castSpell";
-            this.castSpell.Size = new System.Drawing.Size(77, 23);
-            this.castSpell.TabIndex = 2;
-            this.castSpell.Text = "Cast Spell";
-            this.castSpell.UseVisualStyleBackColor = true;
-            this.castSpell.Click += new System.EventHandler(this.CastSpell_Click);
-            // 
-            // spellDescription
-            // 
-            this.spellDescription.AutoSize = true;
-            this.spellDescription.Location = new System.Drawing.Point(4, 21);
-            this.spellDescription.Name = "spellDescription";
-            this.spellDescription.Size = new System.Drawing.Size(81, 13);
-            this.spellDescription.TabIndex = 1;
-            this.spellDescription.Text = "spellDescription";
-            // 
-            // spellName
-            // 
-            this.spellName.AutoSize = true;
-            this.spellName.Location = new System.Drawing.Point(4, 4);
-            this.spellName.Name = "spellName";
-            this.spellName.Size = new System.Drawing.Size(56, 13);
-            this.spellName.TabIndex = 0;
-            this.spellName.Text = "spellName";
-            // 
             // nextAction
             // 
-            this.nextAction.Location = new System.Drawing.Point(1142, 571);
+            this.nextAction.Location = new System.Drawing.Point(1148, 569);
             this.nextAction.Name = "nextAction";
             this.nextAction.Size = new System.Drawing.Size(90, 56);
             this.nextAction.TabIndex = 9;
             this.nextAction.Text = "Next Action";
             this.nextAction.UseVisualStyleBackColor = true;
             this.nextAction.Click += new System.EventHandler(this.NextAction_Click);
-            // 
-            // playerWeaponList
-            // 
-            this.playerWeaponList.FormattingEnabled = true;
-            this.playerWeaponList.Location = new System.Drawing.Point(825, 231);
-            this.playerWeaponList.Name = "playerWeaponList";
-            this.playerWeaponList.Size = new System.Drawing.Size(199, 95);
-            this.playerWeaponList.TabIndex = 10;
-            this.playerWeaponList.SelectedIndexChanged += new System.EventHandler(this.PlayerWeaponList_SelectedIndexChanged);
-            // 
-            // playerPossibleWeaponName
-            // 
-            this.playerPossibleWeaponName.AutoSize = true;
-            this.playerPossibleWeaponName.Location = new System.Drawing.Point(824, 333);
-            this.playerPossibleWeaponName.Name = "playerPossibleWeaponName";
-            this.playerPossibleWeaponName.Size = new System.Drawing.Size(73, 13);
-            this.playerPossibleWeaponName.TabIndex = 11;
-            this.playerPossibleWeaponName.Text = "weaponName";
-            // 
-            // playerPossibleAttackRange
-            // 
-            this.playerPossibleAttackRange.AutoSize = true;
-            this.playerPossibleAttackRange.Location = new System.Drawing.Point(825, 363);
-            this.playerPossibleAttackRange.Name = "playerPossibleAttackRange";
-            this.playerPossibleAttackRange.Size = new System.Drawing.Size(77, 13);
-            this.playerPossibleAttackRange.TabIndex = 12;
-            this.playerPossibleAttackRange.Text = "weaponRange";
-            // 
-            // playerPossibleWeaponDamage
-            // 
-            this.playerPossibleWeaponDamage.AutoSize = true;
-            this.playerPossibleWeaponDamage.Location = new System.Drawing.Point(824, 350);
-            this.playerPossibleWeaponDamage.Name = "playerPossibleWeaponDamage";
-            this.playerPossibleWeaponDamage.Size = new System.Drawing.Size(85, 13);
-            this.playerPossibleWeaponDamage.TabIndex = 13;
-            this.playerPossibleWeaponDamage.Text = "weaponDamage";
-            // 
-            // playerPossibleWeaponType
-            // 
-            this.playerPossibleWeaponType.AutoSize = true;
-            this.playerPossibleWeaponType.Location = new System.Drawing.Point(824, 376);
-            this.playerPossibleWeaponType.Name = "playerPossibleWeaponType";
-            this.playerPossibleWeaponType.Size = new System.Drawing.Size(69, 13);
-            this.playerPossibleWeaponType.TabIndex = 14;
-            this.playerPossibleWeaponType.Text = "weaponType";
-            // 
-            // changeWeapon
-            // 
-            this.changeWeapon.Location = new System.Drawing.Point(951, 333);
-            this.changeWeapon.Name = "changeWeapon";
-            this.changeWeapon.Size = new System.Drawing.Size(75, 43);
-            this.changeWeapon.TabIndex = 15;
-            this.changeWeapon.Text = "Use";
-            this.changeWeapon.UseVisualStyleBackColor = true;
-            this.changeWeapon.Click += new System.EventHandler(this.ChangeWeapon_Click);
-            // 
-            // playerPossibleWeaponAttacks
-            // 
-            this.playerPossibleWeaponAttacks.AutoSize = true;
-            this.playerPossibleWeaponAttacks.Location = new System.Drawing.Point(825, 389);
-            this.playerPossibleWeaponAttacks.Name = "playerPossibleWeaponAttacks";
-            this.playerPossibleWeaponAttacks.Size = new System.Drawing.Size(69, 13);
-            this.playerPossibleWeaponAttacks.TabIndex = 16;
-            this.playerPossibleWeaponAttacks.Text = "weaponType";
             // 
             // showHeightDifference
             // 
@@ -527,16 +182,6 @@
             this.showHeightDifference.Text = "Show height difference";
             this.showHeightDifference.UseVisualStyleBackColor = true;
             this.showHeightDifference.CheckedChanged += new System.EventHandler(this.ShowHeightDifference_CheckedChanged);
-            // 
-            // dumpWeapon
-            // 
-            this.dumpWeapon.Location = new System.Drawing.Point(951, 383);
-            this.dumpWeapon.Name = "dumpWeapon";
-            this.dumpWeapon.Size = new System.Drawing.Size(75, 31);
-            this.dumpWeapon.TabIndex = 18;
-            this.dumpWeapon.Text = "Dump";
-            this.dumpWeapon.UseVisualStyleBackColor = true;
-            this.dumpWeapon.Click += new System.EventHandler(this.DumpWeapon_Click);
             // 
             // panel1
             // 
@@ -579,7 +224,7 @@
             // 
             // levelUpButton
             // 
-            this.levelUpButton.Location = new System.Drawing.Point(1059, 599);
+            this.levelUpButton.Location = new System.Drawing.Point(1065, 583);
             this.levelUpButton.Name = "levelUpButton";
             this.levelUpButton.Size = new System.Drawing.Size(77, 28);
             this.levelUpButton.TabIndex = 20;
@@ -587,66 +232,15 @@
             this.levelUpButton.UseVisualStyleBackColor = true;
             this.levelUpButton.Click += new System.EventHandler(this.LevelUpButton_Click);
             // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.skillLevel);
-            this.panel2.Controls.Add(this.treeInformation);
-            this.panel2.Controls.Add(this.treeName);
-            this.panel2.Controls.Add(this.treeList);
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Location = new System.Drawing.Point(824, 418);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(201, 209);
-            this.panel2.TabIndex = 21;
-            // 
-            // treeInformation
-            // 
-            this.treeInformation.AutoSize = true;
-            this.treeInformation.Location = new System.Drawing.Point(7, 114);
-            this.treeInformation.MaximumSize = new System.Drawing.Size(180, 100);
-            this.treeInformation.Name = "treeInformation";
-            this.treeInformation.Size = new System.Drawing.Size(77, 13);
-            this.treeInformation.TabIndex = 3;
-            this.treeInformation.Text = "treeInformation";
-            // 
-            // treeName
-            // 
-            this.treeName.AutoSize = true;
-            this.treeName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.treeName.Location = new System.Drawing.Point(10, 97);
-            this.treeName.Name = "treeName";
-            this.treeName.Size = new System.Drawing.Size(61, 13);
-            this.treeName.TabIndex = 2;
-            this.treeName.Text = "treeName";
-            // 
-            // treeList
-            // 
-            this.treeList.FormattingEnabled = true;
-            this.treeList.Location = new System.Drawing.Point(7, 34);
-            this.treeList.Name = "treeList";
-            this.treeList.Size = new System.Drawing.Size(183, 56);
-            this.treeList.TabIndex = 1;
-            this.treeList.SelectedIndexChanged += new System.EventHandler(this.TreeList_SelectedIndexChanged);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(10, 10);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(117, 20);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Skills and Titles";
-            // 
             // console
             // 
             this.console.BackColor = System.Drawing.SystemColors.Control;
-            this.console.Location = new System.Drawing.Point(1030, 418);
+            this.console.Location = new System.Drawing.Point(1026, 406);
             this.console.Multiline = true;
             this.console.Name = "console";
             this.console.ReadOnly = true;
             this.console.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.console.Size = new System.Drawing.Size(202, 147);
+            this.console.Size = new System.Drawing.Size(212, 147);
             this.console.TabIndex = 22;
             // 
             // ShowBlockedFields
@@ -669,113 +263,41 @@
             this.enemyMovement.Text = "All enemies move at once";
             this.enemyMovement.UseVisualStyleBackColor = true;
             // 
-            // statsPanel
-            // 
-            this.statsPanel.Controls.Add(this.statusDescription);
-            this.statsPanel.Controls.Add(this.statusTitle);
-            this.statsPanel.Controls.Add(this.statusList);
-            this.statsPanel.Controls.Add(this.label3);
-            this.statsPanel.Location = new System.Drawing.Point(1033, 15);
-            this.statsPanel.Name = "statsPanel";
-            this.statsPanel.Size = new System.Drawing.Size(198, 209);
-            this.statsPanel.TabIndex = 25;
-            // 
-            // statusDescription
-            // 
-            this.statusDescription.AutoSize = true;
-            this.statusDescription.Location = new System.Drawing.Point(7, 129);
-            this.statusDescription.MaximumSize = new System.Drawing.Size(190, 100);
-            this.statusDescription.Name = "statusDescription";
-            this.statusDescription.Size = new System.Drawing.Size(88, 13);
-            this.statusDescription.TabIndex = 3;
-            this.statusDescription.Text = "statusDescription";
-            // 
-            // statusTitle
-            // 
-            this.statusTitle.AutoSize = true;
-            this.statusTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.statusTitle.Location = new System.Drawing.Point(4, 112);
-            this.statusTitle.Name = "statusTitle";
-            this.statusTitle.Size = new System.Drawing.Size(66, 13);
-            this.statusTitle.TabIndex = 2;
-            this.statusTitle.Text = "statusTitle";
-            // 
-            // statusList
-            // 
-            this.statusList.FormattingEnabled = true;
-            this.statusList.Location = new System.Drawing.Point(4, 23);
-            this.statusList.Name = "statusList";
-            this.statusList.Size = new System.Drawing.Size(191, 82);
-            this.statusList.TabIndex = 1;
-            this.statusList.SelectedIndexChanged += new System.EventHandler(this.StatusList_SelectedIndexChanged);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.label3.Location = new System.Drawing.Point(59, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(73, 20);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Statuses";
-            // 
             // debugButton
             // 
-            this.debugButton.Location = new System.Drawing.Point(1030, 599);
+            this.debugButton.Location = new System.Drawing.Point(1036, 583);
             this.debugButton.Name = "debugButton";
-            this.debugButton.Size = new System.Drawing.Size(23, 23);
+            this.debugButton.Size = new System.Drawing.Size(23, 28);
             this.debugButton.TabIndex = 26;
             this.debugButton.Text = "D";
             this.debugButton.UseVisualStyleBackColor = true;
             this.debugButton.Click += new System.EventHandler(this.DebugButton_Click);
             // 
-            // label4
+            // playerView
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.label4.Location = new System.Drawing.Point(1105, 221);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(52, 20);
-            this.label4.TabIndex = 4;
-            this.label4.Text = "Spells";
-            // 
-            // skillLevel
-            // 
-            this.skillLevel.AutoSize = true;
-            this.skillLevel.Location = new System.Drawing.Point(4, 190);
-            this.skillLevel.Name = "skillLevel";
-            this.skillLevel.Size = new System.Drawing.Size(50, 13);
-            this.skillLevel.TabIndex = 4;
-            this.skillLevel.Text = "skillLevel";
+            this.playerView.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.playerView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.playerView.Location = new System.Drawing.Point(825, 12);
+            this.playerView.Name = "playerView";
+            this.playerView.Size = new System.Drawing.Size(413, 270);
+            this.playerView.TabIndex = 27;
+            this.playerView.Load += new System.EventHandler(this.PlayerView1_Load);
             // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1241, 639);
-            this.Controls.Add(this.label4);
+            this.ClientSize = new System.Drawing.Size(1250, 637);
+            this.Controls.Add(this.playerView);
             this.Controls.Add(this.debugButton);
-            this.Controls.Add(this.statsPanel);
             this.Controls.Add(this.enemyMovement);
             this.Controls.Add(this.ShowBlockedFields);
             this.Controls.Add(this.console);
-            this.Controls.Add(this.panel2);
             this.Controls.Add(this.levelUpButton);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.dumpWeapon);
             this.Controls.Add(this.showHeightDifference);
-            this.Controls.Add(this.playerPossibleWeaponAttacks);
-            this.Controls.Add(this.changeWeapon);
-            this.Controls.Add(this.playerPossibleWeaponType);
-            this.Controls.Add(this.playerPossibleWeaponDamage);
-            this.Controls.Add(this.playerPossibleAttackRange);
-            this.Controls.Add(this.playerPossibleWeaponName);
-            this.Controls.Add(this.playerWeaponList);
             this.Controls.Add(this.nextAction);
-            this.Controls.Add(this.spellInfo);
-            this.Controls.Add(this.spellList);
             this.Controls.Add(this.playerInfo);
-            this.Controls.Add(this.enemyInfo);
             this.Controls.Add(this.troopList);
             this.Controls.Add(this.gameBoard);
             this.Name = "MainGameWindow";
@@ -785,18 +307,10 @@
             this.Shown += new System.EventHandler(this.MainGameWindow_Shown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainGameWindow_MouseMove);
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).EndInit();
-            this.enemyInfo.ResumeLayout(false);
-            this.enemyInfo.PerformLayout();
             this.playerInfo.ResumeLayout(false);
             this.playerInfo.PerformLayout();
-            this.spellInfo.ResumeLayout(false);
-            this.spellInfo.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            this.statsPanel.ResumeLayout(false);
-            this.statsPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -805,70 +319,27 @@
         #endregion
         private System.Windows.Forms.PictureBox gameBoard;
         private System.Windows.Forms.ListBox troopList;
-        private System.Windows.Forms.Panel enemyInfo;
         private System.Windows.Forms.Panel playerInfo;
-        private System.Windows.Forms.ListBox spellList;
-        private System.Windows.Forms.Panel spellInfo;
-        private System.Windows.Forms.Label playerName;
         private System.Windows.Forms.Button nextAction;
         private System.Windows.Forms.Label enemyName;
-        private System.Windows.Forms.Label playerAttackType;
-        private System.Windows.Forms.Label playerAttackRange;
-        private System.Windows.Forms.Label playerAttackDamage;
         private System.Windows.Forms.Label enemyAttackType;
         private System.Windows.Forms.Label enemyAttackRange;
         private System.Windows.Forms.Label enemyAttackDamage;
-        private System.Windows.Forms.ListBox playerWeaponList;
-        private System.Windows.Forms.Label playerPossibleWeaponName;
-        private System.Windows.Forms.Label playerPossibleAttackRange;
-        private System.Windows.Forms.Label playerPossibleWeaponDamage;
-        private System.Windows.Forms.Label playerPossibleWeaponType;
-        private System.Windows.Forms.Button changeWeapon;
-        private System.Windows.Forms.Label playerActionPoints;
-        private System.Windows.Forms.Label playerHealth;
         private System.Windows.Forms.Label enemyHealth;
-        private System.Windows.Forms.Label playerWeaponAttacks;
-        private System.Windows.Forms.Label playerPossibleWeaponAttacks;
         private System.Windows.Forms.Label enemyPosition;
-        private System.Windows.Forms.Label playerHeight;
         private System.Windows.Forms.Label enemyHeight;
         private System.Windows.Forms.CheckBox showHeightDifference;
-        private System.Windows.Forms.Button dumpWeapon;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label fieldHeight;
         private System.Windows.Forms.Label fieldPosition;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label playerDefense;
         private System.Windows.Forms.Label enemyDefense;
-        private System.Windows.Forms.Label playerVitatlity;
-        private System.Windows.Forms.Label playerEndurance;
-        private System.Windows.Forms.Label playerAgility;
-        private System.Windows.Forms.Label playerStrength;
         private System.Windows.Forms.Button levelUpButton;
-        private System.Windows.Forms.Label playerLevel;
-        private System.Windows.Forms.Label playerXP;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label treeInformation;
-        private System.Windows.Forms.Label treeName;
-        private System.Windows.Forms.ListBox treeList;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox console;
         private System.Windows.Forms.Button ShowBlockedFields;
         private System.Windows.Forms.CheckBox enemyMovement;
-        private System.Windows.Forms.Panel statsPanel;
-        private System.Windows.Forms.Label statusDescription;
-        private System.Windows.Forms.Label statusTitle;
-        private System.Windows.Forms.ListBox statusList;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button debugButton;
-        private System.Windows.Forms.Label playerIntelligence;
-        private System.Windows.Forms.Label playerWisdom;
-        private System.Windows.Forms.Label playerMana;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label spellDescription;
-        private System.Windows.Forms.Label spellName;
-        private System.Windows.Forms.Button castSpell;
-        private System.Windows.Forms.Label skillLevel;
+        private PlayerView playerView;
     }
 }
 

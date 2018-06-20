@@ -14,6 +14,7 @@ namespace StartGame
         public WeaponReward? weaponReward;
         public int XP;
         public SpellReward? spellReward;
+        public int Money;
     }
 
     internal struct SpellReward
@@ -103,7 +104,7 @@ namespace StartGame
                 weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null }
                 ,
                 XP = 5,
-                spellReward = new SpellReward() { spell = new TeleportSpell(2, 0) }
+                spellReward = new SpellReward() { spell = World.Instance.GainSpell<TeleportSpell>() }
             };
         }
 
@@ -206,7 +207,7 @@ namespace StartGame
             {
                 weaponReward = new WeaponReward() { random = true, rarity = 2, reward = null },
                 XP = xp,
-                spellReward = new SpellReward() { spell = new FireBall(8, 3, 4, 0) }
+                spellReward = new SpellReward() { spell = World.Instance.GainSpell<FireBall>() }
             };
         }
 
@@ -321,10 +322,10 @@ namespace StartGame
         {
             return new Reward()
             {
-                weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null }
-                ,
+                weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null },
                 XP = 5,
-                spellReward = new SpellReward() { spell = new TeleportSpell(2, 0) }
+                spellReward = new SpellReward() { spell = World.Instance.GainSpell<DebuffSpell>() },
+                Money = 12
             };
         }
 
@@ -432,7 +433,8 @@ namespace StartGame
             {
                 weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null },
                 XP = 2,
-                spellReward = null
+                spellReward = null,
+                Money = 0
             };
         }
 
@@ -514,7 +516,8 @@ namespace StartGame
             {
                 weaponReward = new WeaponReward() { random = true, rarity = 3, reward = null },
                 XP = 5,
-                spellReward = new SpellReward() { spell = new FireBall(10, 2, 3, 0) }
+                spellReward = new SpellReward() { spell = World.Instance.GainSpell<TeleportSpell>() },
+                Money = 48
             };
         }
 
@@ -645,7 +648,8 @@ namespace StartGame
             {
                 weaponReward = new WeaponReward() { random = true, rarity = 3, reward = null },
                 XP = 5,
-                spellReward = null
+                spellReward = null,
+                Money = 34
             };
         }
 

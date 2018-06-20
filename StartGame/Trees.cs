@@ -60,7 +60,7 @@ namespace StartGame
                     level++;
                     maxXP = (int)Math.Max(maxXP + minGrowth, maxXP * growthFactor);
                 }
-                if (!(main is null)) main.UpdateTreeView();
+                if (!(main is null)) main.UpdatePlayerView();
                 if (levelup) main.SkillLevelUp(this);
             }
         }
@@ -118,7 +118,7 @@ namespace StartGame
         {
             //Add effect
             active = true;
-            main.UpdateTreeView();
+            main.UpdatePlayerView();
             level = level == 0 ? 1 : level;
         }
 
@@ -177,7 +177,7 @@ namespace StartGame
 
                 {
                     mainGame.humanPlayer.trees.Add(this);
-                    mainGame.UpdateTreeView();
+                    mainGame.UpdatePlayerView();
                     //Pop up for title notice
                     mainGame.TreeGained(this);
 
@@ -220,7 +220,7 @@ namespace StartGame
                 {
                     level = 1;
                     main.humanPlayer.trees.Add(this);
-                    main.UpdateTreeView();
+                    main.UpdatePlayerView();
 
                     //Pop up for skill notice
                     main.TreeGained(this);
@@ -265,7 +265,7 @@ namespace StartGame
                 {
                     level = 1;
                     main.humanPlayer.trees.Add(this);
-                    main.UpdateTreeView();
+                    main.UpdatePlayerView();
 
                     //Pop up
                     main.TreeGained(this);

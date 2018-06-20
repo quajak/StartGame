@@ -116,7 +116,7 @@ namespace StartGame
                 main.WriteConsole($"{playerName} has been put on fire!");
                 f[0].statuses.Add(new FireStatus(turns + 2, damage, main, player));
                 if (playerName == main.humanPlayer.Name)
-                    main.UpdateStatusList();
+                    main.UpdatePlayerView();
             }
         }
 
@@ -135,7 +135,7 @@ namespace StartGame
                         e.player.troop.statuses.Add(new FireStatus(turns + 1, damage, main, e.player));
                         if (e.player.Name == main.humanPlayer.Name)
                         {
-                            main.UpdateStatusList();
+                            main.UpdatePlayerView();
                         }
                     }
                     else
@@ -181,7 +181,7 @@ namespace StartGame
             this.main.Turn += Main_Turn;
             player.InitialiseTurnHandler += Player_InitialiseTurnHandler;
             player.troop.statuses.Add(this);
-            main.UpdateStatusList();
+            main.UpdatePlayerView();
         }
 
         private void Player_InitialiseTurnHandler(object sender, EventArgs e)
@@ -202,7 +202,7 @@ namespace StartGame
             {
                 player.InitialiseTurnHandler -= Player_InitialiseTurnHandler;
                 player.troop.statuses.Remove(this);
-                main.UpdateStatusList();
+                main.UpdatePlayerView();
             }
         }
 
@@ -264,7 +264,7 @@ namespace StartGame
             main.Turn -= Main_Turn;
             main.PlayerMoved -= Main_PlayerMoved;
             player.troop.statuses.Remove(this);
-            main.UpdateStatusList();
+            main.UpdatePlayerView();
         }
 
         public override string Description()

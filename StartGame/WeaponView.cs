@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace PlayerCreator
 {
-    public partial class WeaponView : Form
+    partial class WeaponView : Form
     {
         public bool decision = false;
 

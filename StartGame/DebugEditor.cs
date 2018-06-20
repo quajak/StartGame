@@ -72,5 +72,10 @@ namespace StartGame
             main.humanPlayer.mana += 10;
             main.ShowPlayerStats();
         }
+
+        private void GainMoney_Click(object sender, EventArgs e)
+        {
+            main.humanPlayer.money += 10;
+        }
     }
 }

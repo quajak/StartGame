@@ -13,26 +13,27 @@ namespace StartGame
     internal enum DamageType
     { melee, fire, water, earth, air, unblockable };
 
-    internal abstract class Spell
+    internal abstract class Spell : Item
     {
+        //TODO Add description to each spell
         //Long term: Add spell shop
         //Long term: Add: Spells have a chance to fail
-        internal readonly string name;
-
         internal int coolDown;
+
         public readonly SpellInformationFormat format;
         internal readonly int MaxCoolDown;
         internal MainGameWindow main;
         internal Map map;
 
         public int manaCost;
+        public readonly int buyCost;
 
         public bool Ready { get => coolDown == 0; set => coolDown = value ? 0 : coolDown; }
 
-        public Spell(string name, int MaxCoolDown, int? InitialCoolDown, SpellInformationFormat format, int manaCost)
+        public Spell(string name, int MaxCoolDown, int? InitialCoolDown, SpellInformationFormat format, int manaCost, int BuyCost) : base(name)
         {
             this.manaCost = manaCost;
-            this.name = name;
+            buyCost = BuyCost;
             this.MaxCoolDown = MaxCoolDown;
             coolDown = InitialCoolDown ?? MaxCoolDown;
             this.format = format;
@@ -42,6 +43,12 @@ namespace StartGame
         {
             this.main = main;
             map = Map;
+        }
+
+        public string Description(bool meta)
+        {
+            if (meta) return $"Mana: {manaCost} Cooldown: {MaxCoolDown}";
+            else return $"Mana: {manaCost} Cooldown: {coolDown}/{MaxCoolDown}";
         }
 
         public abstract string Activate(SpellInformation information);
@@ -78,7 +85,7 @@ namespace StartGame
         //TODO: Allow this to be done to none player targets
         private readonly int gainHealth;
 
-        public HealingSpell(int GainHealth) : base("Healing Spell", 3, 0, new SpellInformationFormat() { Positions = 0 }, 2)
+        public HealingSpell(int GainHealth, int Cost) : base("Healing Spell", 3, 0, new SpellInformationFormat() { Positions = 0 }, 2, Cost)
         {
             gainHealth = GainHealth;
         }
@@ -99,7 +106,7 @@ namespace StartGame
     {
         private readonly int damage;
 
-        public LightningBoltSpell(int damage) : base("Lightning Bolt", 3, 0, new SpellInformationFormat() { Positions = 1 }, 8)
+        public LightningBoltSpell(int damage, int Cost) : base("Lightning Bolt", 3, 0, new SpellInformationFormat() { Positions = 1 }, 8, Cost)
         {
             this.damage = damage;
         }
@@ -134,7 +141,7 @@ namespace StartGame
         private readonly int damage;
         private readonly int radius;
 
-        public EarthQuakeSpell(int damage, int radius) : base("Earthquake", 8, 0, new SpellInformationFormat() { Positions = 1 }, 10)
+        public EarthQuakeSpell(int damage, int radius, int Cost) : base("Earthquake", 8, 0, new SpellInformationFormat() { Positions = 1 }, 10, Cost)
         {
             this.damage = damage;
             this.radius = radius;
@@ -184,7 +191,7 @@ namespace StartGame
         private readonly int turns;
         private readonly int strength;
 
-        public DebuffSpell(int turns, int strength, int MaxCooldDown, int? initialCoolDown) : base("Debuff", MaxCooldDown, initialCoolDown, new SpellInformationFormat() { Positions = 1 }, 4)
+        public DebuffSpell(int turns, int strength, int MaxCooldDown, int? initialCoolDown, int Cost) : base("Debuff Spell", MaxCooldDown, initialCoolDown, new SpellInformationFormat() { Positions = 1 }, 4, Cost)
         {
             this.turns = turns;
             this.strength = strength;
@@ -218,8 +225,8 @@ namespace StartGame
 
         private readonly int turns;
 
-        public FireBall(int damage, int turns, int MaxCoolDown, int? intialCoolDown) : base("Fireball", MaxCoolDown, intialCoolDown,
-            new SpellInformationFormat() { Positions = 1 }, 5)
+        public FireBall(int damage, int turns, int MaxCoolDown, int? intialCoolDown, int Cost) : base("Fireball", MaxCoolDown, intialCoolDown,
+            new SpellInformationFormat() { Positions = 1 }, 5, Cost)
         {
             this.damage = damage;
             this.turns = turns;
@@ -249,8 +256,8 @@ namespace StartGame
 
     internal class TeleportSpell : Spell
     {
-        public TeleportSpell(int MaxCoolDown, int? initalCoolDown) : base("Teleport", MaxCoolDown, initalCoolDown,
-            new SpellInformationFormat() { Positions = 2 }, 10)
+        public TeleportSpell(int MaxCoolDown, int? initalCoolDown, int Cost) : base("Teleport", MaxCoolDown, initalCoolDown,
+            new SpellInformationFormat() { Positions = 2 }, 10, Cost)
         {
         }
 

@@ -35,6 +35,7 @@
             this.GainHealth = new System.Windows.Forms.Button();
             this.CooldownDec = new System.Windows.Forms.Button();
             this.GainMana = new System.Windows.Forms.Button();
+            this.gainMoney = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // incActionPoints
@@ -71,7 +72,7 @@
             // 
             this.gainXP.Location = new System.Drawing.Point(10, 86);
             this.gainXP.Name = "gainXP";
-            this.gainXP.Size = new System.Drawing.Size(95, 21);
+            this.gainXP.Size = new System.Drawing.Size(98, 21);
             this.gainXP.TabIndex = 3;
             this.gainXP.Text = "Gain 10 XP";
             this.gainXP.UseVisualStyleBackColor = true;
@@ -107,11 +108,22 @@
             this.GainMana.UseVisualStyleBackColor = true;
             this.GainMana.Click += new System.EventHandler(this.GainMana_Click);
             // 
+            // gainMoney
+            // 
+            this.gainMoney.Location = new System.Drawing.Point(13, 195);
+            this.gainMoney.Name = "gainMoney";
+            this.gainMoney.Size = new System.Drawing.Size(92, 23);
+            this.gainMoney.TabIndex = 7;
+            this.gainMoney.Text = "Gain 10 Coins";
+            this.gainMoney.UseVisualStyleBackColor = true;
+            this.gainMoney.Click += new System.EventHandler(this.GainMoney_Click);
+            // 
             // DebugEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(211, 294);
+            this.Controls.Add(this.gainMoney);
             this.Controls.Add(this.GainMana);
             this.Controls.Add(this.CooldownDec);
             this.Controls.Add(this.GainHealth);
@@ -135,5 +147,6 @@
         private System.Windows.Forms.Button GainHealth;
         private System.Windows.Forms.Button CooldownDec;
         private System.Windows.Forms.Button GainMana;
+        private System.Windows.Forms.Button gainMoney;
     }
 }

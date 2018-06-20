@@ -152,13 +152,16 @@ namespace StartGame
         public int levelXP = 5;
         public int storedLevelUps = 0;
 
+        public int money;
+
         public MainGameWindow main;
 
         public List<Tree> trees = new List<Tree>();
 
-        public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window) : base(Type, Name, Map, Enemies, 0, 1)
+        public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window, int Money) : base(Type, Name, Map, Enemies, 0, 1)
         {
             main = window;
+            money = Money;
             strength = 1;
             agility = 1;
             endurance = 1;
@@ -965,9 +968,9 @@ namespace StartGame
         private int lastHealth;
         private readonly int round;
 
-        public ElementalWizard(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 10, 3 + Round + Difficulty / 2
-            , new List<Spell>() { new FireBall(Difficulty / 2 + Round + 1, Difficulty / 3 + 1 ,6 - Difficulty / 2, 0)
-                , new TeleportSpell(8- Difficulty/2, 0)
+        public ElementalWizard(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 10, 3 + Round + Difficulty / 2,
+                new List<Spell>() { new FireBall(Difficulty / 2 + Round + 1, Difficulty / 3 + 1 ,6 - Difficulty / 2, 0, 0),
+                new TeleportSpell(8- Difficulty/2, 0, 0)
             })
         {
             map = Map;
@@ -1164,7 +1167,7 @@ namespace StartGame
 
         public void CreateGraph()
         {
-            //TODO: Slowly create a graph of the difference costs
+            //TODO: Slowly create a graph of the difference costs - or set static calculation or dynamic
             lock (this) lock (map)
                 {
                     graph = new double[map.map.GetUpperBound(0) + 1, map.map.GetUpperBound(1) + 1];

@@ -13,6 +13,7 @@ namespace StartGame
 {
     internal class Campaign
     {
+        public Mission mission;
         public HumanPlayer player;
         private List<MainGameWindow> playedGames = new List<MainGameWindow>();
         private int numberOfGames;
@@ -54,7 +55,7 @@ namespace StartGame
         public void Start()
         {
             //Setup map
-            Mission mission = DecideMission(Round);
+            mission = DecideMission(Round);
             Map map = new Map();
             Thread mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), mission.heightDiff)));
             mapCreator.Start();
@@ -87,7 +88,7 @@ namespace StartGame
             if (activeGame is null) throw new Exception();
             playedGames.Add(activeGame);
 
-            Mission mission = DecideMission(Round);
+            mission = DecideMission(Round);
 
             //Setup map
             Map map = new Map();
@@ -114,7 +115,7 @@ namespace StartGame
             return true;
         }
 
-        public Weapon CalculateReward(WeaponReward weaponReward)
+        public Weapon CalculateWeaponReward(WeaponReward weaponReward)
         {
             if (!weaponReward.random) return weaponReward.reward;
 

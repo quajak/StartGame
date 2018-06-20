@@ -69,7 +69,7 @@ namespace StartGame
                 playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
                 //return;
             }
-            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null)
+            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null, 0)
             {
                 troop = playerTroop
             };
@@ -123,7 +123,7 @@ namespace StartGame
         private void Button1_Click(object sender, EventArgs e)
         {
             Hide();
-            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null)
+            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null, 0)
             {
                 troop = playerTroop
             };
