@@ -675,7 +675,34 @@ namespace StartGame
 
                     if (goals.Count <= 1)
                     {
-                        FindRandomLandTile(playerNumber, ref toReturn);
+                        for (int i = 0; i < playerNumber; i++)
+                        {
+                            int x;
+                            int y;
+                            int n = generic.Next(4);
+                            if (n == 0)
+                            {
+                                x = 0;
+                                y = generic.Next(map.GetUpperBound(1));
+                            }
+                            else if (n == 1)
+                            {
+                                x = generic.Next(map.GetUpperBound(0));
+                                y = 0;
+                            }
+                            else if (n == 2)
+                            {
+                                x = map.GetUpperBound(0);
+                                y = generic.Next(map.GetUpperBound(1));
+                            }
+                            else
+                            {
+                                x = generic.Next(map.GetUpperBound(0));
+                                y = map.GetUpperBound(1);
+                            }
+
+                            toReturn.Add(new Point(x, y));
+                        }
                         break;
                     }
                     //Determin which road spawn point to start

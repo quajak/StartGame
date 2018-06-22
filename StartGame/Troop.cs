@@ -1,13 +1,11 @@
 ﻿using StartGame;
+using StartGame.Items;
 using StartGame.Properties;
 using System.Collections.Generic;
 using System.Drawing;
 
 namespace PlayerCreator
 {
-    public enum AttackType
-    { melee, range, magic };
-
     internal abstract class Entity
     {
         public readonly string name;
@@ -81,6 +79,7 @@ namespace PlayerCreator
     {
         public Weapon activeWeapon;
         public List<Weapon> weapons = new List<Weapon>();
+        public List<Armour> armours = new List<Armour>();
 
         public int maxHealth;
         public int health;
@@ -91,6 +90,8 @@ namespace PlayerCreator
         private int weaponIndex = 0;
 
         public List<Status> statuses = new List<Status>();
+
+        public Body body;
 
         public int WeaponIndex
         {
@@ -113,6 +114,7 @@ namespace PlayerCreator
             defense = Defense;
             dodge = Dodge;
             baseDodge = Dodge;
+            body = new Body();
         }
 
         private Dictionary<DamageType, double> vurneabilites;
@@ -137,28 +139,6 @@ namespace PlayerCreator
         public void Die()
         {
             Map.map[Position.X, Position.Y].free = true;
-        }
-    }
-
-    internal class Weapon : Item
-    {
-        public int attackDamage;
-        public AttackType type;
-        public int range;
-        public int attacks;
-        public int maxAttacks;
-        public bool discardeable;
-        public int attackCost;
-
-        public Weapon(int AttackDamage, AttackType Type, int Range, string Name, int Attacks, bool Discardeable, int AttackCost = 1) : base(Name)
-        {
-            attackCost = AttackCost;
-            discardeable = Discardeable;
-            range = Range;
-            type = Type;
-            attackDamage = AttackDamage;
-            attacks = Attacks;
-            maxAttacks = Attacks;
         }
     }
 }

@@ -72,7 +72,6 @@ namespace StartGame
             Xp = 0;
             level = 0;
             this.minGrowth = minGrowth;
-            //TODO: Allow skills to gain levels
         }
     }
 

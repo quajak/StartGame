@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using StartGame.Items;
 
 namespace StartGame.User_Controls
 {
@@ -45,6 +46,75 @@ namespace StartGame.User_Controls
             playerWisdom.Text = $"Wisdom: {player.wisdom}";
             playerIntelligence.Text = $"Intelligence: {player.intelligence}";
             playerMoney.Text = $"Money: {player.money}";
+            playerGearWeight.Text = $"Gear weight: {player.GearWeight} / {player.MaxGearWeight}";
+            if (player.GearWeight > player.MaxGearWeight)
+            {
+                playerGearWeight.ForeColor = Color.Red;
+            }
+            else
+            {
+                playerGearWeight.ForeColor = playerMoney.ForeColor;
+            }
+            playerTroopImage.Image = player.troop.body.Render(false, player.troop.armours.Where(a => a.active).ToList(), 16);
+
+            if (active != null)
+            {
+                playerBodyPartArmourList.Visible = true;
+                if (playerBodyPartName.Text != active.name)
+                {
+                    playerBodyPartName.Text = active.name;
+                    playerBodyPartArmourList.Items.Clear();
+                    playerBodyPartArmourList.Items.AddRange(
+                        player.troop.armours.Where(a => a.affected.Exists(b => b == active.part) && a.active)
+                        .ToList().ConvertAll(a => a.name).ToArray());
+                }
+
+                if (playerBodyPartArmourList.SelectedIndex != -1)
+                {
+                    playerActiveArmourTitle.Visible = true;
+                    playerActiveArmourDescription.Visible = true;
+                    int selectedIndex = playerBodyPartArmourList.SelectedIndex;
+                    Armour armour = player.troop.armours.Where(a => a.active && a.affected.Exists(b => b == active.part)).ToList()[selectedIndex];
+                    playerActiveArmourTitle.Text = armour.name;
+                    playerActiveArmourDescription.Text = armour.Description;
+                }
+                else
+                {
+                    playerActiveArmourTitle.Visible = false;
+                    playerActiveArmourDescription.Visible = false;
+                }
+            }
+            else
+            {
+                playerBodyPartName.Text = "";
+                playerBodyPartArmourList.Visible = false;
+                playerActiveArmourTitle.Visible = false;
+                playerActiveArmourDescription.Visible = false;
+            }
+        }
+
+        private BodyPart active = null;
+
+        private void PlayerTroopImage_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void PlayerBaseStats_Click(object sender, EventArgs e)
+        {
+            active = null;
+        }
+
+        private void PlayerTroopImage_MouseClick(object sender, MouseEventArgs e)
+        {
+            int x = e.X / 16;
+            int y = e.Y / 16;
+            active = player.troop.body.body[x, y];
+            Render();
+        }
+
+        private void PlayerBodyPartArmourList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Render();
         }
     }
 }

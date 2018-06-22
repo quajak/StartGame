@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using PlayerCreator;
 using StartGame;
+using StartGame.Items;
 using StartGame.Properties;
 using static StartGame.MainGameWindow;
 
@@ -158,6 +159,39 @@ namespace StartGame
 
         public List<Tree> trees = new List<Tree>();
 
+        private OverweightStatus overweightStatus;
+
+        public int GearWeight //TODO: Move this to base player together with strength
+        {
+            get => troop.armours.Sum(a => a.active ? a.weight : 0);
+        }
+
+        private int lastMaxGearWeight = 0;
+
+        public int MaxGearWeight
+        {
+            get
+            {
+                int max = strength * 1000 + 5000;
+                if (max != lastMaxGearWeight)
+                {
+                    if (GearWeight <= lastMaxGearWeight && GearWeight > max)
+                    {
+                        //Player becomes overweight
+                        overweightStatus = new OverweightStatus(this);
+                    }
+                    else if (GearWeight <= max && GearWeight > lastMaxGearWeight)
+                    {
+                        //Lose overweight status
+                        overweightStatus.RemoveEffect();
+                        overweightStatus = null;
+                    }
+                }
+                lastMaxGearWeight = max;
+                return max;
+            }
+        }
+
         public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window, int Money) : base(Type, Name, Map, Enemies, 0, 1)
         {
             main = window;
@@ -167,6 +201,7 @@ namespace StartGame
             endurance = 1;
             vitality = 10;
             wisdom = 1;
+            lastMaxGearWeight = strength * 1000 + 5000;
         }
 
         public void CalculateStats()
@@ -947,7 +982,7 @@ namespace StartGame
                 WarriorSpiderAI spider = new WarriorSpiderAI(PlayerType.computer, "Spider Spawn " + numSpawned, map, main.players.ToArray())
                 {
                     troop = new Troop("Spider Spawn " + numSpawned, (difficulty / 3) + (int)(round * 1.5) + 1, new Weapon(1 + difficulty / 5 + round / 2,
-                        AttackType.melee, 1, "Fangs", 1, false), Resources.spiderWarrior, 0, map, 25)
+                        BaseAttackType.melee, BaseDamageType.sharp, 1, "Fangs", 1, false), Resources.spiderWarrior, 0, map, 25)
                     {
                         Position = pos
                     }

@@ -1,4 +1,5 @@
 ﻿using PlayerCreator;
+using StartGame.Items;
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
@@ -205,6 +206,7 @@ namespace StartGame
             public bool doged;
             public bool killed;
             public int range;
+            public BodyPart hit;
         }
 
         public event EventHandler<CombatData> Combat = delegate { };
@@ -290,7 +292,7 @@ namespace StartGame
                 {
                     continue;
                 }
-                if (weapon.type != AttackType.range)
+                if (weapon.type != BaseAttackType.range)
                 {
                     weapon.attacks = weapon.maxAttacks;
                 }
@@ -957,21 +959,31 @@ namespace StartGame
 
         public int CalculateDamage(CombatData data)
         {
-            return CalculateDamage(data.attacker.troop.Position, data.attacker, data.attacked, data.weapon);
+            return CalculateDamage(data.attacker.troop.Position, data.attacker, data.attacked, data.weapon, data.hit);
         }
 
-        public int CalculateDamage(Player attacking, Player defending, Weapon weapon)
+        public int CalculateDamage(Player attacking, Player defending, Weapon weapon, BodyPart hit)
         {
-            return CalculateDamage(attacking.troop.Position, attacking, defending, weapon);
+            return CalculateDamage(attacking.troop.Position, attacking, defending, weapon, hit);
         }
 
-        public int CalculateDamage(Point attackingPosition, Player attacking, Player defending, Weapon weapon)
+        /// <summary>
+        /// This function simualates combat and returns the damage dealt, armour is simulated here and changes in armour are directly applied
+        /// </summary>
+        /// <param name="attackingPosition"></param>
+        /// <param name="attacking"></param>
+        /// <param name="defending"></param>
+        /// <param name="weapon"></param>
+        /// <param name="hit"></param>
+        /// <returns></returns>
+        public int CalculateDamage(Point attackingPosition, Player attacking, Player defending, Weapon weapon, BodyPart hit)
         {
+            string text = $"{defending.Name} is attacked by {attacking} at the {hit.name}";
             int damage = weapon.attackDamage - defending.troop.defense;
             damage += attacking is HumanPlayer ? (attacking as HumanPlayer).strength : 0;
 
             //if melee code check for height difference
-            if (weapon.type == AttackType.melee)
+            if (weapon.type == BaseAttackType.melee)
             {
                 double attackingHeight = map.map[attackingPosition.X, attackingPosition.Y].height;
                 double defendingHeight = map.map[defending.troop.Position.X, defending.troop.Position.Y].height;
@@ -980,7 +992,66 @@ namespace StartGame
 
                 damage = damage + (int)Math.Ceiling(difference * damage);
             }
+            text += $"Raw damage: {damage}";
 
+            //Find damage protected by armour
+            List<Armour> protecting = defending.troop.armours.Where(a => a.active && a.affected.Exists(b => b == hit.part)).ToList();
+            protecting = protecting.OrderByDescending(p => (int)p.layer).ToList();
+
+            //Armour must be penetrated from the outside inwards, if sharp must be stronger than armour to continue full strength or it is like blunt, portion of damage continues, magic just ignore all but magic resistance
+            BaseDamageType damageType = weapon.damageType;
+            foreach (var layer in protecting)
+            {
+                int durLost;
+                switch (damageType)
+                {
+                    case BaseDamageType.sharp:
+                        if (layer.sharpDefense >= damage)
+                        {
+                            //Weapon does not penetrate
+                            damage = layer.sharpDefense < damage * 2 ? damage / 10 : 0;
+                            durLost = damage * 2;
+                            text += $"The weapon does not penetrate {layer.name}. {damage} continues as blunt damage. {layer.name} looses {durLost} durability.";
+                            layer.durability -= durLost;
+                            damageType = BaseDamageType.blunt;
+                        }
+                        else
+                        {
+                            damage -= layer.sharpDefense;
+                            durLost = (int)(damage * (double)layer.durability / layer.maxDurability) + 1;
+                            text += $"The weapon penetrates {layer.name}. {damage} continues on as sharp damage. {layer.name} looses {durLost} durability.";
+                            layer.durability -= durLost;
+                        }
+                        break;
+
+                    case BaseDamageType.blunt:
+                        int redDamage = (int)(damage * (100 - (double)layer.bluntDefense) / 100d);
+                        durLost = damage - redDamage;
+                        text += $"The weapon does a blunt attack on {layer.name}. {redDamage} from {damage} is not blocked. {layer.name} looses {durLost} durability.";
+                        layer.durability -= durLost;
+                        damage = redDamage;
+                        break;
+
+                    case BaseDamageType.magic: //Longterm: Find better way to handle magic defense
+                        redDamage = (int)(damage * (100 - (double)layer.magicDefense) / 100d);
+                        durLost = damage - redDamage;
+                        text += $"The weapon does a magic attack on {layer.name}. {redDamage} from {damage} is not blocked. {layer.name} looses {durLost} durability.";
+                        layer.durability -= durLost;
+                        damage = redDamage;
+                        break;
+
+                    default:
+                        break;
+                }
+                if (layer.durability <= 0)
+                {
+                    //Armor broken
+                    text += $"The attack destroys {layer.name}";
+                    defending.troop.armours.Remove(layer);
+                }
+                if (damage == 0) break;
+            }
+            console.Text += text;
             damage = defending.troop.health - damage < 0 ? defending.troop.health : damage;
             return damage;
         }
@@ -1004,32 +1075,7 @@ namespace StartGame
             bool killed = false;
 
             int damage = 0;
-            if (attacking.Name == humanPlayer.Name)
-            {
-                CombatData combatData = new CombatData()
-                {
-                    attacked = attacked,
-                    attacker = attacking,
-                    damage = 0,
-                    doged = false,
-                    killed = false,
-                    range = AIUtility.Distance(attacked.troop.Position, attacking.troop.Position),
-                    weapon = attacking.troop.activeWeapon
-                };
 
-                foreach (var func in CalculatePlayerAttackDamage)
-                {
-                    combatData.damage = func(combatData);
-                }
-                damage = combatData.damage;
-            }
-            else
-            {
-                damage = CalculateDamage(attacking, attacked, attacking.troop.activeWeapon);
-            }
-
-            attacking.troop.activeWeapon.attacks--;
-            attacking.actionPoints -= attacking.troop.activeWeapon.attackCost;
             //Check if hit
             if (random.Next(100) < attacked.troop.dodge)
             {
@@ -1040,6 +1086,37 @@ namespace StartGame
                 Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = true, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon });
                 return (0, false, false);
             } //Long term: Add scraping hit
+
+            //Determine where teh attacker hits the attacked;
+            BodyPart hit = DetermineHitBodyPart(attacking, attacked);
+
+            if (attacking.Name == humanPlayer.Name)
+            {
+                CombatData combatData = new CombatData()
+                {
+                    attacked = attacked,
+                    attacker = attacking,
+                    damage = 0,
+                    doged = false,
+                    killed = false,
+                    range = AIUtility.Distance(attacked.troop.Position, attacking.troop.Position),
+                    weapon = attacking.troop.activeWeapon,
+                    hit = hit
+                };
+
+                foreach (var func in CalculatePlayerAttackDamage)
+                {
+                    combatData.damage = func(combatData);
+                }
+                damage = combatData.damage;
+            }
+            else
+            {
+                damage = CalculateDamage(attacking, attacked, attacking.troop.activeWeapon, hit);
+            }
+
+            attacking.troop.activeWeapon.attacks--;
+            attacking.actionPoints -= attacking.troop.activeWeapon.attackCost;
 
             attacked.troop.health -= damage;
 
@@ -1060,7 +1137,7 @@ namespace StartGame
                     players.Remove(attacked);
                     UpdatePlayerList();
 
-                    Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = true, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon });
+                    Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = true, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon, hit = hit });
 
                     //Let player gain xp
                     humanPlayer.GainXP(attacked.XP);
@@ -1068,7 +1145,7 @@ namespace StartGame
             }
             else
             {
-                Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon });
+                Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = false, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon, hit = hit });
             }
 
             if (show)
@@ -1098,6 +1175,11 @@ namespace StartGame
         public void SkillLevelUp(Skill skill)
         {
             MessageBox.Show($"The skill {skill.name} has leveled up to level {skill.level}!");
+        }
+
+        public BodyPart DetermineHitBodyPart(Player attacker, Player defender)
+        {
+            return defender.troop.body.bodyParts[random.Next(defender.troop.body.bodyParts.Count)];
         }
 
         #endregion Player Events

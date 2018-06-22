@@ -1,4 +1,5 @@
 ﻿using PlayerCreator;
+using StartGame.Items;
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
@@ -121,18 +122,19 @@ namespace StartGame
 
             List<Weapon> weapons = new List<Weapon>
             {
-                new Weapon(6, AttackType.melee, 2, "Stick", 2, true),
-                new Weapon(8, AttackType.melee, 1, "Large rock", 1, true),
-                new Weapon(4, AttackType.range, 5, "Rock", 1, true),
-                new Weapon(11, AttackType.melee, 1, "Dagger", 1, true),
-                new Weapon(12, AttackType.melee, 2, "Axe", 1, true, 2),
-                new Weapon(9, AttackType.melee, 2, "Sword", 2, true),
-                new Weapon(8, AttackType.melee, 4, "Spear", 2, true),
-                new Weapon(12, AttackType.melee, 2, "Long sword", 2, true),
-                new Weapon(7, AttackType.melee, 1, "Short Sword", 4, true),
-                new Weapon(15, AttackType.magic, 7, "Firewand", 1, true, 2),
-                new Weapon(11, AttackType.range, 11, "Bow", 8, true, 2),
-                new Weapon(15, AttackType.range, 20, "Long bow", 5, true, 3)
+                new Weapon(6, BaseAttackType.melee, BaseDamageType.blunt, 2, "Stick", 2, true),
+                new Weapon(8, BaseAttackType.melee,BaseDamageType.blunt, 1, "Large rock", 1, true),
+                new Weapon(4, BaseAttackType.range, BaseDamageType.blunt, 5, "Rock", 1, true),
+                new Weapon(11, BaseAttackType.melee,BaseDamageType.sharp,  1, "Dagger", 1, true),
+                new Weapon(12, BaseAttackType.melee,BaseDamageType.sharp, 2, "Axe", 1, true, 2),
+                new Weapon(9, BaseAttackType.melee,BaseDamageType.sharp, 2, "Sword", 2, true),
+                new Weapon(8, BaseAttackType.melee, BaseDamageType.sharp, 4, "Spear", 2, true),
+                new Weapon(12, BaseAttackType.melee,BaseDamageType.sharp, 2, "Long sword", 2, true),
+                new Weapon(7, BaseAttackType.melee, BaseDamageType.sharp, 1, "Short Sword", 4, true),
+                new Weapon(15, BaseAttackType.magic,BaseDamageType.magic, 7, "Firewand", 1, true, 2),
+                new Weapon(11, BaseAttackType.range,BaseDamageType.sharp, 11, "Bow", 8, true, 2),
+                new Weapon(15, BaseAttackType.range,BaseDamageType.sharp, 20, "Long bow", 5, true, 3),
+                new Weapon(4, BaseAttackType.range, BaseDamageType.blunt, 8, "Slingshot", 7, true)
             };
             weapons.Sort((w1, w2) => (w1.attackDamage * w1.attacks * w1.range / 4) > (w2.attackDamage * w2.attacks * w2.range / 4) ? 1 : -1);
             return weapons[random.Next(weapons.Count / numberOfGames * playedGames.Count + weaponReward.rarity, Math.Min(weapons.Count / numberOfGames * (playedGames.Count + 1) + weaponReward.rarity, weapons.Count))];

@@ -92,7 +92,8 @@ namespace StartGame
             string cleaned = Regex.Replace(text, "[^.0-9]", "");
             if (text != cleaned)
                 seedInput.Text = cleaned;
-            Seed = Int32.Parse(cleaned);
+            if (cleaned == "") Seed = 0;
+            else Seed = Int32.Parse(cleaned);
         }
 
         private void HeightDifference_Scroll(object sender, EventArgs e)

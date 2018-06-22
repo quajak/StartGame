@@ -34,6 +34,7 @@
             this.playerSetup = new System.Windows.Forms.Button();
             this.quit = new System.Windows.Forms.Button();
             this.startCampaign = new System.Windows.Forms.Button();
+            this.armourCreator = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -96,11 +97,22 @@
             this.startCampaign.UseVisualStyleBackColor = true;
             this.startCampaign.Click += new System.EventHandler(this.Button1_Click);
             // 
+            // armourCreator
+            // 
+            this.armourCreator.Location = new System.Drawing.Point(83, 233);
+            this.armourCreator.Name = "armourCreator";
+            this.armourCreator.Size = new System.Drawing.Size(100, 23);
+            this.armourCreator.TabIndex = 7;
+            this.armourCreator.Text = "Armour Creator";
+            this.armourCreator.UseVisualStyleBackColor = true;
+            this.armourCreator.Click += new System.EventHandler(this.ArmourCreator_Click);
+            // 
             // MainGameMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(284, 268);
+            this.Controls.Add(this.armourCreator);
             this.Controls.Add(this.startCampaign);
             this.Controls.Add(this.quit);
             this.Controls.Add(this.playerSetup);
@@ -123,5 +135,6 @@
         private System.Windows.Forms.Button playerSetup;
         private System.Windows.Forms.Button quit;
         private System.Windows.Forms.Button startCampaign;
+        private System.Windows.Forms.Button armourCreator;
     }
 }

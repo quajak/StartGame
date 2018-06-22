@@ -78,7 +78,7 @@ namespace StartGame.User_Controls
         {
         }
 
-        private void spellList_SelectedIndexChanged(object sender, EventArgs e)
+        private void SpellList_SelectedIndexChanged(object sender, EventArgs e)
         {
             Render();
         }

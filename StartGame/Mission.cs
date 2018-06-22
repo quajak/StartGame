@@ -1,4 +1,5 @@
 ﻿using PlayerCreator;
+using StartGame.Items;
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
@@ -158,11 +159,11 @@ namespace StartGame
             {
                 troop = new Troop("Dragon", 100 + (difficulty / 2) + (int)(Round * 1.5) - 4,
                     new Weapon(8 + difficulty / 4 + Round - 1,
-                        AttackType.melee, 3, "Claw", 1, false),
+                        BaseAttackType.melee, BaseDamageType.sharp, 3, "Claw", 1, false),
                     Resources.Dragon, 0, map, Vurneabilities: vurn)
             });
             players[1].troop.Position = dragonSpawn;
-            players[1].troop.weapons.Add(new Weapon(6 + difficulty / 3 + Round, AttackType.magic, 6, "Tail", 1, false, 1));
+            players[1].troop.weapons.Add(new Weapon(6 + difficulty / 3 + Round, BaseAttackType.melee, BaseDamageType.blunt, 6, "Tail", 1, false, 1));
 
             #endregion Player Creation
 
@@ -252,7 +253,7 @@ namespace StartGame
                 {
                     troop = new Troop(name, 10 + (difficulty / 2) + (int)(Round * 1.5) - 4,
                     new Weapon(4 + difficulty / 4 + Round - 1,
-                        AttackType.melee, 1, "Fists", 1, false),
+                        BaseAttackType.melee, BaseDamageType.blunt, 1, "Fists", 1, false),
                     Resources.enemyScout, 0, map)
                 });
                 players[i + 1].troop.Position = spawnPoints[i];
@@ -371,7 +372,7 @@ namespace StartGame
                 {
                     troop = new Troop(name, (difficulty / 3) + (int)(Round * 1.5) + 2,
                     new Weapon(1 + difficulty / 5 + Round / 2,
-                        AttackType.melee, 1, "Fangs", 1, false),
+                        BaseAttackType.melee, BaseDamageType.sharp, 1, "Fangs", 1, false),
                     Resources.spiderWarrior, 0, map, Dodge: 25)
                 });
                 players[i + 1].troop.Position = spawnPoints[i];
@@ -471,7 +472,7 @@ namespace StartGame
             {
                 troop = new Troop(name, (difficulty / 3) + (int)(Round * 1.5) + 5,
                 new Weapon(3 + difficulty / 5 + Round / 2,
-                    AttackType.melee, 1, "Dagger", 2, false),
+                    BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
                 Resources.elementalWizard, 0, map, Dodge: 25)
             });
             players[1].troop.Position = startPos[0];
@@ -602,7 +603,7 @@ namespace StartGame
                 {
                     troop = new Troop(name, (difficulty / 3) + (int)(Round * 1.5) + 5,
                     new Weapon(3 + difficulty / 5 + Round / 2,
-                        AttackType.melee, 1, "Dagger", 2, false),
+                        BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
                     Resources.enemyScout, 0, map, Dodge: 25)
                 });
                 players[i + 1].troop.Position = startPos[i];

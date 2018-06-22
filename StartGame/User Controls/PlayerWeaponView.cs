@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using PlayerCreator;
+using StartGame.Items;
 
 namespace StartGame.User_Controls
 {

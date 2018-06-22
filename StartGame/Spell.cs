@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static StartGame.MainGameWindow;
+using StartGame.Items;
 
 namespace StartGame
 {
@@ -16,7 +17,6 @@ namespace StartGame
     internal abstract class Spell : Item
     {
         //TODO Add description to each spell
-        //Long term: Add spell shop
         //Long term: Add: Spells have a chance to fail
         internal int coolDown;
 

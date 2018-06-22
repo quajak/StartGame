@@ -158,6 +158,7 @@ namespace StartGame
 
         public int? turns;
         internal readonly Player player;
+        //TODO: Automatically add to statuses
 
         public Status(string Name, int? Turns, Player Player)
         {
@@ -270,6 +271,41 @@ namespace StartGame
         public override string Description()
         {
             return $"This troop is on fire for {(turns != null ? $"the next {turns} {(turns > 1 ? "turns" : "turn")}" : "for ever")}. It deals {damage} per turn.";
+        }
+    }
+
+    internal class OverweightStatus : Status
+    {
+        private int level;
+
+        public OverweightStatus(HumanPlayer player) : base("Overweight", null, player)
+        {
+            player.troop.statuses.Add(this);
+            player.InitialiseTurnHandler += Player_InitialiseTurnHandler;
+        }
+
+        private void Player_InitialiseTurnHandler(object sender, EventArgs e)
+        {
+            CalculateLevel();
+            player.actionPoints -= level;
+        }
+
+        private void CalculateLevel()
+        {
+            HumanPlayer h = player as HumanPlayer;
+            level = (h.GearWeight - h.MaxGearWeight) / (h.MaxGearWeight / 4) + 1;
+        }
+
+        public override string Description()
+        {
+            CalculateLevel();
+            return $"You are overweight as you are using too much armour right now. You have {level} less action points each turn.";
+        }
+
+        public void RemoveEffect()
+        {
+            player.InitialiseTurnHandler -= Player_InitialiseTurnHandler;
+            player.troop.statuses.Remove(this);
         }
     }
 }

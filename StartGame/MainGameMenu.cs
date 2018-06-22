@@ -5,12 +5,14 @@ using PlayerCreator;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
+using StartGame.Items;
+using System.Linq;
+using StartGame.DebugViews;
 
 namespace StartGame
 {
     public partial class MainGameMenu : Form
     {
-        //TODO: Add try catch block around MaiNGame to catch errors and log them
         //Logger
         public static TraceSource log = new TraceSource("MainLog");
 
@@ -65,27 +67,36 @@ namespace StartGame
             if (playerTroop is null)
             {
                 MessageBox.Show("Please create your troop before starting the game!");
-                playerTroop = new Troop(Settings.Default.Name, 10, new Weapon(5, AttackType.magic, 1, "Punch", 2, false), Resources.playerTroop, 0, map);
-                playerTroop.weapons.Add(new Weapon(50, AttackType.magic, 40, "GOD", 10, true));
+                playerTroop = new Troop(Settings.Default.Name, 10, new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0, map)
+                {
+                    armours = new List<Armour>
+                    {
+                        new Armour("Woolen Tunic", 50, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.clothing),
+                        new Armour("Old Pants", 40, new List<BodyParts> { BodyParts.UpperLegs, BodyParts.LeftLowerLeg, BodyParts.RightLowerLeg, BodyParts.LeftShin, BodyParts.RightShin }, Material.Materials.First(m => m.name == "Cloth"), Quality.Poor, ArmourLayer.clothing),
+                        new Armour("Wooden Shoes", 32, new List<BodyParts> { BodyParts.LeftFoot, BodyParts.RightFoot }, Material.Materials.First(m => m.name == "Wood"), Quality.Poor, ArmourLayer.light)
+                    }
+                };
+                playerTroop.weapons.Add(new Weapon(50, BaseAttackType.magic, BaseDamageType.magic, 40, "GOD", 10, true));
                 //return;
             }
             HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null, 0)
             {
                 troop = playerTroop
             };
+            player.troop.armours.ForEach(a => a.active = true);
 
-            player.agility = 5;
-            player.strength = 5;
-            player.vitality = 20;
-            player.intelligence = 5;
-            player.wisdom = 5;
-            player.endurance = 5;
+            //player.agility = 5;
+            //player.strength = 5;
+            //player.vitality = 20;
+            //player.intelligence = 5;
+            //player.wisdom = 5;
+            //player.endurance = 5;
 
-            player.CalculateStats();
+            //player.CalculateStats();
             Hide();
             //Long term: Make form to allow use to choose mission and difficulty
 
-            Mission mission = new DragonFight();
+            Mission mission = new BanditMission();
 
             List<Tree> trees = Tree.GenerateTrees();
 
@@ -127,8 +138,18 @@ namespace StartGame
             {
                 troop = playerTroop
             };
+            player.troop.armours.ForEach(a => a.active = true);
+
             CampaignController campaignCreator = new CampaignController(player);
             campaignCreator.ShowDialog();
+            Show();
+        }
+
+        private void ArmourCreator_Click(object sender, EventArgs e)
+        {
+            Hide();
+            ArmourCreator armourCreator = new ArmourCreator();
+            armourCreator.ShowDialog();
             Show();
         }
     }

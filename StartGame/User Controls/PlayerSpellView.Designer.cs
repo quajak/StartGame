@@ -93,7 +93,7 @@
             this.spellList.Name = "spellList";
             this.spellList.Size = new System.Drawing.Size(294, 82);
             this.spellList.TabIndex = 10;
-            this.spellList.SelectedIndexChanged += new System.EventHandler(this.spellList_SelectedIndexChanged);
+            this.spellList.SelectedIndexChanged += new System.EventHandler(this.SpellList_SelectedIndexChanged);
             // 
             // PlayerSpellView
             // 

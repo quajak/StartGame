@@ -38,7 +38,6 @@
             this.playerAgility = new System.Windows.Forms.Label();
             this.playerStrength = new System.Windows.Forms.Label();
             this.playerDefense = new System.Windows.Forms.Label();
-            this.playerHeight = new System.Windows.Forms.Label();
             this.playerWeaponAttacks = new System.Windows.Forms.Label();
             this.playerHealth = new System.Windows.Forms.Label();
             this.playerActionPoints = new System.Windows.Forms.Label();
@@ -47,12 +46,19 @@
             this.playerAttackDamage = new System.Windows.Forms.Label();
             this.playerName = new System.Windows.Forms.Label();
             this.playerMoney = new System.Windows.Forms.Label();
+            this.playerGearWeight = new System.Windows.Forms.Label();
+            this.playerTroopImage = new System.Windows.Forms.PictureBox();
+            this.playerBodyPartName = new System.Windows.Forms.Label();
+            this.playerBodyPartArmourList = new System.Windows.Forms.ListBox();
+            this.playerActiveArmourTitle = new System.Windows.Forms.Label();
+            this.playerActiveArmourDescription = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.playerTroopImage)).BeginInit();
             this.SuspendLayout();
             // 
             // playerMana
             // 
             this.playerMana.AutoSize = true;
-            this.playerMana.Location = new System.Drawing.Point(12, 144);
+            this.playerMana.Location = new System.Drawing.Point(12, 131);
             this.playerMana.Name = "playerMana";
             this.playerMana.Size = new System.Drawing.Size(62, 13);
             this.playerMana.TabIndex = 60;
@@ -61,7 +67,7 @@
             // playerIntelligence
             // 
             this.playerIntelligence.AutoSize = true;
-            this.playerIntelligence.Location = new System.Drawing.Point(149, 108);
+            this.playerIntelligence.Location = new System.Drawing.Point(13, 251);
             this.playerIntelligence.Name = "playerIntelligence";
             this.playerIntelligence.Size = new System.Drawing.Size(89, 13);
             this.playerIntelligence.TabIndex = 59;
@@ -70,7 +76,7 @@
             // playerWisdom
             // 
             this.playerWisdom.AutoSize = true;
-            this.playerWisdom.Location = new System.Drawing.Point(149, 95);
+            this.playerWisdom.Location = new System.Drawing.Point(13, 238);
             this.playerWisdom.Name = "playerWisdom";
             this.playerWisdom.Size = new System.Drawing.Size(73, 13);
             this.playerWisdom.TabIndex = 58;
@@ -79,7 +85,7 @@
             // playerXP
             // 
             this.playerXP.AutoSize = true;
-            this.playerXP.Location = new System.Drawing.Point(16, 217);
+            this.playerXP.Location = new System.Drawing.Point(13, 311);
             this.playerXP.Name = "playerXP";
             this.playerXP.Size = new System.Drawing.Size(49, 13);
             this.playerXP.TabIndex = 57;
@@ -88,7 +94,7 @@
             // playerLevel
             // 
             this.playerLevel.AutoSize = true;
-            this.playerLevel.Location = new System.Drawing.Point(16, 200);
+            this.playerLevel.Location = new System.Drawing.Point(13, 294);
             this.playerLevel.Name = "playerLevel";
             this.playerLevel.Size = new System.Drawing.Size(61, 13);
             this.playerLevel.TabIndex = 56;
@@ -97,7 +103,7 @@
             // playerVitatlity
             // 
             this.playerVitatlity.AutoSize = true;
-            this.playerVitatlity.Location = new System.Drawing.Point(149, 82);
+            this.playerVitatlity.Location = new System.Drawing.Point(13, 225);
             this.playerVitatlity.Name = "playerVitatlity";
             this.playerVitatlity.Size = new System.Drawing.Size(65, 13);
             this.playerVitatlity.TabIndex = 55;
@@ -106,7 +112,7 @@
             // playerEndurance
             // 
             this.playerEndurance.AutoSize = true;
-            this.playerEndurance.Location = new System.Drawing.Point(149, 69);
+            this.playerEndurance.Location = new System.Drawing.Point(13, 212);
             this.playerEndurance.Name = "playerEndurance";
             this.playerEndurance.Size = new System.Drawing.Size(87, 13);
             this.playerEndurance.TabIndex = 54;
@@ -115,7 +121,7 @@
             // playerAgility
             // 
             this.playerAgility.AutoSize = true;
-            this.playerAgility.Location = new System.Drawing.Point(149, 56);
+            this.playerAgility.Location = new System.Drawing.Point(13, 199);
             this.playerAgility.Name = "playerAgility";
             this.playerAgility.Size = new System.Drawing.Size(62, 13);
             this.playerAgility.TabIndex = 53;
@@ -124,7 +130,7 @@
             // playerStrength
             // 
             this.playerStrength.AutoSize = true;
-            this.playerStrength.Location = new System.Drawing.Point(149, 43);
+            this.playerStrength.Location = new System.Drawing.Point(13, 186);
             this.playerStrength.Name = "playerStrength";
             this.playerStrength.Size = new System.Drawing.Size(75, 13);
             this.playerStrength.TabIndex = 52;
@@ -133,20 +139,11 @@
             // playerDefense
             // 
             this.playerDefense.AutoSize = true;
-            this.playerDefense.Location = new System.Drawing.Point(13, 131);
+            this.playerDefense.Location = new System.Drawing.Point(13, 118);
             this.playerDefense.Name = "playerDefense";
             this.playerDefense.Size = new System.Drawing.Size(75, 13);
             this.playerDefense.TabIndex = 51;
             this.playerDefense.Text = "playerDefense";
-            // 
-            // playerHeight
-            // 
-            this.playerHeight.AutoSize = true;
-            this.playerHeight.Location = new System.Drawing.Point(12, 118);
-            this.playerHeight.Name = "playerHeight";
-            this.playerHeight.Size = new System.Drawing.Size(66, 13);
-            this.playerHeight.TabIndex = 50;
-            this.playerHeight.Text = "playerHeight";
             // 
             // playerWeaponAttacks
             // 
@@ -214,17 +211,79 @@
             // playerMoney
             // 
             this.playerMoney.AutoSize = true;
-            this.playerMoney.Location = new System.Drawing.Point(12, 157);
+            this.playerMoney.Location = new System.Drawing.Point(156, 53);
             this.playerMoney.Name = "playerMoney";
             this.playerMoney.Size = new System.Drawing.Size(67, 13);
             this.playerMoney.TabIndex = 61;
             this.playerMoney.Text = "playerMoney";
+            // 
+            // playerGearWeight
+            // 
+            this.playerGearWeight.AutoSize = true;
+            this.playerGearWeight.Location = new System.Drawing.Point(156, 40);
+            this.playerGearWeight.Name = "playerGearWeight";
+            this.playerGearWeight.Size = new System.Drawing.Size(92, 13);
+            this.playerGearWeight.TabIndex = 62;
+            this.playerGearWeight.Text = "playerGearWeight";
+            // 
+            // playerTroopImage
+            // 
+            this.playerTroopImage.Location = new System.Drawing.Point(159, 79);
+            this.playerTroopImage.Name = "playerTroopImage";
+            this.playerTroopImage.Size = new System.Drawing.Size(112, 240);
+            this.playerTroopImage.TabIndex = 63;
+            this.playerTroopImage.TabStop = false;
+            this.playerTroopImage.Click += new System.EventHandler(this.PlayerTroopImage_Click);
+            this.playerTroopImage.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PlayerTroopImage_MouseClick);
+            // 
+            // playerBodyPartName
+            // 
+            this.playerBodyPartName.AutoSize = true;
+            this.playerBodyPartName.Font = new System.Drawing.Font("Modern No. 20", 8F, System.Drawing.FontStyle.Bold);
+            this.playerBodyPartName.Location = new System.Drawing.Point(277, 79);
+            this.playerBodyPartName.Name = "playerBodyPartName";
+            this.playerBodyPartName.Size = new System.Drawing.Size(118, 14);
+            this.playerBodyPartName.TabIndex = 64;
+            this.playerBodyPartName.Text = "playerBodyPartName";
+            // 
+            // playerBodyPartArmourList
+            // 
+            this.playerBodyPartArmourList.FormattingEnabled = true;
+            this.playerBodyPartArmourList.Location = new System.Drawing.Point(280, 96);
+            this.playerBodyPartArmourList.Name = "playerBodyPartArmourList";
+            this.playerBodyPartArmourList.Size = new System.Drawing.Size(115, 95);
+            this.playerBodyPartArmourList.TabIndex = 65;
+            this.playerBodyPartArmourList.SelectedIndexChanged += new System.EventHandler(this.PlayerBodyPartArmourList_SelectedIndexChanged);
+            // 
+            // playerActiveArmourTitle
+            // 
+            this.playerActiveArmourTitle.AutoSize = true;
+            this.playerActiveArmourTitle.Font = new System.Drawing.Font("Modern No. 20", 8.249999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.playerActiveArmourTitle.Location = new System.Drawing.Point(281, 196);
+            this.playerActiveArmourTitle.Name = "playerActiveArmourTitle";
+            this.playerActiveArmourTitle.Size = new System.Drawing.Size(140, 14);
+            this.playerActiveArmourTitle.TabIndex = 66;
+            this.playerActiveArmourTitle.Text = "playerActiveArmourTitle";
+            // 
+            // playerActiveArmourDescription
+            // 
+            this.playerActiveArmourDescription.Location = new System.Drawing.Point(283, 212);
+            this.playerActiveArmourDescription.Name = "playerActiveArmourDescription";
+            this.playerActiveArmourDescription.Size = new System.Drawing.Size(112, 107);
+            this.playerActiveArmourDescription.TabIndex = 67;
+            this.playerActiveArmourDescription.Text = "playerActiveArmourDescription";
             // 
             // PlayerBaseStats
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.Controls.Add(this.playerActiveArmourDescription);
+            this.Controls.Add(this.playerActiveArmourTitle);
+            this.Controls.Add(this.playerBodyPartArmourList);
+            this.Controls.Add(this.playerBodyPartName);
+            this.Controls.Add(this.playerTroopImage);
+            this.Controls.Add(this.playerGearWeight);
             this.Controls.Add(this.playerMoney);
             this.Controls.Add(this.playerMana);
             this.Controls.Add(this.playerIntelligence);
@@ -236,7 +295,6 @@
             this.Controls.Add(this.playerAgility);
             this.Controls.Add(this.playerStrength);
             this.Controls.Add(this.playerDefense);
-            this.Controls.Add(this.playerHeight);
             this.Controls.Add(this.playerWeaponAttacks);
             this.Controls.Add(this.playerHealth);
             this.Controls.Add(this.playerActionPoints);
@@ -245,8 +303,10 @@
             this.Controls.Add(this.playerAttackDamage);
             this.Controls.Add(this.playerName);
             this.Name = "PlayerBaseStats";
-            this.Size = new System.Drawing.Size(300, 250);
+            this.Size = new System.Drawing.Size(400, 330);
             this.Load += new System.EventHandler(this.PlayerBaseStats_Load);
+            this.Click += new System.EventHandler(this.PlayerBaseStats_Click);
+            ((System.ComponentModel.ISupportInitialize)(this.playerTroopImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -264,7 +324,6 @@
         private System.Windows.Forms.Label playerAgility;
         private System.Windows.Forms.Label playerStrength;
         private System.Windows.Forms.Label playerDefense;
-        private System.Windows.Forms.Label playerHeight;
         private System.Windows.Forms.Label playerWeaponAttacks;
         private System.Windows.Forms.Label playerHealth;
         private System.Windows.Forms.Label playerActionPoints;
@@ -273,5 +332,11 @@
         private System.Windows.Forms.Label playerAttackDamage;
         private System.Windows.Forms.Label playerName;
         private System.Windows.Forms.Label playerMoney;
+        private System.Windows.Forms.Label playerGearWeight;
+        private System.Windows.Forms.PictureBox playerTroopImage;
+        private System.Windows.Forms.Label playerBodyPartName;
+        private System.Windows.Forms.ListBox playerBodyPartArmourList;
+        private System.Windows.Forms.Label playerActiveArmourTitle;
+        private System.Windows.Forms.Label playerActiveArmourDescription;
     }
 }

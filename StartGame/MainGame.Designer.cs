@@ -279,7 +279,7 @@
             this.playerView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.playerView.Location = new System.Drawing.Point(825, 12);
             this.playerView.Name = "playerView";
-            this.playerView.Size = new System.Drawing.Size(413, 270);
+            this.playerView.Size = new System.Drawing.Size(413, 350);
             this.playerView.TabIndex = 27;
             this.playerView.Load += new System.EventHandler(this.PlayerView1_Load);
             // 
