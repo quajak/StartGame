@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StartGame.Items;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -68,6 +69,11 @@ namespace StartGame
                 }
             }
             return "";
+        }
+
+        public static Quality GetQuality(int num)
+        {
+            return new Quality[] { Quality.Broken, Quality.Poor, Quality.Simple, Quality.Common, Quality.Good, Quality.Superior, Quality.Exceptional, Quality.Legendary }[num];
         }
     }
 }

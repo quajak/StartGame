@@ -28,12 +28,12 @@ namespace StartGame
         {
             spells = new List<Spell>()
             {
-                new HealingSpell(5, 15),
-                new EarthQuakeSpell(5, 5, 45),
-                new LightningBoltSpell(15, 40),
-                new DebuffSpell(2, 1, 5, 0, 8),
-                new TeleportSpell(2, 0, 96),
-                new FireBall(8, 3, 4, 0, 23)
+                new HealingSpell(5, 500),
+                new EarthQuakeSpell(5, 5, 4500),
+                new LightningBoltSpell(15, 4000),
+                new DebuffSpell(2, 1, 5, 0, 800),
+                new TeleportSpell(2, 0, 9600),
+                new FireBall(8, 3, 4, 0, 2300)
             };
         }
 

@@ -251,7 +251,7 @@
             this.playerBodyPartArmourList.FormattingEnabled = true;
             this.playerBodyPartArmourList.Location = new System.Drawing.Point(280, 96);
             this.playerBodyPartArmourList.Name = "playerBodyPartArmourList";
-            this.playerBodyPartArmourList.Size = new System.Drawing.Size(115, 95);
+            this.playerBodyPartArmourList.Size = new System.Drawing.Size(115, 56);
             this.playerBodyPartArmourList.TabIndex = 65;
             this.playerBodyPartArmourList.SelectedIndexChanged += new System.EventHandler(this.PlayerBodyPartArmourList_SelectedIndexChanged);
             // 
@@ -259,7 +259,7 @@
             // 
             this.playerActiveArmourTitle.AutoSize = true;
             this.playerActiveArmourTitle.Font = new System.Drawing.Font("Modern No. 20", 8.249999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playerActiveArmourTitle.Location = new System.Drawing.Point(281, 196);
+            this.playerActiveArmourTitle.Location = new System.Drawing.Point(277, 155);
             this.playerActiveArmourTitle.Name = "playerActiveArmourTitle";
             this.playerActiveArmourTitle.Size = new System.Drawing.Size(140, 14);
             this.playerActiveArmourTitle.TabIndex = 66;
@@ -267,9 +267,9 @@
             // 
             // playerActiveArmourDescription
             // 
-            this.playerActiveArmourDescription.Location = new System.Drawing.Point(283, 212);
+            this.playerActiveArmourDescription.Location = new System.Drawing.Point(277, 169);
             this.playerActiveArmourDescription.Name = "playerActiveArmourDescription";
-            this.playerActiveArmourDescription.Size = new System.Drawing.Size(112, 107);
+            this.playerActiveArmourDescription.Size = new System.Drawing.Size(118, 150);
             this.playerActiveArmourDescription.TabIndex = 67;
             this.playerActiveArmourDescription.Text = "playerActiveArmourDescription";
             // 

@@ -106,9 +106,6 @@ namespace StartGame
             player.map = map;
             player.troop.Map = map;
 
-            //TODO: Where do we reset health
-            player.mana = player.maxMana;
-
             //Finish initialisation
             player.active = false;
             activeGame = new MainGameWindow(map, player, mission, trees, this);

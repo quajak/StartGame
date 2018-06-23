@@ -255,6 +255,13 @@ namespace StartGame
                     new Weapon(4 + difficulty / 4 + Round - 1,
                         BaseAttackType.melee, BaseDamageType.blunt, 1, "Fists", 1, false),
                     Resources.enemyScout, 0, map)
+                    {
+                        armours = new List<Armour>
+                        {
+                            new Armour("Shirt", 32, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Cloth"),Quality.Broken, ArmourLayer.clothing),
+                            new Armour("Hose", 60, new List<BodyParts> { BodyParts.UpperLegs, BodyParts.LeftLowerLeg, BodyParts.RightLowerLeg, BodyParts.LeftShin, BodyParts.RightShin }, Material.Materials.First(m => m.name == "Cloth"), Quality.Simple, ArmourLayer.clothing)
+                        }
+                    }
                 });
                 players[i + 1].troop.Position = spawnPoints[i];
             }
@@ -474,6 +481,15 @@ namespace StartGame
                 new Weapon(3 + difficulty / 5 + Round / 2,
                     BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
                 Resources.elementalWizard, 0, map, Dodge: 25)
+                {
+                    armours = new List<Armour>
+                    {
+                        new Armour("Wizard's Cloak", 40, new List<BodyParts>{BodyParts.Head,BodyParts.Neck,BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso,BodyParts.UpperLegs,BodyParts.LeftLowerLeg,BodyParts.RightLowerLeg}, Material.Materials.First(m => m.name == "Wool"),Quality.Superior, ArmourLayer.light)
+                        {
+                            magicDefense = 20
+                        }
+                    }
+                }
             });
             players[1].troop.Position = startPos[0];
 
@@ -605,7 +621,17 @@ namespace StartGame
                     new Weapon(3 + difficulty / 5 + Round / 2,
                         BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
                     Resources.enemyScout, 0, map, Dodge: 25)
+                    {
+                        armours = new List<Armour>
+                        {
+                            new Armour("Cap", 10, new List<BodyParts>{BodyParts.Head}, Material.Materials.First(m => m.name == "Cloth"),Quality.Simple, ArmourLayer.clothing),
+                            new Armour("Shirt", 20, new List<BodyParts>{BodyParts.Torso}, Material.Materials.First(m => m.name == "Cloth"),Quality.Poor, ArmourLayer.clothing),
+                            new Armour("Hose", 25, new List<BodyParts>{BodyParts.UpperLegs,BodyParts.LeftLowerLeg,BodyParts.RightLowerLeg}, Material.Materials.First(m => m.name == "Cloth"),Quality.Common, ArmourLayer.clothing),
+                            new Armour("Cloak", 35, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso,BodyParts.UpperLegs,BodyParts.LeftLowerLeg,BodyParts.RightLowerLeg}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.light)
+                        }
+                    }
                 });
+
                 players[i + 1].troop.Position = startPos[i];
             }
 

@@ -72,7 +72,7 @@
             this.troopList.Location = new System.Drawing.Point(641, 13);
             this.troopList.Name = "troopList";
             this.troopList.Size = new System.Drawing.Size(178, 212);
-            this.troopList.TabIndex = 2;
+            this.troopList.TabIndex = 9;
             this.troopList.SelectedIndexChanged += new System.EventHandler(this.PlayerList_SelectedIndexChanged);
             // 
             // playerInfo
@@ -88,7 +88,7 @@
             this.playerInfo.Location = new System.Drawing.Point(641, 231);
             this.playerInfo.Name = "playerInfo";
             this.playerInfo.Size = new System.Drawing.Size(178, 182);
-            this.playerInfo.TabIndex = 6;
+            this.playerInfo.TabIndex = 8;
             // 
             // enemyDefense
             // 
@@ -96,7 +96,7 @@
             this.enemyDefense.Location = new System.Drawing.Point(3, 92);
             this.enemyDefense.Name = "enemyDefense";
             this.enemyDefense.Size = new System.Drawing.Size(78, 13);
-            this.enemyDefense.TabIndex = 13;
+            this.enemyDefense.TabIndex = 0;
             this.enemyDefense.Text = "enemyDefense";
             // 
             // enemyHeight
@@ -105,7 +105,7 @@
             this.enemyHeight.Location = new System.Drawing.Point(3, 79);
             this.enemyHeight.Name = "enemyHeight";
             this.enemyHeight.Size = new System.Drawing.Size(69, 13);
-            this.enemyHeight.TabIndex = 12;
+            this.enemyHeight.TabIndex = 7;
             this.enemyHeight.Text = "enemyHeight";
             // 
             // enemyPosition
@@ -114,7 +114,7 @@
             this.enemyPosition.Location = new System.Drawing.Point(3, 66);
             this.enemyPosition.Name = "enemyPosition";
             this.enemyPosition.Size = new System.Drawing.Size(75, 13);
-            this.enemyPosition.TabIndex = 11;
+            this.enemyPosition.TabIndex = 6;
             this.enemyPosition.Text = "enemyPosition";
             // 
             // enemyHealth
@@ -123,7 +123,7 @@
             this.enemyHealth.Location = new System.Drawing.Point(3, 53);
             this.enemyHealth.Name = "enemyHealth";
             this.enemyHealth.Size = new System.Drawing.Size(69, 13);
-            this.enemyHealth.TabIndex = 9;
+            this.enemyHealth.TabIndex = 5;
             this.enemyHealth.Text = "enemyHealth";
             // 
             // enemyAttackType
@@ -132,7 +132,7 @@
             this.enemyAttackType.Location = new System.Drawing.Point(3, 40);
             this.enemyAttackType.Name = "enemyAttackType";
             this.enemyAttackType.Size = new System.Drawing.Size(93, 13);
-            this.enemyAttackType.TabIndex = 10;
+            this.enemyAttackType.TabIndex = 4;
             this.enemyAttackType.Text = "enemyAttackType";
             // 
             // enemyAttackRange
@@ -167,7 +167,7 @@
             this.nextAction.Location = new System.Drawing.Point(1148, 569);
             this.nextAction.Name = "nextAction";
             this.nextAction.Size = new System.Drawing.Size(90, 56);
-            this.nextAction.TabIndex = 9;
+            this.nextAction.TabIndex = 0;
             this.nextAction.Text = "Next Action";
             this.nextAction.UseVisualStyleBackColor = true;
             this.nextAction.Click += new System.EventHandler(this.NextAction_Click);
@@ -178,7 +178,7 @@
             this.showHeightDifference.Location = new System.Drawing.Point(640, 598);
             this.showHeightDifference.Name = "showHeightDifference";
             this.showHeightDifference.Size = new System.Drawing.Size(135, 17);
-            this.showHeightDifference.TabIndex = 17;
+            this.showHeightDifference.TabIndex = 2;
             this.showHeightDifference.Text = "Show height difference";
             this.showHeightDifference.UseVisualStyleBackColor = true;
             this.showHeightDifference.CheckedChanged += new System.EventHandler(this.ShowHeightDifference_CheckedChanged);
@@ -192,7 +192,7 @@
             this.panel1.Location = new System.Drawing.Point(643, 418);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(176, 67);
-            this.panel1.TabIndex = 19;
+            this.panel1.TabIndex = 7;
             // 
             // fieldHeight
             // 
@@ -200,7 +200,7 @@
             this.fieldHeight.Location = new System.Drawing.Point(4, 45);
             this.fieldHeight.Name = "fieldHeight";
             this.fieldHeight.Size = new System.Drawing.Size(57, 13);
-            this.fieldHeight.TabIndex = 2;
+            this.fieldHeight.TabIndex = 0;
             this.fieldHeight.Text = "fieldHeight";
             // 
             // fieldPosition
@@ -219,7 +219,7 @@
             this.label1.Location = new System.Drawing.Point(55, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(65, 17);
-            this.label1.TabIndex = 0;
+            this.label1.TabIndex = 2;
             this.label1.Text = "Field Info";
             // 
             // levelUpButton
@@ -227,7 +227,7 @@
             this.levelUpButton.Location = new System.Drawing.Point(1065, 583);
             this.levelUpButton.Name = "levelUpButton";
             this.levelUpButton.Size = new System.Drawing.Size(77, 28);
-            this.levelUpButton.TabIndex = 20;
+            this.levelUpButton.TabIndex = 5;
             this.levelUpButton.Text = "Level Up";
             this.levelUpButton.UseVisualStyleBackColor = true;
             this.levelUpButton.Click += new System.EventHandler(this.LevelUpButton_Click);
@@ -241,14 +241,14 @@
             this.console.ReadOnly = true;
             this.console.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.console.Size = new System.Drawing.Size(212, 147);
-            this.console.TabIndex = 22;
+            this.console.TabIndex = 6;
             // 
             // ShowBlockedFields
             // 
             this.ShowBlockedFields.Location = new System.Drawing.Point(640, 491);
             this.ShowBlockedFields.Name = "ShowBlockedFields";
             this.ShowBlockedFields.Size = new System.Drawing.Size(135, 23);
-            this.ShowBlockedFields.TabIndex = 23;
+            this.ShowBlockedFields.TabIndex = 4;
             this.ShowBlockedFields.Text = "Show blocked fields";
             this.ShowBlockedFields.UseVisualStyleBackColor = true;
             this.ShowBlockedFields.Click += new System.EventHandler(this.ShowBlockedFields_Click);
@@ -259,7 +259,7 @@
             this.enemyMovement.Location = new System.Drawing.Point(640, 575);
             this.enemyMovement.Name = "enemyMovement";
             this.enemyMovement.Size = new System.Drawing.Size(147, 17);
-            this.enemyMovement.TabIndex = 24;
+            this.enemyMovement.TabIndex = 1;
             this.enemyMovement.Text = "All enemies move at once";
             this.enemyMovement.UseVisualStyleBackColor = true;
             // 
@@ -268,7 +268,7 @@
             this.debugButton.Location = new System.Drawing.Point(1036, 583);
             this.debugButton.Name = "debugButton";
             this.debugButton.Size = new System.Drawing.Size(23, 28);
-            this.debugButton.TabIndex = 26;
+            this.debugButton.TabIndex = 3;
             this.debugButton.Text = "D";
             this.debugButton.UseVisualStyleBackColor = true;
             this.debugButton.Click += new System.EventHandler(this.DebugButton_Click);
@@ -280,7 +280,7 @@
             this.playerView.Location = new System.Drawing.Point(825, 12);
             this.playerView.Name = "playerView";
             this.playerView.Size = new System.Drawing.Size(413, 350);
-            this.playerView.TabIndex = 27;
+            this.playerView.TabIndex = 10;
             this.playerView.Load += new System.EventHandler(this.PlayerView1_Load);
             // 
             // MainGameWindow

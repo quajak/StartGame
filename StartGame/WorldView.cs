@@ -23,7 +23,7 @@ namespace StartGame
 
         //TODO: Add discounts
 
-        public WorldView(HumanPlayer player, CampaignController controller, Campaign campaign, Mission lastMission)
+        public WorldView(HumanPlayer player, CampaignController controller, Campaign campaign, Mission lastMission, List<Armour> loot)
         {
             InitializeComponent();
             this.player = player;
@@ -54,24 +54,52 @@ namespace StartGame
                 reward.Add(new Coin(_reward.Money));
             }
 
-            //Populate list
+            reward.AddRange(loot);
+
+            //Populate reward list
             foreach (var item in reward)
             {
-                lootList.Items.Add(item.name);
+                lootList.Items.Add(item);
             }
 
+            //Populate shops
             PopulateSpellShop();
+            PopulateItemShop();
 
             playerView.Activate(player, null, false);
 
             Render();
         }
 
+        private List<Item> itemShopItems;
+
+        private void PopulateItemShop()
+        {
+            if (itemShopItems is null)
+            {
+                //Generate items
+                //TODO: Take level of player into consideration
+                itemShopItems = new List<Item>();
+
+                int itemNumber = player.level + 2;
+                for (int i = 0; i < itemNumber; i++)
+                {
+                    //generate a piece of armour
+                    itemShopItems.Add(ArmorPrefabs.CreateArmour(true));
+                }
+            }
+
+            itemShopList.Items.Clear();
+            itemShopList.Items.AddRange(itemShopItems.ToArray());
+        }
+
         private void PopulateSpellShop()
         {
             spellShopList.Items.Clear();
             // Populate spell shop
-            foreach (var spell in World.Instance.Spells)
+            List<Spell> spells = World.Instance.Spells;
+            spells.RemoveAll(s => player.spells.Exists(p => p == s));
+            foreach (var spell in spells)
             {
                 spellShopList.Items.Add(spell.name);
             }
@@ -95,6 +123,33 @@ namespace StartGame
                 spellDescription.Text = "";
                 spellName.Text = "";
             }
+            if (itemShopList.SelectedIndex != -1)
+            {
+                Item item = itemShopItems[itemShopList.SelectedIndex];
+                switch (item)
+                {
+                    case Armour a:
+                        shopItemName.Visible = true;
+                        shopItemDescription.Visible = true;
+                        shopItemPicture.Visible = true;
+                        shopItemName.Text = a.name;
+                        shopItemDescription.Text = a.Description;
+                        shopItemPicture.Image = new Body().Render(false, new List<Armour> { a }, 8);
+                        itemShopBuy.Enabled = player.money >= a.Value;
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                itemShopBuy.Enabled = false;
+                shopItemName.Visible = false;
+                shopItemDescription.Visible = false;
+                shopItemPicture.Visible = false;
+            }
+
             playerView.Render();
         }
 
@@ -201,13 +256,47 @@ namespace StartGame
                         player.money += c.amount;
                         break;
 
+                    case Armour a:
+                        player.troop.armours.Add(a);
+                        break;
+
                     default:
-                        throw new NotImplementedException($"Reward must be spell, coin or weapon not: {item.GetType()}");
+                        throw new NotImplementedException($"Reward must be spell, armour, coin or weapon not: {item.GetType()}");
                 }
             }
             reward.Clear();
             lootList.Items.Clear();
             Render();
+        }
+
+        private void ItemShopList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Render();
+        }
+
+        private void ItemShopBuy_Click(object sender, EventArgs e)
+        {
+            if (itemShopList.SelectedIndex != -1)
+            {
+                Item item = itemShopItems[itemShopList.SelectedIndex];
+                switch (item)
+                {
+                    case Armour a:
+                        if (a.Value > player.money) throw new Exception();
+                        player.money -= a.Value;
+                        player.troop.armours.Add(a);
+                        itemShopItems.Remove(item);
+                        Render();
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                throw new Exception("How can this be? Should not be able to buy when nothing is selected");
+            }
         }
     }
 }

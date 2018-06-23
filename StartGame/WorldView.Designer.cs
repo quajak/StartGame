@@ -40,10 +40,16 @@
             this.spellShopBuy = new System.Windows.Forms.Button();
             this.spellDescription = new System.Windows.Forms.Label();
             this.spellName = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.playerView = new StartGame.PlayerView();
             this.gainAllLoot = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.itemShopList = new System.Windows.Forms.ListBox();
+            this.shopItemName = new System.Windows.Forms.Label();
+            this.shopItemDescription = new System.Windows.Forms.Label();
+            this.shopItemPicture = new System.Windows.Forms.PictureBox();
+            this.itemShopBuy = new System.Windows.Forms.Button();
             this.spellInfo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.shopItemPicture)).BeginInit();
             this.SuspendLayout();
             // 
             // nextMission
@@ -160,15 +166,6 @@
             this.spellName.TabIndex = 0;
             this.spellName.Text = "spellName";
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(0, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(35, 13);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "label3";
-            // 
             // playerView
             // 
             this.playerView.BackColor = System.Drawing.SystemColors.ActiveBorder;
@@ -187,14 +184,72 @@
             this.gainAllLoot.UseVisualStyleBackColor = true;
             this.gainAllLoot.Click += new System.EventHandler(this.GainAllLoot_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(84, 256);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(58, 13);
+            this.label3.TabIndex = 12;
+            this.label3.Text = "Main Shop";
+            // 
+            // itemShopList
+            // 
+            this.itemShopList.FormattingEnabled = true;
+            this.itemShopList.Location = new System.Drawing.Point(12, 272);
+            this.itemShopList.Name = "itemShopList";
+            this.itemShopList.Size = new System.Drawing.Size(90, 147);
+            this.itemShopList.TabIndex = 13;
+            this.itemShopList.SelectedIndexChanged += new System.EventHandler(this.ItemShopList_SelectedIndexChanged);
+            // 
+            // shopItemName
+            // 
+            this.shopItemName.AutoSize = true;
+            this.shopItemName.Location = new System.Drawing.Point(114, 272);
+            this.shopItemName.Name = "shopItemName";
+            this.shopItemName.Size = new System.Drawing.Size(78, 13);
+            this.shopItemName.TabIndex = 14;
+            this.shopItemName.Text = "shopItemName";
+            // 
+            // shopItemDescription
+            // 
+            this.shopItemDescription.Location = new System.Drawing.Point(117, 289);
+            this.shopItemDescription.Name = "shopItemDescription";
+            this.shopItemDescription.Size = new System.Drawing.Size(175, 130);
+            this.shopItemDescription.TabIndex = 15;
+            this.shopItemDescription.Text = "shopItemDescription";
+            // 
+            // shopItemPicture
+            // 
+            this.shopItemPicture.Location = new System.Drawing.Point(298, 272);
+            this.shopItemPicture.Name = "shopItemPicture";
+            this.shopItemPicture.Size = new System.Drawing.Size(52, 120);
+            this.shopItemPicture.TabIndex = 16;
+            this.shopItemPicture.TabStop = false;
+            // 
+            // itemShopBuy
+            // 
+            this.itemShopBuy.Location = new System.Drawing.Point(298, 398);
+            this.itemShopBuy.Name = "itemShopBuy";
+            this.itemShopBuy.Size = new System.Drawing.Size(55, 23);
+            this.itemShopBuy.TabIndex = 17;
+            this.itemShopBuy.Text = "Buy";
+            this.itemShopBuy.UseVisualStyleBackColor = true;
+            this.itemShopBuy.Click += new System.EventHandler(this.ItemShopBuy_Click);
+            // 
             // WorldView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(833, 433);
+            this.Controls.Add(this.itemShopBuy);
+            this.Controls.Add(this.shopItemPicture);
+            this.Controls.Add(this.shopItemDescription);
+            this.Controls.Add(this.shopItemName);
+            this.Controls.Add(this.itemShopList);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.gainAllLoot);
             this.Controls.Add(this.playerView);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.spellInfo);
             this.Controls.Add(this.Label2);
             this.Controls.Add(this.spellShopList);
@@ -208,6 +263,7 @@
             this.Load += new System.EventHandler(this.WorldView_Load);
             this.spellInfo.ResumeLayout(false);
             this.spellInfo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.shopItemPicture)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -226,9 +282,14 @@
         private System.Windows.Forms.Button spellShopBuy;
         private System.Windows.Forms.Label spellDescription;
         private System.Windows.Forms.Label spellName;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label spellCost;
         private PlayerView playerView;
         private System.Windows.Forms.Button gainAllLoot;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ListBox itemShopList;
+        private System.Windows.Forms.Label shopItemName;
+        private System.Windows.Forms.Label shopItemDescription;
+        private System.Windows.Forms.PictureBox shopItemPicture;
+        private System.Windows.Forms.Button itemShopBuy;
     }
 }

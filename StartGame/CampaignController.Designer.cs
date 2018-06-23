@@ -55,7 +55,7 @@
             0});
             this.missionNumber.Name = "missionNumber";
             this.missionNumber.Size = new System.Drawing.Size(120, 20);
-            this.missionNumber.TabIndex = 0;
+            this.missionNumber.TabIndex = 1;
             this.missionNumber.Value = new decimal(new int[] {
             3,
             0,
@@ -69,7 +69,7 @@
             this.label1.Location = new System.Drawing.Point(13, 52);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(47, 13);
-            this.label1.TabIndex = 1;
+            this.label1.TabIndex = 4;
             this.label1.Text = "Missions";
             // 
             // label2
@@ -79,7 +79,7 @@
             this.label2.Location = new System.Drawing.Point(52, 9);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(172, 25);
-            this.label2.TabIndex = 2;
+            this.label2.TabIndex = 3;
             this.label2.Text = "Campaign Creator";
             // 
             // startCampaign
@@ -87,7 +87,7 @@
             this.startCampaign.Location = new System.Drawing.Point(94, 226);
             this.startCampaign.Name = "startCampaign";
             this.startCampaign.Size = new System.Drawing.Size(75, 23);
-            this.startCampaign.TabIndex = 3;
+            this.startCampaign.TabIndex = 0;
             this.startCampaign.Text = "Start";
             this.startCampaign.UseVisualStyleBackColor = true;
             this.startCampaign.Click += new System.EventHandler(this.StartCampaign_Click);
@@ -98,7 +98,7 @@
             this.difficultyBar.Minimum = 1;
             this.difficultyBar.Name = "difficultyBar";
             this.difficultyBar.Size = new System.Drawing.Size(256, 45);
-            this.difficultyBar.TabIndex = 4;
+            this.difficultyBar.TabIndex = 2;
             this.difficultyBar.Value = 5;
             // 
             // label3
@@ -108,7 +108,7 @@
             this.label3.Location = new System.Drawing.Point(242, 113);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(30, 13);
-            this.label3.TabIndex = 5;
+            this.label3.TabIndex = 6;
             this.label3.Text = "Hard";
             // 
             // label4
@@ -118,7 +118,7 @@
             this.label4.Location = new System.Drawing.Point(102, 141);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(57, 16);
-            this.label4.TabIndex = 6;
+            this.label4.TabIndex = 7;
             this.label4.Text = "Difficulty";
             // 
             // label5
@@ -128,7 +128,7 @@
             this.label5.Location = new System.Drawing.Point(13, 113);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(30, 13);
-            this.label5.TabIndex = 7;
+            this.label5.TabIndex = 5;
             this.label5.Text = "Easy";
             // 
             // CampaignController

@@ -34,6 +34,7 @@
             this.itemImage = new System.Windows.Forms.PictureBox();
             this.itemDescription = new System.Windows.Forms.Label();
             this.itemButton1 = new System.Windows.Forms.Button();
+            this.itemButton2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.itemImage)).BeginInit();
             this.SuspendLayout();
             // 
@@ -94,11 +95,22 @@
             this.itemButton1.UseVisualStyleBackColor = true;
             this.itemButton1.Click += new System.EventHandler(this.ItemButton1_Click);
             // 
+            // itemButton2
+            // 
+            this.itemButton2.Location = new System.Drawing.Point(133, 272);
+            this.itemButton2.Name = "itemButton2";
+            this.itemButton2.Size = new System.Drawing.Size(75, 23);
+            this.itemButton2.TabIndex = 6;
+            this.itemButton2.Text = "itemButton2";
+            this.itemButton2.UseVisualStyleBackColor = true;
+            this.itemButton2.Click += new System.EventHandler(this.ItemButton2_Click);
+            // 
             // PlayerItemView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.Controls.Add(this.itemButton2);
             this.Controls.Add(this.itemButton1);
             this.Controls.Add(this.itemDescription);
             this.Controls.Add(this.itemImage);
@@ -122,5 +134,6 @@
         private System.Windows.Forms.PictureBox itemImage;
         private System.Windows.Forms.Label itemDescription;
         private System.Windows.Forms.Button itemButton1;
+        private System.Windows.Forms.Button itemButton2;
     }
 }

@@ -34,15 +34,15 @@ namespace StartGame.User_Controls
             items.Clear();
             items.AddRange(player.troop.armours);
 
-            List<string> itemNames = items.ConvertAll(t => t.name);
-            List<string> diff = itemList.Items.Cast<string>().Except(itemNames).ToList();
-            foreach (string dif in diff)
+            List<Item> itemNames = player.troop.armours.Cast<Item>().ToList();
+            List<Item> diff = itemList.Items.Cast<Item>().Except(itemNames).ToList();
+            foreach (Item dif in diff)
             {
                 itemList.Items.Remove(dif);
             }
 
-            diff = itemNames.Except(itemList.Items.Cast<string>()).ToList();
-            foreach (string dif in diff)
+            diff = itemNames.Except(itemList.Items.Cast<Item>()).ToList();
+            foreach (Item dif in diff)
             {
                 itemList.Items.Add(dif);
             }
@@ -59,7 +59,7 @@ namespace StartGame.User_Controls
                         Body dummy = new Body();
                         itemImage.Image = dummy.Render(false, new List<Armour> { a }, 8);
 
-                        itemButton1.Enabled = true;
+                        itemButton1.Enabled = a.active || !player.troop.armours.Exists(b => b.active && b.affected.Intersect(a.affected).Count() != 0);
                         itemButton1.Visible = true;
                         itemButton1.Text = a.active ? "Take off" : "Wear";
                         break;
@@ -75,6 +75,9 @@ namespace StartGame.User_Controls
                 itemImage.Image = new Bitmap(1, 1);
                 itemButton1.Visible = false;
             }
+
+            itemButton2.Visible = true;
+            itemButton2.Text = "Sell";
         }
 
         private void ItemList_SelectedIndexChange(object sender, EventArgs e)
@@ -93,6 +96,23 @@ namespace StartGame.User_Controls
 
                 default:
                     throw new NotImplementedException("This type of item does not support button 1");
+            }
+        }
+
+        private void ItemButton2_Click(object sender, EventArgs e)
+        {
+            switch (active)
+            {
+                case Armour a:
+                    //Sell the armour
+                    a.active = false;
+                    player.troop.armours.Remove(a);
+                    player.money += a.Value;
+                    Render();
+                    break;
+
+                default:
+                    throw new NotImplementedException("This type of item does nt support button 2");
             }
         }
     }

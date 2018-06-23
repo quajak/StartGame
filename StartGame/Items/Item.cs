@@ -15,6 +15,11 @@ namespace StartGame.Items
         {
             name = Name;
         }
+
+        public override string ToString()
+        {
+            return name;
+        }
     }
 
     /// <summary>

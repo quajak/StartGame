@@ -138,7 +138,6 @@ namespace StartGame
             {
                 troop = playerTroop
             };
-            player.troop.armours.ForEach(a => a.active = true);
 
             CampaignController campaignCreator = new CampaignController(player);
             campaignCreator.ShowDialog();

@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animations.cs" />
+    <Compile Include="Items\ArmorPrefabs.cs" />
     <Compile Include="Items\Armour.cs" />
     <Compile Include="Body.cs" />
     <Compile Include="Campaign.cs" />

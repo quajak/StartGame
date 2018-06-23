@@ -44,7 +44,7 @@
             this.label1.Location = new System.Drawing.Point(20, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(241, 51);
-            this.label1.TabIndex = 0;
+            this.label1.TabIndex = 6;
             this.label1.Text = "Start Game";
             // 
             // startGame
@@ -72,7 +72,7 @@
             this.playerSetup.Location = new System.Drawing.Point(83, 150);
             this.playerSetup.Name = "playerSetup";
             this.playerSetup.Size = new System.Drawing.Size(100, 23);
-            this.playerSetup.TabIndex = 4;
+            this.playerSetup.TabIndex = 3;
             this.playerSetup.Text = "Profile";
             this.playerSetup.UseVisualStyleBackColor = true;
             this.playerSetup.Click += new System.EventHandler(this.PlayerSetup_Click);
@@ -82,7 +82,7 @@
             this.quit.Location = new System.Drawing.Point(83, 179);
             this.quit.Name = "quit";
             this.quit.Size = new System.Drawing.Size(100, 23);
-            this.quit.TabIndex = 5;
+            this.quit.TabIndex = 4;
             this.quit.Text = "Quit";
             this.quit.UseVisualStyleBackColor = true;
             this.quit.Click += new System.EventHandler(this.Quit_Click);
@@ -92,7 +92,7 @@
             this.startCampaign.Location = new System.Drawing.Point(83, 63);
             this.startCampaign.Name = "startCampaign";
             this.startCampaign.Size = new System.Drawing.Size(100, 23);
-            this.startCampaign.TabIndex = 6;
+            this.startCampaign.TabIndex = 0;
             this.startCampaign.Text = "Start Campaign";
             this.startCampaign.UseVisualStyleBackColor = true;
             this.startCampaign.Click += new System.EventHandler(this.Button1_Click);
@@ -102,7 +102,7 @@
             this.armourCreator.Location = new System.Drawing.Point(83, 233);
             this.armourCreator.Name = "armourCreator";
             this.armourCreator.Size = new System.Drawing.Size(100, 23);
-            this.armourCreator.TabIndex = 7;
+            this.armourCreator.TabIndex = 5;
             this.armourCreator.Text = "Armour Creator";
             this.armourCreator.UseVisualStyleBackColor = true;
             this.armourCreator.Click += new System.EventHandler(this.ArmourCreator_Click);

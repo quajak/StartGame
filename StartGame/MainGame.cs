@@ -51,6 +51,8 @@ namespace StartGame
         private DebugEditor debug;
         public bool forceWin = false;
 
+        public List<Player> killedPlayers = new List<Player>();
+
         public MainGameWindow(Map Map, HumanPlayer player, Mission mission, List<Tree> trees, Campaign Campaign = null)
         {
             player.main = this;
@@ -893,17 +895,7 @@ namespace StartGame
                 }
                 else
                 {
-                    //Enemy Died
-                    player.troop.Die();
-                    map.troops.Remove(player.troop);
-                    map.entites.Remove(player.troop);
-                    map.RemoveEntityRenderObject(player.troop.name);
-
-                    players.Remove(player);
-                    UpdatePlayerList();
-
-                    //Let player gain xp
-                    humanPlayer.GainXP(player.XP);
+                    EnemyKilled(player);
                 }
             }
 
@@ -1129,18 +1121,9 @@ namespace StartGame
                 }
                 else
                 {
-                    //Enemy Died
-                    attacked.troop.Die();
-                    map.troops.Remove(attacked.troop);
-                    map.entites.Remove(attacked.troop);
-                    map.RemoveEntityRenderObject(attacked.troop.name);
-                    players.Remove(attacked);
-                    UpdatePlayerList();
+                    EnemyKilled(attacked);
 
                     Combat(this, new CombatData() { attacked = attacked, attacker = attacking, doged = false, damage = damage, killed = true, range = AIUtility.Distance(attacking.troop.Position, attacked.troop.Position), weapon = attacking.troop.activeWeapon, hit = hit });
-
-                    //Let player gain xp
-                    humanPlayer.GainXP(attacked.XP);
                 }
             }
             else
@@ -1165,6 +1148,21 @@ namespace StartGame
             ShowEnemyStats();
 
             return (damage, killed, true);
+        }
+
+        private void EnemyKilled(Player killed)
+        {
+            //Enemy Died
+            killedPlayers.Add(killed);
+            killed.troop.Die();
+            map.troops.Remove(killed.troop);
+            map.entites.Remove(killed.troop);
+            map.RemoveEntityRenderObject(killed.troop.name);
+            players.Remove(killed);
+            UpdatePlayerList();
+
+            //Let player gain xp
+            humanPlayer.GainXP(killed.XP);
         }
 
         public void TreeGained(Tree tree)

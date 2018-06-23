@@ -67,6 +67,8 @@ namespace StartGame.User_Controls
                     playerBodyPartArmourList.Items.AddRange(
                         player.troop.armours.Where(a => a.affected.Exists(b => b == active.part) && a.active)
                         .ToList().ConvertAll(a => a.name).ToArray());
+                    playerBodyPartArmourList.Visible = playerBodyPartArmourList.Items.Count != 0;
+                    if (playerBodyPartArmourList.Items.Count == 1) playerBodyPartArmourList.SelectedIndex = 0;
                 }
 
                 if (playerBodyPartArmourList.SelectedIndex != -1)
