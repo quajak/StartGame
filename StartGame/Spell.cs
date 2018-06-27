@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static StartGame.MainGameWindow;
 using StartGame.Items;
+using StartGame.PlayerData;
 
 namespace StartGame
 {
@@ -97,7 +98,7 @@ namespace StartGame
 
             coolDown = MaxCoolDown;
 
-            main.humanPlayer.troop.health = Math.Min(information.mage.intelligence + gainHealth + main.humanPlayer.troop.health, main.humanPlayer.troop.maxHealth);
+            main.humanPlayer.troop.health = Math.Min(information.mage.Intelligence.Value + gainHealth + main.humanPlayer.troop.health, main.humanPlayer.troop.maxHealth);
             return $"{main.humanPlayer.Name} has healed for {gainHealth}";
         }
     }
@@ -120,7 +121,7 @@ namespace StartGame
 
             Point hit = information.positions[0];
 
-            int appliedDamage = damage + information.mage.intelligence / 2;
+            int appliedDamage = damage + information.mage.Intelligence.rawValue / 2;
             if (map.map.Get(hit).type.FType == FieldType.water) appliedDamage *= 2;
 
             new LightningBolt(1, hit, map, main);
@@ -154,8 +155,8 @@ namespace StartGame
 
             coolDown = MaxCoolDown;
 
-            int appliedDamage = damage + information.mage.intelligence / 4;
-            int appliedRadius = radius + information.mage.intelligence / 7;
+            int appliedDamage = damage + information.mage.Intelligence.Value / 4;
+            int appliedRadius = radius + information.mage.Intelligence.Value / 7;
 
             Point hit = information.positions[0];
 
@@ -211,7 +212,7 @@ namespace StartGame
             }
             else
             {
-                int effectiveStrength = strength + information.mage.intelligence / 10;
+                int effectiveStrength = strength + information.mage.Intelligence.Value / 10;
                 new DebuffStatus(turns, effectiveStrength, main, player);
                 return $"{player.Name} has been debuffed for {effectiveStrength}!";
             }
@@ -238,8 +239,8 @@ namespace StartGame
             if (!CheckFormat(information)) throw new Exception("Information is incomplete!");
 
             coolDown = MaxCoolDown;
-            int appliedDamage = damage + information.mage.intelligence / 2;
-            int appliedTurns = turns + information.mage.intelligence / 10;
+            int appliedDamage = damage + information.mage.Intelligence.Value / 2;
+            int appliedTurns = turns + information.mage.Intelligence.Value / 10;
 
             if (map.map[information.positions[0].X, information.positions[0].Y].type.FType != FieldType.water)
             {

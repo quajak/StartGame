@@ -8,6 +8,7 @@ using System.Diagnostics;
 using StartGame.Items;
 using System.Linq;
 using StartGame.DebugViews;
+using StartGame.PlayerData;
 
 namespace StartGame
 {
@@ -119,7 +120,7 @@ namespace StartGame
 
         private void PlayerSetup_Click(object sender, EventArgs e)
         {
-            PlayerProfile playerProfile = new PlayerCreator.PlayerProfile();
+            PlayerProfile playerProfile = new PlayerProfile();
             Hide();
             playerProfile.ShowDialog();
             playerTroop = playerProfile.troop;

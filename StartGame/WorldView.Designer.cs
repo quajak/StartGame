@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.nextMission = new System.Windows.Forms.Button();
-            this.levelUp = new System.Windows.Forms.Button();
+            this.levelUpButton = new System.Windows.Forms.Button();
             this.lootList = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.gainLoot = new System.Windows.Forms.Button();
@@ -62,15 +62,15 @@
             this.nextMission.UseVisualStyleBackColor = true;
             this.nextMission.Click += new System.EventHandler(this.NextMission_Click);
             // 
-            // levelUp
+            // levelUpButton
             // 
-            this.levelUp.Location = new System.Drawing.Point(12, 12);
-            this.levelUp.Name = "levelUp";
-            this.levelUp.Size = new System.Drawing.Size(75, 23);
-            this.levelUp.TabIndex = 1;
-            this.levelUp.Text = "Level Up";
-            this.levelUp.UseVisualStyleBackColor = true;
-            this.levelUp.Click += new System.EventHandler(this.LevelUp_Click);
+            this.levelUpButton.Location = new System.Drawing.Point(12, 12);
+            this.levelUpButton.Name = "levelUpButton";
+            this.levelUpButton.Size = new System.Drawing.Size(75, 23);
+            this.levelUpButton.TabIndex = 1;
+            this.levelUpButton.Text = "Level Up";
+            this.levelUpButton.UseVisualStyleBackColor = true;
+            this.levelUpButton.Click += new System.EventHandler(this.LevelUp_Click);
             // 
             // lootList
             // 
@@ -256,7 +256,7 @@
             this.Controls.Add(this.gainLoot);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lootList);
-            this.Controls.Add(this.levelUp);
+            this.Controls.Add(this.levelUpButton);
             this.Controls.Add(this.nextMission);
             this.Name = "WorldView";
             this.Text = "WorldView";
@@ -272,7 +272,7 @@
         #endregion
 
         private System.Windows.Forms.Button nextMission;
-        private System.Windows.Forms.Button levelUp;
+        private System.Windows.Forms.Button levelUpButton;
         private System.Windows.Forms.ListBox lootList;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button gainLoot;

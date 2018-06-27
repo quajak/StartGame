@@ -1,4 +1,4 @@
-﻿namespace PlayerCreator
+﻿namespace StartGame.PlayerData
 {
     partial class PlayerProfile
     {

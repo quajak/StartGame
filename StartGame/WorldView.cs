@@ -1,5 +1,6 @@
 ﻿using PlayerCreator;
 using StartGame.Items;
+using StartGame.PlayerData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,8 +33,8 @@ namespace StartGame
             this.lastMission = lastMission;
 
             //Enable level up
-            levelUp.Enabled = player.storedLevelUps != 0;
-            levelUp.Text = $"Level up x{player.storedLevelUps}";
+            levelUpButton.Enabled = player.storedLevelUps != 0;
+            levelUpButton.Text = $"Level up x{player.storedLevelUps}";
 
             //Generate reward
             Reward _reward = lastMission.Reward();
@@ -170,8 +171,8 @@ namespace StartGame
             player.level += player.storedLevelUps;
             player.storedLevelUps = 0;
 
-            levelUp.Enabled = false;
-            levelUp.Text = "Already leveled up";
+            levelUpButton.Enabled = false;
+            levelUpButton.Text = "Already leveled up";
         }
 
         private void GainLoot_Click(object sender, EventArgs e)

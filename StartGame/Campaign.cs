@@ -1,5 +1,6 @@
 ﻿using PlayerCreator;
 using StartGame.Items;
+using StartGame.PlayerData;
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace StartGame
             healthRegen = 10 - Difficulty;
             if (Difficulty < 6)
             {
-                player.vitality += 6 - Difficulty;
+                player.Vitality.rawValue += 6 - Difficulty;
                 player.CalculateStats();
             }
         }

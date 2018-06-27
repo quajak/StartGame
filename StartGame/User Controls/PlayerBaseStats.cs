@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using StartGame.Items;
+using StartGame.PlayerData;
 
 namespace StartGame.User_Controls
 {
@@ -29,22 +30,22 @@ namespace StartGame.User_Controls
         public void Render()
         {
             playerName.Text = player.Name;
-            playerAttackDamage.Text = player.troop.activeWeapon.attackDamage.ToString();
-            playerAttackRange.Text = player.troop.activeWeapon.range.ToString();
-            playerAttackType.Text = player.troop.activeWeapon.type.ToString();
-            playerActionPoints.Text = $"{player.actionPoints} / {player.maxActionPoints}";
-            playerHealth.Text = $"{player.troop.health} / {player.troop.maxHealth}";
+            playerAttackDamage.Text = $"Damage: {player.troop.activeWeapon.attackDamage}";
+            playerAttackRange.Text = $"Attack range: {player.troop.activeWeapon.range}";
+            playerAttackType.Text = $"Attack type: {player.troop.activeWeapon.type}";
+            playerActionPoints.Text = $"Action points: {player.actionPoints} / {player.MaxActionPoints}";
+            playerHealth.Text = $"Health: {player.troop.health} / {player.troop.maxHealth}";
             playerWeaponAttacks.Text = $"Attacks: {player.troop.activeWeapon.attacks} / {player.troop.activeWeapon.maxAttacks}";
             playerDefense.Text = $"Defense: {player.troop.defense}";
-            playerStrength.Text = $"Strength: {player.strength}";
-            playerAgility.Text = $"Agility: {player.agility}";
-            playerEndurance.Text = $"Endurance: {player.endurance}";
-            playerVitatlity.Text = $"Vitality: {player.vitality}";
+            playerStrength.Text = player.Strength.ToString();
+            playerAgility.Text = player.Agility.ToString();
+            playerEndurance.Text = player.Endurance.ToString();
+            playerVitatlity.Text = player.Vitality.ToString();
             playerLevel.Text = $"Level: {player.level} + ({player.storedLevelUps})";
             playerXP.Text = $"XP: {player.xp} / {player.levelXP}";
             playerMana.Text = $"Mana: {player.mana} / {player.maxMana}";
-            playerWisdom.Text = $"Wisdom: {player.wisdom}";
-            playerIntelligence.Text = $"Intelligence: {player.intelligence}";
+            playerWisdom.Text = player.Wisdom.ToString();
+            playerIntelligence.Text = player.Intelligence.ToString();
             playerMoney.Text = $"Money: {player.money}";
             playerGearWeight.Text = $"Gear weight: {player.GearWeight} / {player.MaxGearWeight}";
             if (player.GearWeight > player.MaxGearWeight)
@@ -117,6 +118,10 @@ namespace StartGame.User_Controls
         private void PlayerBodyPartArmourList_SelectedIndexChanged(object sender, EventArgs e)
         {
             Render();
+        }
+
+        private void playerAttackDamage_Click(object sender, EventArgs e)
+        {
         }
     }
 }

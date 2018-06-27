@@ -1,5 +1,6 @@
 ﻿using PlayerCreator;
 using StartGame.Items;
+using StartGame.PlayerData;
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
@@ -94,6 +95,7 @@ namespace StartGame
 
             //Setup game
             humanPlayer = player;
+            humanPlayer.CalculateStats();
             this.mission = mission;
             activePlayer = players[0];
 
@@ -972,7 +974,7 @@ namespace StartGame
         {
             string text = $"{defending.Name} is attacked by {attacking} at the {hit.name}";
             int damage = weapon.attackDamage - defending.troop.defense;
-            damage += attacking is HumanPlayer ? (attacking as HumanPlayer).strength : 0;
+            damage += attacking is HumanPlayer ? (attacking as HumanPlayer).Strength.Value : 0;
 
             //if melee code check for height difference
             if (weapon.type == BaseAttackType.melee)

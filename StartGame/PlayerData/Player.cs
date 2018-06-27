@@ -12,7 +12,7 @@ using StartGame.Items;
 using StartGame.Properties;
 using static StartGame.MainGameWindow;
 
-namespace StartGame
+namespace StartGame.PlayerData
 {
     internal abstract class Player
     {
@@ -25,19 +25,20 @@ namespace StartGame
         public int XP;
         internal readonly List<Spell> spells;
 
-        public int intelligence; //improves the effectivness of spells
+        private Attribute intelligence; //improves the effectivness of spells
 
         //Derived stats
-        public int maxActionPoints = 4;
+        public int MaxActionPoints => 4;
 
         public Troop troop;
 
         public bool Dead { get => troop.health == 0; }
+        internal Attribute Intelligence { get => intelligence; set => intelligence = value; }
 
         public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, int Intelligence, List<Spell> spells = null)
         {
             this.XP = XP;
-            intelligence = Intelligence;
+            this.Intelligence = new Attribute(Intelligence, "Intelligence");
             if (spells != null)
             {
                 this.spells = spells;
@@ -66,7 +67,7 @@ namespace StartGame
         /// <summary>
         /// Called when turn starts used to set action points
         /// </summary>
-        public event EventHandler InitialiseTurnHandler = (sender, e) => (sender as Player).actionPoints = (sender as Player).maxActionPoints;
+        public event EventHandler InitialiseTurnHandler = (sender, e) => (sender as Player).actionPoints = (sender as Player).MaxActionPoints;
 
         public void NextTurn()
         {
@@ -138,12 +139,12 @@ namespace StartGame
     internal class HumanPlayer : Player
     {
         //Base stats
-        public int strength; //Bonus damage dealt
+        private Attribute strength; //Bonus damage dealt
 
-        public int agility; //Chance to dodge
-        public int endurance; //How many action points + defense
-        public int vitality; //How much health
-        public int wisdom; //how much mana
+        private Attribute agility; //Chance to dodge
+        private Attribute endurance; //How many action points + defense
+        private Attribute vitality; //How much health
+        private Attribute wisdom; //how much mana
 
         public int mana;
         public int maxMana;
@@ -167,12 +168,13 @@ namespace StartGame
         }
 
         private int lastMaxGearWeight = 0;
+        new public int MaxActionPoints => 4 + Endurance.Value / 10;
 
         public int MaxGearWeight
         {
             get
             {
-                int max = strength * 1000 + 5000;
+                int max = Strength.Value * 1000 + 5000;
                 if (max != lastMaxGearWeight)
                 {
                     if (GearWeight <= lastMaxGearWeight && GearWeight > max)
@@ -192,33 +194,75 @@ namespace StartGame
             }
         }
 
+        internal Attribute Vitality
+        {
+            get => vitality; set
+            {
+                vitality = value;
+                CalculateStats();
+            }
+        }
+
+        internal Attribute Endurance
+        {
+            get => endurance; set
+            {
+                endurance = value;
+                CalculateStats();
+            }
+        }
+
+        internal Attribute Agility
+        {
+            get => agility; set
+            {
+                agility = value;
+                CalculateStats();
+            }
+        }
+
+        internal Attribute Wisdom
+        {
+            get => wisdom; set
+            {
+                wisdom = value;
+                CalculateStats();
+            }
+        }
+
+        internal Attribute Strength { get => strength; set => strength = value; }
+
         public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window, int Money) : base(Type, Name, Map, Enemies, 0, 1)
         {
             main = window;
             money = Money;
-            strength = 1;
-            agility = 1;
-            endurance = 1;
-            vitality = 10;
-            wisdom = 1;
-            lastMaxGearWeight = strength * 1000 + 5000;
+            Strength = new Attribute(1, "Strength");
+            Agility = new Attribute(1, "Agility");
+            Endurance = new Attribute(1, "Endurance");
+            Vitality = new Attribute(10, "Vitality");
+            Wisdom = new Attribute(1, "Wisdom");
         }
 
         public void CalculateStats()
         {
-            maxActionPoints = 4 + endurance / 10;
-
-            int healthDifference = troop.health - troop.maxHealth;
-            troop.maxHealth = 2 * vitality;
-            troop.health = troop.maxHealth - healthDifference;
-
-            troop.defense = endurance / 5;
-
-            troop.dodge = troop.baseDodge + agility * 2;
-
-            int manaDifference = mana - maxMana;
-            maxMana = wisdom * 2 + 10;
-            mana = maxMana - manaDifference;
+            if (strength != null)
+            {
+                lastMaxGearWeight = Strength.Value * 1000 + 5000;
+            }
+            if (wisdom != null)
+            {
+                int manaDifference = mana - maxMana;
+                maxMana = wisdom.Value * 2 + 10;
+                mana = maxMana - manaDifference;
+            }
+            if (troop != null)
+            {
+                int healthDifference = troop.health - troop.maxHealth;
+                troop.maxHealth = 2 * vitality.Value;
+                troop.health = troop.maxHealth - healthDifference;
+                troop.dodge = troop.baseDodge + agility.Value * 2;
+                troop.defense = endurance.Value / 5;
+            }
         }
 
         public void GainXP(int XP)

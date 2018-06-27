@@ -1,4 +1,5 @@
 ﻿using StartGame;
+using StartGame.PlayerData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,12 +37,12 @@ namespace PlayerCreator
 
         private void Render()
         {
-            playerStrength.Text = $"Strength: {player.strength} ({StrengthUp + player.strength})";
-            playerAgiltiy.Text = $"Agility: {player.agility} ({AgilityUp + player.agility})";
-            playerEndurance.Text = $"Endurance: {player.endurance} ({EnduranceUp + player.endurance})";
-            playerVitality.Text = $"Vitality: {player.vitality} ({VitatlityUp + player.vitality})";
-            playerWisdom.Text = $"Wisdom: {player.wisdom} ({player.wisdom + WisdomUp})";
-            playerIntelligence.Text = $"Intelligence: {player.intelligence} ({player.intelligence + IntelligenceUp})";
+            playerStrength.Text = $"{player.Strength.ToString()} ({StrengthUp + player.Strength.Value})";
+            playerAgiltiy.Text = $"{player.Agility.ToString()} ({AgilityUp + player.Agility.Value})";
+            playerEndurance.Text = $"{player.Endurance.ToString()} ({EnduranceUp + player.Endurance.Value})";
+            playerVitality.Text = $"{player.Vitality.ToString()} ({VitatlityUp + player.Vitality.Value})";
+            playerWisdom.Text = $"{player.Wisdom.ToString()} ({player.Wisdom.Value + WisdomUp})";
+            playerIntelligence.Text = $"{player.Intelligence.ToString()} ({player.Intelligence.Value + IntelligenceUp})";
 
             strengthUp.Enabled = points != 0;
             agilityUp.Enabled = points != 0;
@@ -57,10 +58,10 @@ namespace PlayerCreator
             wisdomDown.Enabled = WisdomUp != 0;
             intelligenceDown.Enabled = IntelligenceUp != 0;
 
-            playerMaxHealth.Text = $"Max Health: {player.troop.maxHealth} ({2 * (VitatlityUp + player.vitality)})";
-            playerActionPoints.Text = $"Action Points: {player.maxActionPoints} ({4 + (player.endurance + EnduranceUp) / 10})";
-            playerDefense.Text = $"Defense: {player.troop.defense} ({player.endurance + EnduranceUp / 5})";
-            playerDodge.Text = $"Dodge: {player.troop.dodge} ({player.troop.baseDodge + (player.agility + AgilityUp) * 2})";
+            playerMaxHealth.Text = $"Max Health: {player.troop.maxHealth} ({2 * (VitatlityUp + player.Vitality.Value)})";
+            playerActionPoints.Text = $"Action Points: {player.MaxActionPoints} ({4 + (player.Endurance.Value + EnduranceUp) / 10})";
+            playerDefense.Text = $"Defense: {player.troop.defense} ({player.Endurance.Value + EnduranceUp / 5})";
+            playerDodge.Text = $"Dodge: {player.troop.dodge} ({player.troop.baseDodge + (player.Agility.Value + AgilityUp) * 2})";
             playerMana.Text = $"Mana: {player.maxMana} ({player.maxMana + WisdomUp * 2})";
 
             ok.Enabled = points == 0;
@@ -132,12 +133,12 @@ namespace PlayerCreator
         private void DistributePoints()
         {
             finished = true;
-            player.strength += StrengthUp;
-            player.agility += AgilityUp;
-            player.endurance += EnduranceUp;
-            player.vitality += VitatlityUp;
-            player.wisdom += WisdomUp;
-            player.intelligence += IntelligenceUp;
+            player.Strength.rawValue += StrengthUp;
+            player.Agility.rawValue += AgilityUp;
+            player.Endurance.rawValue += EnduranceUp;
+            player.Vitality.rawValue += VitatlityUp;
+            player.Wisdom.rawValue += WisdomUp;
+            player.Intelligence.rawValue += IntelligenceUp;
             player.CalculateStats();
             Close();
         }

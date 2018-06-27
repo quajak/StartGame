@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace PlayerCreator
+namespace StartGame.PlayerData
 {
     internal partial class PlayerProfile : Form
     {
