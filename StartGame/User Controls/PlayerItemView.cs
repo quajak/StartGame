@@ -23,7 +23,7 @@ namespace StartGame.User_Controls
         {
             InitializeComponent();
             this.player = player;
-            items.AddRange(player.troop.armours);
+            items.AddRange(player.troop.Items);
         }
 
         private void PlayerItemView_Load(object sender, EventArgs e)
@@ -33,9 +33,9 @@ namespace StartGame.User_Controls
         public void Render()
         {
             items.Clear();
-            items.AddRange(player.troop.armours);
+            items.AddRange(player.troop.Items);
 
-            List<Item> itemNames = player.troop.armours.Cast<Item>().ToList();
+            List<Item> itemNames = player.troop.Items;
             List<Item> diff = itemList.Items.Cast<Item>().Except(itemNames).ToList();
             foreach (Item dif in diff)
             {
@@ -62,7 +62,20 @@ namespace StartGame.User_Controls
 
                         itemButton1.Enabled = a.active || !player.troop.armours.Exists(b => b.active && b.affected.Intersect(a.affected).Count() != 0);
                         itemButton1.Visible = true;
-                        itemButton1.Text = a.active ? "Take off" : "Wear";
+                        itemButton1.Text = a.active ? "Equip" : "Unequip";
+                        itemButton2.Visible = true;
+                        itemButton2.Text = "Sell";
+                        break;
+
+                    case Jewelry j:
+                        itemName.Text = j.name;
+                        itemDescription.Text = j.Description;
+                        itemImage.Image = new Bitmap(1, 1);
+                        itemButton1.Enabled = j.Active || player.GetJewelryType(j.type).Space;
+                        itemButton1.Visible = true;
+                        itemButton1.Text = !j.Active ? "Equip" : "Unequip";
+                        itemButton2.Visible = true;
+                        itemButton2.Text = "Sell";
                         break;
 
                     default:
@@ -75,10 +88,8 @@ namespace StartGame.User_Controls
                 itemDescription.Text = "";
                 itemImage.Image = new Bitmap(1, 1);
                 itemButton1.Visible = false;
+                itemButton2.Visible = false;
             }
-
-            itemButton2.Visible = true;
-            itemButton2.Text = "Sell";
         }
 
         private void ItemList_SelectedIndexChange(object sender, EventArgs e)
@@ -92,6 +103,11 @@ namespace StartGame.User_Controls
             {
                 case Armour a:
                     a.active = !a.active;
+                    Render();
+                    break;
+
+                case Jewelry j:
+                    j.Active = !j.Active;
                     Render();
                     break;
 
@@ -109,6 +125,13 @@ namespace StartGame.User_Controls
                     a.active = false;
                     player.troop.armours.Remove(a);
                     player.money += a.Value;
+                    Render();
+                    break;
+
+                case Jewelry j:
+                    j.Active = false;
+                    player.troop.jewelries.Remove(j);
+                    player.money += j.Value;
                     Render();
                     break;
 

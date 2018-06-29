@@ -79,7 +79,7 @@
             // 
             this.itemDescription.AutoSize = true;
             this.itemDescription.Location = new System.Drawing.Point(136, 81);
-            this.itemDescription.MaximumSize = new System.Drawing.Size(150, 150);
+            this.itemDescription.MaximumSize = new System.Drawing.Size(150, 200);
             this.itemDescription.Name = "itemDescription";
             this.itemDescription.Size = new System.Drawing.Size(79, 13);
             this.itemDescription.TabIndex = 4;

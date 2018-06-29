@@ -1,6 +1,6 @@
 ﻿namespace StartGame.DebugViews
 {
-    partial class ArmourCreator
+    partial class ItemCreator
     {
         /// <summary>
         /// Required designer variable.
@@ -37,6 +37,13 @@
             this.armourQualityList = new System.Windows.Forms.ListBox();
             this.armourLayerList = new System.Windows.Forms.ListBox();
             this.output = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.jewelryName = new System.Windows.Forms.TextBox();
+            this.jewelryQuality = new System.Windows.Forms.ListBox();
+            this.jewelryMaterial = new System.Windows.Forms.ListBox();
+            this.jewelryCreator = new System.Windows.Forms.Button();
+            this.jewelryType = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.baseArmourDurability)).BeginInit();
             this.SuspendLayout();
             // 
@@ -123,11 +130,77 @@
             this.output.Size = new System.Drawing.Size(407, 20);
             this.output.TabIndex = 10;
             // 
-            // ArmourCreator
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(963, 12);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(40, 13);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "Armour";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(680, 12);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(42, 13);
+            this.label3.TabIndex = 12;
+            this.label3.Text = "Jewelry";
+            // 
+            // jewelryName
+            // 
+            this.jewelryName.Location = new System.Drawing.Point(669, 38);
+            this.jewelryName.Name = "jewelryName";
+            this.jewelryName.Size = new System.Drawing.Size(182, 20);
+            this.jewelryName.TabIndex = 13;
+            // 
+            // jewelryQuality
+            // 
+            this.jewelryQuality.FormattingEnabled = true;
+            this.jewelryQuality.Location = new System.Drawing.Point(775, 471);
+            this.jewelryQuality.Name = "jewelryQuality";
+            this.jewelryQuality.Size = new System.Drawing.Size(94, 95);
+            this.jewelryQuality.TabIndex = 14;
+            // 
+            // jewelryMaterial
+            // 
+            this.jewelryMaterial.FormattingEnabled = true;
+            this.jewelryMaterial.Location = new System.Drawing.Point(672, 471);
+            this.jewelryMaterial.Name = "jewelryMaterial";
+            this.jewelryMaterial.Size = new System.Drawing.Size(94, 95);
+            this.jewelryMaterial.TabIndex = 15;
+            // 
+            // jewelryCreator
+            // 
+            this.jewelryCreator.Location = new System.Drawing.Point(669, 572);
+            this.jewelryCreator.Name = "jewelryCreator";
+            this.jewelryCreator.Size = new System.Drawing.Size(106, 23);
+            this.jewelryCreator.TabIndex = 16;
+            this.jewelryCreator.Text = "Create Jewelry";
+            this.jewelryCreator.UseVisualStyleBackColor = true;
+            this.jewelryCreator.Click += new System.EventHandler(this.JewelryCreator_Click);
+            // 
+            // jewelryType
+            // 
+            this.jewelryType.FormattingEnabled = true;
+            this.jewelryType.Location = new System.Drawing.Point(669, 369);
+            this.jewelryType.Name = "jewelryType";
+            this.jewelryType.Size = new System.Drawing.Size(97, 95);
+            this.jewelryType.TabIndex = 17;
+            // 
+            // ItemCreator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1115, 618);
+            this.Controls.Add(this.jewelryType);
+            this.Controls.Add(this.jewelryCreator);
+            this.Controls.Add(this.jewelryMaterial);
+            this.Controls.Add(this.jewelryQuality);
+            this.Controls.Add(this.jewelryName);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.output);
             this.Controls.Add(this.armourLayerList);
             this.Controls.Add(this.armourQualityList);
@@ -137,7 +210,7 @@
             this.Controls.Add(this.armourName);
             this.Controls.Add(this.createArmour);
             this.Controls.Add(this.playerView);
-            this.Name = "ArmourCreator";
+            this.Name = "ItemCreator";
             this.Text = "ArmourCreator";
             this.Load += new System.EventHandler(this.ArmourCreator_Load);
             ((System.ComponentModel.ISupportInitialize)(this.baseArmourDurability)).EndInit();
@@ -157,5 +230,12 @@
         private System.Windows.Forms.ListBox armourQualityList;
         private System.Windows.Forms.ListBox armourLayerList;
         private System.Windows.Forms.TextBox output;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox jewelryName;
+        private System.Windows.Forms.ListBox jewelryQuality;
+        private System.Windows.Forms.ListBox jewelryMaterial;
+        private System.Windows.Forms.Button jewelryCreator;
+        private System.Windows.Forms.ListBox jewelryType;
     }
 }

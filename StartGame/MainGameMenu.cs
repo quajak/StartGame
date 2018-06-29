@@ -148,7 +148,7 @@ namespace StartGame
         private void ArmourCreator_Click(object sender, EventArgs e)
         {
             Hide();
-            ArmourCreator armourCreator = new ArmourCreator();
+            ItemCreator armourCreator = new ItemCreator();
             armourCreator.ShowDialog();
             Show();
         }

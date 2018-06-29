@@ -9,6 +9,15 @@ namespace StartGame.Items
 {
     internal abstract class Item
     {
+        public static readonly List<JewelryType> JewelryTypes = new List<JewelryType>()
+        {
+            new JewelryType("Necklace", 2),
+            new JewelryType("Ring", 10),
+            new JewelryType("Earring", 4)
+        };
+
+        public static JewelryType GetJewelryType(string name) => JewelryTypes.First(j => j.name == name);
+
         public readonly string name;
 
         public Item(string Name)

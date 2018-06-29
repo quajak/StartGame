@@ -31,7 +31,7 @@ namespace StartGame.PlayerData
                             break;
 
                         case BuffType.Percentage:
-                            value = (int)(buff.value / 100d * value);
+                            value = (int)((buff.value + 100d) / 100d * value);
                             break;
 
                         case BuffType.Constant:
@@ -120,11 +120,34 @@ namespace StartGame.PlayerData
     {
         public readonly BuffType type;
         public readonly int value;
+        public double Value => type == BuffType.Percentage ? value / 100d : value;
 
         public Buff(BuffType type, int value)
         {
             this.type = type;
             this.value = value;
+        }
+
+        /// <summary>
+        /// To be used to end sentence: This [buff] affects your [stat] by ...
+        /// </summary>
+        /// <returns>Does not include final .</returns>
+        public override string ToString()
+        {
+            switch (type)
+            {
+                case BuffType.Absolute:
+                    return $"increasing it by {value} points";
+
+                case BuffType.Percentage:
+                    return $"increasing it by {value}%";
+
+                case BuffType.Constant:
+                    return $"setting it to {value}";
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

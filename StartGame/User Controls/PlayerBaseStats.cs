@@ -120,7 +120,7 @@ namespace StartGame.User_Controls
             Render();
         }
 
-        private void playerAttackDamage_Click(object sender, EventArgs e)
+        private void PlayerAttackDamage_Click(object sender, EventArgs e)
         {
         }
     }

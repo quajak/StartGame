@@ -198,7 +198,7 @@
             this.playerAttackDamage.Size = new System.Drawing.Size(77, 13);
             this.playerAttackDamage.TabIndex = 44;
             this.playerAttackDamage.Text = "attackDamage";
-            this.playerAttackDamage.Click += new System.EventHandler(this.playerAttackDamage_Click);
+            this.playerAttackDamage.Click += new System.EventHandler(this.PlayerAttackDamage_Click);
             // 
             // playerName
             // 

@@ -3,6 +3,7 @@ using StartGame.Items;
 using StartGame.Properties;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace StartGame.PlayerData
 {
@@ -11,6 +12,12 @@ namespace StartGame.PlayerData
         public Weapon activeWeapon;
         public List<Weapon> weapons = new List<Weapon>();
         public List<Armour> armours = new List<Armour>();
+        public List<Jewelry> jewelries = new List<Jewelry>();
+
+        /// <summary>
+        /// List of all items player has
+        /// </summary>
+        public List<Item> Items => armours.Concat<Item>(jewelries).ToList();
 
         public int maxHealth;
         public int health;

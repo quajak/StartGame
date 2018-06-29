@@ -35,6 +35,17 @@ namespace StartGame.PlayerData
         public bool Dead { get => troop.health == 0; }
         internal Attribute Intelligence { get => intelligence; set => intelligence = value; }
 
+        public List<JewelryType> JewelryTypes = new List<JewelryType>()
+        {
+            new JewelryType("Necklace", 2),
+            new JewelryType("Ring", 10),
+            new JewelryType("Earring", 4)
+        };
+
+        public JewelryType GetJewelryType(JewelryType type) => GetJewelryType(type.name);
+
+        public JewelryType GetJewelryType(string name) => JewelryTypes.First(j => j.name == name);
+
         public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, int Intelligence, List<Spell> spells = null)
         {
             this.XP = XP;
