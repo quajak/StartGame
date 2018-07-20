@@ -65,10 +65,11 @@ namespace StartGame
                 }
             }
             //Load player
+            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null, 0);
             if (playerTroop is null)
             {
                 MessageBox.Show("Please create your troop before starting the game!");
-                playerTroop = new Troop(Settings.Default.Name, 10, new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0, map)
+                playerTroop = new Troop(Settings.Default.Name, new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0, map, player)
                 {
                     armours = new List<Armour>
                     {
@@ -78,12 +79,8 @@ namespace StartGame
                     }
                 };
                 playerTroop.weapons.Add(new Weapon(50, BaseAttackType.magic, BaseDamageType.magic, 40, "GOD", 10, true));
-                //return;
             }
-            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null, 0)
-            {
-                troop = playerTroop
-            };
+            player.troop = playerTroop;
             player.troop.armours.ForEach(a => a.active = true);
 
             //player.agility = 5;
@@ -97,7 +94,7 @@ namespace StartGame
             Hide();
             //Long term: Make form to allow use to choose mission and difficulty
 
-            Mission mission = new BanditMission();
+            Mission mission = new DebugMission();
 
             List<Tree> trees = Tree.GenerateTrees();
 
@@ -116,15 +113,6 @@ namespace StartGame
             //Reset all variables
             map = null;
             player = null;
-        }
-
-        private void PlayerSetup_Click(object sender, EventArgs e)
-        {
-            PlayerProfile playerProfile = new PlayerProfile();
-            Hide();
-            playerProfile.ShowDialog();
-            playerTroop = playerProfile.troop;
-            Show();
         }
 
         private void Quit_Click(object sender, EventArgs e)

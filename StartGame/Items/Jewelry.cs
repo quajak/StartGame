@@ -12,14 +12,22 @@ namespace StartGame.Items
         private bool active;
         public Buff agility;
         public Buff endurance;
+        public Buff vitality;
         public Buff intelligence;
+        public Buff defense;
+        public Buff health;
+        public Buff movementDistance;
+        public Buff dodge;
+        public Buff mana;
+        public Buff carryCapacity;
+        public Buff weight;
+        public Buff wisdom;
+        public Buff strength;
         public Material material;
         public Quality quality;
-        public Buff strength;
         public JewelryType type;
-        public Buff wisdom;
 
-        private HumanPlayer player;
+        private Player player;
 
         public int Value
         {
@@ -27,11 +35,20 @@ namespace StartGame.Items
             {
                 double pricePerAttribute = 1.5;
                 int cost = 0;
-                cost += (int)Math.Pow(strength.Value, pricePerAttribute);
-                cost += (int)Math.Pow(agility.Value, pricePerAttribute);
-                cost += (int)Math.Pow(endurance.Value, pricePerAttribute);
-                cost += (int)Math.Pow(intelligence.Value, pricePerAttribute);
-                cost += (int)Math.Pow(wisdom.Value, pricePerAttribute);
+                cost += (int)Math.Pow(strength.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(agility.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(endurance.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(intelligence.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(wisdom.CValue, pricePerAttribute);
+
+                cost += (int)Math.Pow(defense.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(health.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(movementDistance.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(dodge.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(mana.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(carryCapacity.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(weight.CValue, pricePerAttribute);
+
                 cost += material.value;
                 cost = (int)(cost * (100d - (int)quality) / 100d);
                 return cost;
@@ -54,27 +71,45 @@ namespace StartGame.Items
                     {
                         type.number++;
                         if (type.number > type.MaxNumber) throw new Exception("The player is wearing too much jewelry of type " + type.name);
-                        Player.Strength.buffs.Add(strength);
-                        Player.Intelligence.buffs.Add(intelligence);
-                        Player.Wisdom.buffs.Add(wisdom);
-                        Player.Endurance.buffs.Add(endurance);
-                        Player.Agility.buffs.Add(agility);
+                        Player.strength.buffs.Add(strength);
+                        Player.intelligence.buffs.Add(intelligence);
+                        Player.wisdom.buffs.Add(wisdom);
+                        Player.endurance.buffs.Add(endurance);
+                        Player.agility.buffs.Add(agility);
+                        Player.vitality.buffs.Add(vitality);
+
+                        Player.troop.defense.buffs.Add(defense);
+                        Player.troop.health.buffs.Add(health);
+                        Player.movementPoints.buffs.Add(movementDistance);
+                        Player.troop.dodge.buffs.Add(dodge);
+                        Player.mana.buffs.Add(mana);
+                        Player.gearWeight.maxGearWeight.Add(carryCapacity);
+                        Player.gearWeight.itemGearWeight.Add(weight);
                     }
                     else
                     {
                         type.number--;
                         if (type.number < 0) throw new Exception("The player is less than 0 jewelry of type " + type.name);
-                        Player.Strength.buffs.Remove(strength);
-                        Player.Intelligence.buffs.Remove(intelligence);
-                        Player.Wisdom.buffs.Remove(wisdom);
-                        Player.Endurance.buffs.Remove(endurance);
-                        Player.Agility.buffs.Remove(agility);
+                        Player.strength.buffs.Remove(strength);
+                        Player.intelligence.buffs.Remove(intelligence);
+                        Player.wisdom.buffs.Remove(wisdom);
+                        Player.endurance.buffs.Remove(endurance);
+                        Player.agility.buffs.Remove(agility);
+                        Player.vitality.buffs.Remove(vitality);
+
+                        Player.troop.defense.buffs.Remove(defense);
+                        Player.troop.health.buffs.Remove(health);
+                        Player.movementPoints.buffs.Remove(movementDistance);
+                        Player.troop.dodge.buffs.Remove(dodge);
+                        Player.mana.buffs.Remove(mana);
+                        Player.gearWeight.maxGearWeight.Remove(carryCapacity);
+                        Player.gearWeight.itemGearWeight.Remove(weight);
                     }
                 }
             }
         }
 
-        internal HumanPlayer Player
+        internal Player Player
         {
             get => player; set
             {
@@ -90,13 +125,22 @@ namespace StartGame.Items
             }
         }
 
-        protected Jewelry(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, JewelryType type, bool active, string name, Quality quality, Material material) : base(name)
+        protected Jewelry(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, Buff vitality, Buff defense, Buff health, Buff movementDistance,
+            Buff dodge, Buff mana, Buff carryCapacity, Buff weight, JewelryType type, bool active, string name, Quality quality, Material material) : base(name)
         {
             this.strength = strength;
             this.intelligence = intelligence;
             this.wisdom = wisdom;
             this.agility = agility;
             this.endurance = endurance;
+            this.vitality = vitality;
+            this.defense = defense;
+            this.health = health;
+            this.movementDistance = movementDistance;
+            this.dodge = dodge;
+            this.mana = mana;
+            this.carryCapacity = carryCapacity;
+            this.weight = weight;
             this.type = type;
             this.Active = active;
             this.quality = quality;
@@ -113,7 +157,17 @@ namespace StartGame.Items
                 if (wisdom.value != 0) buffs += $" It affects your wisdom by {wisdom.ToString()}.";
                 if (agility.value != 0) buffs += $" It affects your agility by {agility.ToString()}.";
                 if (endurance.value != 0) buffs += $" It affects your endurance by {endurance.ToString()}.";
-                return $"This is a {GetType().Name} made out of {material.name}. {buffs}. It is of {quality} quality and has a value of {Value}.";
+                if (vitality.value != 0) buffs += $" It affects your vitality by {vitality.ToString()}.";
+
+                if (defense.value != 0) buffs += $" It affects your defense by {defense.ToString()}.";
+                if (health.value != 0) buffs += $" It affects your health by {health.ToString()}.";
+                if (movementDistance.value != 0) buffs += $" It affects your movement distance by {movementDistance.ToString()}.";
+                if (dodge.value != 0) buffs += $" It affects your dodge by {dodge.ToString()}.";
+                if (mana.value != 0) buffs += $" It affects your mana by {mana.ToString()}.";
+                if (carryCapacity.value != 0) buffs += $" It affects your carry capacity by {carryCapacity.ToString()}.";
+                if (weight.value != 0) buffs += $" It affects your item weight by {weight.ToString()}.";
+
+                return $"This is a {GetType().Name} made out of {material.name}. {buffs} It is of {quality} quality and has a value of {Value}.";
             }
         }
 
@@ -122,45 +176,108 @@ namespace StartGame.Items
             return name;
         }
 
-        public static Jewelry New(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, string name, Quality quality, Material material, JewelryType jewelryType)
+        public static Jewelry New(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, Buff vitality, Buff defense, Buff health, Buff movementDistance, Buff dodge, Buff mana, Buff carryCapacity, Buff weight, string name, Quality quality, Material material, JewelryType jewelryType)
         {
             switch (jewelryType.name)
             {
                 case "Necklace":
-                    return new Necklace(strength, intelligence, wisdom, agility, endurance, name, quality, material);
+                    return new Necklace(strength, intelligence, wisdom, agility, endurance, vitality, defense, health,
+                        movementDistance, dodge, mana, carryCapacity, weight, name, quality, material);
 
                 case "Ring":
-                    return new Ring(strength, intelligence, wisdom, agility, endurance, name, quality, material);
+                    return new Ring(strength, intelligence, wisdom, agility, endurance, vitality, defense, health,
+                        movementDistance, dodge, mana, carryCapacity, weight, name, quality, material);
 
                 case "Earring":
-                    return new Earring(strength, intelligence, wisdom, agility, endurance, name, quality, material);
+                    return new Earring(strength, intelligence, wisdom, agility, endurance, vitality, defense, health,
+                        movementDistance, dodge, mana, carryCapacity, weight, name, quality, material);
 
                 default:
                     throw new NotImplementedException();
             }
         }
+
+        private static Random random = new Random();
+
+        public static Jewelry GenerateJewelry(Quality quality)
+        {
+            //Bonus Points determine how many buffs it has and how many points it has together
+            Dictionary<Quality, (int, int)> BonusPoints = new Dictionary<Quality, (int, int)>()
+            {
+                {Quality.Broken, (1, 2) },
+                {Quality.Poor, (1, 4) },
+                {Quality.Simple, (1, 6) },
+                {Quality.Common, (2, 9) },
+                {Quality.Good, (2, 12) },
+                {Quality.Superior, (3, 15) },
+                {Quality.Exceptional, (3, 19) },
+                {Quality.Legendary, (4, 25) }
+            };
+            (int buffNumber, int totalPoints) = BonusPoints[quality];
+            string[] names = new string[13] {   "Strength", "Intelligence", "Wisdom", "Agility", "Endurance", "Vitality",
+                                                "Defense", "Health", "MovementDistance", "Dodge", "Mana", "CarryCapacity",
+                                                "Weight" };
+            Buff[] buffs = new Buff[13];
+
+            List<int> positions = Enumerable.Range(0, 5).ToList();
+
+            for (int i = 0; i < buffNumber; i++)
+            {
+                int position = positions[random.Next(positions.Count)];
+                positions.Remove(position);
+                int points = buffNumber - i == 1 ? totalPoints : random.Next(totalPoints);
+                if (names[i] == "Weight") points *= -1;
+                totalPoints -= points;
+                //0 is absolute, this is not used in this case
+                BuffType buffType = (BuffType)random.Next(1, 3);
+                buffs[position] = new Buff(buffType, points * (buffType == BuffType.Percentage ? 5 : 1));
+            }
+            for (int i = 0; i < buffs.Length; i++)
+            {
+                buffs[i] = buffs[i] is null ? new Buff(BuffType.Constant, 0) : buffs[i];
+            }
+            //Buffs are now created now decide material and type
+            Material material = Material.Materials.Where(m => m.armourLayers.Exists(l => l == ArmourLayer.jewelry)).OrderBy(x => random.Next()).First();
+            JewelryType jewelryType = JewelryTypes.OrderBy(_ => random.Next()).First();
+
+            //Generate name
+            //TODO: Improve the name generation
+            Buff strongestBuff = buffs.ToList().OrderByDescending(b => b.type == BuffType.Percentage ? b.value / 5 : b.value).First();
+            int index = buffs.ToList().IndexOf(strongestBuff);
+            string buffName = names[index];
+            string name = $"{jewelryType.name} of {buffName}";
+
+            return New(buffs[0], buffs[1], buffs[2], buffs[3], buffs[4], buffs[5], buffs[6], buffs[7], buffs[8],
+                buffs[9], buffs[10], buffs[11], buffs[12], name, quality, material, jewelryType);
+        }
     }
 
     internal class Necklace : Jewelry
     {
-        public Necklace(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, string name, Quality quality, Material material)
-        : base(strength, intelligence, wisdom, agility, endurance, GetJewelryType("Necklace"), false, name, quality, material)
+        public Necklace(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, Buff vitality, Buff defense, Buff health, Buff movementDistance,
+            Buff dodge, Buff mana, Buff carryCapacity, Buff weight, string name, Quality quality, Material material)
+        : base(strength, intelligence, wisdom, agility, endurance, vitality, defense, health, movementDistance, dodge, mana, carryCapacity, weight,
+              GetJewelryType("Necklace"), false, name, quality, material)
         {
         }
     }
 
     internal class Ring : Jewelry
     {
-        public Ring(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, string name, Quality quality, Material material)
-            : base(strength, intelligence, wisdom, agility, endurance, GetJewelryType("Ring"), false, name, quality, material)
+        public Ring(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, Buff vitality, Buff defense, Buff health, Buff movementDistance,
+            Buff dodge, Buff mana, Buff carryCapacity, Buff weight, string name, Quality quality, Material material)
+            : base(strength, intelligence, wisdom, agility, endurance, vitality, defense, health, movementDistance, dodge, mana, carryCapacity, weight,
+                  GetJewelryType("Ring"), false, name, quality, material)
         {
         }
     }
 
     internal class Earring : Jewelry
     {
-        public Earring(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, string name, Quality quality, Material material)
-            : base(strength, intelligence, wisdom, agility, endurance, GetJewelryType("Earring"), false, name, quality, material)
+        public Earring(Buff strength, Buff intelligence, Buff wisdom, Buff agility, Buff endurance, Buff vitality, Buff defense, Buff health, Buff movementDistance,
+            Buff dodge, Buff mana, Buff carryCapacity, Buff weight, string name, Quality quality, Material material)
+            : base(strength, intelligence, wisdom, agility, endurance, vitality, defense, health, movementDistance, dodge, mana, carryCapacity, weight,
+                  GetJewelryType("Earring"), false, name, quality, material)
         {
         }
     }

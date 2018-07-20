@@ -25,8 +25,8 @@ namespace StartGame
             player = _player;
             if (player.troop is null)
             {
-                MessageBox.Show("Please design your player, before starting the campaign.");
-                Troop playerTroop = new Troop("Player", 10, new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0, null)
+                Troop playerTroop = new Troop("Player", new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0
+                    , null, player)
                 {
                     armours = new List<Armour>
                     {
@@ -37,10 +37,7 @@ namespace StartGame
                 };
                 playerTroop.armours.ForEach(a => a.active = true);
                 playerTroop.weapons.Add(new Weapon(50, BaseAttackType.magic, BaseDamageType.magic, 40, "GOD", 10, true));
-                player = new HumanPlayer(PlayerType.localHuman, Resources.BasePlayerName, null, null, null, 0)
-                {
-                    troop = playerTroop
-                };
+                player.troop = playerTroop;
             }
             InitializeComponent();
         }
@@ -80,9 +77,9 @@ namespace StartGame
                         weapon.attacks = weapon.maxAttacks;
                 }
 
-                player.mana = player.maxMana;
-                player.troop.health += campaign.healthRegen;
-                player.troop.health = player.troop.health > player.troop.maxHealth ? player.troop.maxHealth : player.troop.health;
+                player.mana.rawValue = player.mana.MaxValue().Value;
+                player.troop.health.rawValue += campaign.healthRegen;
+                player.troop.health.rawValue = player.troop.health.Value > player.troop.health.MaxValue().Value ? player.troop.health.MaxValue().Value : player.troop.health.Value;
 
                 List<Armour> lootableArmour = new List<Armour>();
                 foreach (var deadPlayer in campaign.activeGame.killedPlayers)
@@ -99,6 +96,7 @@ namespace StartGame
                 {
                     if (random.NextDouble() < 1d / (chosen + 2d))
                     {
+                        lootpiece.active = false;
                         loot.Add(lootpiece);
                         chosen++;
                     }

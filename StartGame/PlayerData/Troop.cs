@@ -19,11 +19,9 @@ namespace StartGame.PlayerData
         /// </summary>
         public List<Item> Items => armours.Concat<Item>(jewelries).ToList();
 
-        public int maxHealth;
-        public int health;
-        public int defense;
-        public int baseDodge;
-        public int dodge;
+        public Health health;
+        public Defense defense;
+        public Dodge dodge;
 
         private int weaponIndex = 0;
 
@@ -41,17 +39,14 @@ namespace StartGame.PlayerData
             }
         }
 
-        public Troop(string Name, int Health, Weapon Weapon, Bitmap Image, int Defense, Map map, int Dodge = 10
-            , Dictionary<DamageType, double> Vurneabilities = null) : base(Name, new Point(0, 0), Image, true, map)
+        public Troop(string Name, Weapon Weapon, Bitmap Image, int Defense, Map map, Player player, int Dodge = 10, Dictionary<DamageType, double> Vurneabilities = null) : base(Name, new Point(0, 0), Image, true, map)
         {
             vurneabilites = Vurneabilities ?? new Dictionary<DamageType, double>();
-            maxHealth = Health;
-            health = Health;
+            health = new Health(player, 0);
+            defense = new Defense(player, Defense);
             weapons.Add(Weapon);
             activeWeapon = weapons[WeaponIndex];
-            defense = Defense;
-            dodge = Dodge;
-            baseDodge = Dodge;
+            dodge = new Dodge(player, Dodge);
             body = new Body();
         }
 

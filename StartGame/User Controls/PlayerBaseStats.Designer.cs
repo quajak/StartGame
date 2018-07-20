@@ -52,13 +52,15 @@
             this.playerBodyPartArmourList = new System.Windows.Forms.ListBox();
             this.playerActiveArmourTitle = new System.Windows.Forms.Label();
             this.playerActiveArmourDescription = new System.Windows.Forms.Label();
+            this.playerDodge = new System.Windows.Forms.Label();
+            this.playerMovementPoints = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.playerTroopImage)).BeginInit();
             this.SuspendLayout();
             // 
             // playerMana
             // 
             this.playerMana.AutoSize = true;
-            this.playerMana.Location = new System.Drawing.Point(12, 131);
+            this.playerMana.Location = new System.Drawing.Point(12, 144);
             this.playerMana.Name = "playerMana";
             this.playerMana.Size = new System.Drawing.Size(62, 13);
             this.playerMana.TabIndex = 60;
@@ -139,7 +141,7 @@
             // playerDefense
             // 
             this.playerDefense.AutoSize = true;
-            this.playerDefense.Location = new System.Drawing.Point(13, 118);
+            this.playerDefense.Location = new System.Drawing.Point(13, 131);
             this.playerDefense.Name = "playerDefense";
             this.playerDefense.Size = new System.Drawing.Size(75, 13);
             this.playerDefense.TabIndex = 51;
@@ -148,7 +150,7 @@
             // playerWeaponAttacks
             // 
             this.playerWeaponAttacks.AutoSize = true;
-            this.playerWeaponAttacks.Location = new System.Drawing.Point(13, 105);
+            this.playerWeaponAttacks.Location = new System.Drawing.Point(13, 118);
             this.playerWeaponAttacks.Name = "playerWeaponAttacks";
             this.playerWeaponAttacks.Size = new System.Drawing.Size(112, 13);
             this.playerWeaponAttacks.TabIndex = 49;
@@ -157,7 +159,7 @@
             // playerHealth
             // 
             this.playerHealth.AutoSize = true;
-            this.playerHealth.Location = new System.Drawing.Point(13, 92);
+            this.playerHealth.Location = new System.Drawing.Point(13, 105);
             this.playerHealth.Name = "playerHealth";
             this.playerHealth.Size = new System.Drawing.Size(66, 13);
             this.playerHealth.TabIndex = 48;
@@ -217,6 +219,7 @@
             this.playerMoney.Size = new System.Drawing.Size(67, 13);
             this.playerMoney.TabIndex = 61;
             this.playerMoney.Text = "playerMoney";
+            this.playerMoney.Click += new System.EventHandler(this.PlayerMoney_Click);
             // 
             // playerGearWeight
             // 
@@ -274,11 +277,32 @@
             this.playerActiveArmourDescription.TabIndex = 67;
             this.playerActiveArmourDescription.Text = "playerActiveArmourDescription";
             // 
+            // playerDodge
+            // 
+            this.playerDodge.AutoSize = true;
+            this.playerDodge.Location = new System.Drawing.Point(13, 157);
+            this.playerDodge.Name = "playerDodge";
+            this.playerDodge.Size = new System.Drawing.Size(67, 13);
+            this.playerDodge.TabIndex = 68;
+            this.playerDodge.Text = "playerDodge";
+            // 
+            // playerMovementPoints
+            // 
+            this.playerMovementPoints.AutoSize = true;
+            this.playerMovementPoints.Location = new System.Drawing.Point(13, 92);
+            this.playerMovementPoints.Name = "playerMovementPoints";
+            this.playerMovementPoints.Size = new System.Drawing.Size(114, 13);
+            this.playerMovementPoints.TabIndex = 69;
+            this.playerMovementPoints.Text = "playerMovementPoints";
+            this.playerMovementPoints.Click += new System.EventHandler(this.PlayerMovementPoints_Click);
+            // 
             // PlayerBaseStats
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.Controls.Add(this.playerMovementPoints);
+            this.Controls.Add(this.playerDodge);
             this.Controls.Add(this.playerActiveArmourDescription);
             this.Controls.Add(this.playerActiveArmourTitle);
             this.Controls.Add(this.playerBodyPartArmourList);
@@ -339,5 +363,7 @@
         private System.Windows.Forms.ListBox playerBodyPartArmourList;
         private System.Windows.Forms.Label playerActiveArmourTitle;
         private System.Windows.Forms.Label playerActiveArmourDescription;
+        private System.Windows.Forms.Label playerDodge;
+        private System.Windows.Forms.Label playerMovementPoints;
     }
 }

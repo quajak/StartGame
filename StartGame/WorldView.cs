@@ -19,6 +19,7 @@ namespace StartGame
         private readonly CampaignController controller;
         private readonly Campaign campaign;
         private readonly Mission lastMission;
+        private Random random = new Random();
 
         private List<Item> reward = new List<Item>();
 
@@ -38,14 +39,33 @@ namespace StartGame
 
             //Generate reward
             Reward _reward = lastMission.Reward();
+            if (_reward.jewelryReward != null)
+            {
+                if (_reward.jewelryReward.jewelries != null)
+                {
+                    reward.AddRange(_reward.jewelryReward.jewelries);
+                }
+
+                while (_reward.jewelryReward.number != 0)
+                {
+                    //Determine the quality
+                    MathNet.Numerics.Distributions.Normal normal = new MathNet.Numerics.Distributions.Normal();
+                    int offset = (int)normal.InverseCumulativeDistribution(random.NextDouble());
+                    int num = Extensions.GetQualityPos(_reward.jewelryReward.quality) + offset;
+                    num = Math.Min(Math.Max(num, 0), Enum.GetNames(typeof(Quality)).Length); //Bound the value
+                    Quality quality = Extensions.GetQuality(num);
+                    reward.Add(Jewelry.GenerateJewelry(quality));
+                    _reward.jewelryReward.number--;
+                }
+            }
             if (!(_reward.weaponReward is null))
             {
-                reward.Add(campaign.CalculateWeaponReward((WeaponReward)_reward.weaponReward));
+                reward.Add(campaign.CalculateWeaponReward(_reward.weaponReward));
             }
             if (!(_reward.spellReward is null))
             {
-                Spell spell = ((SpellReward)_reward.spellReward).spell;
-                if (!player.spells.Exists(s => spell.name == s.name))
+                Spell spell = _reward.spellReward.spell;
+                if (spell != null && !player.spells.Exists(s => spell.name == s.name))
                 {
                     reward.Add(spell);
                 }
@@ -79,14 +99,29 @@ namespace StartGame
             if (itemShopItems is null)
             {
                 //Generate items
-                //TODO: Take level of player into consideration
+                //TODO: Take level of player into consideration for armour
                 itemShopItems = new List<Item>();
 
                 int itemNumber = player.level + 2;
                 for (int i = 0; i < itemNumber; i++)
                 {
-                    //generate a piece of armour
-                    itemShopItems.Add(ArmorPrefabs.CreateArmour(true));
+                    int num = random.Next(0, 2);
+                    switch (num)
+                    {
+                        case 0:
+                            //generate a piece of armour
+                            itemShopItems.Add(ArmorPrefabs.CreateArmour(true));
+                            break;
+
+                        case 1:
+                            int quality = Math.Min(player.level / 2, Quality.Legendary.GetQualityPos());
+                            //generate a piece of armour
+                            itemShopItems.Add(Jewelry.GenerateJewelry(Extensions.GetQuality(random.Next(quality))));
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
             }
 
@@ -112,7 +147,7 @@ namespace StartGame
             if (spellShopList.SelectedIndex != -1)
             {
                 Spell selectedSpell = World.Instance.Spells.First(s => s.name == (string)spellShopList.SelectedItem);
-                spellShopBuy.Enabled = selectedSpell.buyCost <= player.money;
+                spellShopBuy.Enabled = selectedSpell.buyCost <= player.money.Value;
                 spellCost.Text = $"Cost: {selectedSpell.buyCost}";
                 spellDescription.Text = selectedSpell.Description(true);
                 spellName.Text = selectedSpell.name;
@@ -136,7 +171,16 @@ namespace StartGame
                         shopItemName.Text = a.name;
                         shopItemDescription.Text = a.Description;
                         shopItemPicture.Image = new Body().Render(false, new List<Armour> { a }, 8);
-                        itemShopBuy.Enabled = player.money >= a.Value;
+                        itemShopBuy.Enabled = player.money.Value >= a.Value;
+                        break;
+
+                    case Jewelry j:
+                        shopItemName.Visible = true;
+                        shopItemDescription.Visible = true;
+                        shopItemPicture.Visible = false;
+                        shopItemName.Text = j.name;
+                        shopItemDescription.Text = j.Description;
+                        itemShopBuy.Enabled = player.money.Value >= j.Value;
                         break;
 
                     default:
@@ -184,7 +228,7 @@ namespace StartGame
                 {
                     case Spell s:
                         player.spells.Add(s);
-                        lootList.Items.Remove(s.name);
+                        lootList.Items.Remove(s);
                         reward.Remove(s);
                         break;
 
@@ -195,15 +239,27 @@ namespace StartGame
                         {
                             player.troop.weapons.Add(w);
                         }
-                        lootList.Items.Remove(w.name);
+                        lootList.Items.Remove(w);
                         reward.Remove(w);
                         break;
 
                     case Coin c:
-                        player.money += c.amount;
-                        lootList.Items.Remove(c.name);
+                        player.money.rawValue += c.amount;
+                        lootList.Items.Remove(c);
                         reward.Remove(c);
                         Render();
+                        break;
+
+                    case Armour a:
+                        player.troop.armours.Add(a);
+                        lootList.Items.Remove(a);
+                        reward.Remove(a);
+                        break;
+
+                    case Jewelry j:
+                        player.troop.jewelries.Add(j);
+                        lootList.Items.Remove(j);
+                        reward.Remove(j);
                         break;
 
                     default:
@@ -224,10 +280,10 @@ namespace StartGame
 
         private void SpellShopBuy_Click(object sender, EventArgs e)
         {
-            if (spellShopList.SelectedIndex != -1 && World.Instance.Spells.First(s => s.name == (string)spellShopList.SelectedItem).buyCost <= player.money)
+            if (spellShopList.SelectedIndex != -1 && World.Instance.Spells.First(s => s.name == (string)spellShopList.SelectedItem).buyCost <= player.money.rawValue)
             {
                 Spell spell = World.Instance.GainSpell((string)spellShopList.SelectedItem ?? throw new Exception("Spell bought can't be null"));
-                player.money -= spell.buyCost;
+                player.money.rawValue -= spell.buyCost;
                 player.spells.Add(spell);
 
                 PopulateSpellShop();
@@ -254,15 +310,19 @@ namespace StartGame
                         break;
 
                     case Coin c:
-                        player.money += c.amount;
+                        player.money.rawValue += c.amount;
                         break;
 
                     case Armour a:
                         player.troop.armours.Add(a);
                         break;
 
+                    case Jewelry j:
+                        player.troop.jewelries.Add(j);
+                        break;
+
                     default:
-                        throw new NotImplementedException($"Reward must be spell, armour, coin or weapon not: {item.GetType()}");
+                        throw new NotImplementedException($"Reward must be spell, armour, coin, jewelry or weapon not: {item.GetType()}");
                 }
             }
             reward.Clear();
@@ -283,10 +343,11 @@ namespace StartGame
                 switch (item)
                 {
                     case Armour a:
-                        if (a.Value > player.money) throw new Exception();
-                        player.money -= a.Value;
+                        if (a.Value > player.money.Value) throw new Exception();
+                        player.money.rawValue -= a.Value;
                         player.troop.armours.Add(a);
                         itemShopItems.Remove(item);
+                        itemShopList.Items.Remove(item);
                         Render();
                         break;
 

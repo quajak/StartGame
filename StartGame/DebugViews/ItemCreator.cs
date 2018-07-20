@@ -28,21 +28,28 @@ namespace StartGame.DebugViews
             "Agility",
             "Endurance",
             "Wisdom",
-            "Intelligence"
+            "Intelligence",
+            "Vitality",
+            "Defense",
+            "Health",
+            "MovementDistance",
+            "Dodge",
+            "Mana",
+            "CarryCapacity",
+            "Weight"
         };
 
         public ItemCreator()
         {
-            player = new HumanPlayer(PlayerType.localHuman, "Test", null, null, null, 10)
+            player = new HumanPlayer(PlayerType.localHuman, "Test", null, null, null, 10);
+            player.troop = new Troop("Test", new Weapon(1, BaseAttackType.melee, BaseDamageType.sharp, 1, "Test Weapon", 1, true),
+                Resources.playerTroop, 0, null, player)
             {
-                troop = new Troop("Test", 20, new Weapon(1, BaseAttackType.melee, BaseDamageType.sharp, 1, "Test Weapon", 1, true), Resources.playerTroop, 0, null)
+                armours = new List<Armour>
                 {
-                    armours = new List<Armour>
-                    {
-                        new Armour("Woolen Tunic", 50, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.clothing),
-                        new Armour("Old Pants", 40, new List<BodyParts> { BodyParts.UpperLegs, BodyParts.LeftLowerLeg, BodyParts.RightLowerLeg, BodyParts.LeftShin, BodyParts.RightShin }, Material.Materials.First(m => m.name == "Cloth"), Quality.Poor, ArmourLayer.clothing),
-                        new Armour("Wooden Shoes", 32, new List<BodyParts> { BodyParts.LeftFoot, BodyParts.RightFoot }, Material.Materials.First(m => m.name == "Wood"), Quality.Poor, ArmourLayer.light)
-                    }
+                    new Armour("Woolen Tunic", 50, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.clothing),
+                    new Armour("Old Pants", 40, new List<BodyParts> { BodyParts.UpperLegs, BodyParts.LeftLowerLeg, BodyParts.RightLowerLeg, BodyParts.LeftShin, BodyParts.RightShin }, Material.Materials.First(m => m.name == "Cloth"), Quality.Poor, ArmourLayer.clothing),
+                    new Armour("Wooden Shoes", 32, new List<BodyParts> { BodyParts.LeftFoot, BodyParts.RightFoot }, Material.Materials.First(m => m.name == "Wood"), Quality.Poor, ArmourLayer.light)
                 }
             };
             player.troop.armours.ForEach(a => a.active = true);
@@ -67,9 +74,10 @@ namespace StartGame.DebugViews
             armourLayerList.Items.AddRange(Enum.GetNames(typeof(ArmourLayer)));
 
             //Initialise jewelry
-            pos = new Point(669, 65);
-            foreach (var buff in jewelryBuffs)
+            pos = new Point(700, 65);
+            for (int i = 0; i < jewelryBuffs.Count; i++)
             {
+                string buff = jewelryBuffs[i];
                 Label label = new Label()
                 {
                     Text = buff,
@@ -94,9 +102,17 @@ namespace StartGame.DebugViews
                     Location = pos,
                     Height = 40
                 };
+                if (i % 2 == 0)
+                {
+                    pos.X -= 220;
+                }
+                else
+                {
+                    pos.X += 220;
+                    pos.Y += 60;
+                }
                 listBox.Items.AddRange(Enum.GetNames(typeof(BuffType)));
                 pos.X -= 40;
-                pos.Y += 60;
                 jewelryBuffType.Add(listBox);
                 Controls.Add(listBox);
             }
@@ -165,11 +181,20 @@ namespace StartGame.DebugViews
             if (jewelryName.Text == "") return;
             string name = jewelryName.Text;
 
-            Buff strength = new Buff(0, 2);
-            Buff agility = new Buff(0, 2);
-            Buff wisdom = new Buff(0, 2);
-            Buff intelligence = new Buff(0, 2);
-            Buff endurance = new Buff(0, 2);
+            Buff strength = new Buff(BuffType.Constant, 0);
+            Buff agility = new Buff(BuffType.Constant, 0);
+            Buff wisdom = new Buff(BuffType.Constant, 0);
+            Buff intelligence = new Buff(BuffType.Constant, 0);
+            Buff endurance = new Buff(BuffType.Constant, 0);
+            Buff vitality = new Buff(BuffType.Constant, 0);
+            Buff defense = new Buff(BuffType.Constant, 0);
+            Buff health = new Buff(BuffType.Constant, 0);
+            Buff movementDistance = new Buff(BuffType.Constant, 0);
+            Buff dodge = new Buff(BuffType.Constant, 0);
+            Buff mana = new Buff(BuffType.Constant, 0);
+            Buff carryCapacity = new Buff(BuffType.Constant, 0);
+            Buff weight = new Buff(BuffType.Constant, 0);
+
             try
             {
                 foreach (var buff in jewelryBuffs)
@@ -199,12 +224,44 @@ namespace StartGame.DebugViews
                             endurance = new Buff(type, value);
                             break;
 
+                        case "Vitality":
+                            vitality = new Buff(type, value);
+                            break;
+
+                        case "Defense":
+                            defense = new Buff(type, value);
+                            break;
+
+                        case "Health":
+                            health = new Buff(type, value);
+                            break;
+
+                        case "MovementDistance":
+                            movementDistance = new Buff(type, value);
+                            break;
+
+                        case "Dodge":
+                            dodge = new Buff(type, value);
+                            break;
+
+                        case "Mana":
+                            mana = new Buff(type, value);
+                            break;
+
+                        case "CarryCapacity":
+                            carryCapacity = new Buff(type, value);
+                            break;
+
+                        case "Weight":
+                            weight = new Buff(type, value);
+                            break;
+
                         default:
                             throw new Exception();
                     }
                 }
             }
-            catch (Exception E)
+            catch (Exception)
             {
                 return;
             }
@@ -216,7 +273,8 @@ namespace StartGame.DebugViews
 
             if (jewelryType.SelectedItem is null) return;
             JewelryType jtype = jewelryType.SelectedItem as JewelryType;
-            Jewelry jewelry = Jewelry.New(strength, intelligence, wisdom, agility, endurance, name, quality, material, jtype);
+            Jewelry jewelry = Jewelry.New(strength, intelligence, wisdom, agility, endurance, vitality, defense, health, movementDistance,
+                dodge, mana, carryCapacity, weight, name, quality, material, jtype);
             output.Text = $"Jewelry.New({BuffString(strength)},{BuffString(intelligence)},{BuffString(wisdom)},{BuffString(agility)},{BuffString(endurance)},\"{name}\", " +
                 $"Quality.{quality}, Material.Materials.First(m => m.name == \"{material.name}\"), Item.GetJewelryType(\"{jtype}\"));";
             jewelry.Player = player;

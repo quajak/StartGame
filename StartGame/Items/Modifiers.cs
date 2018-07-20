@@ -12,14 +12,15 @@ namespace StartGame.Items
     //To convert from 0-> 6 to this use method in Extension methods
 
     internal enum Materials
-    { Leather, Iron, Steel, Chainmail, Wool, Pelt, Cloth, Wood }
+    { Leather, Iron, Steel, Chainmail, Wool, Pelt, Cloth, Wood, Bone }
 
     internal enum MaterialTypes
     {
         All,
         General, //Exludes wood
         Metal,
-        Clothing
+        Clothing,
+        Armour
     }
 
     internal abstract class Material
@@ -67,10 +68,23 @@ namespace StartGame.Items
             new Pelt(),
             new Wool(),
             new Cloth(),
-            new Wood()
+            new Wood(),
+            new Bone()
         };
 
         private static Random random = new Random();
+
+        /// <summary>
+        /// Returns random Armour Layer from material, excluding jewelry
+        /// </summary>
+        /// <returns></returns>
+        public ArmourLayer GetArmourLayer()
+        {
+            armourLayers.Remove(ArmourLayer.jewelry);
+            ArmourLayer layer = armourLayers[random.Next(armourLayers.Count)];
+            armourLayers.Add(ArmourLayer.jewelry);
+            return layer;
+        }
 
         public static Material Random(MaterialTypes types)
         {
@@ -81,17 +95,23 @@ namespace StartGame.Items
                     break;
 
                 case MaterialTypes.General:
-                    allowed.RemoveAll(m => m.material == Items.Materials.Wood);
+                    List<Materials> filter = new List<Materials> { Items.Materials.Bone, Items.Materials.Wood };
+                    allowed.RemoveAll(m => filter.Exists(f => f == m.material));
                     break;
 
                 case MaterialTypes.Metal:
-                    List<Materials> filter = new List<Materials> { Items.Materials.Iron, Items.Materials.Steel, Items.Materials.Chainmail };
+                    filter = new List<Materials> { Items.Materials.Iron, Items.Materials.Steel, Items.Materials.Chainmail };
                     allowed.RemoveAll(m => !filter.Exists(f => f == m.material));
                     break;
 
                 case MaterialTypes.Clothing:
                     filter = new List<Materials> { Items.Materials.Cloth, Items.Materials.Pelt, Items.Materials.Wool, Items.Materials.Leather };
                     allowed.RemoveAll(m => !filter.Exists(f => f == m.material));
+                    break;
+
+                case MaterialTypes.Armour:
+                    filter = new List<Materials> { Items.Materials.Bone };
+                    allowed.RemoveAll(m => filter.Exists(f => f == m.material));
                     break;
 
                 default:
@@ -103,28 +123,28 @@ namespace StartGame.Items
 
     internal class Wood : Material
     {
-        public Wood() : base("Wood", Items.Materials.Wood, 60, 8, 0, 20, 340, 4, new List<ArmourLayer> { ArmourLayer.light })
+        public Wood() : base("Wood", Items.Materials.Wood, 60, 8, 0, 20, 340, 4, new List<ArmourLayer> { ArmourLayer.light, ArmourLayer.jewelry })
         {
         }
     }
 
     internal class Leather : Material
     {
-        public Leather() : base("Leather", Items.Materials.Leather, 45, 80, 0, 60, 400, 10, new List<ArmourLayer> { ArmourLayer.light, ArmourLayer.clothing })
+        public Leather() : base("Leather", Items.Materials.Leather, 45, 80, 0, 60, 400, 10, new List<ArmourLayer> { ArmourLayer.light, ArmourLayer.clothing, ArmourLayer.jewelry })
         {
         }
     }
 
     internal class Iron : Material
     {
-        public Iron() : base("Iron", Items.Materials.Iron, 65, 40, 0, 70, 1000, 20, new List<ArmourLayer> { ArmourLayer.light, ArmourLayer.heavy })
+        public Iron() : base("Iron", Items.Materials.Iron, 65, 40, 0, 70, 1000, 20, new List<ArmourLayer> { ArmourLayer.light, ArmourLayer.heavy, ArmourLayer.jewelry })
         {
         }
     }
 
     internal class Steel : Material
     {
-        public Steel() : base("Steel", Items.Materials.Steel, 90, 30, 0, 80, 1050, 25, new List<ArmourLayer> { ArmourLayer.heavy })
+        public Steel() : base("Steel", Items.Materials.Steel, 90, 30, 0, 80, 1050, 25, new List<ArmourLayer> { ArmourLayer.heavy, ArmourLayer.jewelry })
         {
         }
     }
@@ -153,6 +173,13 @@ namespace StartGame.Items
     internal class Pelt : Material
     {
         public Pelt() : base("Pelt", Items.Materials.Pelt, 24, 60, 0, 73, 200, 11, new List<ArmourLayer> { ArmourLayer.clothing, ArmourLayer.light })
+        {
+        }
+    }
+
+    internal class Bone : Material
+    {
+        public Bone() : base("Bone", Items.Materials.Bone, 53, 34, 0, 48, 150, 8, new List<ArmourLayer> { ArmourLayer.jewelry })
         {
         }
     }

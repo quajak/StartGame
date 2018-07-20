@@ -61,7 +61,7 @@ namespace StartGame.User_Controls
             if (index != -1 && allowAction)
             {
                 Spell spell = player.spells[index];
-                castSpell.Enabled = main.activePlayer.Name == player.Name && main.gameStarted && spell.manaCost <= player.mana && spell.Ready;
+                castSpell.Enabled = main.activePlayer.Name == player.Name && main.gameStarted && spell.manaCost <= player.mana.Value && spell.Ready;
             }
             else if (allowAction)
             {

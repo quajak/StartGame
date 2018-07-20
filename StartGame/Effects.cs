@@ -181,14 +181,9 @@ namespace StartGame
             strength = Strength;
             this.main = main;
             this.main.Turn += Main_Turn;
-            player.InitialiseTurnHandler += Player_InitialiseTurnHandler;
+            player.actionPoints.rawMaxValue -= strength;
             player.troop.statuses.Add(this);
             main.UpdatePlayerView();
-        }
-
-        private void Player_InitialiseTurnHandler(object sender, EventArgs e)
-        {
-            (sender as Player).actionPoints -= strength;
         }
 
         private void Main_Turn(object sender, MainGameWindow.TurnData e)
@@ -202,9 +197,10 @@ namespace StartGame
             turns--;
             if (turns == 0)
             {
-                player.InitialiseTurnHandler -= Player_InitialiseTurnHandler;
+                player.actionPoints.rawMaxValue += strength;
                 player.troop.statuses.Remove(this);
                 main.UpdatePlayerView();
+                this.main.Turn -= Main_Turn;
             }
         }
 
@@ -279,7 +275,7 @@ namespace StartGame
     {
         private int level;
 
-        public OverweightStatus(HumanPlayer player) : base("Overweight", null, player)
+        public OverweightStatus(Player player) : base("Overweight", null, player)
         {
             player.troop.statuses.Add(this);
             player.InitialiseTurnHandler += Player_InitialiseTurnHandler;
@@ -288,13 +284,12 @@ namespace StartGame
         private void Player_InitialiseTurnHandler(object sender, EventArgs e)
         {
             CalculateLevel();
-            player.actionPoints -= level;
+            player.actionPoints.rawValue -= level;
         }
 
         private void CalculateLevel()
         {
-            HumanPlayer h = player as HumanPlayer;
-            level = (h.GearWeight - h.MaxGearWeight) / (h.MaxGearWeight / 4) + 1;
+            level = (player.gearWeight.Value - player.gearWeight.MaxValue().Value) / (player.gearWeight.MaxValue().Value / 4) + 1;
         }
 
         public override string Description()

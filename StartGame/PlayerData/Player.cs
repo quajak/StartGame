@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
@@ -18,22 +19,17 @@ namespace StartGame.PlayerData
     {
         public PlayerType type;
         public string Name;
-        public double actionPoints = 0;
+        public ActionPoint actionPoints;
         public bool active = false;
         public Map map;
         internal Player[] enemies;
         public int XP;
         internal readonly List<Spell> spells;
 
-        private Attribute intelligence; //improves the effectivness of spells
-
         //Derived stats
-        public int MaxActionPoints => 4;
-
         public Troop troop;
 
-        public bool Dead { get => troop.health == 0; }
-        internal Attribute Intelligence { get => intelligence; set => intelligence = value; }
+        public bool Dead { get => troop.health.Value == 0; }
 
         public List<JewelryType> JewelryTypes = new List<JewelryType>()
         {
@@ -46,10 +42,36 @@ namespace StartGame.PlayerData
 
         public JewelryType GetJewelryType(string name) => JewelryTypes.First(j => j.name == name);
 
-        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, int Intelligence, List<Spell> spells = null)
+        //Base stats
+        public Attribute strength; //Bonus damage dealt
+
+        public Attribute agility; //Chance to dodge
+        public Attribute endurance; //How many action points + defense
+        public Attribute vitality; //How much health
+        public Attribute wisdom; //how much mana
+        public Attribute intelligence; //improves the effectivness of spells
+
+        public Mana mana;
+        public Attribute money;
+        public MovementPoints movementPoints;
+
+        public List<Tree> trees = new List<Tree>();
+
+        public GearWeight gearWeight;
+
+        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, int Intelligence, int Strength, int Endurance, int Wisdom, int Agility, int Vitality, List<Spell> spells = null)
         {
             this.XP = XP;
-            this.Intelligence = new Attribute(Intelligence, "Intelligence");
+            actionPoints = new ActionPoint(this, 4);
+            intelligence = new Attribute(Intelligence, "Intelligence");
+            strength = new Attribute(Strength, "Strength");
+            agility = new Attribute(Agility, "Agility");
+            endurance = new Attribute(Endurance, "Endurance");
+            vitality = new Attribute(Vitality, "Vitality");
+            wisdom = new Attribute(Wisdom, "Wisdom");
+            mana = new Mana(this, 10);
+            movementPoints = new MovementPoints(this, 0);
+            gearWeight = new GearWeight(this, 5000);
             if (spells != null)
             {
                 this.spells = spells;
@@ -78,7 +100,12 @@ namespace StartGame.PlayerData
         /// <summary>
         /// Called when turn starts used to set action points
         /// </summary>
-        public event EventHandler InitialiseTurnHandler = (sender, e) => (sender as Player).actionPoints = (sender as Player).MaxActionPoints;
+        public event EventHandler InitialiseTurnHandler = (sender, e) =>
+        {
+            Player player = (sender as Player);
+            player.actionPoints.rawValue = player.actionPoints.MaxValue().Value;
+            player.movementPoints.Reset();
+        };
 
         public void NextTurn()
         {
@@ -97,7 +124,7 @@ namespace StartGame.PlayerData
                 switch (type)
                 {
                     case MovementType.walk:
-                        cost = next.Cost;
+                        cost = next.MovementCost;
                      break;
 
                     case MovementType.teleport:
@@ -149,131 +176,17 @@ namespace StartGame.PlayerData
 
     internal class HumanPlayer : Player
     {
-        //Base stats
-        private Attribute strength; //Bonus damage dealt
-
-        private Attribute agility; //Chance to dodge
-        private Attribute endurance; //How many action points + defense
-        private Attribute vitality; //How much health
-        private Attribute wisdom; //how much mana
-
-        public int mana;
-        public int maxMana;
+        public MainGameWindow main;
 
         public int level = 1;
         public int xp = 0;
         public int levelXP = 5;
         public int storedLevelUps = 0;
 
-        public int money;
-
-        public MainGameWindow main;
-
-        public List<Tree> trees = new List<Tree>();
-
-        private OverweightStatus overweightStatus;
-
-        public int GearWeight //TODO: Move this to base player together with strength
-        {
-            get => troop.armours.Sum(a => a.active ? a.weight : 0);
-        }
-
-        private int lastMaxGearWeight = 0;
-        new public int MaxActionPoints => 4 + Endurance.Value / 10;
-
-        public int MaxGearWeight
-        {
-            get
-            {
-                int max = Strength.Value * 1000 + 5000;
-                if (max != lastMaxGearWeight)
-                {
-                    if (GearWeight <= lastMaxGearWeight && GearWeight > max)
-                    {
-                        //Player becomes overweight
-                        overweightStatus = new OverweightStatus(this);
-                    }
-                    else if (GearWeight <= max && GearWeight > lastMaxGearWeight)
-                    {
-                        //Lose overweight status
-                        overweightStatus.RemoveEffect();
-                        overweightStatus = null;
-                    }
-                }
-                lastMaxGearWeight = max;
-                return max;
-            }
-        }
-
-        internal Attribute Vitality
-        {
-            get => vitality; set
-            {
-                vitality = value;
-                CalculateStats();
-            }
-        }
-
-        internal Attribute Endurance
-        {
-            get => endurance; set
-            {
-                endurance = value;
-                CalculateStats();
-            }
-        }
-
-        internal Attribute Agility
-        {
-            get => agility; set
-            {
-                agility = value;
-                CalculateStats();
-            }
-        }
-
-        internal Attribute Wisdom
-        {
-            get => wisdom; set
-            {
-                wisdom = value;
-                CalculateStats();
-            }
-        }
-
-        internal Attribute Strength { get => strength; set => strength = value; }
-
-        public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window, int Money) : base(Type, Name, Map, Enemies, 0, 1)
+        public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window, int Money) : base(Type, Name, Map, Enemies, 0, 1, 1, 1, 1, 1, 10)
         {
             main = window;
-            money = Money;
-            Strength = new Attribute(1, "Strength");
-            Agility = new Attribute(1, "Agility");
-            Endurance = new Attribute(1, "Endurance");
-            Vitality = new Attribute(10, "Vitality");
-            Wisdom = new Attribute(1, "Wisdom");
-        }
-
-        public void CalculateStats()
-        {
-            if (strength != null)
-            {
-                lastMaxGearWeight = Strength.Value * 1000 + 5000;
-            }
-            if (wisdom != null)
-            {
-                int manaDifference = mana - maxMana;
-                maxMana = wisdom.Value * 2 + 10;
-                mana = maxMana - manaDifference;
-            }
-            if (troop != null)
-            {
-                int healthDifference = troop.health - troop.maxHealth;
-                troop.maxHealth = 2 * vitality.Value;
-                troop.health = troop.maxHealth - healthDifference;
-                troop.dodge = troop.baseDodge + agility.Value * 2;
-                troop.defense = endurance.Value / 5;
-            }
+            money = new Attribute(Money, "Money", "Coins");
         }
 
         public void GainXP(int XP)
@@ -289,7 +202,7 @@ namespace StartGame.PlayerData
                 main.SetUpdateState(storedLevelUps > 0);
 
                 //Immediate effect
-                troop.health = troop.maxHealth;
+                troop.health.rawValue = troop.health.MaxValue().Value;
                 main.WriteConsole("Level Up! Healing to max hp!");
             }
         }
@@ -301,7 +214,7 @@ namespace StartGame.PlayerData
 
     internal class BanditAI : Player
     {
-        public BanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 3, 0)
+        public BanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 3, 0, 2, 0, 1, 3, 5)
         {
         }
 
@@ -316,7 +229,7 @@ namespace StartGame.PlayerData
             int damageDealt = 0;
             int dodged = 0;
 
-            while (actionPoints > 0)
+            while (actionPoints.Value > 0)
             {
                 Point playerPos = enemies[0].troop.Position;
 
@@ -336,7 +249,7 @@ namespace StartGame.PlayerData
                         main.PlayerDied($"You have been killed by {Name}!");
                         break;
                     }
-                    actionPoints--;
+                    actionPoints.rawValue--;
                     troop.activeWeapon.attacks--;
                     continue;
                 }
@@ -362,7 +275,7 @@ namespace StartGame.PlayerData
 
                 //Find closest field to player
                 Point closestField;
-                closestField = AIUtility.FindClosestField(distanceGraph, playerPos, actionPoints, map,
+                closestField = AIUtility.FindClosestField(distanceGraph, playerPos, movementPoints.Value, map,
                     (List<(Point point, double cost, double height)> list) =>
                     {
                         list.Sort((o1, o2) =>
@@ -430,7 +343,7 @@ namespace StartGame.PlayerData
 
         private MainGameWindow main;
 
-        public DefensiveBanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies, Point Camp) : base(Type, Name, Map, Enemies, 3, 0)
+        public DefensiveBanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies, Point Camp) : base(Type, Name, Map, Enemies, 3, 0, 3, 5, 0, 4, 10)
         {
             camp = Camp;
         }
@@ -464,7 +377,7 @@ namespace StartGame.PlayerData
             int damageDealt = 0;
             int dodged = 0;
 
-            while (actionPoints > 0)
+            while (actionPoints.Value > 0)
             {
                 Point playerPos = enemies[0].troop.Position;
 
@@ -486,7 +399,7 @@ namespace StartGame.PlayerData
                             main.PlayerDied($"You have been killed by {Name}!");
                             break;
                         }
-                        actionPoints--;
+                        actionPoints.rawValue--;
                         troop.activeWeapon.attacks--;
                         main.RenderMap();
                         continue;
@@ -509,7 +422,7 @@ namespace StartGame.PlayerData
                 DistanceGraphCreator graph = enraged || AIUtility.Distance(camp, playerPos) < 8 ? distanceGraph : campGraph;
                 Point goalPos = enraged || AIUtility.Distance(camp, playerPos) < 8 ? playerPos : camp;
 
-                closestField = AIUtility.FindClosestField(graph, goalPos, actionPoints, map,
+                closestField = AIUtility.FindClosestField(graph, goalPos, movementPoints.Value, map,
                     (List<(Point point, double cost, double height)> list) =>
                     {
                         list.Sort((o1, o2) =>
@@ -576,7 +489,7 @@ namespace StartGame.PlayerData
     {
         private readonly Point egg;
         private bool enraged = false;
-        private int fireDamage = 3;
+        private readonly int fireDamage = 3;
 
         private int fireLineCoolDown = 0;
         private int fireBombCoolDown = 0;
@@ -586,14 +499,14 @@ namespace StartGame.PlayerData
         private int bombNumber = 3;
         private List<Point> fireBombPlaces = new List<Point>();
 
-        private int jumpDamage = 3;
+        private readonly int jumpDamage = 3;
         private int jumpCooldown = 3;
-        private int maxJumpCooldown = 3;
-        private int jumpDistance = 15;
+        private readonly int maxJumpCooldown = 3;
+        private readonly int jumpDistance = 15;
 
         private MainGameWindow main;
 
-        public DragonMotherAI(PlayerType Type, string Name, Map Map, Player[] Enemies, Point Camp, int Round, int Difficulty) : base(Type, Name, Map, Enemies, 3, 5 + Difficulty + Round / 2)
+        public DragonMotherAI(PlayerType Type, string Name, Map Map, Player[] Enemies, Point Camp, int Round, int Difficulty) : base(Type, Name, Map, Enemies, 3, 5 + Difficulty + Round / 2, 8, 10, 7, 6, 25)
         {
             egg = Camp;
         }
@@ -656,7 +569,7 @@ namespace StartGame.PlayerData
                             map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
                             main.PlayerDied($"You have been killed by {Name} using {weapon.name}!");
                         }
-                        actionPoints--;
+                        actionPoints.rawValue--;
                         weapon.attacks--;
                         attacked = true;
                     }
@@ -769,7 +682,7 @@ namespace StartGame.PlayerData
             //If enraged go to player
             //If player is close to camp go to player
             //Else stay around camp
-            if (actionPoints == 0)
+            if (actionPoints.Value == 0)
             {
                 path.Abort();
                 pathE.Abort();
@@ -824,7 +737,7 @@ namespace StartGame.PlayerData
             {
                 jumpCooldown = jumpCooldown == 0 ? 0 : jumpCooldown - 1;
 
-                closestField = AIUtility.FindClosestField(graph, goalPos, actionPoints, map,
+                closestField = AIUtility.FindClosestField(graph, goalPos, movementPoints.Value, map,
                     (List<(Point point, double cost, double height)> list) =>
                     {
                         list.Sort((o1, o2) =>
@@ -884,7 +797,7 @@ namespace StartGame.PlayerData
 
     internal class WarriorSpiderAI : Player
     {
-        public WarriorSpiderAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 1, 0)
+        public WarriorSpiderAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 1, 0, 1, 0, 0, 8, 3)
         {
         }
 
@@ -898,7 +811,7 @@ namespace StartGame.PlayerData
             int damageDealt = 0;
             int dodged = 0;
 
-            while (actionPoints > 0)
+            while (actionPoints.Value > 0)
             {
                 Point playerPos = enemies[0].troop.Position;
 
@@ -918,7 +831,7 @@ namespace StartGame.PlayerData
                         main.PlayerDied($"You have been killed by {Name}!");
                         break;
                     }
-                    actionPoints--;
+                    actionPoints.rawValue--;
                     troop.activeWeapon.attacks--;
                     main.RenderMap();
                     continue;
@@ -932,28 +845,40 @@ namespace StartGame.PlayerData
                     continue;
                 }
 
-                //Find closest field to player
-                Point closestField;
-                closestField = AIUtility.FindClosestField(distanceGraph, playerPos, actionPoints, map,
-                    (List<(Point point, double cost, double height)> list) =>
-                    {
-                        list.Sort((o1, o2) =>
+                Point closestField = new Point(-1, -1);
+                try
+                {
+                    // Try finding closer field to player
+                    closestField = AIUtility.FindClosestField(distanceGraph, playerPos, movementPoints.Value, map,
+                        (List<(Point point, double cost, double height)> list) =>
                         {
-                            double diffCost = o1.cost - o2.cost;
-                            double heightDiff = o1.height - o2.height;
-                            if (Math.Abs(diffCost) >= 1) //assume that using the weapon costs 1 action point
+                            list.Sort((o1, o2) =>
                             {
-                                return diffCost < 0 ? -1 : 1;
-                            }
-                            else if (heightDiff != 0)
-                            {
-                                return diffCost < 0 ? -1 : 1;
-                            }
-                            return 0;
+                                double diffCost = o1.cost - o2.cost;
+                                double heightDiff = o1.height - o2.height;
+                                if (Math.Abs(diffCost) >= 1) //assume that using the weapon costs 1 action point
+                                {
+                                    return diffCost < 0 ? -1 : 1;
+                                }
+                                else if (heightDiff != 0)
+                                {
+                                    return diffCost < 0 ? -1 : 1;
+                                }
+                                return 0;
+                            });
+                            return list.First().point;
                         });
-                        return list.First().point;
-                    });
+                }
+                catch (Exception)
+                {
+                    //Most likely errors caused by being sorrounded by 1.5 cost tiles
+                    //Or when any tiles forward are water
+                    //Or when the enemy is already at the player
 
+                    //Trace.TraceError($"Error during warrior spider error: {e.Message} \n {e.StackTrace}");
+                    //MessageBox.Show($"An error occured during spider warrior AI at {troop.Position} turn. Distance to player {AIUtility.Distance(troop.Position, playerPos)} Action points: {actionPoints.Value} Check logs for more details!");
+                    break;
+                }
                 //Move to closest field
                 int closestDistance = AIUtility.Distance(closestField, playerPos);
                 if (closestDistance >= playerDistance) break;
@@ -998,12 +923,12 @@ namespace StartGame.PlayerData
     internal class SpiderNestAI : Player
     {
         private int numSpawned = 0;
-        private int difficulty;
+        private readonly int difficulty;
         private int turn;
-        private int maxSpawned;
+        private readonly int maxSpawned;
         private readonly int round;
 
-        public SpiderNestAI(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 5, 0)
+        public SpiderNestAI(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 5, 0, 0, 10, 0, 0, 10)
         {
             map = Map;
             turn = 7 - (Difficulty / 2);
@@ -1034,13 +959,11 @@ namespace StartGame.PlayerData
 
                 //Spawn a new spider
                 numSpawned++;
-                WarriorSpiderAI spider = new WarriorSpiderAI(PlayerType.computer, "Spider Spawn " + numSpawned, map, main.players.ToArray())
+                WarriorSpiderAI spider = new WarriorSpiderAI(PlayerType.computer, "Spider Spawn " + numSpawned, map, main.players.ToArray());
+                spider.troop = new Troop("Spider Spawn " + numSpawned, new Weapon(1 + difficulty / 5 + round / 2,
+                        BaseAttackType.melee, BaseDamageType.sharp, 1, "Fangs", 1, false), Resources.spiderWarrior, 0, map, spider, 25)
                 {
-                    troop = new Troop("Spider Spawn " + numSpawned, (difficulty / 3) + (int)(round * 1.5) + 1, new Weapon(1 + difficulty / 5 + round / 2,
-                        BaseAttackType.melee, BaseDamageType.sharp, 1, "Fangs", 1, false), Resources.spiderWarrior, 0, map, 25)
-                    {
-                        Position = pos
-                    }
+                    Position = pos
                 };
 
                 main.AddPlayer(spider);
@@ -1058,7 +981,8 @@ namespace StartGame.PlayerData
         private int lastHealth;
         private readonly int round;
 
-        public ElementalWizard(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 10, 3 + Round + Difficulty / 2,
+        public ElementalWizard(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 10,
+            3 + Round + Difficulty / 2, 1, 1, 5, 1, 10,
                 new List<Spell>() { new FireBall(Difficulty / 2 + Round + 1, Difficulty / 3 + 1 ,6 - Difficulty / 2, 0, 0),
                 new TeleportSpell(8- Difficulty/2, 0, 0)
             })
@@ -1071,7 +995,7 @@ namespace StartGame.PlayerData
         public override void Initialise(MainGameWindow main)
         {
             spells.ForEach(s => s.Initialise(main, map));
-            lastHealth = troop.health;
+            lastHealth = troop.health.Value;
         }
 
         public override void PlayTurn(MainGameWindow main, bool singleTurn)
@@ -1083,9 +1007,9 @@ namespace StartGame.PlayerData
             }
 
             //Panic if he has been hit or player is close and he is on low health
-            if (troop.health != lastHealth || (AIUtility.Distance(troop.Position, enemies[0].troop.Position) < 4 && troop.health != troop.maxHealth))
+            if (troop.health.Value != lastHealth || (AIUtility.Distance(troop.Position, enemies[0].troop.Position) < 4 && troop.health.Value != troop.health.MaxValue().Value))
             {
-                lastHealth = troop.health;
+                lastHealth = troop.health.Value;
                 //If teleport spell is ready
                 if (spells[1].Ready)
                 {
@@ -1178,7 +1102,15 @@ namespace StartGame.PlayerData
                     }
                 }
             }
-            if (closestPoints.Count == 0) throw new Exception("Did not find any close field!");
+            if (closestPoints.Count == 0)
+            {
+                string neighbourDescriber = "";
+                foreach (var tile in map.map[goal.X, goal.Y].neighbours.rawMaptiles)
+                {
+                    neighbourDescriber += tile.ToString() + " ";
+                }
+                throw new Exception($"Did not find any close field! Action points: {actionPoints} Point: {goal} Neighbours: {neighbourDescriber}");
+            }
             return chooser.Invoke(closestPoints);
         }
 
@@ -1214,10 +1146,10 @@ namespace StartGame.PlayerData
         private readonly int sX;
         private readonly int sY;
         private Map map;
-        private int eX;
-        private int eY;
+        private readonly int eX;
+        private readonly int eY;
         public double[,] graph;
-        private bool allowWater;
+        private readonly bool allowWater;
         private readonly bool needFree;
 
         /// <summary>
@@ -1276,7 +1208,6 @@ namespace StartGame.PlayerData
                     graph[sX, sY] = 0;
 
                     List<int[]> toCheck = new List<int[]>() { new int[] { sX, sY } };
-                    graph[sX, sY] = 0;
                     Point start = new Point(sX, sY);
                     MapTile startTile = map.map.Get(start);
                     while (toCheck.Count != 0)

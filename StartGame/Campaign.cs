@@ -18,7 +18,7 @@ namespace StartGame
         public Mission mission;
         public HumanPlayer player;
         private List<MainGameWindow> playedGames = new List<MainGameWindow>();
-        private int numberOfGames;
+        private readonly int numberOfGames;
         public MainGameWindow activeGame;
         private Random random = new Random();
         public int difficulty;
@@ -31,14 +31,12 @@ namespace StartGame
         public Campaign(HumanPlayer _player, int gameNumber, int Difficulty)
         {
             player = _player;
-            player.CalculateStats();
             numberOfGames = gameNumber;
             difficulty = Difficulty;
             healthRegen = 10 - Difficulty;
             if (Difficulty < 6)
             {
-                player.Vitality.rawValue += 6 - Difficulty;
-                player.CalculateStats();
+                player.vitality.rawValue += 6 - Difficulty;
             }
         }
 

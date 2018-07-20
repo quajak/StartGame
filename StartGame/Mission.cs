@@ -11,24 +11,72 @@ using System.Threading.Tasks;
 
 namespace StartGame
 {
-    internal struct Reward
+    internal class Reward
     {
-        public WeaponReward? weaponReward;
+        public JewelryReward jewelryReward;
+        public WeaponReward weaponReward;
         public int XP;
-        public SpellReward? spellReward;
+        public SpellReward spellReward;
         public int Money;
+
+        public Reward(JewelryReward jewelryReward, WeaponReward weaponReward, int xP, SpellReward spellReward, int money)
+        {
+            this.jewelryReward = jewelryReward;
+            this.weaponReward = weaponReward;
+            XP = xP;
+            this.spellReward = spellReward;
+            Money = money;
+        }
     }
 
-    internal struct SpellReward
+    internal class JewelryReward
+    {
+        public List<Jewelry> jewelries;
+        public int number;
+        public Quality quality;
+
+        public JewelryReward(Jewelry jewelry)
+        {
+            jewelries = new List<Jewelry>
+            {
+                jewelry
+            };
+        }
+
+        public JewelryReward(List<Jewelry> jewelries)
+        {
+            this.jewelries = jewelries;
+        }
+
+        public JewelryReward(int number, Quality quality)
+        {
+            this.number = number;
+            this.quality = quality;
+        }
+    }
+
+    internal class SpellReward
     {
         public Spell spell;
+
+        public SpellReward(Spell spell)
+        {
+            this.spell = spell;
+        }
     }
 
-    internal struct WeaponReward
+    internal class WeaponReward
     {
         public bool random;
         public int rarity;
         public Weapon reward;
+
+        public WeaponReward(bool random, int rarity, Weapon reward)
+        {
+            this.random = random;
+            this.rarity = rarity;
+            this.reward = reward;
+        }
     }
 
     internal abstract class Mission
@@ -40,7 +88,7 @@ namespace StartGame
 
         public static WinCheck deathCheck = ((_map, main) => main.players.Count == 1 && main.players.Exists(p => p == main.humanPlayer));
 
-        public static WinCheck playerDeath = ((_map, main) => main.humanPlayer == null || main.humanPlayer.troop.health <= 0);
+        public static WinCheck playerDeath = ((_map, main) => main.humanPlayer == null || main.humanPlayer.troop.health.Value <= 0);
 
         public abstract bool MapValidity(Map map);
 
@@ -101,13 +149,12 @@ namespace StartGame
 
         public override Reward Reward()
         {
-            return new Reward()
-            {
-                weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null }
-                ,
-                XP = 5,
-                spellReward = new SpellReward() { spell = World.Instance.GainSpell<TeleportSpell>() }
-            };
+            return new Reward(
+                new JewelryReward(5, Quality.Common),
+                new WeaponReward(true, 0, null),
+                5,
+                new SpellReward(World.Instance.GainSpell<TeleportSpell>()),
+                0);
         }
 
         public override bool MissionAllowed(int Round)
@@ -156,13 +203,14 @@ namespace StartGame
                 { DamageType.fire, 0 }
             };
 
-            players.Add(new DragonMotherAI(PlayerType.computer, "Dragon", map, new Player[] { player }, peak, Round, difficulty)
-            {
-                troop = new Troop("Dragon", 100 + (difficulty / 2) + (int)(Round * 1.5) - 4,
+            DragonMotherAI dragonMother = new DragonMotherAI(PlayerType.computer, "Dragon", map, new Player[] { player }, peak, Round, difficulty);
+
+            dragonMother.troop = new Troop("Dragon",
                     new Weapon(8 + difficulty / 4 + Round - 1,
                         BaseAttackType.melee, BaseDamageType.sharp, 3, "Claw", 1, false),
-                    Resources.Dragon, 0, map, Vurneabilities: vurn)
-            });
+                    Resources.Dragon, 0, map, dragonMother, Vurneabilities: vurn);
+
+            players.Add(dragonMother);
             players[1].troop.Position = dragonSpawn;
             players[1].troop.weapons.Add(new Weapon(6 + difficulty / 3 + Round, BaseAttackType.melee, BaseDamageType.blunt, 6, "Tail", 1, false, 1));
 
@@ -205,12 +253,13 @@ namespace StartGame
 
         public override Reward Reward()
         {
-            return new Reward()
-            {
-                weaponReward = new WeaponReward() { random = true, rarity = 2, reward = null },
-                XP = xp,
-                spellReward = new SpellReward() { spell = World.Instance.GainSpell<FireBall>() }
-            };
+            return new Reward(
+                new JewelryReward(3, Quality.Superior),
+                new WeaponReward(true, 2, null),
+                xp,
+                new SpellReward(World.Instance.GainSpell<FireBall>()),
+                80
+            );
         }
 
         public override bool MissionAllowed(int Round)
@@ -250,20 +299,19 @@ namespace StartGame
             {
                 string name = botNames[rng.Next(botNames.Count)];
                 botNames.Remove(name);
-                players.Add(new BanditAI(PlayerType.computer, name, map, new Player[] { player })
-                {
-                    troop = new Troop(name, 10 + (difficulty / 2) + (int)(Round * 1.5) - 4,
+                BanditAI item = new BanditAI(PlayerType.computer, name, map, new Player[] { player });
+                item.troop = new Troop(name,
                     new Weapon(4 + difficulty / 4 + Round - 1,
                         BaseAttackType.melee, BaseDamageType.blunt, 1, "Fists", 1, false),
-                    Resources.enemyScout, 0, map)
-                    {
-                        armours = new List<Armour>
+                    Resources.enemyScout, 0, map, item)
+                {
+                    armours = new List<Armour>
                         {
                             new Armour("Shirt", 32, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Cloth"),Quality.Broken, ArmourLayer.clothing),
                             new Armour("Hose", 60, new List<BodyParts> { BodyParts.UpperLegs, BodyParts.LeftLowerLeg, BodyParts.RightLowerLeg, BodyParts.LeftShin, BodyParts.RightShin }, Material.Materials.First(m => m.name == "Cloth"), Quality.Simple, ArmourLayer.clothing)
                         }
-                    }
-                });
+                };
+                players.Add(item);
                 players[i + 1].troop.Position = spawnPoints[i];
             }
 
@@ -329,13 +377,13 @@ namespace StartGame
 
         public override Reward Reward()
         {
-            return new Reward()
-            {
-                weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null },
-                XP = 5,
-                spellReward = new SpellReward() { spell = World.Instance.GainSpell<DebuffSpell>() },
-                Money = 12
-            };
+            return new Reward(
+                new JewelryReward(1, Quality.Broken),
+                new WeaponReward(true, 0, null),
+                5,
+                new SpellReward(World.Instance.GainSpell<DebuffSpell>()),
+                12
+            );
         }
 
         public override bool MissionAllowed(int Round)
@@ -376,13 +424,12 @@ namespace StartGame
             for (int i = 0; i < enemyNumber; i++)
             {
                 string name = $"Spider Warrior {i}";
-                players.Add(new WarriorSpiderAI(PlayerType.computer, name, map, new Player[] { player })
-                {
-                    troop = new Troop(name, (difficulty / 3) + (int)(Round * 1.5) + 2,
+                WarriorSpiderAI item = new WarriorSpiderAI(PlayerType.computer, name, map, new Player[] { player });
+                item.troop = new Troop(name,
                     new Weapon(1 + difficulty / 5 + Round / 2,
                         BaseAttackType.melee, BaseDamageType.sharp, 1, "Fangs", 1, false),
-                    Resources.spiderWarrior, 0, map, Dodge: 25)
-                });
+                    Resources.spiderWarrior, 0, map, item, Dodge: 25);
+                players.Add(item);
                 players[i + 1].troop.Position = spawnPoints[i];
             }
 
@@ -392,13 +439,12 @@ namespace StartGame
                .OrderByDescending(p => (Math.Abs(p.position.X - player.troop.Position.X) + Math.Abs(p.position.Y - player.troop.Position.Y)));
             Point spawnPoint = orderedEnumerable.FirstOrDefault().position;
 
-            players.Add(new SpiderNestAI(PlayerType.computer, "Spider Nest", map, new Player[] { player }, difficulty, Round)
+            SpiderNestAI item1 = new SpiderNestAI(PlayerType.computer, "Spider Nest", map, new Player[] { player }, difficulty, Round);
+            item1.troop = new Troop("Spider Nest", null, Resources.spiderNest, 2, map, item1, 0)
             {
-                troop = new Troop("Spider Nest", 10 + (difficulty / 2), null, Resources.spiderNest, 2, map, 0)
-                {
-                    Position = spawnPoint
-                }
-            });
+                Position = spawnPoint
+            };
+            players.Add(item1);
 
             #endregion Player Creation
 
@@ -438,13 +484,13 @@ namespace StartGame
 
         public override Reward Reward()
         {
-            return new Reward()
-            {
-                weaponReward = new WeaponReward() { random = true, rarity = 0, reward = null },
-                XP = 2,
-                spellReward = null,
-                Money = 0
-            };
+            return new Reward(
+                null,
+                new WeaponReward(true, 0, null),
+                2,
+                null,
+                0
+            );
         }
 
         public override bool MissionAllowed(int Round)
@@ -476,22 +522,19 @@ namespace StartGame
 
             List<Point> startPos = map.DeterminSpawnPoint(1, SpawnType.heighestField);
             string name = $"Elemental Wizard";
-            players.Add(new ElementalWizard(PlayerType.computer, name, map, new Player[] { player }, difficulty, Round)
+            ElementalWizard item = new ElementalWizard(PlayerType.computer, name, map, new Player[] { player }, difficulty, Round);
+            item.troop = new Troop(name, new Weapon(3 + difficulty / 5 + Round / 2, BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
+            Resources.elementalWizard, 0, map, item, Dodge: 25)
             {
-                troop = new Troop(name, (difficulty / 3) + (int)(Round * 1.5) + 5,
-                new Weapon(3 + difficulty / 5 + Round / 2,
-                    BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
-                Resources.elementalWizard, 0, map, Dodge: 25)
-                {
-                    armours = new List<Armour>
+                armours = new List<Armour>
                     {
                         new Armour("Wizard's Cloak", 40, new List<BodyParts>{BodyParts.Head,BodyParts.Neck,BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso,BodyParts.UpperLegs,BodyParts.LeftLowerLeg,BodyParts.RightLowerLeg}, Material.Materials.First(m => m.name == "Wool"),Quality.Superior, ArmourLayer.light)
                         {
                             magicDefense = 20
                         }
                     }
-                }
-            });
+            };
+            players.Add(item);
             players[1].troop.Position = startPos[0];
 
             #endregion Player Creation
@@ -530,13 +573,13 @@ namespace StartGame
 
         public override Reward Reward()
         {
-            return new Reward()
-            {
-                weaponReward = new WeaponReward() { random = true, rarity = 3, reward = null },
-                XP = 5,
-                spellReward = new SpellReward() { spell = World.Instance.GainSpell<TeleportSpell>() },
-                Money = 48
-            };
+            return new Reward(
+                null,
+                new WeaponReward(true, 3, null),
+                5,
+                new SpellReward(World.Instance.GainSpell<TeleportSpell>()),
+                48
+            );
         }
 
         public override bool MissionAllowed(int Round)
@@ -616,22 +659,19 @@ namespace StartGame
             for (int i = 0; i < enemyNumber; i++)
             {
                 string name = $"Bandit {i + 1}";
-                players.Add(new DefensiveBanditAI(PlayerType.computer, name, map, new Player[] { player }, camp)
+                DefensiveBanditAI item = new DefensiveBanditAI(PlayerType.computer, name, map, new Player[] { player }, camp);
+                item.troop = new Troop(name, new Weapon(3 + difficulty / 5 + Round / 2, BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
+                Resources.enemyScout, 0, map, item, Dodge: 25)
                 {
-                    troop = new Troop(name, (difficulty / 3) + (int)(Round * 1.5) + 5,
-                    new Weapon(3 + difficulty / 5 + Round / 2,
-                        BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
-                    Resources.enemyScout, 0, map, Dodge: 25)
-                    {
-                        armours = new List<Armour>
+                    armours = new List<Armour>
                         {
                             new Armour("Cap", 10, new List<BodyParts>{BodyParts.Head}, Material.Materials.First(m => m.name == "Cloth"),Quality.Simple, ArmourLayer.clothing),
                             new Armour("Shirt", 20, new List<BodyParts>{BodyParts.Torso}, Material.Materials.First(m => m.name == "Cloth"),Quality.Poor, ArmourLayer.clothing),
                             new Armour("Hose", 25, new List<BodyParts>{BodyParts.UpperLegs,BodyParts.LeftLowerLeg,BodyParts.RightLowerLeg}, Material.Materials.First(m => m.name == "Cloth"),Quality.Common, ArmourLayer.clothing),
                             new Armour("Cloak", 35, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso,BodyParts.UpperLegs,BodyParts.LeftLowerLeg,BodyParts.RightLowerLeg}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.light)
                         }
-                    }
-                });
+                };
+                players.Add(item);
 
                 players[i + 1].troop.Position = startPos[i];
             }
@@ -672,13 +712,13 @@ namespace StartGame
 
         public override Reward Reward()
         {
-            return new Reward()
-            {
-                weaponReward = new WeaponReward() { random = true, rarity = 3, reward = null },
-                XP = 5,
-                spellReward = null,
-                Money = 34
-            };
+            return new Reward(
+                new JewelryReward(1, Quality.Simple),
+                new WeaponReward(true, 3, null),
+                5,
+                null,
+                34
+            );
         }
 
         public override bool MissionAllowed(int Round)

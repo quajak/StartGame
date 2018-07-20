@@ -33,22 +33,24 @@ namespace StartGame.User_Controls
             playerAttackDamage.Text = $"Damage: {player.troop.activeWeapon.attackDamage}";
             playerAttackRange.Text = $"Attack range: {player.troop.activeWeapon.range}";
             playerAttackType.Text = $"Attack type: {player.troop.activeWeapon.type}";
-            playerActionPoints.Text = $"Action points: {player.actionPoints} / {player.MaxActionPoints}";
-            playerHealth.Text = $"Health: {player.troop.health} / {player.troop.maxHealth}";
+            playerActionPoints.Text = player.actionPoints.ToString();
+            playerMovementPoints.Text = player.movementPoints.ToString();
+            playerHealth.Text = player.troop.health.ToString();
             playerWeaponAttacks.Text = $"Attacks: {player.troop.activeWeapon.attacks} / {player.troop.activeWeapon.maxAttacks}";
-            playerDefense.Text = $"Defense: {player.troop.defense}";
-            playerStrength.Text = player.Strength.ToString();
-            playerAgility.Text = player.Agility.ToString();
-            playerEndurance.Text = player.Endurance.ToString();
-            playerVitatlity.Text = player.Vitality.ToString();
+            playerDefense.Text = $"{player.troop.defense}";
+            playerDodge.Text = player.troop.dodge.ToString();
+            playerStrength.Text = player.strength.ToString();
+            playerAgility.Text = player.agility.ToString();
+            playerEndurance.Text = player.endurance.ToString();
+            playerVitatlity.Text = player.vitality.ToString();
             playerLevel.Text = $"Level: {player.level} + ({player.storedLevelUps})";
             playerXP.Text = $"XP: {player.xp} / {player.levelXP}";
-            playerMana.Text = $"Mana: {player.mana} / {player.maxMana}";
-            playerWisdom.Text = player.Wisdom.ToString();
-            playerIntelligence.Text = player.Intelligence.ToString();
-            playerMoney.Text = $"Money: {player.money}";
-            playerGearWeight.Text = $"Gear weight: {player.GearWeight} / {player.MaxGearWeight}";
-            if (player.GearWeight > player.MaxGearWeight)
+            playerMana.Text = player.mana.ToString();
+            playerWisdom.Text = player.wisdom.ToString();
+            playerIntelligence.Text = player.intelligence.ToString();
+            playerMoney.Text = player.money.ToString();
+            playerGearWeight.Text = player.gearWeight.ToString();
+            if (player.gearWeight.Value > player.gearWeight.MaxValue().Value)
             {
                 playerGearWeight.ForeColor = Color.Red;
             }
@@ -121,6 +123,14 @@ namespace StartGame.User_Controls
         }
 
         private void PlayerAttackDamage_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void PlayerMoney_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void PlayerMovementPoints_Click(object sender, EventArgs e)
         {
         }
     }

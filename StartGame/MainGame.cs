@@ -95,7 +95,6 @@ namespace StartGame
 
             //Setup game
             humanPlayer = player;
-            humanPlayer.CalculateStats();
             this.mission = mission;
             activePlayer = players[0];
 
@@ -168,7 +167,7 @@ namespace StartGame
         {
             EntityRenderObject entity = data.map.EntityRenderObjects.FirstOrDefault(e => e.Name == data.player.troop.name);
 
-            if (data.player.troop.health == 0)
+            if (data.player.troop.health.Value == 0)
             {//Player has died
                 return;
             }
@@ -534,7 +533,7 @@ namespace StartGame
                     enemyAttackRange.Text = player.troop.activeWeapon.range.ToString();
                     enemyAttackType.Text = player.troop.activeWeapon.type.ToString();
                 }
-                enemyHealth.Text = $"{player.troop.health} / {player.troop.maxHealth}";
+                enemyHealth.Text = $"{player.troop.health}";
                 enemyPosition.Text = $"{player.troop.Position.X} : {player.troop.Position.Y}";
                 enemyHeight.Text = $"{map.map[player.troop.Position.X, player.troop.Position.Y].height.ToString("0.##")}";
                 enemyDefense.Text = $"Defense: {player.troop.defense}";
@@ -620,9 +619,9 @@ namespace StartGame
 
         private void CastSpell_Click(Spell activeSpell, Button castSpell)
         {
-            if (activeSpell.Ready && humanPlayer.mana >= activeSpell.manaCost)
+            if (activeSpell.Ready && humanPlayer.mana.Value >= activeSpell.manaCost)
             {
-                humanPlayer.mana -= activeSpell.manaCost;
+                humanPlayer.mana.rawValue -= activeSpell.manaCost;
                 if (activeSpell.format.Positions != 0)
                 {
                     castingspell = true;
@@ -793,6 +792,7 @@ namespace StartGame
                     }
                 }
                 canMoveTo.Clear();
+
                 //Find fields the player can move to
                 if (humanPlayer.troop.Position.X == X && humanPlayer.troop.Position.Y == Y)
                 {
@@ -821,7 +821,7 @@ namespace StartGame
                             {
                                 t.leftValue = distanceGraph.graph.Get(t.position);
                             });
-                            sorroundingTiles = sorroundingTiles.Where(t => t.leftValue <= humanPlayer.actionPoints && t.free && !possibleFields.Exists(f => f.position == t.position)).ToList();
+                            sorroundingTiles = sorroundingTiles.Where(t => t.leftValue <= humanPlayer.movementPoints.Value && t.free && !possibleFields.Exists(f => f.position == t.position)).ToList();
                             toCheck.AddRange(sorroundingTiles);
                         }
                     }
@@ -833,12 +833,12 @@ namespace StartGame
                         map.overlayObjects.Add(new OverlayRectangle(f.position.X * fieldSize, f.position.Y * fieldSize, fieldSize, fieldSize, Color.Green, false)));
                     //Add text with cost for each field to overlay
                     possibleFields.ForEach(f =>
-                        map.overlayObjects.Add(new OverlayText(f.position.X * fieldSize, f.position.Y * fieldSize, Color.DarkGreen, $"{humanPlayer.actionPoints - f.leftValue}")));
+                        map.overlayObjects.Add(new OverlayText(f.position.X * fieldSize, f.position.Y * fieldSize, Color.DarkGreen, $"{humanPlayer.movementPoints.Value - f.leftValue}")));
                     canMoveTo.AddRange(possibleFields);
 
                     //Show all enemies it might hit and damage dealt
                     Point center = humanPlayer.troop.Position;
-                    if (humanPlayer.actionPoints >= 1 && humanPlayer.troop.activeWeapon.attacks > 0)
+                    if (humanPlayer.actionPoints.Value >= 1 && humanPlayer.troop.activeWeapon.attacks > 0)
                     {
                         foreach (var troop in map.troops)
                         {
@@ -885,10 +885,10 @@ namespace StartGame
         {
             if (humanPlayer is null) return;
 
-            damage = Math.Min(player.troop.health, (int)(damage * player.troop.GetVurneability(damageType)));
-            player.troop.health -= damage;
+            damage = Math.Min(player.troop.health.Value, (int)(damage * player.troop.GetVurneability(damageType)));
+            player.troop.health.rawValue -= damage;
 
-            if (player.troop.health <= 0)
+            if (player.troop.health.Value <= 0)
             {
                 if (player.Name == humanPlayer.Name)
                 {
@@ -972,9 +972,9 @@ namespace StartGame
         /// <returns></returns>
         public int CalculateDamage(Point attackingPosition, Player attacking, Player defending, Weapon weapon, BodyPart hit)
         {
-            string text = $"{defending.Name} is attacked by {attacking} at the {hit.name}";
-            int damage = weapon.attackDamage - defending.troop.defense;
-            damage += attacking is HumanPlayer ? (attacking as HumanPlayer).Strength.Value : 0;
+            string text = $"{defending.Name} is attacked by {attacking.Name} at the {hit.name}";
+            int damage = weapon.attackDamage - defending.troop.defense.Value;
+            damage += attacking.strength.Value;
 
             //if melee code check for height difference
             if (weapon.type == BaseAttackType.melee)
@@ -1004,7 +1004,7 @@ namespace StartGame
                         {
                             //Weapon does not penetrate
                             damage = layer.sharpDefense < damage * 2 ? damage / 10 : 0;
-                            durLost = damage * 2;
+                            durLost = damage * 2 + 1;
                             text += $"The weapon does not penetrate {layer.name}. {damage} continues as blunt damage. {layer.name} looses {durLost} durability.";
                             layer.durability -= durLost;
                             damageType = BaseDamageType.blunt;
@@ -1045,8 +1045,8 @@ namespace StartGame
                 }
                 if (damage == 0) break;
             }
-            console.Text += text;
-            damage = defending.troop.health - damage < 0 ? defending.troop.health : damage;
+            console.Text += text + "\n";
+            damage = defending.troop.health.Value - damage < 0 ? defending.troop.health.Value : damage;
             return damage;
         }
 
@@ -1071,8 +1071,10 @@ namespace StartGame
             int damage = 0;
 
             //Check if hit
-            if (random.Next(100) < attacked.troop.dodge)
+            if (random.Next(100) < attacked.troop.dodge.Value)
             {
+                attacking.actionPoints.rawValue -= attacking.troop.activeWeapon.attackCost;
+                attacking.troop.activeWeapon.attacks--;
                 //dodged
                 if (show)
                     map.overlayObjects.Add(new OverlayText(attacked.troop.Position.X * fieldSize, attacked.troop.Position.Y * fieldSize, Color.Red, "Dodged!"));
@@ -1110,11 +1112,11 @@ namespace StartGame
             }
 
             attacking.troop.activeWeapon.attacks--;
-            attacking.actionPoints -= attacking.troop.activeWeapon.attackCost;
+            attacking.actionPoints.rawValue -= attacking.troop.activeWeapon.attackCost;
 
-            attacked.troop.health -= damage;
+            attacked.troop.health.rawValue -= damage;
 
-            if (attacked.troop.health <= 0)
+            if (attacked.troop.health.Value <= 0)
             {
                 killed = true;
                 if (attacked.Name == humanPlayer.Name)
@@ -1215,7 +1217,8 @@ namespace StartGame
                         for (int i = 0; i < path.Count; i++)
                         {
                             Point next = new Point(pointer.X + path[i].X, pointer.Y + path[i].Y);
-                            player.actionPoints -= player.CalculateStep(map.map.Get(start), map.map.Get(pointer), map.map.Get(next), i + 1, MovementType.walk);
+                            player.movementPoints.MoveUnit(player.CalculateStep(map.map.Get(start), map.map.Get(pointer), map.map.Get(next), i + 1, MovementType.walk));
+                            pointer = next;
                         }
                     }
                     break;
@@ -1223,7 +1226,7 @@ namespace StartGame
                 case MovementType.teleport:
                     distance = AIUtility.Distance(start, end);
                     if (CostActionPoints)
-                        player.actionPoints -= 1;
+                        player.actionPoints.rawValue -= 1;
                     break;
 
                 default:
@@ -1235,7 +1238,7 @@ namespace StartGame
                 actionOccuring = true;
                 DamagePlayer(10, DamageType.earth, player);
                 WriteConsole($"{player.troop.name} takes 10 damage as he is in an object!");
-                if (player.troop.health == 0)
+                if (player.troop.health.Value == 0)
                 {
                     actionOccuring = false;
                     RenderMap();
@@ -1259,7 +1262,7 @@ namespace StartGame
                     MapTile escape = map.map.Get(end).neighbours.rawMaptiles.FirstOrDefault(m => m.free);
                     if (escape is null)
                     {
-                        DamagePlayer(player.troop.health + 2, DamageType.unblockable, player); //Should kill him
+                        DamagePlayer(player.troop.health.Value + 2, DamageType.unblockable, player); //Should kill him
                         return;
                     }
                     else

@@ -86,6 +86,11 @@ namespace StartGame
                 GoalIDs = GoalIDs
             };
         }
+
+        public override string ToString()
+        {
+            return $"X:{position.X} Y:{position.Y} Type:{type.type.ToString()}";
+        }
     }
 
     internal class SorroundingTiles<T> : ICloneable

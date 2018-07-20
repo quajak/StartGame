@@ -54,8 +54,13 @@
     <StartupObject>StartGame.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=4.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.4.5.1\lib\net461\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -128,12 +133,6 @@
     <Compile Include="Mission.cs" />
     <Compile Include="PerlinNoise.cs" />
     <Compile Include="PlayerData\Player.cs" />
-    <Compile Include="PlayerData\PlayerProfile.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="PlayerData\PlayerProfile.Designer.cs">
-      <DependentUpon>PlayerProfile.cs</DependentUpon>
-    </Compile>
     <Compile Include="User Controls\PlayerBaseStats.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -215,9 +214,6 @@
     <EmbeddedResource Include="MapCreator.resx">
       <DependentUpon>MapCreator.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PlayerData\PlayerProfile.resx">
-      <DependentUpon>PlayerProfile.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="User Controls\PlayerBaseStats.resx">
       <DependentUpon>PlayerBaseStats.cs</DependentUpon>
     </EmbeddedResource>
@@ -250,6 +246,7 @@
     <EmbeddedResource Include="WorldView.resx">
       <DependentUpon>WorldView.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

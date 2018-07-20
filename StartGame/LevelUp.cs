@@ -14,7 +14,7 @@ namespace PlayerCreator
 {
     partial class LevelUp : Form
     {
-        private HumanPlayer player;
+        private Player player;
 
         private int StrengthUp = 0;
         private int AgilityUp = 0;
@@ -25,7 +25,7 @@ namespace PlayerCreator
 
         private int points;
 
-        public LevelUp(HumanPlayer Player, int Points)
+        public LevelUp(Player Player, int Points)
         {
             InitializeComponent();
             player = Player;
@@ -37,12 +37,32 @@ namespace PlayerCreator
 
         private void Render()
         {
-            playerStrength.Text = $"{player.Strength.ToString()} ({StrengthUp + player.Strength.Value})";
-            playerAgiltiy.Text = $"{player.Agility.ToString()} ({AgilityUp + player.Agility.Value})";
-            playerEndurance.Text = $"{player.Endurance.ToString()} ({EnduranceUp + player.Endurance.Value})";
-            playerVitality.Text = $"{player.Vitality.ToString()} ({VitatlityUp + player.Vitality.Value})";
-            playerWisdom.Text = $"{player.Wisdom.ToString()} ({player.Wisdom.Value + WisdomUp})";
-            playerIntelligence.Text = $"{player.Intelligence.ToString()} ({player.Intelligence.Value + IntelligenceUp})";
+            int? actualMaxHealth = player.troop.health.MaxValue();
+            double actualActionPoints = player.actionPoints.MaxValue().Value;
+            Defense actualDefense = player.troop.defense;
+            Dodge actualDodge = player.troop.dodge;
+            int actualMana = player.mana.MaxValue().Value;
+            string strength = player.strength.ToString();
+            string agility = player.agility.ToString();
+            string endurance = player.endurance.ToString();
+            string vitality = player.vitality.ToString();
+            string wisdom = player.wisdom.ToString();
+            string intelligence = player.intelligence.ToString();
+
+            //Now simulate player change
+            player.vitality.rawValue += VitatlityUp;
+            player.endurance.rawValue += EnduranceUp;
+            player.agility.rawValue += AgilityUp;
+            player.wisdom.rawValue += WisdomUp;
+            player.intelligence.rawValue += IntelligenceUp;
+            player.strength.rawValue += StrengthUp;
+
+            playerStrength.Text = $"{strength} ({player.strength.Value})";
+            playerAgiltiy.Text = $"{agility} ({player.agility.Value})";
+            playerEndurance.Text = $"{endurance} ({player.endurance.Value})";
+            playerVitality.Text = $"{vitality} ({player.vitality.Value})";
+            playerWisdom.Text = $"{wisdom} ({player.wisdom.Value})";
+            playerIntelligence.Text = $"{intelligence} ({player.intelligence.Value})";
 
             strengthUp.Enabled = points != 0;
             agilityUp.Enabled = points != 0;
@@ -58,11 +78,19 @@ namespace PlayerCreator
             wisdomDown.Enabled = WisdomUp != 0;
             intelligenceDown.Enabled = IntelligenceUp != 0;
 
-            playerMaxHealth.Text = $"Max Health: {player.troop.maxHealth} ({2 * (VitatlityUp + player.Vitality.Value)})";
-            playerActionPoints.Text = $"Action Points: {player.MaxActionPoints} ({4 + (player.Endurance.Value + EnduranceUp) / 10})";
-            playerDefense.Text = $"Defense: {player.troop.defense} ({player.Endurance.Value + EnduranceUp / 5})";
-            playerDodge.Text = $"Dodge: {player.troop.dodge} ({player.troop.baseDodge + (player.Agility.Value + AgilityUp) * 2})";
-            playerMana.Text = $"Mana: {player.maxMana} ({player.maxMana + WisdomUp * 2})";
+            playerMaxHealth.Text = $"{actualMaxHealth} ({player.troop.health.MaxValue().Value})";
+            playerActionPoints.Text = $"{actualActionPoints} ({player.actionPoints.MaxValue().Value})";
+            playerDefense.Text = $"{actualDefense} ({player.troop.defense.Value})";
+            playerDodge.Text = $"{actualDodge} ({player.troop.dodge.Value})";
+            playerMana.Text = $"{actualMana} ({player.mana.MaxValue().Value})";
+
+            //Undo changes
+            player.vitality.rawValue -= VitatlityUp;
+            player.endurance.rawValue -= EnduranceUp;
+            player.agility.rawValue -= AgilityUp;
+            player.wisdom.rawValue -= WisdomUp;
+            player.intelligence.rawValue -= IntelligenceUp;
+            player.strength.rawValue -= StrengthUp;
 
             ok.Enabled = points == 0;
         }
@@ -133,13 +161,12 @@ namespace PlayerCreator
         private void DistributePoints()
         {
             finished = true;
-            player.Strength.rawValue += StrengthUp;
-            player.Agility.rawValue += AgilityUp;
-            player.Endurance.rawValue += EnduranceUp;
-            player.Vitality.rawValue += VitatlityUp;
-            player.Wisdom.rawValue += WisdomUp;
-            player.Intelligence.rawValue += IntelligenceUp;
-            player.CalculateStats();
+            player.strength.rawValue += StrengthUp;
+            player.agility.rawValue += AgilityUp;
+            player.endurance.rawValue += EnduranceUp;
+            player.vitality.rawValue += VitatlityUp;
+            player.wisdom.rawValue += WisdomUp;
+            player.intelligence.rawValue += IntelligenceUp;
             Close();
         }
 
@@ -192,6 +219,10 @@ namespace PlayerCreator
                     DistributePoints();
                 }
             }
+        }
+
+        private void PlayerMaxHealth_Click(object sender, EventArgs e)
+        {
         }
     }
 }

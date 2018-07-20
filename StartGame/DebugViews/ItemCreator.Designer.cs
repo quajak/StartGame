@@ -184,7 +184,7 @@
             // jewelryType
             // 
             this.jewelryType.FormattingEnabled = true;
-            this.jewelryType.Location = new System.Drawing.Point(669, 369);
+            this.jewelryType.Location = new System.Drawing.Point(569, 471);
             this.jewelryType.Name = "jewelryType";
             this.jewelryType.Size = new System.Drawing.Size(97, 95);
             this.jewelryType.TabIndex = 17;

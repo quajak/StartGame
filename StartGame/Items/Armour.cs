@@ -17,7 +17,10 @@ namespace StartGame.Items
         light,
 
         [Description("Clothing")]
-        clothing
+        clothing,
+
+        [Description("Jewelry")]
+        jewelry
     }
 
     //TODO: Make armour only fit one body type

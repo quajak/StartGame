@@ -38,6 +38,7 @@ namespace StartGame
         }
     }
 
+    //TODO: Description of skills are not hard coded but a function
     internal abstract class Skill : Tree
     {
         private readonly int minGrowth;
@@ -45,7 +46,8 @@ namespace StartGame
         private int xp;
         public int maxXP;
         internal MainGameWindow main;
-        private double growthFactor;
+        private readonly double growthFactor;
+        internal bool activateOnLevelUp = false;
 
         public int Xp
         {
@@ -63,6 +65,7 @@ namespace StartGame
                 }
                 if (!(main is null)) main.UpdatePlayerView();
                 if (levelup) main.SkillLevelUp(this);
+                if (levelup && activateOnLevelUp) Activate();
             }
         }
 
@@ -86,7 +89,7 @@ namespace StartGame
     internal class Rampage : Skill
     {
         private int succesiveTurns = 0;
-        private int goal = 3;
+        private readonly int goal = 3;
         private bool hasKilled = false;
         private bool active = false;
 
@@ -107,7 +110,7 @@ namespace StartGame
             {
                 if (active)
                 {
-                    main.humanPlayer.actionPoints += level;
+                    main.humanPlayer.actionPoints.rawValue += level;
                     main.ShowPlayerStats();
                 }
                 hasKilled = true;
@@ -198,11 +201,13 @@ namespace StartGame
 
     internal class Sprinter : Skill
     {
-        private static int distanceNeeded = 1;
+        private static int distanceNeeded = 10;
         private int totalDistance = 0;
+        private int lastLevel = 0;
 
-        public Sprinter() : base("Sprinter", "Improved ability to run long distances. When moving longer than 4 squares, move one extra.", $"Moving {distanceNeeded} fields!", 2, 20, 10)
+        public Sprinter() : base("Sprinter", "Improved ability to run long distances. Increases the movement points", $"Moving {distanceNeeded} fields!", 2, 20, 10)
         {
+            activateOnLevelUp = true;
         }
 
         public override void Initialise(MainGameWindow mainGame)
@@ -237,7 +242,8 @@ namespace StartGame
         public override void Activate()
         {
             //Add effect
-            main.humanPlayer.CalculateStepCost.Add((m, a, n, d, c, type) => ((d >= 4 && d <= 4 + level - 1) && type == MovementType.walk) ? 0 : c);
+            main.humanPlayer.movementPoints.maxExtraMovement += (level - lastLevel);
+            lastLevel = level;
         }
     }
 

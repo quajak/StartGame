@@ -188,6 +188,7 @@
             this.playerMaxHealth.Size = new System.Drawing.Size(86, 13);
             this.playerMaxHealth.TabIndex = 15;
             this.playerMaxHealth.Text = "playerMaxHealth";
+            this.playerMaxHealth.Click += new System.EventHandler(this.PlayerMaxHealth_Click);
             // 
             // playerDefense
             // 

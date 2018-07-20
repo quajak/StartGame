@@ -35,17 +35,10 @@ namespace StartGame.User_Controls
             items.Clear();
             items.AddRange(player.troop.Items);
 
-            List<Item> itemNames = player.troop.Items;
-            List<Item> diff = itemList.Items.Cast<Item>().Except(itemNames).ToList();
-            foreach (Item dif in diff)
+            if (itemList.Items.Count != items.Count)
             {
-                itemList.Items.Remove(dif);
-            }
-
-            diff = itemNames.Except(itemList.Items.Cast<Item>()).ToList();
-            foreach (Item dif in diff)
-            {
-                itemList.Items.Add(dif);
+                itemList.Items.Clear();
+                itemList.Items.AddRange(items.ToArray());
             }
 
             if (itemList.SelectedIndex != -1)
@@ -53,6 +46,7 @@ namespace StartGame.User_Controls
                 active = items[itemList.SelectedIndex];
                 switch (active)
                 {
+                    //TODO: Compare with active items
                     case Armour a:
                         itemName.Text = a.name;
                         itemDescription.Text = a.Description;
@@ -60,9 +54,9 @@ namespace StartGame.User_Controls
                         Body dummy = new Body();
                         itemImage.Image = dummy.Render(false, new List<Armour> { a }, 8);
 
-                        itemButton1.Enabled = a.active || !player.troop.armours.Exists(b => b.active && b.affected.Intersect(a.affected).Count() != 0);
+                        itemButton1.Enabled = a.active || !player.troop.armours.Exists(b => b.active && a.layer == b.layer && b.affected.Intersect(a.affected).Count() != 0);
                         itemButton1.Visible = true;
-                        itemButton1.Text = a.active ? "Equip" : "Unequip";
+                        itemButton1.Text = a.active ? "Unequip" : "Equip";
                         itemButton2.Visible = true;
                         itemButton2.Text = "Sell";
                         break;
@@ -107,6 +101,7 @@ namespace StartGame.User_Controls
                     break;
 
                 case Jewelry j:
+                    j.Player = player;
                     j.Active = !j.Active;
                     Render();
                     break;
@@ -124,14 +119,14 @@ namespace StartGame.User_Controls
                     //Sell the armour
                     a.active = false;
                     player.troop.armours.Remove(a);
-                    player.money += a.Value;
+                    player.money.rawValue += a.Value;
                     Render();
                     break;
 
                 case Jewelry j:
                     j.Active = false;
                     player.troop.jewelries.Remove(j);
-                    player.money += j.Value;
+                    player.money.rawValue += j.Value;
                     Render();
                     break;
 

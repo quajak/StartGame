@@ -71,9 +71,13 @@ namespace StartGame
             return "";
         }
 
+        private static Quality[] qualities = new Quality[] { Quality.Broken, Quality.Poor, Quality.Simple, Quality.Common, Quality.Good, Quality.Superior, Quality.Exceptional, Quality.Legendary };
+
         public static Quality GetQuality(int num)
         {
-            return new Quality[] { Quality.Broken, Quality.Poor, Quality.Simple, Quality.Common, Quality.Good, Quality.Superior, Quality.Exceptional, Quality.Legendary }[num];
+            return qualities[num];
         }
+
+        public static int GetQualityPos(this Quality quality) => qualities.ToList().IndexOf(quality);
     }
 }

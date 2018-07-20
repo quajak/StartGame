@@ -31,7 +31,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.startGame = new System.Windows.Forms.Button();
             this.setMap = new System.Windows.Forms.Button();
-            this.playerSetup = new System.Windows.Forms.Button();
             this.quit = new System.Windows.Forms.Button();
             this.startCampaign = new System.Windows.Forms.Button();
             this.armourCreator = new System.Windows.Forms.Button();
@@ -67,19 +66,9 @@
             this.setMap.UseVisualStyleBackColor = true;
             this.setMap.Click += new System.EventHandler(this.SetMap_Click);
             // 
-            // playerSetup
-            // 
-            this.playerSetup.Location = new System.Drawing.Point(83, 150);
-            this.playerSetup.Name = "playerSetup";
-            this.playerSetup.Size = new System.Drawing.Size(100, 23);
-            this.playerSetup.TabIndex = 3;
-            this.playerSetup.Text = "Profile";
-            this.playerSetup.UseVisualStyleBackColor = true;
-            this.playerSetup.Click += new System.EventHandler(this.PlayerSetup_Click);
-            // 
             // quit
             // 
-            this.quit.Location = new System.Drawing.Point(83, 179);
+            this.quit.Location = new System.Drawing.Point(83, 184);
             this.quit.Name = "quit";
             this.quit.Size = new System.Drawing.Size(100, 23);
             this.quit.TabIndex = 4;
@@ -99,7 +88,7 @@
             // 
             // armourCreator
             // 
-            this.armourCreator.Location = new System.Drawing.Point(83, 233);
+            this.armourCreator.Location = new System.Drawing.Point(83, 231);
             this.armourCreator.Name = "armourCreator";
             this.armourCreator.Size = new System.Drawing.Size(100, 23);
             this.armourCreator.TabIndex = 5;
@@ -115,7 +104,6 @@
             this.Controls.Add(this.armourCreator);
             this.Controls.Add(this.startCampaign);
             this.Controls.Add(this.quit);
-            this.Controls.Add(this.playerSetup);
             this.Controls.Add(this.setMap);
             this.Controls.Add(this.startGame);
             this.Controls.Add(this.label1);
@@ -132,7 +120,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button startGame;
         private System.Windows.Forms.Button setMap;
-        private System.Windows.Forms.Button playerSetup;
         private System.Windows.Forms.Button quit;
         private System.Windows.Forms.Button startCampaign;
         private System.Windows.Forms.Button armourCreator;
