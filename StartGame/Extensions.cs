@@ -1,10 +1,13 @@
-﻿using StartGame.Items;
+﻿using StartGame.Dungeons;
+using StartGame.Entities;
+using StartGame.Items;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -13,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace StartGame
 {
-    internal static class Extensions
+    internal static class E
     {
         public static Point Mult(this Point point, int Size)
         {
@@ -78,6 +81,96 @@ namespace StartGame
             return qualities[num];
         }
 
-        public static int GetQualityPos(this Quality quality) => qualities.ToList().IndexOf(quality);
+        public static int GetQualityPos(this Quality quality)
+        {
+            return qualities.ToList().IndexOf(quality);
+        }
+
+        public static string WriteAttribute(string data, string name)
+        {
+            return $"{data} {name}";
+        }
+
+        internal static string WriteAttribute(int i, string v)
+        {
+            return WriteAttribute(i.ToString(), v);
+        }
+    }
+}
+
+namespace StartGame.Extra.Loading
+{
+    internal static class Loading
+    {
+        public static string GetString(this string line)
+        {
+            return line.Split(' ')[0];
+        }
+
+        public static int GetInt(this string line)
+        {
+            return int.Parse(line.Split(' ')[0]);
+        }
+
+        public static double GetDouble(this string line)
+        {
+            return double.Parse(line.Split(' ')[0]);
+        }
+
+        public static bool GetBool(this string line)
+        {
+            return bool.Parse(line.Split(' ')[0]);
+        }
+
+        public static Color GetColor(this string line)
+        {
+            return Color.FromArgb(line.GetInt());
+        }
+
+        public static Point GetPoint(this string line)
+        {
+            string[] s = line.Split(' ');
+            return GetPoint(s[0], s[1]);
+        }
+
+        public static Point GetPoint(string line1, string line2)
+        {
+            int x = int.Parse(line1);
+            int y = int.Parse(line2);
+            return new Point(x, y);
+        }
+
+        public static List<string> GetStringList(this string line)
+        {
+            List<string> all = line.Trim().Split(' ').ToList();
+            all = all.Take(all.Count - 1).ToList();
+            all = all.Where(a => a.Trim().Length != 0).ToList();
+            return all;
+        }
+
+        public static EntityPlaceHolder GetEntity(this string line, Room room)
+        {
+            string[] words = line.Split(' ');
+            switch (words[0])
+            {
+                case "Door":
+                    string name = words[1];
+                    Point point = GetPoint(words[2], words[3]);
+                    //bool blocking = GetBool(words[4]); Not needed for door
+                    int id = words[5].GetInt();
+                    bool unlinked = words[6].GetBool();
+                    string roomName = "";
+                    int doorId = 0;
+                    if (!unlinked)
+                    {
+                        roomName = words[7];
+                        doorId = words[8].GetInt();
+                    }
+                    return new DoorPlaceHolder((roomName, doorId), room.name, point, id);
+
+                default:
+                    throw new NotImplementedException(line);
+            }
+        }
     }
 }

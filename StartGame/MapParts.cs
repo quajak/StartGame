@@ -1,5 +1,7 @@
-﻿using System;
+﻿using StartGame.Extra.Loading;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -7,59 +9,118 @@ using System.Linq;
 namespace StartGame
 {
     [DebuggerDisplay("X:{position.X} Y:{position.Y} Type:{type.type.ToString()}")]
-    internal class MapTile : ICloneable
+    public class MapTile : ICloneable
     {
         public Point position;
         public MapTileType type;
-        public double height;
+        private double height;
         public Continent continent;
         public SorroundingTiles<MapTile> neighbours;
         public bool isBeingChecked;
         public double Cost { set; get; }
+
+        public double Height
+        {
+            get => height; set
+            {
+                height = value;
+                CalculateDerivedStats();
+            }
+        }
+
         public double MovementCost;
         public double[] Costs;
         public string[] GoalIDs;
         public string id;
         public double leftValue = -1;
-        public bool free = true;
+        public bool free;
+        public Color color;
+        public Color shader;
 
-        public MapTile(Point Position, MapTileType Type, double Height)
+        private static Random random = new Random();
+
+        public MapTile(Point Position, MapTileType Type, double Height, bool Free = true)
         {
             Cost = 1;
             isBeingChecked = false;
             position = Position;
             id = position.ToString();
             type = Type;
-            height = Height;
-            switch (Type.type)
+            this.Height = Height;
+            free = Free;
+            color = type.BaseColor;
+        }
+
+        public string RawData()
+        {
+            return $"{position.X} {position.Y} {(int)type.type} {height} {Cost} {free} {color.ToArgb()} {shader.ToArgb()}";
+        }
+
+        public static MapTile Load(string line)
+        {
+            string[] parts = line.Split(' ');
+            Point pos = Loading.GetPoint(parts[0], parts[1]);
+            MapTileTypeEnum typeEnum = (MapTileTypeEnum)parts[2].GetInt();
+            double height = parts[3].GetDouble();
+            double cost = parts[4].GetDouble();
+            bool free = parts[5].GetBool();
+            Color color = parts[6].GetColor();
+            Color shader = parts[7].GetColor();
+            return new MapTile(pos, new MapTileType() { type = typeEnum }, height, free, color, shader);
+        }
+
+        private void CalculateDerivedStats()
+        {
+            switch (type.type)
             {
                 case MapTileTypeEnum.land:
                     MovementCost = 1;
+                    shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
                     break;
 
                 case MapTileTypeEnum.mountain:
+                    shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
                     MovementCost = 2;
                     break;
 
                 case MapTileTypeEnum.hill:
+                    shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
                     MovementCost = 1.5;
                     break;
 
                 case MapTileTypeEnum.shallowWater:
+                    shader = Color.FromArgb((int)(((1 - Height) / 2) * 255), 0, 0, 0);
                     MovementCost = 1.5;
                     break;
 
                 case MapTileTypeEnum.deepWater:
+                    shader = Color.FromArgb((int)(((1 - Height) / 2) * 255), 0, 0, 0);
                     MovementCost = 2;
                     break;
 
                 case MapTileTypeEnum.path:
+                    shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
                     MovementCost = 0.5;
                     break;
 
-                default:
+                case MapTileTypeEnum.wall:
+                    shader = Color.FromArgb(random.Next(100, 150), 0, 0, 0);
+                    MovementCost = 20;
                     break;
+
+                default:
+                    throw new NotImplementedException();
             }
+        }
+
+        public MapTile(int x, int y, MapTileType mapTileType, double setHeight, bool free = true) : this(new Point(x, y), mapTileType, setHeight, free)
+        {
+        }
+
+        public MapTile(Point Position, MapTileType Type, double Height, bool Free, Color color, Color shader) : this(Position, Type, Height, Free)
+        {
+            this.color = color;
+            this.shader = shader;
         }
 
         public void InitialiseDistances(int length)
@@ -75,15 +136,16 @@ namespace StartGame
 
         public object Clone()
         {
-            return new MapTile(position, type, height)
-            {
+            return new MapTile(position, type, Height) {
                 id = id,
                 Cost = Cost,
                 Costs = Costs,
                 continent = continent,
                 neighbours = (SorroundingTiles<MapTile>)neighbours.Clone(),
                 isBeingChecked = isBeingChecked,
-                GoalIDs = GoalIDs
+                GoalIDs = GoalIDs,
+                color = color,
+                shader = shader
             };
         }
 
@@ -93,7 +155,7 @@ namespace StartGame
         }
     }
 
-    internal class SorroundingTiles<T> : ICloneable
+    public class SorroundingTiles<T> : ICloneable
     {
         public T top;
         public T left;
@@ -168,14 +230,84 @@ namespace StartGame
     }
 
     public enum MapTileTypeEnum
-    { land, mountain, hill, shallowWater, deepWater, path }
+    {
+        [Description("Land")]
+        land,
 
-    public enum FieldType { water, land, mountain }
+        [Description("Mountain")]
+        mountain,
+
+        [Description("Hill")]
+        hill,
+
+        [Description("Shallow Water")]
+        shallowWater,
+
+        [Description("Deep water")]
+        deepWater,
+
+        [Description("Path")]
+        path,
+
+        [Description("Wall")]
+        wall
+    }
+
+    public enum FieldType { water, land, mountain, wall }
 
     [DebuggerDisplay("Type: {type}")]
     public struct MapTileType
     {
         public MapTileTypeEnum type;
+
+        private static Dictionary<string, MapTileTypeEnum> mapTileMapping;
+
+        public static MapTileTypeEnum MapTileTypeEnumFromString(string data)
+        {
+            if (mapTileMapping is null)
+            {
+                mapTileMapping = new Dictionary<string, MapTileTypeEnum>();
+                foreach (object type in Enum.GetValues(typeof(MapTileTypeEnum)))
+                {
+                    MapTileTypeEnum rType = (MapTileTypeEnum)type;
+                    mapTileMapping.Add(((MapTileTypeEnum)type).Description(), rType);
+                }
+            }
+            return mapTileMapping[data];
+        }
+
+        public Color BaseColor
+        {
+            get
+            {
+                switch (type)
+                {
+                    case MapTileTypeEnum.land:
+                        return Color.Green;
+
+                    case MapTileTypeEnum.mountain:
+                        return Color.DarkGray;
+
+                    case MapTileTypeEnum.hill:
+                        return Color.LightGray;
+
+                    case MapTileTypeEnum.shallowWater:
+                        return Color.Blue;
+
+                    case MapTileTypeEnum.deepWater:
+                        return Color.MediumBlue;
+
+                    case MapTileTypeEnum.path:
+                        return Color.SandyBrown;
+
+                    case MapTileTypeEnum.wall:
+                        return Color.Gray;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+        }
 
         public FieldType FType
         {
@@ -201,14 +333,17 @@ namespace StartGame
                     case MapTileTypeEnum.path:
                         return FieldType.land;
 
+                    case MapTileTypeEnum.wall:
+                        return FieldType.wall;
+
                     default:
-                        throw new Exception();
+                        throw new NotImplementedException();
                 }
             }
         }
     }
 
-    internal class EdgeArray<T>
+    public class EdgeArray<T>
     {
         public List<T> top;
         public List<T> bottom;
@@ -224,7 +359,7 @@ namespace StartGame
         }
     }
 
-    internal class Continent
+    public class Continent
     {
         public List<MapTile> tiles;
         public MapTileTypeEnum Type { get; private set; }

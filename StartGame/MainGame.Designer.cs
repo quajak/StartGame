@@ -1,6 +1,6 @@
 ﻿namespace StartGame
 {
-    partial class MainGameWindow
+    public partial class MainGameWindow
     {
         /// <summary>
         /// Required designer variable.

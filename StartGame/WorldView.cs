@@ -51,9 +51,9 @@ namespace StartGame
                     //Determine the quality
                     MathNet.Numerics.Distributions.Normal normal = new MathNet.Numerics.Distributions.Normal();
                     int offset = (int)normal.InverseCumulativeDistribution(random.NextDouble());
-                    int num = Extensions.GetQualityPos(_reward.jewelryReward.quality) + offset;
+                    int num = E.GetQualityPos(_reward.jewelryReward.quality) + offset;
                     num = Math.Min(Math.Max(num, 0), Enum.GetNames(typeof(Quality)).Length); //Bound the value
-                    Quality quality = Extensions.GetQuality(num);
+                    Quality quality = E.GetQuality(num);
                     reward.Add(Jewelry.GenerateJewelry(quality));
                     _reward.jewelryReward.number--;
                 }
@@ -116,7 +116,7 @@ namespace StartGame
                         case 1:
                             int quality = Math.Min(player.level / 2, Quality.Legendary.GetQualityPos());
                             //generate a piece of armour
-                            itemShopItems.Add(Jewelry.GenerateJewelry(Extensions.GetQuality(random.Next(quality))));
+                            itemShopItems.Add(Jewelry.GenerateJewelry(E.GetQuality(random.Next(quality))));
                             break;
 
                         default:

@@ -1,4 +1,5 @@
 ﻿using StartGame.DebugViews;
+using StartGame.Dungeons;
 using System;
 using System.Windows.Forms;
 
@@ -14,7 +15,7 @@ namespace StartGame
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainGameMenu());
+            Application.Run(new DungeonCreator());
         }
     }
 }

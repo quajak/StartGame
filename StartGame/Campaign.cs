@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace StartGame
 {
-    internal class Campaign
+    public class Campaign
     {
         public Mission mission;
         public HumanPlayer player;
@@ -22,7 +22,7 @@ namespace StartGame
         public MainGameWindow activeGame;
         private Random random = new Random();
         public int difficulty;
-        public int Round { get { return playedGames.Count + 1; } }
+        public int Round => playedGames.Count + 1;
 
         public readonly int healthRegen;
 
@@ -95,8 +95,7 @@ namespace StartGame
             Thread mapCreator;
             do
             {
-                mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), 0)))
-                {
+                mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), 0))) {
                     Priority = ThreadPriority.Highest
                 };
                 mapCreator.Start();
@@ -142,5 +141,5 @@ namespace StartGame
         }
     }
 
-    internal delegate bool WinCheck(Map map, MainGameWindow main);
+    public delegate bool WinCheck(Map map, MainGameWindow main);
 }

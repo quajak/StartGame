@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 using static StartGame.MainGameWindow;
 using StartGame.Items;
 using StartGame.PlayerData;
+using StartGame.Entities;
 
 namespace StartGame
 {
-    internal enum DamageType
+    public enum DamageType
     { melee, fire, water, earth, air, unblockable };
 
-    internal abstract class Spell : Item
+    public abstract class Spell : Item
     {
         //TODO Add description to each spell
         //Long term: Add: Spells have a chance to fail
@@ -70,12 +71,12 @@ namespace StartGame
         }
     }
 
-    internal struct SpellInformationFormat
+    public struct SpellInformationFormat
     {
         public int Positions;
     }
 
-    internal struct SpellInformation
+    public struct SpellInformation
     {
         public List<Point> positions;
         public Player mage;

@@ -1,4 +1,5 @@
 ﻿using PlayerCreator;
+using StartGame.Entities;
 using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace StartGame
 {
-    internal class Reward
+    public class Reward
     {
         public JewelryReward jewelryReward;
         public WeaponReward weaponReward;
@@ -29,7 +30,7 @@ namespace StartGame
         }
     }
 
-    internal class JewelryReward
+    public class JewelryReward
     {
         public List<Jewelry> jewelries;
         public int number;
@@ -55,7 +56,7 @@ namespace StartGame
         }
     }
 
-    internal class SpellReward
+    public class SpellReward
     {
         public Spell spell;
 
@@ -65,7 +66,7 @@ namespace StartGame
         }
     }
 
-    internal class WeaponReward
+    public class WeaponReward
     {
         public bool random;
         public int rarity;
@@ -79,7 +80,7 @@ namespace StartGame
         }
     }
 
-    internal abstract class Mission
+    public abstract class Mission
     {
         public double heightDiff = 0;
         public bool EnemyMoveTogether = false;
@@ -119,8 +120,7 @@ namespace StartGame
 
             #region WinCodition Creation
 
-            List<WinCheck> wins = new List<WinCheck>
-            {
+            List<WinCheck> wins = new List<WinCheck> {
             };
             WinCheck fail = ((_map, main) => false);
             wins.Add(fail);
@@ -303,8 +303,7 @@ namespace StartGame
                 item.troop = new Troop(name,
                     new Weapon(4 + difficulty / 4 + Round - 1,
                         BaseAttackType.melee, BaseDamageType.blunt, 1, "Fists", 1, false),
-                    Resources.enemyScout, 0, map, item)
-                {
+                    Resources.enemyScout, 0, map, item) {
                     armours = new List<Armour>
                         {
                             new Armour("Shirt", 32, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Cloth"),Quality.Broken, ArmourLayer.clothing),
@@ -335,8 +334,7 @@ namespace StartGame
             List<MapTile> goalLocations = new List<MapTile>(map.goals);
             if (goalLocations.Count > 1)
             {
-                goalLocations.Sort((l1, l2) =>
-                {
+                goalLocations.Sort((l1, l2) => {
                     int dis1 = distance(l1.position, playerPosition);
                     int dis2 = distance(l2.position, playerPosition);
                     if (dis1 == dis2) return 0;
@@ -440,8 +438,7 @@ namespace StartGame
             Point spawnPoint = orderedEnumerable.FirstOrDefault().position;
 
             SpiderNestAI item1 = new SpiderNestAI(PlayerType.computer, "Spider Nest", map, new Player[] { player }, difficulty, Round);
-            item1.troop = new Troop("Spider Nest", null, Resources.spiderNest, 2, map, item1, 0)
-            {
+            item1.troop = new Troop("Spider Nest", null, Resources.spiderNest, 2, map, item1, 0) {
                 Position = spawnPoint
             };
             players.Add(item1);
@@ -524,8 +521,7 @@ namespace StartGame
             string name = $"Elemental Wizard";
             ElementalWizard item = new ElementalWizard(PlayerType.computer, name, map, new Player[] { player }, difficulty, Round);
             item.troop = new Troop(name, new Weapon(3 + difficulty / 5 + Round / 2, BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
-            Resources.elementalWizard, 0, map, item, Dodge: 25)
-            {
+            Resources.elementalWizard, 0, map, item, Dodge: 25) {
                 armours = new List<Armour>
                     {
                         new Armour("Wizard's Cloak", 40, new List<BodyParts>{BodyParts.Head,BodyParts.Neck,BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso,BodyParts.UpperLegs,BodyParts.LeftLowerLeg,BodyParts.RightLowerLeg}, Material.Materials.First(m => m.name == "Wool"),Quality.Superior, ArmourLayer.light)
@@ -629,8 +625,7 @@ namespace StartGame
                 toCheck.Remove(checking);
                 startPos.Add(checking);
 
-                map.map[checking.X, checking.Y].neighbours.rawMaptiles.ToList().ForEach(m =>
-                {
+                map.map[checking.X, checking.Y].neighbours.rawMaptiles.ToList().ForEach(m => {
                     //Check if it does not exist, if land and is not blocked
                     if (!startPos.Exists(f => f.X == m.position.X && f.Y == m.position.Y) && m.type.FType == FieldType.land && m.free)
                     {
@@ -661,8 +656,7 @@ namespace StartGame
                 string name = $"Bandit {i + 1}";
                 DefensiveBanditAI item = new DefensiveBanditAI(PlayerType.computer, name, map, new Player[] { player }, camp);
                 item.troop = new Troop(name, new Weapon(3 + difficulty / 5 + Round / 2, BaseAttackType.melee, BaseDamageType.sharp, 1, "Dagger", 2, false),
-                Resources.enemyScout, 0, map, item, Dodge: 25)
-                {
+                Resources.enemyScout, 0, map, item, Dodge: 25) {
                     armours = new List<Armour>
                         {
                             new Armour("Cap", 10, new List<BodyParts>{BodyParts.Head}, Material.Materials.First(m => m.name == "Cloth"),Quality.Simple, ArmourLayer.clothing),

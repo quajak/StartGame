@@ -73,7 +73,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animations.cs" />
-    <Compile Include="Entity.cs" />
+    <Compile Include="Dungeons\Dungeon.cs" />
+    <Compile Include="Dungeons\DungeonCreator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dungeons\DungeonCreator.Designer.cs">
+      <DependentUpon>DungeonCreator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dungeons\DungeonRoom.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityEditor.cs" />
+    <Compile Include="Entities\EntityFactory.cs" />
+    <Compile Include="Entities\PlaceHolder.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Items\ArmorPrefabs.cs" />
     <Compile Include="Items\Armour.cs" />
     <Compile Include="Items\Jewelry.cs" />
@@ -98,7 +110,7 @@
     <Compile Include="DebugViews\ItemCreator.Designer.cs">
       <DependentUpon>ItemCreator.cs</DependentUpon>
     </Compile>
-    <Compile Include="Effects.cs" />
+    <Compile Include="Entities\Effects.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\Modifiers.cs" />
@@ -202,6 +214,9 @@
     <EmbeddedResource Include="DebugViews\ItemCreator.resx">
       <DependentUpon>ItemCreator.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dungeons\DungeonCreator.resx">
+      <DependentUpon>DungeonCreator.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LevelUp.resx">
       <DependentUpon>LevelUp.cs</DependentUpon>
     </EmbeddedResource>
@@ -246,6 +261,8 @@
     <EmbeddedResource Include="WorldView.resx">
       <DependentUpon>WorldView.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include=".editorconfig" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -310,6 +327,20 @@
   <ItemGroup>
     <None Include="Resources\DragonEggNest.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\Door.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PaintTool.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EntityAdderTool.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SelectionTool.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ShowBlocking.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

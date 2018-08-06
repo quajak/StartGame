@@ -15,7 +15,7 @@ namespace StartGame.Items
         {
             Armour toReturn;
             int chosen = random.Next(6);
-            Quality quality = Extensions.GetQuality(random.Next(8));
+            Quality quality = E.GetQuality(random.Next(8));
             switch (chosen)
             {
                 case 0:

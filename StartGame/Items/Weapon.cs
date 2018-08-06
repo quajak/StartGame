@@ -9,12 +9,12 @@ namespace StartGame.Items
     public enum BaseAttackType
     { melee, range, magic };
 
-    internal enum BaseDamageType
+    public enum BaseDamageType
     {
         sharp, blunt, magic
     }
 
-    internal class Weapon : Item
+    public class Weapon : Item
     {
         public int attackDamage;
         public BaseAttackType type;

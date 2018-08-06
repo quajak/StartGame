@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StartGame.Items
 {
-    internal abstract class Jewelry : Item
+    public abstract class Jewelry : Item
     {
         private bool active;
         public Buff agility;
@@ -142,7 +142,7 @@ namespace StartGame.Items
             this.carryCapacity = carryCapacity;
             this.weight = weight;
             this.type = type;
-            this.Active = active;
+            Active = active;
             this.quality = quality;
             this.material = material;
         }
@@ -282,7 +282,7 @@ namespace StartGame.Items
         }
     }
 
-    internal class JewelryType
+    public class JewelryType
     {
         public string name;
         public int MaxNumber;
@@ -308,7 +308,7 @@ namespace StartGame.Items
 
         public override int GetHashCode()
         {
-            var hashCode = -2071717862;
+            int hashCode = -2071717862;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(name);
             hashCode = hashCode * -1521134295 + MaxNumber.GetHashCode();
             return hashCode;

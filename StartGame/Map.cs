@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using PlayerCreator;
+using StartGame.Entities;
 using StartGame.PlayerData;
 
 namespace StartGame
 {
-    internal partial class Map
+    public partial class Map
     {
         public const int Width = 31;
         public const int Height = 31;
@@ -28,7 +29,7 @@ namespace StartGame
 
         private List<Continent> continents;
 
-        private Random generic = new Random();
+        private Random random = new Random();
 
         public List<Troop> troops = new List<Troop>();
 
@@ -38,7 +39,7 @@ namespace StartGame
 
         public const int creationTime = 500;
 
-        public Map()
+        public Map(int Width = 31, int Height = 31)
         {
             width = Width;
             height = Height;
@@ -104,8 +105,7 @@ namespace StartGame
                     else if (mHeight < 0.8) mapTileEnum = MapTileTypeEnum.hill;
                     else if (mHeight <= 1.0) mapTileEnum = MapTileTypeEnum.mountain;
 
-                    map[x, y] = new MapTile(new Point(x, y), new MapTileType
-                    {
+                    map[x, y] = new MapTile(new Point(x, y), new MapTileType {
                         type = mapTileEnum
                     }, mHeight);
                 }
@@ -289,7 +289,7 @@ namespace StartGame
             return;
         }
 
-        public void SetupMap()
+        public void SetupMap(MapTileTypeEnum mapTileType = MapTileTypeEnum.land, bool free = true)
         {
             map = new MapTile[width, height];
 
@@ -297,10 +297,15 @@ namespace StartGame
             {
                 for (int y = 0; y <= map.GetUpperBound(1); y++)
                 {
-                    map[x, y] = new MapTile(new Point(x, y), new MapTileType() { type = MapTileTypeEnum.land }, 0.5);
+                    map[x, y] = new MapTile(new Point(x, y), new MapTileType() { type = mapTileType }, 0.5, free);
                 }
             }
 
+            UpdateMapTileData();
+        }
+
+        public void UpdateMapTileData()
+        {
             //Add neighbours as they are now initialised
             for (int x = 0; x < width; x++)
             {
@@ -680,25 +685,25 @@ namespace StartGame
                         {
                             int x;
                             int y;
-                            int n = generic.Next(4);
+                            int n = random.Next(4);
                             if (n == 0)
                             {
                                 x = 0;
-                                y = generic.Next(map.GetUpperBound(1));
+                                y = random.Next(map.GetUpperBound(1));
                             }
                             else if (n == 1)
                             {
-                                x = generic.Next(map.GetUpperBound(0));
+                                x = random.Next(map.GetUpperBound(0));
                                 y = 0;
                             }
                             else if (n == 2)
                             {
                                 x = map.GetUpperBound(0);
-                                y = generic.Next(map.GetUpperBound(1));
+                                y = random.Next(map.GetUpperBound(1));
                             }
                             else
                             {
-                                x = generic.Next(map.GetUpperBound(0));
+                                x = random.Next(map.GetUpperBound(0));
                                 y = map.GetUpperBound(1);
                             }
 
@@ -710,7 +715,7 @@ namespace StartGame
                     List<MapTile> _goals = new List<MapTile>(goals);
                     while (_goals.Count != 0 && playerNumber != 0)
                     {
-                        MapTile pathPoint = _goals[generic.Next(_goals.Count)];
+                        MapTile pathPoint = _goals[random.Next(_goals.Count)];
                         _goals.Remove(pathPoint);
                         toReturn.Add(pathPoint.position);
                         playerNumber--;
@@ -730,8 +735,8 @@ namespace StartGame
                         Point p = new Point();
                         while (true)
                         {
-                            p = new Point(generic.Next(map.GetUpperBound(0),
-                            generic.Next(map.GetUpperBound(1))));
+                            p = new Point(random.Next(map.GetUpperBound(0),
+                            random.Next(map.GetUpperBound(1))));
                             //Determine is viable
                             if (!troops.Exists(t => t.Position.X == p.X &&
                                  t.Position.Y == p.Y) &&
@@ -749,7 +754,7 @@ namespace StartGame
                 case SpawnType.heighestField:
 
                     var ordered = from field in map.Cast<MapTile>()
-                                  orderby field.height descending
+                                  orderby field.Height descending
                                   select field;
                     toReturn = ordered.Take(playerNumber).ToList().ConvertAll(f => f.position);
                     break;
@@ -767,7 +772,7 @@ namespace StartGame
                 Point point;
                 while (true)
                 {
-                    point = new Point(generic.Next(map.GetUpperBound(0)), generic.Next(map.GetUpperBound(1)));
+                    point = new Point(random.Next(map.GetUpperBound(0)), random.Next(map.GetUpperBound(1)));
                     if ((map[point.X, point.Y].type.type == MapTileTypeEnum.land
                         || map[point.X, point.Y].type.type == MapTileTypeEnum.path) &&
                         !troops.Exists(t => t.Position.X == point.X && t.Position.Y == point.Y))
@@ -778,6 +783,20 @@ namespace StartGame
                 }
             }
         }
+
+        #region Utiltiy Functions
+
+        public List<Entity> GetEntities(Point point)
+        {
+            return entites.Where(e => e.Position == point).ToList();
+        }
+
+        public List<Entity> GetEntities(int x, int y)
+        {
+            return GetEntities(new Point(x, y));
+        }
+
+        #endregion Utiltiy Functions
     }
 
     public enum SpawnType

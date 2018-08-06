@@ -1,4 +1,5 @@
 ﻿using PlayerCreator;
+using StartGame.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +13,7 @@ using System.Windows.Forms;
 
 namespace StartGame
 {
-    internal abstract class RenderObject
+    public abstract class RenderObject
     {
         internal Point position;
         internal Point toRender;
@@ -140,15 +141,15 @@ namespace StartGame
         }
     }
 
-    internal enum PositionSetType
+    public enum PositionSetType
     { absolute, goal };
 
     [DebuggerDisplay("Entity Renderer: {Name} : {position} => {toRender} : {time}")]
-    internal class EntityRenderObject : RenderObject
+    public class EntityRenderObject : RenderObject
     {
         public readonly string Name;
 
-        public Point Position { get { return position.Mult(MapCreator.fieldSize); } }
+        public Point Position => position.Mult(MapCreator.fieldSize);
 
         public EntityRenderObject(Point position, Bitmap image, string name, Animation animation = null) : base(position, image)
         {
@@ -181,7 +182,9 @@ namespace StartGame
     {
         public object RenderController = new object(); //TODO: Whenever an render object is manipulated it needs to lock this controller
         public List<RenderObject> renderObjects = new List<RenderObject>();
-        public List<EntityRenderObject> EntityRenderObjects { get { return renderObjects.Where(o => o is EntityRenderObject).Cast<EntityRenderObject>().ToList(); } }
+
+        public List<EntityRenderObject> EntityRenderObjects =>
+            renderObjects.Where(o => o is EntityRenderObject).Cast<EntityRenderObject>().ToList();
 
         public EntityRenderObject GetEntityRenderObject(string Name)
         {
@@ -192,8 +195,7 @@ namespace StartGame
 
         public void RemoveEntityRenderObject(string name)
         {
-            renderObjects.RemoveAll(o =>
-            {
+            renderObjects.RemoveAll(o => {
                 if (o is EntityRenderObject entity)
                 {
                     return entity.Name == name;
@@ -228,14 +230,17 @@ namespace StartGame
         /// <param name="showGoal"></param>
         /// <param name="colorAlpha"></param>
         /// <param name="showInverseHeight"></param>
-        public void Render(PictureBox gameBoard, List<Bitmap> frames, bool forceEntityRendering = false, int frameTime = 100, bool debug = false, int size = MapCreator.fieldSize, int continentAlpha = 0, int showGoal = 1, int colorAlpha = 255, bool showInverseHeight = false)
+        public void Render(PictureBox gameBoard, List<Bitmap> frames, bool forceEntityRendering = false, int frameTime = 100,
+            bool debug = false, int size = MapCreator.fieldSize, int continentAlpha = 0, int showGoal = 1, int colorAlpha = 255, bool showInverseHeight = false,
+            bool forceDrawBackground = false)
         {
             TimeSpan _time = DateTime.Now.TimeOfDay;
             lock (RenderController)
             {
                 renderObjects.ForEach(o => { if (o.time <= 0) o.CalculateAnimation(); });
 
-                if (debug == usedDebug && size == usedSize && continentAlpha == usedContinentAlpha && usedShowGoal == showGoal && colorAlpha == usedColorAlpha && usedInverseHeights == showInverseHeight)
+                if (!forceDrawBackground && debug == usedDebug && size == usedSize && continentAlpha == usedContinentAlpha && usedShowGoal == showGoal
+                    && colorAlpha == usedColorAlpha && usedInverseHeights == showInverseHeight)
                 {
                     //All parameters are the same
                     rawBackground = rawBackground ?? DrawMapBackground(gameBoard.Width, gameBoard.Height, debug, size, continentAlpha, showGoal, colorAlpha, showInverseHeight);
@@ -267,8 +272,7 @@ namespace StartGame
                     {
                         //Move all entites
                         int c = 0; //DEBUG
-                        renderObjects.ForEach(o =>
-                        {
+                        renderObjects.ForEach(o => {
                             if (o.movementAnimationPoints.MoveNext())
                             {
                                 o.SetPosition(o.movementAnimationPoints.Current, PositionSetType.absolute);
@@ -393,7 +397,7 @@ namespace StartGame
         /// </summary>
         /// <param name="Width">Width of the bitmap</param>
         /// <param name="Height">Height of the bitmap</param>
-        /// <param name="Debug">Will show cost of field from a specific goal</param>
+        /// <param name="Debug">Will show cost of field from a specific goal and count the number of tiles</param>
         /// <param name="size">Size of field in pixel</param>
         /// <param name="continentAlpha">Sets alpha of continent alpha, if 0 they are not shown</param>
         /// <param name="showGoal">Which goal will be selected for debug</param>
@@ -411,63 +415,53 @@ namespace StartGame
             using (Graphics g = Graphics.FromImage(mapBackground))
             {
                 g.Clear(Color.Transparent);
-                for (int x = 0; x < Math.Sqrt(map.Length); x++)
+                for (int x = 0; x <= map.GetUpperBound(0); x++)
                 {
-                    for (int y = 0; y < Math.Sqrt(map.Length); y++)
+                    for (int y = 0; y <= map.GetUpperBound(1); y++)
                     {
                         //Average tile
-                        averageTile = (averageTile + map[x, y].height) / 2;
+                        averageTile = (averageTile + map[x, y].Height) / 2;
 
-                        Color b = Color.Black;
-                        Color c = Color.Black;
+                        Color b = map[x, y].shader;
+                        Color c = map[x, y].color;
                         Color d = Color.Black;
                         if (Debug)
                         {
-                            c = Color.FromArgb((int)(map[x, y].height * 255), 0, 0, 0);
+                            c = Color.FromArgb((int)(map[x, y].Height * 255), 0, 0, 0);
+                            switch (map[x, y].type.type)
+                            {
+                                case MapTileTypeEnum.land:
+                                    flatTile++;
+                                    break;
+
+                                case MapTileTypeEnum.mountain:
+                                    hillTile += 2;
+                                    break;
+
+                                case MapTileTypeEnum.hill:
+                                    hillTile++;
+                                    break;
+
+                                case MapTileTypeEnum.shallowWater:
+                                    waterTile++;
+                                    break;
+
+                                case MapTileTypeEnum.deepWater:
+                                    waterTile += 2;
+                                    break;
+
+                                case MapTileTypeEnum.path:
+                                    break;
+
+                                case MapTileTypeEnum.wall:
+                                    break;
+
+                                default:
+                                    throw new NotImplementedException();
+                            }
                         }
                         else
                         {
-                            //The five different types of land are cut of evenly - due to the fact that perlin has gaussian distribution
-                            //there will be a higher amount of flat land
-                            if (map[x, y].height < 0.2)
-                            {
-                                //Deep water
-                                b = Color.FromArgb((int)((1 - map[x, y].height) * 255), 0, 0, 0);
-                                c = Color.MediumBlue;
-                                waterTile += 2;
-                            }
-                            else if (map[x, y].height < 0.4)
-                            {
-                                //Shallow water
-                                b = Color.FromArgb((int)((1 - map[x, y].height) * 255), 0, 0, 0);
-                                c = Color.Blue;
-                                waterTile++;
-                            }
-                            else if (map[x, y].height < 0.6)
-                            {
-                                //Flat land
-                                b = Color.FromArgb((int)(map[x, y].height * 255), 0, 0, 0);
-                                c = Color.Green;
-                                flatTile++;
-                            }
-                            else if (map[x, y].height < 0.8)
-                            {
-                                //Hills
-                                b = Color.FromArgb((int)(map[x, y].height * 255), 0, 0, 0);
-                                c = Color.LightGray;
-                                hillTile++;
-                            }
-                            else if (map[x, y].height <= 1)
-                            {
-                                //Mountains
-                                b = Color.FromArgb((int)(map[x, y].height * 255), 0, 0, 0);
-                                c = Color.DarkGray;
-                                hillTile += 2;
-                            }
-                            if (map[x, y].type.type == MapTileTypeEnum.path)
-                            {
-                                c = Color.SandyBrown;
-                            }
                             //Adjust alpha of color
                             if (colorAlpha != 255)
                                 c = Color.FromArgb(colorAlpha, c.R, c.G, c.B);

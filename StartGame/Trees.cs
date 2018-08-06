@@ -8,7 +8,7 @@ using static StartGame.MainGameWindow;
 
 namespace StartGame
 {
-    internal abstract class Tree
+    public abstract class Tree
     {
         public string name;
 
@@ -39,7 +39,7 @@ namespace StartGame
     }
 
     //TODO: Description of skills are not hard coded but a function
-    internal abstract class Skill : Tree
+    public abstract class Skill : Tree
     {
         private readonly int minGrowth;
         public int level;

@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StartGame.PlayerData;
 
-namespace StartGame
+namespace StartGame.Entities
 {
     [DebuggerDisplay("Effect - {name}")]
     internal abstract class Effect : Entity
@@ -109,7 +109,7 @@ namespace StartGame
             this.main.PlayerMoved += Main_PlayerMoved;
 
             //Check if put on position of entity
-            var f = Map.troops.Where(t => t.Position == Position).ToList();
+            List<Troop> f = Map.troops.Where(t => t.Position == Position).ToList();
             if (f.Count != 0)
             {
                 Player player = main.players.First(p => p.troop == f[0]);
@@ -153,7 +153,7 @@ namespace StartGame
         }
     }
 
-    internal abstract class Status
+    public abstract class Status
     {
         public readonly string name;
 
@@ -171,7 +171,7 @@ namespace StartGame
         public abstract string Description();
     }
 
-    internal class DebuffStatus : Status
+    public class DebuffStatus : Status
     {
         private readonly int strength;
         private readonly MainGameWindow main;
@@ -188,7 +188,7 @@ namespace StartGame
 
         private void Main_Turn(object sender, MainGameWindow.TurnData e)
         {
-            var main = sender as MainGameWindow;
+            MainGameWindow main = sender as MainGameWindow;
             if (e.active.Name != player.Name) return;
 
             //Handle turn countdown
@@ -223,7 +223,7 @@ namespace StartGame
 
         private void Main_PlayerMoved(object sender, MainGameWindow.PlayerMovementData e)
         {
-            var main = sender as MainGameWindow;
+            MainGameWindow main = sender as MainGameWindow;
             if (e.player.Name == player.Name && e.goal.type.FType == FieldType.water)
             {
                 Point start = e.start.position;
@@ -241,7 +241,7 @@ namespace StartGame
 
         private void Main_Turn(object sender, MainGameWindow.TurnData e)
         {
-            var main = sender as MainGameWindow;
+            MainGameWindow main = sender as MainGameWindow;
             if (e.active.Name != player.Name) return;
 
             //Do effect

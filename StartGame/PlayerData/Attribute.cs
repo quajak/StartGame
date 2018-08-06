@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StartGame.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,15 @@ using System.Threading.Tasks;
 
 namespace StartGame.PlayerData
 {
-    internal class Attribute
+    public class Attribute
     {
         public string name;
         public int rawValue;
 
-        public virtual int RawValue() => rawValue;
+        public virtual int RawValue()
+        {
+            return rawValue;
+        }
 
         public string unit = "";
         public List<Buff> buffs = new List<Buff>();
@@ -119,7 +123,7 @@ namespace StartGame.PlayerData
         public Attribute(int rawValue, int maxValue, bool allowOverflow, string name)
         {
             this.rawValue = rawValue;
-            this.rawMaxValue = maxValue;
+            rawMaxValue = maxValue;
             this.allowOverflow = allowOverflow;
             this.name = name;
         }
@@ -127,7 +131,7 @@ namespace StartGame.PlayerData
         public Attribute(int rawValue, int maxValue, bool allowOverflow, List<Buff> buffs, string name)
         {
             this.rawValue = rawValue;
-            this.rawMaxValue = maxValue;
+            rawMaxValue = maxValue;
             this.allowOverflow = allowOverflow;
             this.buffs = buffs;
             this.name = name;
@@ -154,7 +158,7 @@ namespace StartGame.PlayerData
             this.name = name;
             this.unit = unit;
             this.buffs = buffs;
-            this.rawMaxValue = maxValue;
+            rawMaxValue = maxValue;
             this.allowOverflow = allowOverflow;
         }
 
@@ -166,11 +170,14 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal abstract class DerivedAttribute : Attribute
+    public abstract class DerivedAttribute : Attribute
     {
         internal Player player;
 
-        new public virtual int RawValue() => throw new NotImplementedException();
+        new public virtual int RawValue()
+        {
+            throw new NotImplementedException();
+        }
 
         public DerivedAttribute(Player player, string name, int rawValue) : base(rawValue, name)
         {
@@ -188,7 +195,7 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal class Health : DerivedAttribute
+    public class Health : DerivedAttribute
     {
         public Health(Player player, int bonusMaxValue) : base(player, "Health", 0, bonusMaxValue, true)
         {
@@ -213,7 +220,7 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal class Defense : DerivedAttribute
+    public class Defense : DerivedAttribute
     {
         public Defense(Player player, int bonusDefense) : base(player, "Defense", bonusDefense)
         {
@@ -237,7 +244,7 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal class Dodge : DerivedAttribute
+    public class Dodge : DerivedAttribute
     {
         public Dodge(Player player, int bonusDodge) : base(player, "Dodge", bonusDodge)
         {
@@ -256,7 +263,7 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal class Mana : DerivedAttribute
+    public class Mana : DerivedAttribute
     {
         public Mana(Player player, int baseMaxMana = 10) : base(player, "Mana", 0, baseMaxMana, true)
         {
@@ -280,7 +287,7 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal class ActionPoint : DerivedAttribute
+    public class ActionPoint : DerivedAttribute
     {
         new public double rawValue;
 
@@ -306,7 +313,7 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal class GearWeight : DerivedAttribute
+    public class GearWeight : DerivedAttribute
     {
         public List<Buff> maxGearWeight = new List<Buff>();
         public List<Buff> itemGearWeight = new List<Buff>();
@@ -358,7 +365,7 @@ namespace StartGame.PlayerData
     /// Movement Distance is used to calculate how many fields a unit can move. It is calculate from action points and extra moves a unit has.
     /// To keep track of this, Reset must be called at the beginning of each turn and whenever a unit moves.
     /// </summary>
-    internal class MovementPoints : DerivedAttribute
+    public class MovementPoints : DerivedAttribute
     {
         public new double rawValue;
         public double maxExtraMovement = 0;
@@ -381,7 +388,10 @@ namespace StartGame.PlayerData
             return null;
         }
 
-        public new double RawValue() => rawValue;
+        public new double RawValue()
+        {
+            return rawValue;
+        }
 
         public void Reset()
         {
@@ -416,14 +426,14 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal enum BuffType
+    public enum BuffType
     {
         Absolute = 0,
         Percentage = 1,
         Constant = 2
     }
 
-    internal class Buff
+    public class Buff
     {
         public readonly BuffType type;
         public readonly int value;

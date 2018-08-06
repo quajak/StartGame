@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StartGame.PlayerData
 {
-    internal class Body
+    public class Body
     {
         public List<BodyPart> bodyParts;
 
@@ -72,10 +72,10 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal enum BodyParts
+    public enum BodyParts
     { Head, Neck, LeftUpperArm, RightUpperArm, LeftLowerArm, RightLowerArm, LeftHand, RightHand, Torso, UpperLegs, LeftLowerLeg, RightLowerLeg, LeftShin, RightShin, LeftFoot, RightFoot }
 
-    internal abstract class BodyPart
+    public abstract class BodyPart
     {
         public readonly string name;
         public readonly int size;

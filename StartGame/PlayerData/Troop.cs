@@ -1,4 +1,4 @@
-﻿using StartGame;
+﻿using StartGame.Entities;
 using StartGame.Items;
 using StartGame.Properties;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace StartGame.PlayerData
 {
-    internal class Troop : Entity
+    public class Troop : Entity
     {
         public Weapon activeWeapon;
         public List<Weapon> weapons = new List<Weapon>();
@@ -31,7 +31,7 @@ namespace StartGame.PlayerData
 
         public int WeaponIndex
         {
-            get { return weaponIndex; }
+            get => weaponIndex;
             set
             {
                 weaponIndex = value;
@@ -39,7 +39,9 @@ namespace StartGame.PlayerData
             }
         }
 
-        public Troop(string Name, Weapon Weapon, Bitmap Image, int Defense, Map map, Player player, int Dodge = 10, Dictionary<DamageType, double> Vurneabilities = null) : base(Name, new Point(0, 0), Image, true, map)
+        public Troop(string Name, Weapon Weapon, Bitmap Image, int Defense, Map map, Player player,
+            int Dodge = 10, Dictionary<DamageType, double> Vurneabilities = null)
+            : base(Name, new Point(0, 0), Image, true, map)
         {
             vurneabilites = Vurneabilities ?? new Dictionary<DamageType, double>();
             health = new Health(player, 0);

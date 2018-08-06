@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using PlayerCreator;
 using StartGame;
+using StartGame.Entities;
 using StartGame.Items;
 using StartGame.Properties;
 using static StartGame.MainGameWindow;
 
 namespace StartGame.PlayerData
 {
-    internal abstract class Player
+    public abstract class Player
     {
         public PlayerType type;
         public string Name;
@@ -29,7 +30,7 @@ namespace StartGame.PlayerData
         //Derived stats
         public Troop troop;
 
-        public bool Dead { get => troop.health.Value == 0; }
+        public bool Dead => troop.health.Value == 0;
 
         public List<JewelryType> JewelryTypes = new List<JewelryType>()
         {
@@ -38,9 +39,15 @@ namespace StartGame.PlayerData
             new JewelryType("Earring", 4)
         };
 
-        public JewelryType GetJewelryType(JewelryType type) => GetJewelryType(type.name);
+        public JewelryType GetJewelryType(JewelryType type)
+        {
+            return GetJewelryType(type.name);
+        }
 
-        public JewelryType GetJewelryType(string name) => JewelryTypes.First(j => j.name == name);
+        public JewelryType GetJewelryType(string name)
+        {
+            return JewelryTypes.First(j => j.name == name);
+        }
 
         //Base stats
         public Attribute strength; //Bonus damage dealt
@@ -59,7 +66,8 @@ namespace StartGame.PlayerData
 
         public GearWeight gearWeight;
 
-        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, int Intelligence, int Strength, int Endurance, int Wisdom, int Agility, int Vitality, List<Spell> spells = null)
+        public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, int Intelligence,
+            int Strength, int Endurance, int Wisdom, int Agility, int Vitality, List<Spell> spells = null)
         {
             this.XP = XP;
             actionPoints = new ActionPoint(this, 4);
@@ -100,8 +108,7 @@ namespace StartGame.PlayerData
         /// <summary>
         /// Called when turn starts used to set action points
         /// </summary>
-        public event EventHandler InitialiseTurnHandler = (sender, e) =>
-        {
+        public event EventHandler InitialiseTurnHandler = (sender, e) => {
             Player player = (sender as Player);
             player.actionPoints.rawValue = player.actionPoints.MaxValue().Value;
             player.movementPoints.Reset();
@@ -174,7 +181,7 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal class HumanPlayer : Player
+    public class HumanPlayer : Player
     {
         public MainGameWindow main;
 
@@ -276,10 +283,8 @@ namespace StartGame.PlayerData
                 //Find closest field to player
                 Point closestField;
                 closestField = AIUtility.FindClosestField(distanceGraph, playerPos, movementPoints.Value, map,
-                    (List<(Point point, double cost, double height)> list) =>
-                    {
-                        list.Sort((o1, o2) =>
-                        {
+                    (List<(Point point, double cost, double height)> list) => {
+                        list.Sort((o1, o2) => {
                             double diffCost = o1.cost - o2.cost;
                             double heightDiff = o1.height - o2.height;
                             if (Math.Abs(diffCost) >= 1) //assume that using the weapon costs 1 action point
@@ -423,10 +428,8 @@ namespace StartGame.PlayerData
                 Point goalPos = enraged || AIUtility.Distance(camp, playerPos) < 8 ? playerPos : camp;
 
                 closestField = AIUtility.FindClosestField(graph, goalPos, movementPoints.Value, map,
-                    (List<(Point point, double cost, double height)> list) =>
-                    {
-                        list.Sort((o1, o2) =>
-                        {
+                    (List<(Point point, double cost, double height)> list) => {
+                        list.Sort((o1, o2) => {
                             double diffCost = o1.cost - o2.cost;
                             double heightDiff = o1.height - o2.height;
                             if (Math.Abs(diffCost) >= 1) //assume that using the weapon costs 1 action point
@@ -658,7 +661,7 @@ namespace StartGame.PlayerData
                         tries++;
                     }
 
-                    if (tries == 100) Extensions.LogInfo("Did not find locations for fire bombs!");
+                    if (tries == 100) E.LogInfo("Did not find locations for fire bombs!");
                     else bombNumber++;
 
                     lock (map.RenderController)
@@ -700,10 +703,8 @@ namespace StartGame.PlayerData
             {
                 //Jump towards player and create earthquake
                 closestField = AIUtility.FindClosestField(graph, goalPos, jumpDistance, map,
-                (List<(Point point, double cost, double height)> list) =>
-                {
-                    list.Sort((o1, o2) =>
-                    {
+                (List<(Point point, double cost, double height)> list) => {
+                    list.Sort((o1, o2) => {
                         double diffCost = o1.cost - o2.cost;
                         double heightDiff = o1.height - o2.height;
                         if (Math.Abs(diffCost) >= 1) //assume that using the weapon costs 1 action point
@@ -738,10 +739,8 @@ namespace StartGame.PlayerData
                 jumpCooldown = jumpCooldown == 0 ? 0 : jumpCooldown - 1;
 
                 closestField = AIUtility.FindClosestField(graph, goalPos, movementPoints.Value, map,
-                    (List<(Point point, double cost, double height)> list) =>
-                    {
-                        list.Sort((o1, o2) =>
-                        {
+                    (List<(Point point, double cost, double height)> list) => {
+                        list.Sort((o1, o2) => {
                             double diffCost = o1.cost - o2.cost;
                             double heightDiff = o1.height - o2.height;
                             if (Math.Abs(diffCost) >= 1) //assume that using the weapon costs 1 action point
@@ -850,10 +849,8 @@ namespace StartGame.PlayerData
                 {
                     // Try finding closer field to player
                     closestField = AIUtility.FindClosestField(distanceGraph, playerPos, movementPoints.Value, map,
-                        (List<(Point point, double cost, double height)> list) =>
-                        {
-                            list.Sort((o1, o2) =>
-                            {
+                        (List<(Point point, double cost, double height)> list) => {
+                            list.Sort((o1, o2) => {
                                 double diffCost = o1.cost - o2.cost;
                                 double heightDiff = o1.height - o2.height;
                                 if (Math.Abs(diffCost) >= 1) //assume that using the weapon costs 1 action point
@@ -961,8 +958,7 @@ namespace StartGame.PlayerData
                 numSpawned++;
                 WarriorSpiderAI spider = new WarriorSpiderAI(PlayerType.computer, "Spider Spawn " + numSpawned, map, main.players.ToArray());
                 spider.troop = new Troop("Spider Spawn " + numSpawned, new Weapon(1 + difficulty / 5 + round / 2,
-                        BaseAttackType.melee, BaseDamageType.sharp, 1, "Fangs", 1, false), Resources.spiderWarrior, 0, map, spider, 25)
-                {
+                        BaseAttackType.melee, BaseDamageType.sharp, 1, "Fangs", 1, false), Resources.spiderWarrior, 0, map, spider, 25) {
                     Position = pos
                 };
 
@@ -1017,7 +1013,7 @@ namespace StartGame.PlayerData
                     var HeightSorted = from field in map.map.Cast<MapTile>()
                                        where field.free
                                        where AIUtility.Distance(field.position, enemies[0].troop.Position) > 10
-                                       orderby field.height descending
+                                       orderby field.Height descending
                                        select field;
                     //Teleport
                     spells[1].Activate(new SpellInformation() { positions = new List<Point>() { troop.Position, HeightSorted.Take(1).ToList()[0].position }, mage = this });
@@ -1093,11 +1089,11 @@ namespace StartGame.PlayerData
                         {
                             closestDistance = playerDis;
                             closestPoints.Clear();
-                            closestPoints.Add((new Point(x, y), distanceGraph.graph[x, y], map.map[x, y].height));
+                            closestPoints.Add((new Point(x, y), distanceGraph.graph[x, y], map.map[x, y].Height));
                         }
                         else if (playerDis == closestDistance)
                         {
-                            closestPoints.Add((new Point(x, y), distanceGraph.graph[x, y], map.map[x, y].height));
+                            closestPoints.Add((new Point(x, y), distanceGraph.graph[x, y], map.map[x, y].Height));
                         }
                     }
                 }
@@ -1136,7 +1132,7 @@ namespace StartGame.PlayerData
         }
     }
 
-    internal enum PlayerType
+    public enum PlayerType
     { localHuman, computer };
 
     internal class DistanceGraphCreator
@@ -1275,8 +1271,7 @@ namespace StartGame.PlayerData
 
                 //Find field with lowest value for graph (lowest movement cost from start)
                 List<Point> fields = AIUtility.GetFields(active, this);
-                active = fields.Aggregate((best, field) =>
-                {
+                active = fields.Aggregate((best, field) => {
                     if (path.Exists(f => f.position == field)) return best;
                     double b = graph[best.X, best.Y]; //Do not use Get method for optimization
                     double n = graph[field.X, field.Y];

@@ -72,6 +72,16 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Door {
+            get {
+                object obj = ResourceManager.GetObject("Door", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Dragon {
             get {
                 object obj = ResourceManager.GetObject("Dragon", resourceCulture);
@@ -122,6 +132,16 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap EntityAdderTool {
+            get {
+                object obj = ResourceManager.GetObject("EntityAdderTool", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Fire {
             get {
                 object obj = ResourceManager.GetObject("Fire", resourceCulture);
@@ -152,9 +172,39 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap PaintTool {
+            get {
+                object obj = ResourceManager.GetObject("PaintTool", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap playerTroop {
             get {
                 object obj = ResourceManager.GetObject("playerTroop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SelectionTool {
+            get {
+                object obj = ResourceManager.GetObject("SelectionTool", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ShowBlocking {
+            get {
+                object obj = ResourceManager.GetObject("ShowBlocking", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

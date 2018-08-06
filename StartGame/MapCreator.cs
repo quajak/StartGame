@@ -93,7 +93,7 @@ namespace StartGame
             if (text != cleaned)
                 seedInput.Text = cleaned;
             if (cleaned == "") Seed = 0;
-            else Seed = Int32.Parse(cleaned);
+            else Seed = int.Parse(cleaned);
         }
 
         private void HeightDifference_Scroll(object sender, EventArgs e)

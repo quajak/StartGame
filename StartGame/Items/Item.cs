@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StartGame.Items
 {
-    internal abstract class Item
+    public abstract class Item
     {
         public static readonly List<JewelryType> JewelryTypes = new List<JewelryType>()
         {
@@ -16,7 +16,10 @@ namespace StartGame.Items
             new JewelryType("Earring", 4)
         };
 
-        public static JewelryType GetJewelryType(string name) => JewelryTypes.First(j => j.name == name);
+        public static JewelryType GetJewelryType(string name)
+        {
+            return JewelryTypes.First(j => j.name == name);
+        }
 
         public readonly string name;
 

@@ -1,4 +1,5 @@
 ﻿using PlayerCreator;
+using StartGame.Entities;
 using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
@@ -12,7 +13,7 @@ using System.Windows.Forms;
 
 namespace StartGame
 {
-    partial class MainGameWindow : Form
+    public partial class MainGameWindow : Form
     {
         //Long term: Add dialog
         //Long term: Add save feature
@@ -54,7 +55,8 @@ namespace StartGame
 
         public List<Player> killedPlayers = new List<Player>();
 
-        public MainGameWindow(Map Map, HumanPlayer player, Mission mission, List<Tree> trees, Campaign Campaign = null)
+        public MainGameWindow(Map Map, HumanPlayer player, Mission mission,
+            List<Tree> trees, Campaign Campaign = null)
         {
             player.main = this;
             map = Map;
@@ -163,8 +165,7 @@ namespace StartGame
         public enum MovementType { walk, teleport };
 
         //Initial handler is used to set animation
-        public event EventHandler<PlayerMovementData> PlayerMoved = (sender, data) =>
-        {
+        public event EventHandler<PlayerMovementData> PlayerMoved = (sender, data) => {
             EntityRenderObject entity = data.map.EntityRenderObjects.FirstOrDefault(e => e.Name == data.player.troop.name);
 
             if (data.player.troop.health.Value == 0)
@@ -385,13 +386,11 @@ namespace StartGame
                 Trace.TraceInformation($"Rendering - Called from {stackTrace.GetFrame(1).GetMethod().Name}");
                 animating = true;
                 frames = new List<Bitmap>();
-                animator = new Thread(() => map.Render(gameBoard, frames, forceEntityRedrawing, frameTime: 100, debug: false, colorAlpha: showHeightDifference.Checked ? 50 : 255, showInverseHeight: showHeightDifference.Checked))
-                {
+                animator = new Thread(() => map.Render(gameBoard, frames, forceEntityRedrawing, frameTime: 100, debug: false, colorAlpha: showHeightDifference.Checked ? 50 : 255, showInverseHeight: showHeightDifference.Checked)) {
                     Name = "Animator Thread"
                 };
                 animator.Start();
-                System.Timers.Timer timer = new System.Timers.Timer(100)
-                {
+                System.Timers.Timer timer = new System.Timers.Timer(100) {
                     Enabled = true
                 };
                 timer.Elapsed += ChangeImage;
@@ -462,7 +461,7 @@ namespace StartGame
             else
             {
                 fieldPosition.Text = $"Co-ords: {position.X} : {position.Y}";
-                fieldHeight.Text = "Height: " + map.map[position.X, position.Y].height.ToString("0.##");
+                fieldHeight.Text = "Height: " + map.map[position.X, position.Y].Height.ToString("0.##");
             }
         }
 
@@ -535,7 +534,7 @@ namespace StartGame
                 }
                 enemyHealth.Text = $"{player.troop.health}";
                 enemyPosition.Text = $"{player.troop.Position.X} : {player.troop.Position.Y}";
-                enemyHeight.Text = $"{map.map[player.troop.Position.X, player.troop.Position.Y].height.ToString("0.##")}";
+                enemyHeight.Text = $"{map.map[player.troop.Position.X, player.troop.Position.Y].Height.ToString("0.##")}";
                 enemyDefense.Text = $"Defense: {player.troop.defense}";
             }
             if (clicked)
@@ -817,8 +816,7 @@ namespace StartGame
                         {
                             possibleFields.Add(checking);
                             List<MapTile> sorroundingTiles = new SorroundingTiles<MapTile>(checking.position, map.map).rawMaptiles.ToList();
-                            sorroundingTiles.ForEach(t =>
-                            {
+                            sorroundingTiles.ForEach(t => {
                                 t.leftValue = distanceGraph.graph.Get(t.position);
                             });
                             sorroundingTiles = sorroundingTiles.Where(t => t.leftValue <= humanPlayer.movementPoints.Value && t.free && !possibleFields.Exists(f => f.position == t.position)).ToList();
@@ -979,8 +977,8 @@ namespace StartGame
             //if melee code check for height difference
             if (weapon.type == BaseAttackType.melee)
             {
-                double attackingHeight = map.map[attackingPosition.X, attackingPosition.Y].height;
-                double defendingHeight = map.map[defending.troop.Position.X, defending.troop.Position.Y].height;
+                double attackingHeight = map.map[attackingPosition.X, attackingPosition.Y].Height;
+                double defendingHeight = map.map[defending.troop.Position.X, defending.troop.Position.Y].Height;
 
                 double difference = attackingHeight - defendingHeight;
 
@@ -1088,8 +1086,7 @@ namespace StartGame
 
             if (attacking.Name == humanPlayer.Name)
             {
-                CombatData combatData = new CombatData()
-                {
+                CombatData combatData = new CombatData() {
                     attacked = attacked,
                     attacker = attacking,
                     damage = 0,
@@ -1280,8 +1277,7 @@ namespace StartGame
             troopP.Y = end.Y;
             player.troop.Position = troopP;
 
-            PlayerMoved(this, new PlayerMovementData()
-            {
+            PlayerMoved(this, new PlayerMovementData() {
                 player = player,
                 start = map.map[start.X, start.Y],
                 goal = map.map[end.X, end.Y],
@@ -1310,7 +1306,10 @@ namespace StartGame
             return players.FirstOrDefault(p => p.troop == troop);
         }
 
-        public Player GetPlayer(Point point) => players.FirstOrDefault(p => p.troop.Position == point);
+        public Player GetPlayer(Point point)
+        {
+            return players.FirstOrDefault(p => p.troop.Position == point);
+        }
 
         #endregion Helper Functions
     }

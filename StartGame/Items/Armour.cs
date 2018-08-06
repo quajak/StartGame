@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StartGame.Items
 {
-    internal enum ArmourLayer
+    public enum ArmourLayer
     {
         [Description("Heavy armour")]
         heavy,
@@ -24,7 +24,7 @@ namespace StartGame.Items
     }
 
     //TODO: Make armour only fit one body type
-    internal class Armour : Item
+    public class Armour : Item
     {
         public readonly List<BodyParts> affected;
         private List<BodyPart> parts;

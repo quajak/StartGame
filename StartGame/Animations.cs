@@ -6,12 +6,12 @@ using System.Linq;
 
 namespace StartGame
 {
-    internal abstract class Animation
+    public abstract class Animation
     {
         public int time;
     }
 
-    internal class LinearAnimation : Animation
+    public class LinearAnimation : Animation
     {
         private readonly int start;
         private readonly int end;
@@ -59,7 +59,7 @@ namespace StartGame
         }
     }
 
-    internal class LinearPointAnimation : Animation
+    public class LinearPointAnimation : Animation
     {
         private Point start;
         private Point end;
@@ -110,7 +110,7 @@ namespace StartGame
         }
     }
 
-    internal class TeleportPointAnimation : Animation
+    public class TeleportPointAnimation : Animation
     {
         private readonly Point start;
         private readonly Point end;

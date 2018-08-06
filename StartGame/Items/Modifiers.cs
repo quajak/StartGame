@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace StartGame.Items
 {
-    internal enum Quality
+    public enum Quality
     { Broken = -15, Poor = -10, Simple = -5, Common = 0, Good = 5, Superior = 10, Exceptional = 15, Legendary = 25 }
 
     //To convert from 0-> 6 to this use method in Extension methods
 
-    internal enum Materials
+    public enum Materials
     { Leather, Iron, Steel, Chainmail, Wool, Pelt, Cloth, Wood, Bone }
 
-    internal enum MaterialTypes
+    public enum MaterialTypes
     {
         All,
         General, //Exludes wood
@@ -23,7 +23,7 @@ namespace StartGame.Items
         Armour
     }
 
-    internal abstract class Material
+    public abstract class Material
     {
         public readonly string name;
         public readonly Materials material;
@@ -49,7 +49,7 @@ namespace StartGame.Items
         public Material(string name, Materials materials, int hardness, int density, int magicResistance, int durability, int mass, int value, List<ArmourLayer> armourLayers)
         {
             this.name = name;
-            this.material = materials;
+            material = materials;
             this.hardness = hardness;
             this.density = density;
             this.magicResistance = magicResistance;
