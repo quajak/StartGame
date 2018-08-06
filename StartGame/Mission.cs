@@ -85,11 +85,18 @@ namespace StartGame
         public double heightDiff = 0;
         public bool EnemyMoveTogether = false;
 
-        public abstract (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description) GenerateMission(int difficulty, int Round, Map map, Player player);
+        public abstract (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
+            string description) GenerateMission(int difficulty, int Round, ref Map map, Player player);
 
         public static WinCheck deathCheck = ((_map, main) => main.players.Count == 1 && main.players.Exists(p => p == main.humanPlayer));
 
         public static WinCheck playerDeath = ((_map, main) => main.humanPlayer == null || main.humanPlayer.troop.health.Value <= 0);
+        public readonly bool useWinChecks;
+
+        public Mission(bool UseWinChecks = true)
+        {
+            useWinChecks = UseWinChecks;
+        }
 
         public abstract bool MapValidity(Map map);
 
@@ -102,7 +109,8 @@ namespace StartGame
 
     internal class DebugMission : Mission
     {
-        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description) GenerateMission(int difficulty, int Round, Map map, Player player)
+        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
+            string description) GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
             Random rng = new Random();
             rng.Next();
@@ -167,7 +175,8 @@ namespace StartGame
     {
         private int xp;
 
-        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description) GenerateMission(int difficulty, int Round, Map map, Player player)
+        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
+            string description) GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
             Random rng = new Random();
             rng.Next();
@@ -271,7 +280,8 @@ namespace StartGame
     internal class BanditMission : Mission
 
     {
-        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description) GenerateMission(int difficulty, int Round, Map map, Player player)
+        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
+            string description) GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
             Random rng = new Random();
             rng.Next();
@@ -395,7 +405,7 @@ namespace StartGame
         //Long term: Allow more than one spider nest to spawn
         //Long term: When first hit, spawn a few spiders
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description)
-            GenerateMission(int difficulty, int Round, Map map, Player player)
+            GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
             Random rng = new Random();
             rng.Next();
@@ -433,7 +443,8 @@ namespace StartGame
 
             //Generate the spider nest
             //Choose the land tile which is the furthest away, which is sorrounded by land tiles and is a land tile
-            IOrderedEnumerable<MapTile> orderedEnumerable = map.map.Cast<MapTile>().ToList().Where(p => map.map[p.position.X, p.position.Y].type.type == MapTileTypeEnum.land && map.map[p.position.X, p.position.Y].neighbours.rawMaptiles.All(m => m.type.type == MapTileTypeEnum.land))
+            Map _map = map;
+            IOrderedEnumerable<MapTile> orderedEnumerable = map.map.Cast<MapTile>().ToList().Where(p => _map.map[p.position.X, p.position.Y].type.type == MapTileTypeEnum.land && _map.map[p.position.X, p.position.Y].neighbours.rawMaptiles.All(m => m.type.type == MapTileTypeEnum.land))
                .OrderByDescending(p => (Math.Abs(p.position.X - player.troop.Position.X) + Math.Abs(p.position.Y - player.troop.Position.Y)));
             Point spawnPoint = orderedEnumerable.FirstOrDefault().position;
 
@@ -449,7 +460,7 @@ namespace StartGame
 
             //Must kill spider nest to win
 
-            WinCheck nestState = new WinCheck((_map, main) => !_map.troops.Exists(t => t.name == "Spider Nest"));
+            WinCheck nestState = new WinCheck((__map, main) => !__map.troops.Exists(t => t.name == "Spider Nest"));
 
             List<WinCheck> wins = new List<WinCheck>
             {
@@ -503,7 +514,7 @@ namespace StartGame
         }
 
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description)
-            GenerateMission(int difficulty, int Round, Map map, Player player)
+            GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
             Random rng = new Random();
             rng.Next();
@@ -593,7 +604,7 @@ namespace StartGame
         }
 
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description)
-            GenerateMission(int difficulty, int Round, Map map, Player player)
+            GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
             Random rng = new Random();
             rng.Next();
@@ -637,11 +648,12 @@ namespace StartGame
             enemyNumber = Math.Min(enemyNumber, startPos.Count); //in case there are too few positions
 
             //If extra, remove path
+            Map _map = map;
             while (startPos.Count > enemyNumber)
             {
-                if (startPos.Exists(f => map.map[f.X, f.Y].type.type == MapTileTypeEnum.path))
+                if (startPos.Exists(f => _map.map[f.X, f.Y].type.type == MapTileTypeEnum.path))
                 {
-                    startPos.Remove(startPos.First(f => map.map[f.X, f.Y].type.type == MapTileTypeEnum.path));
+                    startPos.Remove(startPos.First(f => _map.map[f.X, f.Y].type.type == MapTileTypeEnum.path));
                 }
                 //If no path left remove random
                 else

@@ -58,6 +58,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.dungeonName = new System.Windows.Forms.TextBox();
             this.saveDungeon = new System.Windows.Forms.Button();
+            this.loadExternalDungeon = new System.Windows.Forms.Button();
+            this.externalDungeonFolderBrowser = new System.Windows.Forms.FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)(this.dungeonPicture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.mapWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.mapHeight)).BeginInit();
@@ -375,11 +377,22 @@
             this.saveDungeon.UseVisualStyleBackColor = true;
             this.saveDungeon.Click += new System.EventHandler(this.SaveDungeon_Click);
             // 
+            // loadExternalDungeon
+            // 
+            this.loadExternalDungeon.Location = new System.Drawing.Point(740, 439);
+            this.loadExternalDungeon.Name = "loadExternalDungeon";
+            this.loadExternalDungeon.Size = new System.Drawing.Size(120, 23);
+            this.loadExternalDungeon.TabIndex = 31;
+            this.loadExternalDungeon.Text = "Load External";
+            this.loadExternalDungeon.UseVisualStyleBackColor = true;
+            this.loadExternalDungeon.Click += new System.EventHandler(this.LoadExternalDungeon_Click);
+            // 
             // DungeonCreator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(873, 566);
+            this.Controls.Add(this.loadExternalDungeon);
             this.Controls.Add(this.saveDungeon);
             this.Controls.Add(this.dungeonName);
             this.Controls.Add(this.label2);
@@ -454,5 +467,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox dungeonName;
         private System.Windows.Forms.Button saveDungeon;
+        private System.Windows.Forms.Button loadExternalDungeon;
+        private System.Windows.Forms.FolderBrowserDialog externalDungeonFolderBrowser;
     }
 }

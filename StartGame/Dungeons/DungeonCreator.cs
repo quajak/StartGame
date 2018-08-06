@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -13,6 +14,7 @@ using System.Windows.Forms;
 
 namespace StartGame.Dungeons
 {
+    //TODO: Add dialog to choose dungeon
     public partial class DungeonCreator : Form
     {
         private Dungeon dungeon;
@@ -134,6 +136,16 @@ namespace StartGame.Dungeons
                 if (selectedIndex < roomList.Items.Count)
                     roomList.SelectedIndex = selectedIndex;
             }
+        }
+
+        private void ShowNewDungeon()
+        {
+            EntityFactory?.CleanUp();
+            EntityFactory = null;
+            entityOverviewControls.ForEach(en => Controls.Remove(en));
+            entityOverviewControls.Clear();
+            FullRender();
+            CheckValidity();
         }
 
         private List<Bitmap> frames = new List<Bitmap>();
@@ -492,11 +504,7 @@ namespace StartGame.Dungeons
         {
             if (dungeonList.SelectedItem is null) return;
             dungeon = Dungeon.Load(dungeonList.SelectedItem as string);
-            EntityFactory?.CleanUp();
-            EntityFactory = null;
-            entityOverviewControls.ForEach(en => Controls.Remove(en));
-            entityOverviewControls.Clear();
-            FullRender();
+            ShowNewDungeon();
         }
 
         private void SaveDungeon_Click(object sender, EventArgs e)
@@ -513,6 +521,18 @@ namespace StartGame.Dungeons
             //Update the dungeon list
             dungeonList.Items.Clear();
             dungeonList.Items.AddRange(Dungeon.GetDungeons().ToArray());
+        }
+
+        private void LoadExternalDungeon_Click(object sender, EventArgs e)
+        {
+            externalDungeonFolderBrowser.SelectedPath = Directory.GetCurrentDirectory();
+            externalDungeonFolderBrowser.Description = "Directory of external dungeon";
+            DialogResult dialog = externalDungeonFolderBrowser.ShowDialog();
+            if (dialog == DialogResult.OK && externalDungeonFolderBrowser.SelectedPath != Directory.GetCurrentDirectory())
+            {
+                dungeon = Dungeon.LoadPath(externalDungeonFolderBrowser.SelectedPath);
+                ShowNewDungeon();
+            }
         }
 
         #endregion Event Handler

@@ -51,6 +51,7 @@
             this.enemyMovement = new System.Windows.Forms.CheckBox();
             this.debugButton = new System.Windows.Forms.Button();
             this.playerView = new StartGame.PlayerView();
+            this.exitMission = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.playerInfo.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -224,7 +225,7 @@
             // 
             // levelUpButton
             // 
-            this.levelUpButton.Location = new System.Drawing.Point(1065, 583);
+            this.levelUpButton.Location = new System.Drawing.Point(1065, 569);
             this.levelUpButton.Name = "levelUpButton";
             this.levelUpButton.Size = new System.Drawing.Size(77, 28);
             this.levelUpButton.TabIndex = 5;
@@ -265,7 +266,7 @@
             // 
             // debugButton
             // 
-            this.debugButton.Location = new System.Drawing.Point(1036, 583);
+            this.debugButton.Location = new System.Drawing.Point(1036, 569);
             this.debugButton.Name = "debugButton";
             this.debugButton.Size = new System.Drawing.Size(23, 28);
             this.debugButton.TabIndex = 3;
@@ -283,11 +284,22 @@
             this.playerView.TabIndex = 10;
             this.playerView.Load += new System.EventHandler(this.PlayerView1_Load);
             // 
+            // exitMission
+            // 
+            this.exitMission.Location = new System.Drawing.Point(1065, 598);
+            this.exitMission.Name = "exitMission";
+            this.exitMission.Size = new System.Drawing.Size(77, 27);
+            this.exitMission.TabIndex = 11;
+            this.exitMission.Text = "Exit";
+            this.exitMission.UseVisualStyleBackColor = true;
+            this.exitMission.Click += new System.EventHandler(this.ExitMission_Click);
+            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1250, 637);
+            this.Controls.Add(this.exitMission);
             this.Controls.Add(this.playerView);
             this.Controls.Add(this.debugButton);
             this.Controls.Add(this.enemyMovement);
@@ -340,6 +352,7 @@
         private System.Windows.Forms.CheckBox enemyMovement;
         private System.Windows.Forms.Button debugButton;
         private PlayerView playerView;
+        private System.Windows.Forms.Button exitMission;
     }
 }
 

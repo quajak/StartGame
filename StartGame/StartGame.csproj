@@ -74,6 +74,12 @@
   <ItemGroup>
     <Compile Include="Animations.cs" />
     <Compile Include="Dungeons\Dungeon.cs" />
+    <Compile Include="Dungeons\DungeonChooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dungeons\DungeonChooser.Designer.cs">
+      <DependentUpon>DungeonChooser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dungeons\DungeonCreator.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -213,6 +219,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DebugViews\ItemCreator.resx">
       <DependentUpon>ItemCreator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dungeons\DungeonChooser.resx">
+      <DependentUpon>DungeonChooser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dungeons\DungeonCreator.resx">
       <DependentUpon>DungeonCreator.cs</DependentUpon>

@@ -76,7 +76,7 @@ namespace StartGame
             player.troop.Map = map;
 
             //Finish initialisation
-            activeGame = new MainGameWindow(map, player, mission, trees, this);
+            activeGame = new MainGameWindow(map, player, mission, trees, difficulty, Round);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace StartGame
 
             //Finish initialisation
             player.active = false;
-            activeGame = new MainGameWindow(map, player, mission, trees, this);
+            activeGame = new MainGameWindow(map, player, mission, trees, difficulty, Round);
 
             return true;
         }

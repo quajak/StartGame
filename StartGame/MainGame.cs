@@ -1,4 +1,5 @@
 ﻿using PlayerCreator;
+using StartGame.Dungeons;
 using StartGame.Entities;
 using StartGame.Items;
 using StartGame.PlayerData;
@@ -17,6 +18,7 @@ namespace StartGame
     {
         //Long term: Add dialog
         //Long term: Add save feature
+        //Bug: Leveling up endurance to 10 to increase action points will not set value to max, instantly
 
         private const int fieldSize = MapCreator.fieldSize;
 
@@ -41,8 +43,6 @@ namespace StartGame
 
         private string description;
 
-        private Campaign campaign;
-
         public int playerDamage;
         public int playerDoged;
 
@@ -56,31 +56,17 @@ namespace StartGame
         public List<Player> killedPlayers = new List<Player>();
 
         public MainGameWindow(Map Map, HumanPlayer player, Mission mission,
-            List<Tree> trees, Campaign Campaign = null)
+            List<Tree> trees, int difficulty, int round)
         {
             player.main = this;
             map = Map;
             if (map.map is null)
                 throw new Exception("Map of maptiles can not be undefined when starting the game. Please initialise before calling this function");
 
-            campaign = Campaign;
-
             selected = new Point(-1, 0);
             random = new Random();
 
             //Setup mission
-            int difficulty;
-            if (campaign != null)
-                difficulty = campaign.difficulty;
-            else
-                difficulty = 5;
-
-            int round;
-            if (campaign != null)
-                round = campaign.Round;
-            else
-                round = 0;
-
             bool first = true;
             do
             {
@@ -90,11 +76,10 @@ namespace StartGame
                 }
                 else
                     first = false;
-                (players, winConditions, deathConditions, description) = mission.GenerateMission(difficulty, round, map, player);
+                (players, winConditions, deathConditions, description) = mission.GenerateMission(difficulty, round, ref map, player);
             } while (players is null);
 
-            useWinChecks = true;
-
+            useWinChecks = mission.useWinChecks;
             //Setup game
             humanPlayer = player;
             this.mission = mission;
@@ -106,6 +91,7 @@ namespace StartGame
 
             InitializeComponent();
 
+            exitMission.Visible = !useWinChecks;
             //Initialse functions
             CalculatePlayerAttackDamage.Add(CalculateDamage);
 
@@ -145,6 +131,9 @@ namespace StartGame
             humanPlayer.spells.ForEach(s => s.Initialise(this, map));
 
             UpdateSpellList();
+
+            if (mission is Dungeon d)
+                d.EnterDungeon(player, this);
         }
 
         #region Game Logic
@@ -198,6 +187,16 @@ namespace StartGame
             else
             {
                 entity.Animation = new ListPointAnimation(data.path.ToList(), data.start.position);
+            }
+            //Trigger the first building
+            for (int i = 0; i < data.map.entites.Count; i++)
+            {
+                Entity e = data.map.entites[i];
+                if (e.Position == data.player.troop.Position && e is Building b)
+                {
+                    b.PlayerEnter(data.player);
+                    break;
+                }
             }
         };
 
@@ -259,12 +258,6 @@ namespace StartGame
                 if (dead)
                 {
                     Close();
-                }
-                if (players.Count == 1 && players.Exists(t => t == humanPlayer))
-                {
-                    //Won
-                    PlayerWins("You have defeated all the enemies!");
-                    return true;
                 }
             }
             return false;
@@ -378,7 +371,7 @@ namespace StartGame
         private bool animating = false;
         public bool actionOccuring = false;
 
-        public void RenderMap(bool forceEntityRedrawing = false)
+        public void RenderMap(bool forceEntityRedrawing = false, bool forceDrawBackground = false)
         {
             if (!animating && !actionOccuring)
             {
@@ -386,7 +379,9 @@ namespace StartGame
                 Trace.TraceInformation($"Rendering - Called from {stackTrace.GetFrame(1).GetMethod().Name}");
                 animating = true;
                 frames = new List<Bitmap>();
-                animator = new Thread(() => map.Render(gameBoard, frames, forceEntityRedrawing, frameTime: 100, debug: false, colorAlpha: showHeightDifference.Checked ? 50 : 255, showInverseHeight: showHeightDifference.Checked)) {
+                animator = new Thread(() => map.Render(gameBoard, frames, forceEntityRedrawing, frameTime: 100, debug: false,
+                    colorAlpha: showHeightDifference.Checked ? 50 : 255,
+                    showInverseHeight: showHeightDifference.Checked, forceDrawBackground: forceDrawBackground)) {
                     Name = "Animator Thread"
                 };
                 animator.Start();
@@ -678,6 +673,11 @@ namespace StartGame
             MessageBox.Show(description);
         }
 
+        private void ExitMission_Click(object sender, EventArgs e)
+        {
+            PlayerWins("You exit the mission!");
+        }
+
         #region Player Game Board Interaction
 
         private List<MapTile> canMoveTo = new List<MapTile>();
@@ -774,6 +774,7 @@ namespace StartGame
                         movementGraph.CreateGraph();
 
                         List<Point> movement = movementGraph.GeneratePath(moveTo.position, humanPlayer.troop.Position, map).ToList().ConvertAll(m => m.position);
+                        //calculate the actual movements not the real fields
                         for (int i = 0; i < movement.Count; i++)
                         {
                             if (movement.Count - i - 1 != 0)
@@ -1189,6 +1190,7 @@ namespace StartGame
         {
             players.Add(player);
             map.troops.Add(player.troop);
+            player.troop.Map = map;
             map.entites.Add(player.troop);
             map.renderObjects.Add(new EntityRenderObject(player.troop, new TeleportPointAnimation(new Point(0, 0), player.troop.Position)));
             UpdatePlayerList();

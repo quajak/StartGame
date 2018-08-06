@@ -34,6 +34,8 @@
             this.quit = new System.Windows.Forms.Button();
             this.startCampaign = new System.Windows.Forms.Button();
             this.armourCreator = new System.Windows.Forms.Button();
+            this.dungeonCreator = new System.Windows.Forms.Button();
+            this.enterDungeon = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -43,32 +45,32 @@
             this.label1.Location = new System.Drawing.Point(20, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(241, 51);
-            this.label1.TabIndex = 6;
+            this.label1.TabIndex = 7;
             this.label1.Text = "Start Game";
             // 
             // startGame
             // 
-            this.startGame.Location = new System.Drawing.Point(83, 92);
+            this.startGame.Location = new System.Drawing.Point(83, 121);
             this.startGame.Name = "startGame";
             this.startGame.Size = new System.Drawing.Size(100, 23);
-            this.startGame.TabIndex = 1;
+            this.startGame.TabIndex = 2;
             this.startGame.Text = "Play Single Match";
             this.startGame.UseVisualStyleBackColor = true;
             this.startGame.Click += new System.EventHandler(this.StartGame_Click);
             // 
             // setMap
             // 
-            this.setMap.Location = new System.Drawing.Point(83, 121);
+            this.setMap.Location = new System.Drawing.Point(83, 150);
             this.setMap.Name = "setMap";
             this.setMap.Size = new System.Drawing.Size(100, 23);
-            this.setMap.TabIndex = 2;
+            this.setMap.TabIndex = 3;
             this.setMap.Text = "Set Map";
             this.setMap.UseVisualStyleBackColor = true;
             this.setMap.Click += new System.EventHandler(this.SetMap_Click);
             // 
             // quit
             // 
-            this.quit.Location = new System.Drawing.Point(83, 184);
+            this.quit.Location = new System.Drawing.Point(83, 179);
             this.quit.Name = "quit";
             this.quit.Size = new System.Drawing.Size(100, 23);
             this.quit.TabIndex = 4;
@@ -88,19 +90,41 @@
             // 
             // armourCreator
             // 
-            this.armourCreator.Location = new System.Drawing.Point(83, 231);
+            this.armourCreator.Location = new System.Drawing.Point(83, 237);
             this.armourCreator.Name = "armourCreator";
             this.armourCreator.Size = new System.Drawing.Size(100, 23);
-            this.armourCreator.TabIndex = 5;
+            this.armourCreator.TabIndex = 6;
             this.armourCreator.Text = "Armour Creator";
             this.armourCreator.UseVisualStyleBackColor = true;
             this.armourCreator.Click += new System.EventHandler(this.ArmourCreator_Click);
+            // 
+            // dungeonCreator
+            // 
+            this.dungeonCreator.Location = new System.Drawing.Point(83, 208);
+            this.dungeonCreator.Name = "dungeonCreator";
+            this.dungeonCreator.Size = new System.Drawing.Size(100, 23);
+            this.dungeonCreator.TabIndex = 5;
+            this.dungeonCreator.Text = "Dungeon Creator";
+            this.dungeonCreator.UseVisualStyleBackColor = true;
+            this.dungeonCreator.Click += new System.EventHandler(this.DungeonCreator_Click);
+            // 
+            // enterDungeon
+            // 
+            this.enterDungeon.Location = new System.Drawing.Point(83, 92);
+            this.enterDungeon.Name = "enterDungeon";
+            this.enterDungeon.Size = new System.Drawing.Size(100, 23);
+            this.enterDungeon.TabIndex = 1;
+            this.enterDungeon.Text = "Enter Dungeon";
+            this.enterDungeon.UseVisualStyleBackColor = true;
+            this.enterDungeon.Click += new System.EventHandler(this.EnterDungeon_Click);
             // 
             // MainGameMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 268);
+            this.Controls.Add(this.enterDungeon);
+            this.Controls.Add(this.dungeonCreator);
             this.Controls.Add(this.armourCreator);
             this.Controls.Add(this.startCampaign);
             this.Controls.Add(this.quit);
@@ -123,5 +147,7 @@
         private System.Windows.Forms.Button quit;
         private System.Windows.Forms.Button startCampaign;
         private System.Windows.Forms.Button armourCreator;
+        private System.Windows.Forms.Button dungeonCreator;
+        private System.Windows.Forms.Button enterDungeon;
     }
 }

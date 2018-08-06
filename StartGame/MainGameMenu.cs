@@ -9,6 +9,7 @@ using StartGame.Items;
 using System.Linq;
 using StartGame.DebugViews;
 using StartGame.PlayerData;
+using StartGame.Dungeons;
 
 namespace StartGame
 {
@@ -51,8 +52,7 @@ namespace StartGame
                     Thread mapThread;
                     do
                     {
-                        mapThread = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, rnd.Next(), -0.2)))
-                        {
+                        mapThread = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, rnd.Next(), -0.2))) {
                             Priority = ThreadPriority.Highest
                         };
                         mapThread.Start();
@@ -69,8 +69,7 @@ namespace StartGame
             if (playerTroop is null)
             {
                 MessageBox.Show("Please create your troop before starting the game!");
-                playerTroop = new Troop(Settings.Default.Name, new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0, map, player)
-                {
+                playerTroop = new Troop(Settings.Default.Name, new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0, map, player) {
                     armours = new List<Armour>
                     {
                         new Armour("Woolen Tunic", 50, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.clothing),
@@ -98,7 +97,7 @@ namespace StartGame
 
             List<Tree> trees = Tree.GenerateTrees();
 
-            MainGameWindow mainGameWindow = new MainGameWindow(map, player, mission, trees);
+            MainGameWindow mainGameWindow = new MainGameWindow(map, player, mission, trees, 5, 1);
             try
             {
                 mainGameWindow.ShowDialog();
@@ -123,8 +122,7 @@ namespace StartGame
         private void Button1_Click(object sender, EventArgs e)
         {
             Hide();
-            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null, 0)
-            {
+            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null, 0) {
                 troop = playerTroop
             };
 
@@ -138,6 +136,43 @@ namespace StartGame
             Hide();
             ItemCreator armourCreator = new ItemCreator();
             armourCreator.ShowDialog();
+            Show();
+        }
+
+        private void EnterDungeon_Click(object sender, EventArgs e)
+        {
+            Hide();
+            DungeonChooser chooser = new DungeonChooser();
+            chooser.ShowDialog();
+            if (chooser.selected != null)
+            {
+                List<Tree> trees = Tree.GenerateTrees();
+                HumanPlayer player = new HumanPlayer(PlayerType.localHuman, Settings.Default.Name, null, null, null, 0);
+                if (playerTroop is null)
+                {
+                    playerTroop = new Troop(Settings.Default.Name, new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0, map, player) {
+                        armours = new List<Armour>
+                        {
+                        new Armour("Woolen Tunic", 50, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.clothing),
+                        new Armour("Old Pants", 40, new List<BodyParts> { BodyParts.UpperLegs, BodyParts.LeftLowerLeg, BodyParts.RightLowerLeg, BodyParts.LeftShin, BodyParts.RightShin }, Material.Materials.First(m => m.name == "Cloth"), Quality.Poor, ArmourLayer.clothing),
+                        new Armour("Wooden Shoes", 32, new List<BodyParts> { BodyParts.LeftFoot, BodyParts.RightFoot }, Material.Materials.First(m => m.name == "Wood"), Quality.Poor, ArmourLayer.light)
+                    }
+                    };
+                    playerTroop.weapons.Add(new Weapon(50, BaseAttackType.magic, BaseDamageType.magic, 40, "GOD", 10, true));
+                }
+                player.troop = playerTroop;
+                player.troop.armours.ForEach(a => a.active = true);
+                MainGameWindow mainGame = new MainGameWindow(chooser.selected.start.room.map, player, chooser.selected, trees, 1, 1);
+                mainGame.ShowDialog();
+            }
+            Show();
+        }
+
+        private void DungeonCreator_Click(object sender, EventArgs e)
+        {
+            DungeonCreator dungeonCreator = new DungeonCreator();
+            Hide();
+            dungeonCreator.ShowDialog();
             Show();
         }
     }

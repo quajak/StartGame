@@ -15,7 +15,7 @@ namespace StartGame
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new DungeonCreator());
+            Application.Run(new MainGameMenu());
         }
     }
 }

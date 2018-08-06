@@ -177,7 +177,8 @@ namespace StartGame.Entities
 
         public override void PlayerEnter(Player player)
         {
-            if (unlinked) throw new Exception();
+            if (unlinked)
+                throw new Exception();
 
             if (player is HumanPlayer humanPlayer)
                 dungeon.MoveTo(from, Next);

@@ -12,22 +12,23 @@ using System.Windows.Forms;
 
 namespace StartGame.Dungeons
 {
-    public class Dungeon
+    public class Dungeon : Mission
     {
         public Room active;
         public List<Room> dungeonRooms = new List<Room>();
         private Player player;
         public string name;
         public (Room room, Point position) start = (null, new Point(-1, -1));
+        public MainGameWindow mainGame;
 
-        public Dungeon(string name, int FirstRoomWidth = 10, int FirstRoomHeight = 10)
+        public Dungeon(string name, int FirstRoomWidth = 10, int FirstRoomHeight = 10) : base(false)
         {
             active = new Room(FirstRoomWidth, FirstRoomHeight, "Entrance");
             dungeonRooms.Add(active);
             this.name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
-        public Dungeon(string name, List<Room> rooms, string startRoom, Point startPosition)
+        public Dungeon(string name, List<Room> rooms, string startRoom, Point startPosition) : base(false)
         {
             this.name = name;
             dungeonRooms = rooms;
@@ -43,9 +44,40 @@ namespace StartGame.Dungeons
             }
         }
 
-        public void EnterDungeon(Player player)
+        public override (List<Player> players, List<WinCheck> winConditions,
+            List<WinCheck> lossConditions, string description)
+            GenerateMission(int difficulty, int Round, ref Map map, Player player)
+        {
+            if (!IsValid().Item1 || start.room is null) throw new Exception();
+            map = start.room.map;
+            active = start.room;
+            player.troop.Map = map;
+            player.troop.Position = start.position;
+            player.map = map;
+            return (new List<Player> { player }, null, new List<WinCheck> { deathCheck },
+                $"Welcome to the {name} dungeon!");
+        }
+
+        public override bool MissionAllowed(int Round)
+        {
+            //Easy: Add difficulty to dungeon
+            return true;
+        }
+
+        public override bool MapValidity(Map map)
+        {
+            return true;
+        }
+
+        public override Reward Reward()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EnterDungeon(Player player, MainGameWindow gameWindow)
         {
             this.player = player;
+            mainGame = gameWindow;
         }
 
         public void MoveTo(Room from, (Room, Door) to)
@@ -53,6 +85,18 @@ namespace StartGame.Dungeons
             var (room, door) = to;
             active = room;
             player.troop.Position = door.Position;
+            if (mainGame != null)
+            {
+                mainGame.map.entites.Clear();
+                lock (mainGame.map.RenderController)
+                {
+                    mainGame.map.renderObjects.Clear();
+                }
+                mainGame.map = active.map;
+                mainGame.players.Clear();
+                mainGame.AddPlayer(player);
+                mainGame.RenderMap(true, true);
+            }
         }
 
         public (bool, string) IsValid()
@@ -74,7 +118,14 @@ namespace StartGame.Dungeons
         {
             string curDir = Directory.GetCurrentDirectory();
             string dungeonPath = curDir + @"\" + name;
-            if (curDir == dungeonPath) throw new Exception();
+            return LoadPath(dungeonPath);
+        }
+
+        public static Dungeon LoadPath(string dungeonPath)
+        {
+            if (string.IsNullOrWhiteSpace(dungeonPath))
+                throw new ArgumentException("message", nameof(dungeonPath));
+            string name = Path.GetFileName(dungeonPath);
             if (!Directory.Exists(dungeonPath)) throw new Exception();
             DirectoryInfo dungeon = new DirectoryInfo(dungeonPath);
 
@@ -107,6 +158,7 @@ namespace StartGame.Dungeons
                 }
                 room.entityPlaceHolders.Clear();
             }
+
             return dungeon1;
         }
 

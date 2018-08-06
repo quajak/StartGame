@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StartGame;
 using StartGame.Dungeons;
 using StartGame.Entities;
+using StartGame.PlayerData;
 
 namespace Tests
 {
@@ -121,6 +123,25 @@ namespace Tests
             Assert.IsTrue(dungeon.active.DoorID == 1);
             Assert.IsTrue(!d.unlinked);
             Assert.IsNotNull(d.Next.room);
+        }
+
+        [TestMethod]
+        public void PlayDungeon()
+        {
+            //Load the dungeon
+            Dungeon dungeon = Dungeon.Load("new"); //This dungeon is first created and then manually copied over
+            Assert.IsNotNull(dungeon);
+            Assert.IsFalse(dungeon.useWinChecks);
+            Assert.IsTrue(dungeon.IsValid().Item1);
+
+            Map map = null;
+            (List<Player> players, List<WinCheck> winCondition, List<WinCheck> loss, string description) =
+                dungeon.GenerateMission(1, 1, ref map,
+                new HumanPlayer(PlayerType.localHuman, "Test", map, new Player[] { }, null, 0));
+            Assert.IsNotNull(map);
+            Assert.IsTrue(players.Count == 1);
+            Assert.IsNull(winCondition);
+            Assert.IsTrue(description.Trim().Length != 0);
         }
     }
 }
