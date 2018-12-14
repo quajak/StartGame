@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Resources;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StartGame;
 using StartGame.Dungeons;
 using StartGame.Entities;
+using StartGame.Items;
 using StartGame.PlayerData;
 
 namespace Tests
@@ -14,7 +16,7 @@ namespace Tests
     public class DungeonTest
     {
         [TestMethod]
-        public void SaveAndLoadBasicDungeon()
+        public void SaLBasicDungeon()
         {
             Dungeon dungeon = new Dungeon("Test");
             Assert.IsNotNull(dungeon.active);
@@ -40,7 +42,7 @@ namespace Tests
         }
 
         [TestMethod]
-        public void SaveAndLoadChangedDungeon()
+        public void SaLChangedDungeon()
         {
             Dungeon dungeon = new Dungeon("Test1");
             dungeon.active.map.map[0, 0].type = new MapTileType() { type = MapTileTypeEnum.land };
@@ -60,7 +62,29 @@ namespace Tests
         }
 
         [TestMethod]
-        public void SaveAndLoadEntityDungeon()
+        public void SaLDungeonWithCustomEntities()
+        {
+            Dungeon dungeon = new Dungeon("SpiderTest");
+            dungeon.active.map.map[0, 0].type = new MapTileType() { type = MapTileTypeEnum.land };
+            dungeon.active.map.map[0, 0].free = true;
+            CustomPlayer item = new CustomPlayer("spider", "spiderWarrior", Weapon.Fist, 0);
+            item.troop.Position = new Point(0, 0);
+            dungeon.customEntities.Add((CustomPlayer)item.Clone());
+            dungeon.active.AddEntity(item.troop);
+
+            Assert.IsTrue(dungeon.Save(true));
+
+            dungeon = Dungeon.Load("SpiderTest");
+            Assert.IsNotNull(dungeon);
+            Assert.IsNotNull(dungeon.customEntities);
+            Assert.IsTrue(dungeon.customEntities.Count == 1);
+            Assert.IsTrue(dungeon.customEntities[0].Name == "spider");
+            Assert.IsTrue(dungeon.active.map.entities.Count == 1);
+           
+        }
+
+        [TestMethod]
+        public void SaLDoorDungeon()
         {
             Dungeon dungeon = new Dungeon("EntityTest");
             Door door = new Door(dungeon, (null, null), dungeon.active, new Point(0, 0));
@@ -71,7 +95,9 @@ namespace Tests
 
             dungeon = Dungeon.Load("EntityTest");
             Assert.IsNotNull(dungeon);
-            Assert.IsTrue(dungeon.active.map.entites.Count == 1);
+            Assert.IsNotNull(dungeon.active);
+            Assert.IsNotNull(dungeon.active.map);
+            Assert.IsTrue(dungeon.active.map.entities.Count == 1);
             Assert.IsTrue(dungeon.active.DoorID == 1);
         }
 
@@ -80,7 +106,7 @@ namespace Tests
         {
             Dungeon dungeon = new Dungeon("Test", 10, 10);
             Door door = new Door(dungeon, (null, null), dungeon.active, new Point(2, 2));
-            Assert.AreEqual(door.RawValue(), "Door Door 2 2 False 0 True null null");
+            Assert.AreEqual(door.RawValue(), "Door Door1 2 2 False 0 True null null");
         }
 
         [TestMethod]
@@ -131,13 +157,16 @@ namespace Tests
             //Load the dungeon
             Dungeon dungeon = Dungeon.Load("new"); //This dungeon is first created and then manually copied over
             Assert.IsNotNull(dungeon);
+            Assert.IsNotNull(dungeon.active);
+            Assert.IsNotNull(dungeon.active.map);
             Assert.IsFalse(dungeon.useWinChecks);
             Assert.IsTrue(dungeon.IsValid().Item1);
 
-            Map map = null;
+            Map map = dungeon.active.map;
+            HumanPlayer player = new HumanPlayer(PlayerType.localHuman, "Test", map, new Player[] { }, null, 0);
+            player.troop = new Troop("Test", null, null, 0, map, player);
             (List<Player> players, List<WinCheck> winCondition, List<WinCheck> loss, string description) =
-                dungeon.GenerateMission(1, 1, ref map,
-                new HumanPlayer(PlayerType.localHuman, "Test", map, new Player[] { }, null, 0));
+                dungeon.GenerateMission(1, 1, ref map, player);
             Assert.IsNotNull(map);
             Assert.IsTrue(players.Count == 1);
             Assert.IsNull(winCondition);

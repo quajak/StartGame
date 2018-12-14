@@ -14,12 +14,12 @@ namespace StartGame.User_Controls
 {
     partial class PlayerItemView : UserControl
     {
-        private HumanPlayer player;
+        private Player player;
         private List<Item> items = new List<Item>();
 
         private Item active;
 
-        public void Activate(HumanPlayer player)
+        public void Activate(Player player)
         {
             InitializeComponent();
             this.player = player;

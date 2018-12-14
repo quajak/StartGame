@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace PlayerCreator
+namespace StartGame
 {
     partial class WeaponView : Form
     {

@@ -22,7 +22,7 @@ namespace StartGame.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace StartGame.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("StartGame.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace StartGame.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Alex.
         /// </summary>
-        internal static string BasePlayerName {
+        public static string BasePlayerName {
             get {
                 return ResourceManager.GetString("BasePlayerName", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Door {
+        public static System.Drawing.Bitmap Door {
             get {
                 object obj = ResourceManager.GetObject("Door", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -82,7 +82,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Dragon {
+        public static System.Drawing.Bitmap Dragon {
             get {
                 object obj = ResourceManager.GetObject("Dragon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -92,7 +92,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap DragonEggNest {
+        public static System.Drawing.Bitmap DragonEggNest {
             get {
                 object obj = ResourceManager.GetObject("DragonEggNest", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -102,7 +102,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap EarthQuake {
+        public static System.Drawing.Bitmap EarthQuake {
             get {
                 object obj = ResourceManager.GetObject("EarthQuake", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -112,7 +112,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap elementalWizard {
+        public static System.Drawing.Bitmap elementalWizard {
             get {
                 object obj = ResourceManager.GetObject("elementalWizard", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -122,7 +122,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap enemyScout {
+        public static System.Drawing.Bitmap enemyScout {
             get {
                 object obj = ResourceManager.GetObject("enemyScout", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -132,7 +132,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap EntityAdderTool {
+        public static System.Drawing.Bitmap EntityAdderTool {
             get {
                 object obj = ResourceManager.GetObject("EntityAdderTool", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -142,7 +142,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Fire {
+        public static System.Drawing.Bitmap Fire {
             get {
                 object obj = ResourceManager.GetObject("Fire", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -152,7 +152,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap firePlace {
+        public static System.Drawing.Bitmap firePlace {
             get {
                 object obj = ResourceManager.GetObject("firePlace", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -162,7 +162,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap LightningBolt {
+        public static System.Drawing.Bitmap LightningBolt {
             get {
                 object obj = ResourceManager.GetObject("LightningBolt", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -172,7 +172,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap PaintTool {
+        public static System.Drawing.Bitmap PaintTool {
             get {
                 object obj = ResourceManager.GetObject("PaintTool", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -182,7 +182,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap playerTroop {
+        public static System.Drawing.Bitmap playerTroop {
             get {
                 object obj = ResourceManager.GetObject("playerTroop", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -192,7 +192,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap SelectionTool {
+        public static System.Drawing.Bitmap SelectionTool {
             get {
                 object obj = ResourceManager.GetObject("SelectionTool", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -202,7 +202,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ShowBlocking {
+        public static System.Drawing.Bitmap ShowBlocking {
             get {
                 object obj = ResourceManager.GetObject("ShowBlocking", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -212,7 +212,17 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap spiderNest {
+        public static System.Drawing.Bitmap Slime {
+            get {
+                object obj = ResourceManager.GetObject("Slime", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap spiderNest {
             get {
                 object obj = ResourceManager.GetObject("spiderNest", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -222,7 +232,7 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap spiderWarrior {
+        public static System.Drawing.Bitmap spiderWarrior {
             get {
                 object obj = ResourceManager.GetObject("spiderWarrior", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));

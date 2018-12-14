@@ -60,6 +60,8 @@
             this.saveDungeon = new System.Windows.Forms.Button();
             this.loadExternalDungeon = new System.Windows.Forms.Button();
             this.externalDungeonFolderBrowser = new System.Windows.Forms.FolderBrowserDialog();
+            this.createNewEntittyTemplate = new System.Windows.Forms.Button();
+            this.selectedEntityDelete = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dungeonPicture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.mapWidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.mapHeight)).BeginInit();
@@ -76,6 +78,7 @@
             this.dungeonPicture.TabStop = false;
             this.dungeonPicture.Click += new System.EventHandler(this.DungeonPicture_Click);
             this.dungeonPicture.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DungeonPicture_MouseClick);
+            this.dungeonPicture.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DungeonPicture_MouseMove);
             // 
             // label1
             // 
@@ -387,11 +390,33 @@
             this.loadExternalDungeon.UseVisualStyleBackColor = true;
             this.loadExternalDungeon.Click += new System.EventHandler(this.LoadExternalDungeon_Click);
             // 
+            // createNewEntittyTemplate
+            // 
+            this.createNewEntittyTemplate.Location = new System.Drawing.Point(676, 56);
+            this.createNewEntittyTemplate.Name = "createNewEntittyTemplate";
+            this.createNewEntittyTemplate.Size = new System.Drawing.Size(75, 23);
+            this.createNewEntittyTemplate.TabIndex = 32;
+            this.createNewEntittyTemplate.Text = "New Entity";
+            this.createNewEntittyTemplate.UseVisualStyleBackColor = true;
+            this.createNewEntittyTemplate.Click += new System.EventHandler(this.CreateNewEntittyTemplate_Click);
+            // 
+            // selectedEntityDelete
+            // 
+            this.selectedEntityDelete.Location = new System.Drawing.Point(427, 439);
+            this.selectedEntityDelete.Name = "selectedEntityDelete";
+            this.selectedEntityDelete.Size = new System.Drawing.Size(75, 23);
+            this.selectedEntityDelete.TabIndex = 33;
+            this.selectedEntityDelete.Text = "Delete Entity";
+            this.selectedEntityDelete.UseVisualStyleBackColor = true;
+            this.selectedEntityDelete.Click += new System.EventHandler(this.SelectedEntityDelete_Click);
+            // 
             // DungeonCreator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(873, 566);
+            this.Controls.Add(this.selectedEntityDelete);
+            this.Controls.Add(this.createNewEntittyTemplate);
             this.Controls.Add(this.loadExternalDungeon);
             this.Controls.Add(this.saveDungeon);
             this.Controls.Add(this.dungeonName);
@@ -425,6 +450,7 @@
             this.Controls.Add(this.dungeonPicture);
             this.Name = "DungeonCreator";
             this.Text = "DungeonCreator";
+            this.Load += new System.EventHandler(this.DungeonCreator_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dungeonPicture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.mapWidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.mapHeight)).EndInit();
@@ -469,5 +495,7 @@
         private System.Windows.Forms.Button saveDungeon;
         private System.Windows.Forms.Button loadExternalDungeon;
         private System.Windows.Forms.FolderBrowserDialog externalDungeonFolderBrowser;
+        private System.Windows.Forms.Button createNewEntittyTemplate;
+        private System.Windows.Forms.Button selectedEntityDelete;
     }
 }

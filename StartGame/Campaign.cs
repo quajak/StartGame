@@ -1,5 +1,4 @@
-﻿using PlayerCreator;
-using StartGame.Items;
+﻿using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
 using System;

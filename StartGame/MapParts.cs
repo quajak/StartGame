@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 
 namespace StartGame
@@ -53,7 +54,10 @@ namespace StartGame
 
         public string RawData()
         {
-            return $"{position.X} {position.Y} {(int)type.type} {height} {Cost} {free} {color.ToArgb()} {shader.ToArgb()}";
+            NumberFormatInfo nfi = new NumberFormatInfo {
+                NumberDecimalSeparator = "."
+            };
+            return $"{position.X} {position.Y} {(int)type.type} {height.ToString(nfi)} {Cost} {free} {color.ToArgb()} {shader.ToArgb()}";
         }
 
         public static MapTile Load(string line)

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using PlayerCreator;
 using StartGame.Entities;
 using StartGame.PlayerData;
 
@@ -33,7 +32,7 @@ namespace StartGame
 
         public List<Troop> troops = new List<Troop>();
 
-        public List<Entity> entites = new List<Entity>();
+        public List<Entity> entities = new List<Entity>();
 
         public bool created = false;
 
@@ -788,7 +787,7 @@ namespace StartGame
 
         public List<Entity> GetEntities(Point point)
         {
-            return entites.Where(e => e.Position == point).ToList();
+            return entities.Where(e => e.Position == point).ToList();
         }
 
         public List<Entity> GetEntities(int x, int y)

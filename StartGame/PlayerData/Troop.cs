@@ -43,6 +43,7 @@ namespace StartGame.PlayerData
             int Dodge = 10, Dictionary<DamageType, double> Vurneabilities = null)
             : base(Name, new Point(0, 0), Image, true, map)
         {
+            this.player = player;
             vurneabilites = Vurneabilities ?? new Dictionary<DamageType, double>();
             health = new Health(player, 0);
             defense = new Defense(player, Defense);
@@ -52,6 +53,7 @@ namespace StartGame.PlayerData
             body = new Body();
         }
 
+        public readonly Player player;
         private Dictionary<DamageType, double> vurneabilites;
 
         public double GetVurneability(DamageType damageType)
@@ -75,5 +77,12 @@ namespace StartGame.PlayerData
         {
             Map.map[Position.X, Position.Y].free = true;
         }
+
+        public override string RawValue()
+        {
+            //type name x y blocking (all from base) [name of player]
+            return base.RawValue() + " " + player.Name;
+        }
+
     }
 }

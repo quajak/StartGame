@@ -1,5 +1,4 @@
-﻿using PlayerCreator;
-using StartGame.Items;
+﻿using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
 using System;
@@ -26,8 +25,7 @@ namespace StartGame
             if (player.troop is null)
             {
                 Troop playerTroop = new Troop("Player", new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0
-                    , null, player)
-                {
+                    , null, player) {
                     armours = new List<Armour>
                     {
                         new Armour("Woolen Tunic", 50, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.clothing),

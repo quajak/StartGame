@@ -20,6 +20,7 @@ namespace StartGame.Dungeons
         public string name;
         public (Room room, Point position) start = (null, new Point(-1, -1));
         public MainGameWindow mainGame;
+        public List<CustomPlayer> customEntities = new List<CustomPlayer>();
 
         public Dungeon(string name, int FirstRoomWidth = 10, int FirstRoomHeight = 10) : base(false)
         {
@@ -44,8 +45,7 @@ namespace StartGame.Dungeons
             }
         }
 
-        public override (List<Player> players, List<WinCheck> winConditions,
-            List<WinCheck> lossConditions, string description)
+        public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description)
             GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
             if (!IsValid().Item1 || start.room is null) throw new Exception();
@@ -54,7 +54,13 @@ namespace StartGame.Dungeons
             player.troop.Map = map;
             player.troop.Position = start.position;
             player.map = map;
-            return (new List<Player> { player }, null, new List<WinCheck> { deathCheck },
+            List<Player> list = new List<Player> { player };
+            list.AddRange(active.players);
+            foreach (var room in dungeonRooms)
+            {
+                room.players.ForEach(p => p.enemies = new[] { player });
+            }
+            return (list, null, new List<WinCheck> { deathCheck },
                 $"Welcome to the {name} dungeon!");
         }
 
@@ -83,18 +89,25 @@ namespace StartGame.Dungeons
         public void MoveTo(Room from, (Room, Door) to)
         {
             var (room, door) = to;
+            active.map.troops.Remove(player.troop);
+            active.players = mainGame.players;
+            active.players.Remove(player);
+            active.map.entities.Remove(player.troop);
+            active.map.renderObjects.RemoveAll(r => r.Name == player.troop.Name);
             active = room;
+            player.map = active.map;
+            player.troop.Map = active.map;
             player.troop.Position = door.Position;
             if (mainGame != null)
             {
-                mainGame.map.entites.Clear();
-                lock (mainGame.map.RenderController)
-                {
-                    mainGame.map.renderObjects.Clear();
-                }
                 mainGame.map = active.map;
-                mainGame.players.Clear();
-                mainGame.AddPlayer(player);
+                mainGame.map.troops.Add(player.troop);
+                mainGame.map.entities.Add(player.troop);
+                mainGame.map.renderObjects.Add(
+                    new EntityRenderObject(player.troop, new TeleportPointAnimation(new Point(0, 0), player.troop.Position)));
+                mainGame.players = active.players;
+                mainGame.players.Add(player);
+                mainGame.UpdateTroopList();
                 mainGame.RenderMap(true, true);
             }
         }
@@ -137,10 +150,20 @@ namespace StartGame.Dungeons
             List<string> roomNames = lines[2].GetStringList();
             string startRoom = lines[3].GetString();
             Point startPosition = lines[4].GetPoint();
+            List<string> customEntityTypes = lines[5].GetStringList();
+
+            
+            //Now load custom entities
+            var customPlayers = customEntityTypes.ConvertAll(c => CustomPlayer.Load(dungeonPath + "\\" + c + ".txt"));
 
             //Now load dungeon rooms
-            List<Room> rooms = roomNames.ConvertAll(r => Room.Load(r, dungeonPath + "\\" + r + ".txt"));
-            Dungeon dungeon1 = new Dungeon(name, rooms, startRoom, startPosition);
+            List<Room> rooms = roomNames.ConvertAll(r => Room.Load(r, dungeonPath + "\\" + r + ".txt", customPlayers));
+
+            //Prepare to create deungon from individual parts
+            Dungeon dungeon1 = new Dungeon(name, rooms, startRoom, startPosition) {
+                customEntities = customPlayers
+            };
+
             //Now we finish intialising the entities
             foreach (var room in dungeon1.dungeonRooms)
             {
@@ -151,7 +174,11 @@ namespace StartGame.Dungeons
                         case DoorPlaceHolder d:
                             room.AddEntity(d.Initialise(dungeon1));
                             break;
-
+                        case PlayerPlaceHolder p:
+                            p.player.map = room.map;
+                            p.player.troop.Map = room.map;
+                            room.AddEntity(p.player.troop);
+                            break;
                         default:
                             throw new NotImplementedException();
                     }
@@ -213,8 +240,13 @@ namespace StartGame.Dungeons
             lines.Add(E.WriteAttribute(startroom, "startroom"));
             //Start position
             lines.Add(E.WriteAttribute($"{start.position.X} {start.position.Y}", "startposition"));
+            //now save all the custom entity types
+            lines.Add(E.WriteAttribute(string.Join(" ", customEntities.Select(c => c.Name)), "customEntityTypes"));
+            //write to file
             File.WriteAllLines(dungeonPath + @"\main.txt", lines.ToArray());
 
+            //save the custom entities
+            customEntities.ForEach(c => c.Save(dungeonPath + @"\" + c.Name + ".txt"));
             //now save all the rooms
             dungeonRooms.ForEach(d => d.Save(dungeonPath + @"\" + d.name + ".txt"));
             return true;

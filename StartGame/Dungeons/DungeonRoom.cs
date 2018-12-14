@@ -19,6 +19,7 @@ namespace StartGame.Dungeons
         public List<Door> doors = new List<Door>();
         private List<Entity> entities = new List<Entity>();
         public List<EntityPlaceHolder> entityPlaceHolders = new List<EntityPlaceHolder>();
+        public List<Player> players = new List<Player>();
         private Player player;
         public int DoorID = 0;
 
@@ -50,7 +51,7 @@ namespace StartGame.Dungeons
                     lock (map.RenderController)
                     {
                         newMap.renderObjects.AddRange(map.renderObjects);
-                        newMap.entites.AddRange(map.entites);
+                        newMap.entities.AddRange(map.entities);
                         newMap.troops.AddRange(map.troops);
                     }
                     newMap.SetupMap(MapTileTypeEnum.wall);
@@ -78,7 +79,7 @@ namespace StartGame.Dungeons
                     lock (map.RenderController)
                     {
                         newMap.renderObjects.AddRange(map.renderObjects);
-                        newMap.entites.AddRange(map.entites);
+                        newMap.entities.AddRange(map.entities);
                         newMap.troops.AddRange(map.troops);
                     }
                     newMap.SetupMap(MapTileTypeEnum.wall);
@@ -171,7 +172,7 @@ namespace StartGame.Dungeons
             entities.Add(entity);
             lock (map.RenderController)
             {
-                map.entites.Add(entity);
+                map.entities.Add(entity);
                 map.renderObjects.Add(new EntityRenderObject(entity, new TeleportPointAnimation(new System.Drawing.Point(-1, -1), entity.Position)));
             }
 
@@ -182,12 +183,17 @@ namespace StartGame.Dungeons
                     break;
 
                 case Troop t:
-                    map.troops.Add(t);
+                    players.Add(t.player);
+                    map.troops.Add(t.player.troop);
                     break;
 
                 default:
                     break;
             }
+        }
+
+        public void RemoveEntity(Entity entity)
+        {
         }
 
         public override string ToString()
@@ -224,7 +230,7 @@ namespace StartGame.Dungeons
             return true;
         }
 
-        public static Room Load(string name, string path)
+        public static Room Load(string name, string path, List<CustomPlayer> customPlayers)
         {
             string[] lines = File.ReadAllLines(path);
             string _name = lines[0].GetString();
@@ -250,7 +256,7 @@ namespace StartGame.Dungeons
             while (3 + counter < lines.Length)
             {
                 if (lines[3 + counter].Trim().Length != 0)
-                    room.entityPlaceHolders.Add(lines[3 + counter].GetEntity(room));
+                    room.entityPlaceHolders.Add(lines[3 + counter].GetEntity(room, customPlayers));
                 counter++;
             }
             return room;

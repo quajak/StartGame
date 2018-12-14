@@ -95,7 +95,9 @@
     <Compile Include="Items\ArmorPrefabs.cs" />
     <Compile Include="Items\Armour.cs" />
     <Compile Include="Items\Jewelry.cs" />
+    <Compile Include="PlayerData\AIUtility.cs" />
     <Compile Include="PlayerData\Attribute.cs" />
+    <Compile Include="PlayerData\BanditAI.cs" />
     <Compile Include="PlayerData\Body.cs" />
     <Compile Include="Campaign.cs" />
     <Compile Include="CampaignController.cs">
@@ -150,7 +152,21 @@
     <Compile Include="MapRenderer.cs" />
     <Compile Include="Mission.cs" />
     <Compile Include="PerlinNoise.cs" />
+    <Compile Include="PlayerData\CustomPlayer.cs" />
+    <Compile Include="PlayerData\DefensiveBanditAI.cs" />
+    <Compile Include="PlayerData\DistanceGraphCreator.cs" />
+    <Compile Include="PlayerData\DragonMotherAI.cs" />
+    <Compile Include="PlayerData\ElementalWizard.cs" />
+    <Compile Include="PlayerData\HumanPlayer.cs" />
     <Compile Include="PlayerData\Player.cs" />
+    <Compile Include="PlayerData\PlayerCreator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlayerData\PlayerCreator.Designer.cs">
+      <DependentUpon>PlayerCreator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PlayerData\SpiderNestAI.cs" />
+    <Compile Include="PlayerData\WarriorSpiderAI.cs" />
     <Compile Include="User Controls\PlayerBaseStats.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -238,6 +254,9 @@
     <EmbeddedResource Include="MapCreator.resx">
       <DependentUpon>MapCreator.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="PlayerData\PlayerCreator.resx">
+      <DependentUpon>PlayerCreator.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="User Controls\PlayerBaseStats.resx">
       <DependentUpon>PlayerBaseStats.cs</DependentUpon>
     </EmbeddedResource>
@@ -257,7 +276,7 @@
       <DependentUpon>PlayerView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
@@ -350,6 +369,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ShowBlocking.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Slime.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

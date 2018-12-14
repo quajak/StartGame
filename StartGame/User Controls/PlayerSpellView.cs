@@ -13,7 +13,7 @@ namespace StartGame.User_Controls
 {
     partial class PlayerSpellView : UserControl
     {
-        private HumanPlayer player;
+        private Player player;
         private MainGameWindow main;
         private bool allowAction;
 
@@ -22,7 +22,7 @@ namespace StartGame.User_Controls
             InitializeComponent();
         }
 
-        public void Activate(HumanPlayer Player, MainGameWindow Main, bool AllowAction)
+        public void Activate(Player Player, MainGameWindow Main, bool AllowAction)
         {
             allowAction = AllowAction;
             main = Main;

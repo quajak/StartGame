@@ -1,5 +1,4 @@
-﻿using PlayerCreator;
-using StartGame.Items;
+﻿using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
 using System;
@@ -43,8 +42,7 @@ namespace StartGame.DebugViews
         {
             player = new HumanPlayer(PlayerType.localHuman, "Test", null, null, null, 10);
             player.troop = new Troop("Test", new Weapon(1, BaseAttackType.melee, BaseDamageType.sharp, 1, "Test Weapon", 1, true),
-                Resources.playerTroop, 0, null, player)
-            {
+                Resources.playerTroop, 0, null, player) {
                 armours = new List<Armour>
                 {
                     new Armour("Woolen Tunic", 50, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.clothing),
@@ -58,8 +56,7 @@ namespace StartGame.DebugViews
             Point pos = new Point(879, 65);
             foreach (BodyParts part in Enum.GetValues(typeof(BodyParts)))
             {
-                CheckBox item = new CheckBox()
-                {
+                CheckBox item = new CheckBox() {
                     Name = "c" + part.ToString(),
                     Text = part.ToString(),
                     Location = pos
@@ -78,15 +75,13 @@ namespace StartGame.DebugViews
             for (int i = 0; i < jewelryBuffs.Count; i++)
             {
                 string buff = jewelryBuffs[i];
-                Label label = new Label()
-                {
+                Label label = new Label() {
                     Text = buff,
                     Location = new Point(pos.X - 50, pos.Y),
                     Width = 45
                 };
                 Controls.Add(label);
-                NumericUpDown numericUpDown = new NumericUpDown()
-                {
+                NumericUpDown numericUpDown = new NumericUpDown() {
                     Name = "n" + buff,
                     Location = pos,
                     Width = 35,
@@ -96,8 +91,7 @@ namespace StartGame.DebugViews
                 jewelryBuffValues.Add(numericUpDown);
                 Controls.Add(numericUpDown);
                 pos.X += 40;
-                ListBox listBox = new ListBox()
-                {
+                ListBox listBox = new ListBox() {
                     Name = "l" + buff,
                     Location = pos,
                     Height = 40

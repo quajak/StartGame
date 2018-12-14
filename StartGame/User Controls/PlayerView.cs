@@ -26,7 +26,7 @@ namespace StartGame
 
         private UserControl active;
         private PlayerTab tab;
-        private HumanPlayer player;
+        private Player player;
 
         private bool allowAction;
 
@@ -35,7 +35,7 @@ namespace StartGame
             InitializeComponent();
         }
 
-        public void Activate(HumanPlayer player, MainGameWindow main, bool AllowAction)
+        public void Activate(Player player, MainGameWindow main, bool AllowAction)
         {
             allowAction = AllowAction;
             this.player = player;

@@ -1,5 +1,4 @@
-﻿using StartGame;
-using StartGame.PlayerData;
+﻿using StartGame.PlayerData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace PlayerCreator
+namespace StartGame
 {
     partial class LevelUp : Form
     {

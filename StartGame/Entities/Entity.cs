@@ -3,6 +3,7 @@ using StartGame.PlayerData;
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,9 +14,9 @@ namespace StartGame.Entities
 {
     public abstract class Entity
     {
-        public readonly string name;
+        private string name;
         private Point position;
-        public readonly Bitmap image;
+        public Bitmap image;
         public readonly bool blocking;
         private Map map;
         public bool finishedInitialisation = true;
@@ -24,6 +25,8 @@ namespace StartGame.Entities
         {
             get => position; set
             {
+                StackTrace stackTrace = new StackTrace();
+                Trace.TraceInformation($"Changing position from {position} to {value} for {Name} - Called from {stackTrace.GetFrame(1).GetMethod().Name}");
                 if (Map != null && blocking)
                     Map.map[position.X, position.Y].free = true;
                 position = value;
@@ -35,9 +38,11 @@ namespace StartGame.Entities
                 {
                     lock (Map.RenderController)
                     {
-                        EntityRenderObject entity = Map.EntityRenderObjects.Find(o => o.Name == name);
+                        Trace.TraceInformation($"Total render objects: {Map.renderObjects.Count} Entity render objects: {Map.EntityRenderObjects.Count}");
+                        EntityRenderObject entity = Map.EntityRenderObjects.Find(o => o.Name == Name);
                         if (entity != null)
                         {
+                            Trace.TraceInformation("Render Object will be changed!");
                             //If an objects position is changed two or more times between two animations, the object will do the last animation
                             if (entity.toRender != entity.position)
                             {
@@ -64,9 +69,25 @@ namespace StartGame.Entities
             }
         }
 
+        public string Name
+        {
+            get => name; set
+            {
+                //if we have an entity render object, rename it first+
+                if(Map != null)
+                {
+                    EntityRenderObject entity = Map.EntityRenderObjects.Find(o => o.Name == Name);
+                    if (entity != null)
+                        entity.Name = value;
+                }
+                name = value;
+            }
+        }
+
         public Entity(string Name, Point Position, Bitmap Image, bool Blocking, Map map)
         {
-            name = Name;
+            Trace.TraceInformation($"Entity Created: {Name} at {Position}");
+            this.Name = Name;
             Map = map;
             blocking = Blocking;
             this.Position = Position;
@@ -80,7 +101,7 @@ namespace StartGame.Entities
 
         public virtual string RawValue()
         {
-            return $"{GetType().Name} {name} {position.X} {position.Y} {blocking}";
+            return $"{GetType().Name} {Name} {position.X} {position.Y} {blocking}";
         }
 
         public virtual List<Control> GenerateFieldEditors(Point position, Form form)
@@ -155,7 +176,7 @@ namespace StartGame.Entities
             }
         }
 
-        public Door(Dungeon dungeon, (Room, Door) next, Room from, Point position, bool assingID = true) : base("Door", position, Resources.Door, from.map, false)
+        public Door(Dungeon dungeon, (Room, Door) next, Room from, Point position, bool assingID = true, int id = 0) : base("Door" + (assingID ? from.DoorID + 1 : id), position, Resources.Door, from.map, false)
         {
             var (room, door) = next;
             unlinked = door == null;
@@ -168,7 +189,7 @@ namespace StartGame.Entities
             }
         }
 
-        public Door(Dungeon dungeon, (Room, Door) next, Room from, Point position, int id) : this(dungeon, next, from, position, false)
+        public Door(Dungeon dungeon, (Room, Door) next, Room from, Point position, int id) : this(dungeon, next, from, position, false, id)
         {
             Id = id;
             if (from.DoorID <= id) from.DoorID = id + 1;

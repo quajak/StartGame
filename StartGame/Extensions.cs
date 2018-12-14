@@ -1,6 +1,7 @@
 ﻿using StartGame.Dungeons;
 using StartGame.Entities;
 using StartGame.Items;
+using StartGame.PlayerData;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -65,7 +66,7 @@ namespace StartGame
                 FieldInfo field = type.GetField(name);
                 if (field != null)
                 {
-                    if (Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) is DescriptionAttribute attr)
+                    if (System.Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) is DescriptionAttribute attr)
                     {
                         return attr.Description;
                     }
@@ -148,7 +149,7 @@ namespace StartGame.Extra.Loading
             return all;
         }
 
-        public static EntityPlaceHolder GetEntity(this string line, Room room)
+        public static EntityPlaceHolder GetEntity(this string line, Room room, List<CustomPlayer>  customEntities)
         {
             string[] words = line.Split(' ');
             switch (words[0])
@@ -168,6 +169,15 @@ namespace StartGame.Extra.Loading
                     }
                     return new DoorPlaceHolder((roomName, doorId), room.name, point, id);
 
+                case "Troop":
+                    name = words[5];
+                    point = GetPoint(words[2], words[3]);
+                    string type = words[1];
+                    CustomPlayer player = (CustomPlayer)customEntities.First(c => c.Name == type).Clone();
+                    player.troop.Name = name;
+                    player.troop.Position = point;
+                    player.Name = name;
+                    return new PlayerPlaceHolder(player);
                 default:
                     throw new NotImplementedException(line);
             }

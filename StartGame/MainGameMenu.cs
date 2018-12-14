@@ -1,7 +1,6 @@
 ﻿using StartGame.Properties;
 using System;
 using System.Windows.Forms;
-using PlayerCreator;
 using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -82,18 +81,17 @@ namespace StartGame
             player.troop = playerTroop;
             player.troop.armours.ForEach(a => a.active = true);
 
-            //player.agility = 5;
-            //player.strength = 5;
-            //player.vitality = 20;
-            //player.intelligence = 5;
-            //player.wisdom = 5;
-            //player.endurance = 5;
+            player.agility.rawValue = 5;
+            player.strength.rawValue = 5;
+            player.vitality.rawValue = 20;
+            player.intelligence.rawValue = 5;
+            player.wisdom.rawValue = 5;
+            player.endurance.rawValue = 5;
 
-            //player.CalculateStats();
             Hide();
             //Long term: Make form to allow use to choose mission and difficulty
 
-            Mission mission = new DebugMission();
+            Mission mission = new DragonFight();
 
             List<Tree> trees = Tree.GenerateTrees();
 

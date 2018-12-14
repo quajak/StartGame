@@ -13,14 +13,14 @@ namespace StartGame.User_Controls
 {
     partial class PlayerTreeView : UserControl
     {
-        private HumanPlayer player;
+        private Player player;
 
         public PlayerTreeView()
         {
             InitializeComponent();
         }
 
-        public void Activate(HumanPlayer Player)
+        public void Activate(Player Player)
         {
             player = Player;
             Render();

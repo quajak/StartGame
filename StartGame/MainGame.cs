@@ -1,5 +1,4 @@
-﻿using PlayerCreator;
-using StartGame.Dungeons;
+﻿using StartGame.Dungeons;
 using StartGame.Entities;
 using StartGame.Items;
 using StartGame.PlayerData;
@@ -85,9 +84,11 @@ namespace StartGame
             this.mission = mission;
             activePlayer = players[0];
 
-            players.ForEach(p => map.troops.Add(p.troop));
-            players.ForEach(p => map.entites.Add(p.troop));
-            players.ForEach(p => map.renderObjects.Add(new EntityRenderObject(p.troop, new TeleportPointAnimation(new Point(0, 0), p.troop.Position))));
+            players.ForEach(p => { if (!map.troops.Contains(p.troop)) map.troops.Add(p.troop); }); //Sometimes may already have been added in a map
+            players.ForEach(p => { if (!map.entities.Contains(p.troop)) map.entities.Add(p.troop); });
+            players.ForEach(p => { if (!map.renderObjects.Exists(e => e.Name == p.troop.Name)) map.renderObjects.Add(
+                  new EntityRenderObject(p.troop, new TeleportPointAnimation(new Point(0, 0), p.troop.Position)));
+            });
 
             InitializeComponent();
 
@@ -155,7 +156,9 @@ namespace StartGame
 
         //Initial handler is used to set animation
         public event EventHandler<PlayerMovementData> PlayerMoved = (sender, data) => {
-            EntityRenderObject entity = data.map.EntityRenderObjects.FirstOrDefault(e => e.Name == data.player.troop.name);
+            EntityRenderObject entity = data.map.EntityRenderObjects.FirstOrDefault(e => e.Name == data.player.troop.Name);
+
+            Trace.TraceInformation($"PLayer Moved: Player Name {data.player.troop.Name} Render Object {entity.Name} Start {data.start} End {data.goal}");
 
             if (data.player.troop.health.Value == 0)
             {//Player has died
@@ -189,9 +192,9 @@ namespace StartGame
                 entity.Animation = new ListPointAnimation(data.path.ToList(), data.start.position);
             }
             //Trigger the first building
-            for (int i = 0; i < data.map.entites.Count; i++)
+            for (int i = 0; i < data.map.entities.Count; i++)
             {
-                Entity e = data.map.entites[i];
+                Entity e = data.map.entities[i];
                 if (e.Position == data.player.troop.Position && e is Building b)
                 {
                     b.PlayerEnter(data.player);
@@ -425,6 +428,12 @@ namespace StartGame
             }
         }
 
+        public void UpdateTroopList()
+        {
+            troopList.Items.Clear();
+            troopList.Items.AddRange(map.troops.Select(t => t.Name).ToArray());
+        }
+
         public void UpdatePlayerView()
         {
             playerView.Render();
@@ -456,13 +465,16 @@ namespace StartGame
             else
             {
                 fieldPosition.Text = $"Co-ords: {position.X} : {position.Y}";
-                fieldHeight.Text = "Height: " + map.map[position.X, position.Y].Height.ToString("0.##");
+                if (position.X >= map.width || position.Y >= map.height)
+                    fieldHeight.Text = "";
+                else
+                    fieldHeight.Text = "Height: " + map.map[position.X, position.Y].Height.ToString("0.##");
             }
         }
 
         private void UpdatePlayerList()
         {
-            List<string> playerNames = players.ConvertAll(t => t.troop.name);
+            List<string> playerNames = players.ConvertAll(t => t.troop.Name);
             List<string> diff = troopList.Items.Cast<string>().Except(playerNames).ToList();
             foreach (string dif in diff)
             {
@@ -486,7 +498,7 @@ namespace StartGame
         private void ShowEntityData(Entity entity)
         {
             troopList.SelectedIndex = -1;
-            enemyName.Text = entity.name;
+            enemyName.Text = entity.Name;
             enemyAttackDamage.Text = "";
             enemyAttackRange.Text = "";
             enemyAttackType.Text = "";
@@ -740,9 +752,9 @@ namespace StartGame
             else
             {
                 //Check if any entity has been clicked
-                if (map.entites.Exists(t => t.Position.X == X && t.Position.Y == Y))
+                if (map.entities.Exists(t => t.Position.X == X && t.Position.Y == Y))
                 {
-                    Entity e = map.entites.Find(t => t.Position.X == X && t.Position.Y == Y);
+                    Entity e = map.entities.Find(t => t.Position.X == X && t.Position.Y == Y);
                     ShowEntityData(e);
                 }
             }
@@ -930,8 +942,8 @@ namespace StartGame
             if (humanPlayer is null) return;
             players.Remove(humanPlayer);
             map.troops.Remove(humanPlayer.troop);
-            map.entites.Remove(humanPlayer.troop);
-            map.RemoveEntityRenderObject(humanPlayer.troop.name);
+            map.entities.Remove(humanPlayer.troop);
+            map.RemoveEntityRenderObject(humanPlayer.troop.Name);
             UpdatePlayerList();
             RenderMap();
             ShowPlayerStats();
@@ -1158,8 +1170,8 @@ namespace StartGame
             killedPlayers.Add(killed);
             killed.troop.Die();
             map.troops.Remove(killed.troop);
-            map.entites.Remove(killed.troop);
-            map.RemoveEntityRenderObject(killed.troop.name);
+            map.entities.Remove(killed.troop);
+            map.RemoveEntityRenderObject(killed.troop.Name);
             players.Remove(killed);
             UpdatePlayerList();
 
@@ -1191,7 +1203,7 @@ namespace StartGame
             players.Add(player);
             map.troops.Add(player.troop);
             player.troop.Map = map;
-            map.entites.Add(player.troop);
+            map.entities.Add(player.troop);
             map.renderObjects.Add(new EntityRenderObject(player.troop, new TeleportPointAnimation(new Point(0, 0), player.troop.Position)));
             UpdatePlayerList();
         }
@@ -1236,7 +1248,7 @@ namespace StartGame
             {
                 actionOccuring = true;
                 DamagePlayer(10, DamageType.earth, player);
-                WriteConsole($"{player.troop.name} takes 10 damage as he is in an object!");
+                WriteConsole($"{player.troop.Name} takes 10 damage as he is in an object!");
                 if (player.troop.health.Value == 0)
                 {
                     actionOccuring = false;
@@ -1249,7 +1261,7 @@ namespace StartGame
                 {
                     Player recPlayer = GetPlayer(receiving);
                     DamagePlayer(10, DamageType.earth, recPlayer);
-                    WriteConsole($"{receiving.name} has been daamaged as {player.troop.name} has teleported into it!");
+                    WriteConsole($"{receiving.Name} has been daamaged as {player.troop.Name} has teleported into it!");
                     if (recPlayer is null || recPlayer.Dead)
                     {
                         free = true;

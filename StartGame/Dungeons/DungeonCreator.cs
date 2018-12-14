@@ -1,4 +1,5 @@
 ﻿using StartGame.Entities;
+using StartGame.PlayerData;
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
@@ -144,6 +145,7 @@ namespace StartGame.Dungeons
             EntityFactory = null;
             entityOverviewControls.ForEach(en => Controls.Remove(en));
             entityOverviewControls.Clear();
+            entityChooser.Items.AddRange(dungeon.customEntities.Select(c => c.Name).ToArray());
             FullRender();
             CheckValidity();
         }
@@ -158,15 +160,18 @@ namespace StartGame.Dungeons
             if (IsActive(Command.ShowBlocking))
             {
                 Color fill = Color.FromArgb(120, Color.Brown);
-                for (int X = 0; X <= dungeon.active.map.map.GetUpperBound(0); X++)
+                lock (dungeon.active.map.RenderController)
                 {
-                    for (int Y = 0; Y <= dungeon.active.map.map.GetUpperBound(1); Y++)
+                    for (int X = 0; X <= dungeon.active.map.map.GetUpperBound(0); X++)
                     {
-                        if (!dungeon.active.map.map[X, Y].free)
-                            dungeon.active.map.overlayObjects.Add(
-                                new OverlayRectangle(X * MapCreator.fieldSize,
-                                Y * MapCreator.fieldSize, MapCreator.fieldSize,
-                                MapCreator.fieldSize, Color.Brown, true, FillColor: fill));
+                        for (int Y = 0; Y <= dungeon.active.map.map.GetUpperBound(1); Y++)
+                        {
+                            if (!dungeon.active.map.map[X, Y].free)
+                                dungeon.active.map.overlayObjects.Add(
+                                    new OverlayRectangle(X * MapCreator.fieldSize,
+                                    Y * MapCreator.fieldSize, MapCreator.fieldSize,
+                                    MapCreator.fieldSize, Color.Brown, true, FillColor: fill));
+                        }
                     }
                 }
             }
@@ -237,6 +242,14 @@ namespace StartGame.Dungeons
 
         private void CreateEntityFactory()
         {
+            if (dungeon.customEntities.Exists(c => c.Name == entityChooser.SelectedItem as string))
+            {
+                CustomPlayer c = dungeon.customEntities.Find(ce => ce.Name == entityChooser.SelectedItem as string);
+                EntityFactory = new EntityFactory(EntityTemplate.CustomPlayer, dungeon, (CustomPlayer)c.Clone());
+                EntityFactory.InitialiseEntityFactoryGUI(this, new Point(549, 180));
+                return;
+            }
+
             switch (entityChooser.SelectedItem)
             {
                 case "Door":
@@ -264,6 +277,12 @@ namespace StartGame.Dungeons
         private void DungeonPicture_Click(object sender, EventArgs e)
         {
             return;
+        }
+
+        private void DungeonPicture_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+                DungeonPicture_MouseClick(sender, e);
         }
 
         private void DungeonPicture_MouseClick(object sender, MouseEventArgs e)
@@ -391,7 +410,21 @@ namespace StartGame.Dungeons
             Entity entity = null;
             if (EntityFactory.CreateEntity(ref entity))
             {
-                dungeon.active.AddEntity(entity);
+                if (entity is null)//assume that it is a custom player
+                {
+                    CustomPlayer player = EntityFactory.customPlayer ?? throw new NoNullAllowedException();
+                    int num = 0;
+                    while (dungeon.active.players.Exists(p => p.Name == player.Name + num))
+                    {
+                        num++;
+                    }
+                    player.Name += num;
+                    dungeon.active.AddEntity(player.troop);
+                }
+                else
+                {
+                    dungeon.active.AddEntity(entity);
+                }
                 EntityFactory.CleanUp();
                 EntityFactory = null;
                 RenderMap();
@@ -443,6 +476,7 @@ namespace StartGame.Dungeons
         private void SelectedEntities_SelectedIndexChanged(object sender, EventArgs e)
         {
             selectedEntityData.Visible = selectedEntities.SelectedItem != null;
+            selectedEntityDelete.Visible = selectedEntities.SelectedItem != null;
             if (selectedEntities.SelectedItem != null)
             {
                 Entity entity = selectedEntities.SelectedItem as Entity;
@@ -533,6 +567,26 @@ namespace StartGame.Dungeons
                 dungeon = Dungeon.LoadPath(externalDungeonFolderBrowser.SelectedPath);
                 ShowNewDungeon();
             }
+        }
+
+        private void CreateNewEntittyTemplate_Click(object sender, EventArgs e)
+        {
+            PlayerCreator playerCreator = new PlayerCreator();
+            playerCreator.ShowDialog();
+            CustomPlayer p = playerCreator.player;
+            if (p != null)
+            {
+                if (!entityChooser.Items.Contains(p.Name))
+                {
+                    entityChooser.Items.Add(p.Name);
+                    dungeon.customEntities.Add(p);
+                }
+            }
+        }
+
+        private void SelectedEntityDelete_Click(object sender, EventArgs e)
+        {
+            Entity entity = selectedEntities.SelectedItem as Entity;
         }
 
         #endregion Event Handler
@@ -636,7 +690,11 @@ namespace StartGame.Dungeons
             RenderMap();
             CommandBarDrawActive();
         }
-
         #endregion Command Bar
+
+        private void DungeonCreator_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

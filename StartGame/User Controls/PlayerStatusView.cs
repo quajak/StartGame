@@ -13,14 +13,14 @@ namespace StartGame.User_Controls
 {
     partial class PlayerStatusView : UserControl
     {
-        private HumanPlayer player;
+        private Player player;
 
         public PlayerStatusView()
         {
             InitializeComponent();
         }
 
-        public void Activate(HumanPlayer player)
+        public void Activate(Player player)
         {
             this.player = player;
         }

@@ -1,5 +1,4 @@
-﻿using PlayerCreator;
-using StartGame.Items;
+﻿using StartGame.Items;
 using StartGame.PlayerData;
 using System;
 using System.Collections.Generic;
@@ -346,6 +345,15 @@ namespace StartGame
                         if (a.Value > player.money.Value) throw new Exception();
                         player.money.rawValue -= a.Value;
                         player.troop.armours.Add(a);
+                        itemShopItems.Remove(item);
+                        itemShopList.Items.Remove(item);
+                        Render();
+                        break;
+
+                    case Jewelry j:
+                        if (j.Value > player.money.Value) throw new Exception();
+                        player.money.rawValue -= j.Value;
+                        player.troop.jewelries.Add(j);
                         itemShopItems.Remove(item);
                         itemShopList.Items.Remove(item);
                         Render();

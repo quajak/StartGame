@@ -1,5 +1,4 @@
-﻿using PlayerCreator;
-using StartGame.Entities;
+﻿using StartGame.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,6 +23,7 @@ namespace StartGame
         private Animation animation;
         public int time;
         public IEnumerator<Point> movementAnimationPoints;
+        public string Name = "None";
 
         public Animation Animation
         {
@@ -147,8 +147,6 @@ namespace StartGame
     [DebuggerDisplay("Entity Renderer: {Name} : {position} => {toRender} : {time}")]
     public class EntityRenderObject : RenderObject
     {
-        public readonly string Name;
-
         public Point Position => position.Mult(MapCreator.fieldSize);
 
         public EntityRenderObject(Point position, Bitmap image, string name, Animation animation = null) : base(position, image)
@@ -166,7 +164,8 @@ namespace StartGame
 
         public EntityRenderObject(Entity entity, Animation animation = null) : base(entity.Position, entity.image, entity.blocking)
         {
-            Name = entity.name;
+            Trace.TraceInformation($"Created new render object for entity name {entity.Name} - {entity}");
+            Name = entity.Name;
             if (animation is null)
             {
                 Animation = new LinearPointAnimation(position, toRender);

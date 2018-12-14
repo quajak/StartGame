@@ -1,5 +1,4 @@
-﻿using PlayerCreator;
-using StartGame.Properties;
+﻿using StartGame.Properties;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,10 +25,10 @@ namespace StartGame.Entities
             ID = IDcounter;
             IDcounter++;
             //DEBUG Test -- check that there is no race condition occuring and that names are being set correctly
-            if (Name + ID.ToString() != name) throw new Exception("Setting of effect name went wrong!");
+            if (Name + ID.ToString() != base.Name) throw new Exception("Setting of effect name went wrong!");
 
             map = Map;
-            map.entites.Add(this);
+            map.entities.Add(this);
 
             lock (map.RenderController)
             {
@@ -55,8 +54,8 @@ namespace StartGame.Entities
 
         internal void BaseDelete()
         {
-            map.entites.Remove(this);
-            map.RemoveEntityRenderObject(name);
+            map.entities.Remove(this);
+            map.RemoveEntityRenderObject(Name);
 
             main.Turn -= Main_Turn;
         }
@@ -130,7 +129,7 @@ namespace StartGame.Entities
                 humanPoint = humanPoint.Add(point);
                 if (humanPoint == Position)
                 {
-                    if (!e.player.troop.statuses.Exists(s => s.name == name))
+                    if (!e.player.troop.statuses.Exists(s => s.name == Name))
                     {
                         main.WriteConsole($"{e.player.Name} has been put on fire!");
                         e.player.troop.statuses.Add(new FireStatus(turns + 1, damage, main, e.player));
@@ -141,7 +140,7 @@ namespace StartGame.Entities
                     }
                     else
                     {
-                        e.player.troop.statuses.Find(s => s.name == name).turns = turns + 1;
+                        e.player.troop.statuses.Find(s => s.name == Name).turns = turns + 1;
                     }
                 }
             }

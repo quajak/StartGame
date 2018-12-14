@@ -276,7 +276,7 @@ namespace StartGame
             {
                 main.MovePlayer(goal, information.positions[0], player, MovementType.teleport, false);
                 main.RenderMap();
-                return $"Teleported {player.troop.name} from {information.positions[0]} to {goal}";
+                return $"Teleported {player.troop.Name} from {information.positions[0]} to {goal}";
             }
             else
             {

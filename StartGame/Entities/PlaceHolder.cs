@@ -9,21 +9,12 @@ using System.Threading.Tasks;
 
 namespace StartGame.Entities
 {
-    public abstract class PlayerPlaceHolder : Entity
+    public class PlayerPlaceHolder : EntityPlaceHolder
     {
-        public PlayerPlaceHolder(Point position, string name, Bitmap image, Map map) : base(name, position, image, false, map)
+        public readonly CustomPlayer player;
+        public PlayerPlaceHolder(CustomPlayer player)
         {
-        }
-
-        public abstract Player InitialisePlayer();
-
-        public static Bitmap AddShade(Bitmap bitmap)
-        {
-            using (Graphics g = Graphics.FromImage(bitmap))
-            {
-                g.DrawRectangle(new Pen(Color.FromArgb(40, 40, 40, 40), 1), 0, 0, bitmap.Width, bitmap.Height);
-                return bitmap;
-            }
+            this.player = player;
         }
     }
 

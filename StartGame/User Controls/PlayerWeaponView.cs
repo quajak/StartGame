@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using PlayerCreator;
 using StartGame.Items;
 using StartGame.PlayerData;
 
@@ -15,7 +14,7 @@ namespace StartGame.User_Controls
 {
     partial class PlayerWeaponView : UserControl
     {
-        private HumanPlayer player;
+        private Player player;
         private MainGameWindow main;
         private bool allowAction = false;
 
@@ -24,7 +23,7 @@ namespace StartGame.User_Controls
             InitializeComponent();
         }
 
-        public void Activate(HumanPlayer Player, MainGameWindow Main, bool AllowAction)
+        public void Activate(Player Player, MainGameWindow Main, bool AllowAction)
         {
             allowAction = AllowAction;
             player = Player;

@@ -1,5 +1,4 @@
-﻿using PlayerCreator;
-using StartGame.Entities;
+﻿using StartGame.Entities;
 using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
@@ -196,7 +195,7 @@ namespace StartGame
 
             //Create the nest
             Building egg = new Building("Nest", peak, Resources.DragonEggNest, map, true);
-            map.entites.Add(egg);
+            map.entities.Add(egg);
             map.renderObjects.Add(new EntityRenderObject(egg, new TeleportPointAnimation(new Point(0, 0), egg.Position)));
 
             //Spawn dragon close to the highest peak
@@ -460,7 +459,7 @@ namespace StartGame
 
             //Must kill spider nest to win
 
-            WinCheck nestState = new WinCheck((__map, main) => !__map.troops.Exists(t => t.name == "Spider Nest"));
+            WinCheck nestState = new WinCheck((__map, main) => !__map.troops.Exists(t => t.Name == "Spider Nest"));
 
             List<WinCheck> wins = new List<WinCheck>
             {
@@ -623,7 +622,7 @@ namespace StartGame
             camp = map.map.Cast<MapTile>().ToList().Where(t => t.neighbours.rawMaptiles.Count(n => n.type.FType == FieldType.land) == 4).OrderByDescending(m => AIUtility.Distance(m.position, player.troop.Position)).First().position;
             //Make camp fire
             Building fireplace = new Building("Fireplace", camp, Resources.firePlace, map);
-            map.entites.Add(fireplace);
+            map.entities.Add(fireplace);
             map.renderObjects.Add(new EntityRenderObject(fireplace, new TeleportPointAnimation(new Point(0, 0), fireplace.Position)));
 
             int enemyNumber = Round / 5 + 2 * difficulty / 3;

@@ -1,4 +1,5 @@
 ﻿using StartGame.Dungeons;
+using StartGame.PlayerData;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -34,7 +35,7 @@ namespace StartGame.Entities
     }
 
     internal enum EntityTemplate
-    { Door }
+    { Door, CustomPlayer }
 
     internal class EntityFactory
     {
@@ -44,6 +45,7 @@ namespace StartGame.Entities
         private readonly List<EntityParameter> entityParameters;
         private readonly EntityTemplate type;
         private readonly Dungeon dungeon;
+        public CustomPlayer customPlayer;
         private DungeonCreator dungeonC;
         private List<Control> inputs = new List<Control>();
 
@@ -54,6 +56,12 @@ namespace StartGame.Entities
                 case EntityTemplate.Door:
                     entityParameters = new List<EntityParameter> {
                         new EntityParameter("Next", EntityParameterType.door),
+                        new EntityParameter("Position", EntityParameterType.position)
+                    };
+                    break;
+
+                case EntityTemplate.CustomPlayer:
+                    entityParameters = new List<EntityParameter> {
                         new EntityParameter("Position", EntityParameterType.position)
                     };
                     break;
@@ -69,6 +77,16 @@ namespace StartGame.Entities
         public EntityFactory(EntityTemplate type, Dungeon dungeon, Point point) : this(type, dungeon)
         {
             entityParameters.Find(e => e.name == "Position").value = point;
+        }
+
+        public EntityFactory(EntityTemplate type, Dungeon dungeon, CustomPlayer customPlayer) : this(type, dungeon)
+        {
+            this.customPlayer = customPlayer;
+        }
+
+        public EntityFactory(EntityTemplate type, Dungeon dungeon, CustomPlayer customPlayer, Point point) : this(type, dungeon, point)
+        {
+            this.customPlayer = customPlayer;
         }
 
         public void InitialiseEntityFactoryGUI(DungeonCreator dungeonCreator, Point point)
@@ -237,6 +255,12 @@ namespace StartGame.Entities
                         real.Item2.unlinked = false;
                         real.Item2.Next = ((toCreate as Door).from, toCreate as Door);
                     }
+                    return true;
+
+                case EntityTemplate.CustomPlayer:
+
+                    customPlayer.troop.Position = (Point)entityParameters.Find(e => e.name == "Position").value;
+                    toCreate = null;
                     return true;
 
                 default:

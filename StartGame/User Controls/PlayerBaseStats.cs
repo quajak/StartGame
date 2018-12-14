@@ -14,9 +14,9 @@ namespace StartGame.User_Controls
 {
     partial class PlayerBaseStats : UserControl
     {
-        private HumanPlayer player;
+        private Player player;
 
-        public void Activate(HumanPlayer player)
+        public void Activate(Player player)
         {
             InitializeComponent();
             this.player = player;
@@ -43,12 +43,21 @@ namespace StartGame.User_Controls
             playerAgility.Text = player.agility.ToString();
             playerEndurance.Text = player.endurance.ToString();
             playerVitatlity.Text = player.vitality.ToString();
-            playerLevel.Text = $"Level: {player.level} + ({player.storedLevelUps})";
-            playerXP.Text = $"XP: {player.xp} / {player.levelXP}";
+            if (player is HumanPlayer h && h != null)
+            {
+                playerLevel.Text = $"Level: {h.level} + ({h.storedLevelUps})";
+                playerXP.Text = $"XP: {h.xp} / {h.levelXP}";
+                playerMoney.Text = player.money.ToString();
+            }
+            else
+            {
+                playerXP.Text = "";
+                playerMoney.Text = "";
+                playerLevel.Text = "";
+            }
             playerMana.Text = player.mana.ToString();
             playerWisdom.Text = player.wisdom.ToString();
             playerIntelligence.Text = player.intelligence.ToString();
-            playerMoney.Text = player.money.ToString();
             playerGearWeight.Text = player.gearWeight.ToString();
             if (player.gearWeight.Value > player.gearWeight.MaxValue().Value)
             {
