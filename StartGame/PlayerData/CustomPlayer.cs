@@ -7,6 +7,7 @@ using System.Threading;
 using StartGame.Extra.Loading;
 using StartGame.Items;
 using StartGame.Properties;
+using StartGame.Rendering;
 using static StartGame.MainGameWindow;
 
 namespace StartGame.PlayerData

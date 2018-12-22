@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using StartGame.Entities;
+using StartGame.MathFunctions;
 using StartGame.PlayerData;
 
 namespace StartGame
@@ -89,7 +90,7 @@ namespace StartGame
                 {
                     //Map generation
                     //Calculate perlin
-                    double mHeight = p.perlin(x * PerlinDiff, y * PerlinDiff, Seed);
+                    double mHeight = p.Perlin(x * PerlinDiff, y * PerlinDiff, Seed);
 
                     //Modify perlin value for more extremes
                     mHeight = mHeight - HeightBias;
@@ -801,48 +802,4 @@ namespace StartGame
     public enum SpawnType
     { road, random, randomLand, heighestField };
 
-    public class OverlayObject
-    {
-        public int x;
-        public int y;
-        public bool once;
-
-        public OverlayObject(int X, int Y, bool Once = true)
-        {
-            x = X;
-            y = Y;
-            once = Once;
-        }
-    }
-
-    internal class OverlayRectangle : OverlayObject
-    {
-        public int width;
-        public int height;
-        public readonly Color borderColor;
-        public bool filled;
-        public readonly Color fillColor;
-
-        public OverlayRectangle(int X, int Y, int Width, int Height, Color BorderColor,
-            bool Filled = false, Color FillColor = new Color(), bool Once = true) : base(X, Y, Once)
-        {
-            width = Width;
-            height = Height;
-            borderColor = BorderColor;
-            filled = Filled;
-            fillColor = FillColor;
-        }
-    }
-
-    internal class OverlayText : OverlayObject
-    {
-        public Color color;
-        public string text;
-
-        public OverlayText(int X, int Y, Color Color, string Text, bool Once = true) : base(X, Y, Once)
-        {
-            color = Color;
-            text = Text;
-        }
-    }
 }

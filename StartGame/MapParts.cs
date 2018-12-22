@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace StartGame
 {
-    [DebuggerDisplay("X:{position.X} Y:{position.Y} Type:{type.type.ToString()}")]
+    [DebuggerDisplay("{position} Type:{type.type.ToString()}")]
     public class MapTile : ICloneable
     {
         public Point position;

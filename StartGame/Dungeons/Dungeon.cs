@@ -1,6 +1,8 @@
 ﻿using StartGame.Entities;
 using StartGame.Extra.Loading;
+using StartGame.Mission;
 using StartGame.PlayerData;
+using StartGame.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,7 +14,7 @@ using System.Windows.Forms;
 
 namespace StartGame.Dungeons
 {
-    public class Dungeon : Mission
+    public class Dungeon : Mission.Mission
     {
         public Room active;
         public List<Room> dungeonRooms = new List<Room>();
@@ -22,14 +24,14 @@ namespace StartGame.Dungeons
         public MainGameWindow mainGame;
         public List<CustomPlayer> customEntities = new List<CustomPlayer>();
 
-        public Dungeon(string name, int FirstRoomWidth = 10, int FirstRoomHeight = 10) : base(false)
+        public Dungeon(string name, int FirstRoomWidth = 10, int FirstRoomHeight = 10) : base(name, false)
         {
             active = new Room(FirstRoomWidth, FirstRoomHeight, "Entrance");
             dungeonRooms.Add(active);
             this.name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
-        public Dungeon(string name, List<Room> rooms, string startRoom, Point startPosition) : base(false)
+        public Dungeon(string name, List<Room> rooms, string startRoom, Point startPosition) : base(name, false)
         {
             this.name = name;
             dungeonRooms = rooms;

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using StartGame.Entities;
+using StartGame.Rendering;
 using static StartGame.MainGameWindow;
 
 namespace StartGame.PlayerData

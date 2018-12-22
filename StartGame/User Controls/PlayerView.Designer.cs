@@ -104,6 +104,7 @@
             this.Controls.Add(this.mainPlayerStrip);
             this.Name = "PlayerView";
             this.Size = new System.Drawing.Size(408, 350);
+            this.Load += new System.EventHandler(this.PlayerView_Load);
             this.mainPlayerStrip.ResumeLayout(false);
             this.mainPlayerStrip.PerformLayout();
             this.ResumeLayout(false);

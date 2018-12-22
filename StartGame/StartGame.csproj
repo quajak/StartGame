@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\AStar.cs" />
     <Compile Include="Animations.cs" />
     <Compile Include="Dungeons\Dungeon.cs" />
     <Compile Include="Dungeons\DungeonChooser.cs">
@@ -95,6 +96,7 @@
     <Compile Include="Items\ArmorPrefabs.cs" />
     <Compile Include="Items\Armour.cs" />
     <Compile Include="Items\Jewelry.cs" />
+    <Compile Include="Mission\MissionWorldPlayer.cs" />
     <Compile Include="PlayerData\AIUtility.cs" />
     <Compile Include="PlayerData\Attribute.cs" />
     <Compile Include="PlayerData\BanditAI.cs" />
@@ -123,10 +125,10 @@
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\Modifiers.cs" />
     <Compile Include="Items\Weapon.cs" />
-    <Compile Include="LevelUp.cs">
+    <Compile Include="PlayerData\LevelUp.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LevelUp.Designer.cs">
+    <Compile Include="PlayerData\LevelUp.Designer.cs">
       <DependentUpon>LevelUp.cs</DependentUpon>
     </Compile>
     <Compile Include="MainGame.cs">
@@ -149,9 +151,10 @@
       <DependentUpon>MapCreator.cs</DependentUpon>
     </Compile>
     <Compile Include="MapParts.cs" />
-    <Compile Include="MapRenderer.cs" />
-    <Compile Include="Mission.cs" />
-    <Compile Include="PerlinNoise.cs" />
+    <Compile Include="PlayerData\WorldPlayer.cs" />
+    <Compile Include="Rendering\MapRenderer.cs" />
+    <Compile Include="Mission\Mission.cs" />
+    <Compile Include="MathFunctions\PerlinNoise.cs" />
     <Compile Include="PlayerData\CustomPlayer.cs" />
     <Compile Include="PlayerData\DefensiveBanditAI.cs" />
     <Compile Include="PlayerData\DistanceGraphCreator.cs" />
@@ -167,6 +170,7 @@
     </Compile>
     <Compile Include="PlayerData\SpiderNestAI.cs" />
     <Compile Include="PlayerData\WarriorSpiderAI.cs" />
+    <Compile Include="Rendering\OverlayObject.cs" />
     <Compile Include="User Controls\PlayerBaseStats.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -220,11 +224,21 @@
     <Compile Include="WeaponView.Designer.cs">
       <DependentUpon>WeaponView.cs</DependentUpon>
     </Compile>
-    <Compile Include="World.cs" />
-    <Compile Include="WorldView.cs">
+    <Compile Include="World\World.cs" />
+    <Compile Include="World\WorldAction.cs" />
+    <Compile Include="World\WorldFeature.cs" />
+    <Compile Include="Rendering\WorldRenderer.cs" />
+    <Compile Include="World\WorldTile.cs" />
+    <Compile Include="Mission\MissionResult.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="WorldView.Designer.cs">
+    <Compile Include="Mission\MissionResult.Designer.cs">
+      <DependentUpon>MissionResult.cs</DependentUpon>
+    </Compile>
+    <Compile Include="World\WorldView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="World\WorldView.Designer.cs">
       <DependentUpon>WorldView.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="CampaignController.resx">
@@ -242,7 +256,7 @@
     <EmbeddedResource Include="Dungeons\DungeonCreator.resx">
       <DependentUpon>DungeonCreator.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LevelUp.resx">
+    <EmbeddedResource Include="PlayerData\LevelUp.resx">
       <DependentUpon>LevelUp.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainGame.resx">
@@ -286,11 +300,15 @@
     <EmbeddedResource Include="WeaponView.resx">
       <DependentUpon>WeaponView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="WorldView.resx">
+    <EmbeddedResource Include="Mission\MissionResult.resx">
+      <DependentUpon>MissionResult.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="World\WorldView.resx">
       <DependentUpon>WorldView.cs</DependentUpon>
     </EmbeddedResource>
     <None Include=".editorconfig" />
     <None Include="ClassDiagram1.cd" />
+    <None Include="GameFlow.md" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -372,6 +390,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Slime.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Mission.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Mission.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

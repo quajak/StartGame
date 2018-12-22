@@ -4,12 +4,14 @@ using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
 using System;
+using StartGame.Mission;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using StartGame.Rendering;
 
 namespace StartGame
 {
@@ -30,7 +32,7 @@ namespace StartGame
         public List<Player> players;
         public Player activePlayer;
         public HumanPlayer humanPlayer;
-        private readonly Mission mission;
+        private readonly Mission.Mission mission;
         private int activePlayerCounter = 0;
         public bool gameStarted = false;
 
@@ -54,7 +56,7 @@ namespace StartGame
 
         public List<Player> killedPlayers = new List<Player>();
 
-        public MainGameWindow(Map Map, HumanPlayer player, Mission mission,
+        public MainGameWindow(Map Map, HumanPlayer player, Mission.Mission mission,
             List<Tree> trees, int difficulty, int round)
         {
             player.main = this;
@@ -158,7 +160,7 @@ namespace StartGame
         public event EventHandler<PlayerMovementData> PlayerMoved = (sender, data) => {
             EntityRenderObject entity = data.map.EntityRenderObjects.FirstOrDefault(e => e.Name == data.player.troop.Name);
 
-            Trace.TraceInformation($"PLayer Moved: Player Name {data.player.troop.Name} Render Object {entity.Name} Start {data.start} End {data.goal}");
+            Trace.TraceInformation($"PlayerMoved Name: {data.player.troop.Name} RenderObject: {entity.Name} Start: {data.start} End: {data.goal}");
 
             if (data.player.troop.health.Value == 0)
             {//Player has died
@@ -191,6 +193,7 @@ namespace StartGame
             {
                 entity.Animation = new ListPointAnimation(data.path.ToList(), data.start.position);
             }
+            Trace.TraceInformation($"Animation set: {entity.Animation.GetType().Name}");
             //Trigger the first building
             for (int i = 0; i < data.map.entities.Count; i++)
             {
@@ -1211,6 +1214,7 @@ namespace StartGame
         //TODO: HAndle all movement through move player, even when using graphs
         public void MovePlayer(Point end, Point start, Player player, MovementType movementType, bool CostActionPoints = true, List<Point> path = null)
         {
+            Trace.TraceInformation($"MainGame::MovePlayer {player.Name} {start} => {end} by {movementType}");
             bool render = false;
             if (path is null)
             {
@@ -1261,7 +1265,7 @@ namespace StartGame
                 {
                     Player recPlayer = GetPlayer(receiving);
                     DamagePlayer(10, DamageType.earth, recPlayer);
-                    WriteConsole($"{receiving.Name} has been daamaged as {player.troop.Name} has teleported into it!");
+                    WriteConsole($"{receiving.Name} has been damaged as {player.troop.Name} has teleported into it!");
                     if (recPlayer is null || recPlayer.Dead)
                     {
                         free = true;

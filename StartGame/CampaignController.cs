@@ -1,6 +1,7 @@
 ﻿using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
+using StartGame.World;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -100,7 +101,7 @@ namespace StartGame
                     }
                 }
                 //Show world map
-                WorldView worldView = new WorldView(player, this, campaign, campaign.mission, loot);
+                MissionResult worldView = new MissionResult(player, this, campaign, campaign.mission, loot);
                 worldView.ShowDialog();
             } while (campaign.Next());
 

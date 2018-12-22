@@ -8,13 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using StartGame.Mission;
+
 using System.Windows.Forms;
 
 namespace StartGame
 {
     public class Campaign
     {
-        public Mission mission;
+        public Mission.Mission mission;
         public HumanPlayer player;
         private List<MainGameWindow> playedGames = new List<MainGameWindow>();
         private readonly int numberOfGames;
@@ -33,15 +35,15 @@ namespace StartGame
             numberOfGames = gameNumber;
             difficulty = Difficulty;
             healthRegen = 10 - Difficulty;
-            if (Difficulty < 6)
+            if (player != null && Difficulty < 6)
             {
                 player.vitality.rawValue += 6 - Difficulty;
             }
         }
 
-        private Mission DecideMission(int Round)
+        public Mission.Mission DecideMission(int Round)
         {
-            List<Mission> missions = new List<Mission> { new ElementalWizardFight(), new AttackCampMission(), new SpiderNestMission(), new BanditMission(), new DragonFight()
+            List<Mission.Mission> missions = new List<Mission.Mission> { new ElementalWizardFight(), new AttackCampMission(), new SpiderNestMission(), new BanditMission(), new DragonFight()
             };
             missions = missions.Where(m => m.MissionAllowed(Round)).ToList();
             int id = random.Next(missions.Count);
@@ -55,6 +57,16 @@ namespace StartGame
         {
             //Setup map
             mission = DecideMission(Round);
+            Map map = GenerateMap();
+            player.map = map;
+            player.troop.Map = map;
+
+            //Finish initialisation
+            activeGame = new MainGameWindow(map, player, mission, trees, difficulty, Round);
+        }
+
+        public Map GenerateMap()
+        {
             Map map = new Map();
             Thread mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), mission.heightDiff)));
             mapCreator.Start();
@@ -71,11 +83,7 @@ namespace StartGame
                 validMap = mission.MapValidity(map);
             }
 
-            player.map = map;
-            player.troop.Map = map;
-
-            //Finish initialisation
-            activeGame = new MainGameWindow(map, player, mission, trees, difficulty, Round);
+            return map;
         }
 
         /// <summary>

@@ -8,8 +8,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StartGame.World;
+using StartGame.Rendering;
 
-namespace StartGame
+namespace StartGame.Mission
 {
     public class Reward
     {
@@ -81,6 +83,8 @@ namespace StartGame
 
     public abstract class Mission
     {
+        public string Name;
+        public bool forced = false;
         public double heightDiff = 0;
         public bool EnemyMoveTogether = false;
 
@@ -92,9 +96,11 @@ namespace StartGame
         public static WinCheck playerDeath = ((_map, main) => main.humanPlayer == null || main.humanPlayer.troop.health.Value <= 0);
         public readonly bool useWinChecks;
 
-        public Mission(bool UseWinChecks = true)
+        public Mission(string name, bool UseWinChecks = true, bool Forced = false)
         {
+            Name = name;
             useWinChecks = UseWinChecks;
+            forced = Forced;
         }
 
         public abstract bool MapValidity(Map map);
@@ -108,6 +114,11 @@ namespace StartGame
 
     internal class DebugMission : Mission
     {
+        public DebugMission() : base("Debug Mission")
+        {
+
+        }
+
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
             string description) GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
@@ -160,7 +171,7 @@ namespace StartGame
                 new JewelryReward(5, Quality.Common),
                 new WeaponReward(true, 0, null),
                 5,
-                new SpellReward(World.Instance.GainSpell<TeleportSpell>()),
+                new SpellReward(World.World.Instance.GainSpell<TeleportSpell>()),
                 0);
         }
 
@@ -173,6 +184,11 @@ namespace StartGame
     internal class DragonFight : Mission
     {
         private int xp;
+
+        public DragonFight() : base("Dragon Fight!")
+        {
+
+        }
 
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
             string description) GenerateMission(int difficulty, int Round, ref Map map, Player player)
@@ -265,7 +281,7 @@ namespace StartGame
                 new JewelryReward(3, Quality.Superior),
                 new WeaponReward(true, 2, null),
                 xp,
-                new SpellReward(World.Instance.GainSpell<FireBall>()),
+                new SpellReward(World.World.Instance.GainSpell<FireBall>()),
                 80
             );
         }
@@ -277,8 +293,12 @@ namespace StartGame
     }
 
     internal class BanditMission : Mission
-
     {
+        public BanditMission() : base("Bandit Fight", Forced: true)
+        {
+
+        }
+
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
             string description) GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
@@ -388,7 +408,7 @@ namespace StartGame
                 new JewelryReward(1, Quality.Broken),
                 new WeaponReward(true, 0, null),
                 5,
-                new SpellReward(World.Instance.GainSpell<DebuffSpell>()),
+                new SpellReward(World.World.Instance.GainSpell<DebuffSpell>()),
                 12
             );
         }
@@ -401,6 +421,11 @@ namespace StartGame
 
     internal class SpiderNestMission : Mission
     {
+        public SpiderNestMission() : base("Destroy a spider nest")
+        {
+
+        }
+
         //Long term: Allow more than one spider nest to spawn
         //Long term: When first hit, spawn a few spiders
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description)
@@ -508,7 +533,7 @@ namespace StartGame
 
     internal class ElementalWizardFight : Mission
     {
-        public ElementalWizardFight()
+        public ElementalWizardFight() : base("Elemental Wizard Fight", Forced: true)
         {
         }
 
@@ -583,7 +608,7 @@ namespace StartGame
                 null,
                 new WeaponReward(true, 3, null),
                 5,
-                new SpellReward(World.Instance.GainSpell<TeleportSpell>()),
+                new SpellReward(World.World.Instance.GainSpell<TeleportSpell>()),
                 48
             );
         }
@@ -596,8 +621,9 @@ namespace StartGame
 
     internal class AttackCampMission : Mission
     {
+
         //TODO: Trigger aggresive AI when casting spell to hurt bandit
-        public AttackCampMission()
+        public AttackCampMission(): base("Camp attacked")
         {
             heightDiff = -0.2;
         }

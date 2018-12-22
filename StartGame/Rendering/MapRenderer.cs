@@ -1,4 +1,5 @@
 ﻿using StartGame.Entities;
+using StartGame.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace StartGame
+namespace StartGame.Rendering
 {
     public abstract class RenderObject
     {
@@ -66,6 +67,7 @@ namespace StartGame
         /// </summary>
         public void CalculateAnimation()
         {
+            Trace.TraceInformation($"RenderObject::CalculateAnimation Name: {Name} Position: {position} toRender {toRender}");
             if (position == toRender)
             {
                 switch (animation)
@@ -124,6 +126,8 @@ namespace StartGame
         /// <param name="setType">Determines what position should be set </param>
         public void SetPosition(Point position, PositionSetType setType)
         {
+            StackTrace stackTrace = new StackTrace();
+            Trace.TraceInformation($"RenderObject::SetPosition {Name} From: {this.position} To: {position} Type: {setType} Stack: {stackTrace.GetFrame(3).GetMethod().Name}");
             switch (setType)
             {
                 case PositionSetType.absolute:
@@ -176,7 +180,10 @@ namespace StartGame
             }
         }
     }
+}
 
+namespace StartGame
+{
     partial class Map
     {
         public object RenderController = new object(); //TODO: Whenever an render object is manipulated it needs to lock this controller
@@ -263,6 +270,7 @@ namespace StartGame
                     Point[] points = new Point[renderObjects.Count]; //DEBUG
                     for (int i = 0; i < renderObjects.Count; i++)
                     {
+                        Trace.TraceInformation($"Rendering {renderObjects[i].Name} in {renderObjects[i].time} from {points[i] = renderObjects[i].position}");
                         times[i] = renderObjects[i].time;
                         points[i] = renderObjects[i].position;
                     }

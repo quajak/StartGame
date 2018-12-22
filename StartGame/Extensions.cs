@@ -8,6 +8,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,11 +19,15 @@ using System.Threading.Tasks;
 
 namespace StartGame
 {
-    internal static class E
+    public static class E
     {
         public static Point Mult(this Point point, int Size)
         {
             return new Point(point.X * Size, point.Y * Size);
+        }
+        public static Point Mult(this Point point, double Size)
+        {
+            return new Point((int)(point.X * Size),(int)( point.Y * Size));
         }
 
         public static Point Div(this Point point, int value)
@@ -39,6 +45,11 @@ namespace StartGame
             return new Point(point.X + b.X, point.Y + b.Y);
         }
 
+        public static Point Add(this Point point, int x, int  y)
+        {
+            return new Point(point.X + x, point.Y + y);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Get<T>(this T[,] map, Point point)
         {
@@ -51,7 +62,7 @@ namespace StartGame
             return map[pos[0], pos[1]];
         }
 
-        [ConditionalAttribute("Debug")]
+        [Conditional("Debug")]
         public static void LogInfo(string message)
         {
             Trace.Write(message);
@@ -95,6 +106,46 @@ namespace StartGame
         internal static string WriteAttribute(int i, string v)
         {
             return WriteAttribute(i.ToString(), v);
+        }
+
+        public static Point Cut(this Point p, int lowX, int highX, int lowY, int highY)
+        {
+            Point r = new Point(p.X, p.Y);
+            if (r.X < lowX) r.X = lowX;
+            if (r.X > highX) r.X = highX;
+            if (r.Y < lowY) r.Y = lowY;
+            if (r.Y > highY) r.Y = highY;
+            return r;
+        }
+
+        public static Point Copy(this Point p)
+        {
+            return new Point(p.X, p.Y);
+        }
+
+        public static Bitmap ResizeImage(this Image image, int width, int height)
+        {
+            Rectangle destRect = new Rectangle(0, 0, width, height);
+            Bitmap destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (Graphics graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (ImageAttributes wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            return destImage;
         }
     }
 }

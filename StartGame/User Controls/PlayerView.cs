@@ -195,5 +195,10 @@ namespace StartGame
             tab = PlayerTab.trees;
             Render();
         }
+
+        private void PlayerView_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

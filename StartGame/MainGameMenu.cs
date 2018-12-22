@@ -9,6 +9,7 @@ using System.Linq;
 using StartGame.DebugViews;
 using StartGame.PlayerData;
 using StartGame.Dungeons;
+using StartGame.Mission;
 
 namespace StartGame
 {
@@ -91,7 +92,7 @@ namespace StartGame
             Hide();
             //Long term: Make form to allow use to choose mission and difficulty
 
-            Mission mission = new DragonFight();
+            Mission.Mission mission = new DragonFight();
 
             List<Tree> trees = Tree.GenerateTrees();
 

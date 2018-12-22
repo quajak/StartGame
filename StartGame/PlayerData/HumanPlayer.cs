@@ -1,10 +1,19 @@
-﻿using System;
+﻿using StartGame.Rendering;
+using StartGame.World;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 namespace StartGame.PlayerData
 {
-    public class HumanPlayer : Player
+    public class HumanPlayer : WorldPlayer
     {
         public MainGameWindow main;
+        public WorldRenderer worldRenderer;
+
+        public List<WorldAction> possibleActions = new List<WorldAction>();
+        public List<WorldAction> availableActions = new List<WorldAction>();
 
         public int level = 1;
         public int xp = 0;
@@ -37,6 +46,45 @@ namespace StartGame.PlayerData
 
         public override void PlayTurn(MainGameWindow main, bool SingleTurn)
         {
+        }
+
+        public override void WorldAction(double newWorldActionPoints)
+        {
+            worldActionPoints += newWorldActionPoints;
+            availableActions = possibleActions.Where(a => a.Available(this)).ToList();
+            if (toMove.Count == 0) worldActionPoints = 0; //TODO: Find a better system to handle actions which need more action points than available in one step
+            
+            //What action to do?
+            if (availableActions.Exists(a => (a is StartMission m) && m.Forced))
+                return;
+
+            HandleMovement();
+        }
+
+        internal override void HandleMovement(double? maxPointUsed = null)
+        {
+            if (toMove.Count == 0) return;
+
+            double points = worldActionPoints;
+            if (maxPointUsed != null)
+                points = Math.Min(points, maxPointUsed.Value);
+
+            worldActionPoints -= points;
+            while (toMove.Count != 0 && points >= World.World.Instance.worldMap.Get(toMove.First()).movementCost)
+            {
+                Point point = toMove.First();
+                points -= World.World.Instance.worldMap.Get(point).movementCost;
+                World.World.Instance.Move(this, point);
+                if(worldRenderer != null)
+                {
+                    worldRenderer.overlayObjects.RemoveAll(o => (o is OverlayLine l) && l.start == point.Mult(20).Add(10, 10));
+                }
+                toMove.RemoveAt(0);
+                availableActions = possibleActions.Where(a => a.Available(this)).ToList();
+                if (availableActions.Exists(a => (a is StartMission m) && m.Forced))
+                    return;
+            }
+            worldActionPoints += points;
         }
     }
 }
