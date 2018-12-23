@@ -6,16 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StartGame
 {
@@ -25,9 +21,10 @@ namespace StartGame
         {
             return new Point(point.X * Size, point.Y * Size);
         }
+
         public static Point Mult(this Point point, double Size)
         {
-            return new Point((int)(point.X * Size),(int)( point.Y * Size));
+            return new Point((int)(point.X * Size), (int)(point.Y * Size));
         }
 
         public static Point Div(this Point point, int value)
@@ -40,12 +37,17 @@ namespace StartGame
             return new Point(point.X - b.X, point.Y - b.Y);
         }
 
+        public static Point Sub(this Point point, int x, int y)
+        {
+            return new Point(point.X - x, point.Y - y);
+        }
+
         public static Point Add(this Point point, Point b)
         {
             return new Point(point.X + b.X, point.Y + b.Y);
         }
 
-        public static Point Add(this Point point, int x, int  y)
+        public static Point Add(this Point point, int x, int y)
         {
             return new Point(point.X + x, point.Y + y);
         }
@@ -121,6 +123,16 @@ namespace StartGame
         public static Point Copy(this Point p)
         {
             return new Point(p.X, p.Y);
+        }
+
+        public static double Cut(this double v, double min, double max)
+        {
+            return v < min ? min : (v > max ? max : v);
+        }
+
+        public static int Cut(this int v, int min, int max)
+        {
+            return v < min ? min : (v > max ? max : v);
         }
 
         public static Bitmap ResizeImage(this Image image, int width, int height)
@@ -200,7 +212,7 @@ namespace StartGame.Extra.Loading
             return all;
         }
 
-        public static EntityPlaceHolder GetEntity(this string line, Room room, List<CustomPlayer>  customEntities)
+        public static EntityPlaceHolder GetEntity(this string line, Room room, List<CustomPlayer> customEntities)
         {
             string[] words = line.Split(' ');
             switch (words[0])
@@ -229,6 +241,7 @@ namespace StartGame.Extra.Loading
                     player.troop.Position = point;
                     player.Name = name;
                     return new PlayerPlaceHolder(player);
+
                 default:
                     throw new NotImplementedException(line);
             }

@@ -1,17 +1,14 @@
 ﻿using StartGame.Dungeons;
 using StartGame.PlayerData;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StartGame.Entities
 {
     public class PlayerPlaceHolder : EntityPlaceHolder
     {
         public readonly CustomPlayer player;
+
         public PlayerPlaceHolder(CustomPlayer player)
         {
             this.player = player;

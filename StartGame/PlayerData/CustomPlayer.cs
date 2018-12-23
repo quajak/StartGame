@@ -1,13 +1,13 @@
-﻿using System;
+﻿using StartGame.Extra.Loading;
+using StartGame.Items;
+using StartGame.Properties;
+using StartGame.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using StartGame.Extra.Loading;
-using StartGame.Items;
-using StartGame.Properties;
-using StartGame.Rendering;
 using static StartGame.MainGameWindow;
 
 namespace StartGame.PlayerData
@@ -180,7 +180,7 @@ namespace StartGame.PlayerData
             };
             File.WriteAllLines(path, lines);
             return true;
-        } 
+        }
 
         public static CustomPlayer Load(string path)
         {
@@ -190,7 +190,7 @@ namespace StartGame.PlayerData
             Weapon weapon = Weapon.Load(lines[2]);
             int defense = lines[3].GetInt();
             int xp = lines[4].GetInt();
-            return new CustomPlayer(name, bitmap, weapon, defense) { XP = xp};
+            return new CustomPlayer(name, bitmap, weapon, defense) { XP = xp };
         }
     }
 }

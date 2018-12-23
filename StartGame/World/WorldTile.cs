@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace StartGame.World
 {
-    public enum WorldTileType { Ocean, River, Grassland, Mountain, Hill, Forest}
+    public enum WorldTileType { Ocean, River, TemperateGrassland, Rainforest, Desert, Tundra, TemperateForest, Savanna, Alpine }
 
     public class WorldTile
     {
@@ -16,12 +11,15 @@ namespace StartGame.World
         public WorldTileType type;
         public double height;
         public double movementCost;
+        public Island island;
+        public SorroundingTiles<WorldTile> sorroundingTiles;
 
-        public WorldTile(double Height, WorldTileType type, double cost)
+        public WorldTile(double Height, WorldTileType type, double cost, Point position)
         {
             height = Height;
             this.type = type;
             movementCost = cost;
+            this.position = position;
         }
 
         public string RawValue()

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StartGame.Rendering
 {
@@ -54,7 +49,7 @@ namespace StartGame.Rendering
     }
 
     [DebuggerDisplay("OverlayLine - {start} => {end}")]
-    class OverlayLine : OverlayObject
+    internal class OverlayLine : OverlayObject
     {
         public Point start;
         public Point end;
@@ -67,5 +62,4 @@ namespace StartGame.Rendering
             this.end = end;
         }
     }
-
 }

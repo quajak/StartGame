@@ -1,7 +1,6 @@
-﻿using System;
-using System.Drawing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StartGame.AI;
+using System.Drawing;
 
 namespace Tests
 {
@@ -17,7 +16,7 @@ namespace Tests
             bool equal = true;
             for (int i = 0; i < path.Length; i++)
             {
-                if(path[i] != expectedPath[i])
+                if (path[i] != expectedPath[i])
                 {
                     equal = false;
                     break;

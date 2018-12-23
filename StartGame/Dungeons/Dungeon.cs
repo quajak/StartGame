@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StartGame.Dungeons
@@ -154,7 +152,6 @@ namespace StartGame.Dungeons
             Point startPosition = lines[4].GetPoint();
             List<string> customEntityTypes = lines[5].GetStringList();
 
-            
             //Now load custom entities
             var customPlayers = customEntityTypes.ConvertAll(c => CustomPlayer.Load(dungeonPath + "\\" + c + ".txt"));
 
@@ -176,11 +173,13 @@ namespace StartGame.Dungeons
                         case DoorPlaceHolder d:
                             room.AddEntity(d.Initialise(dungeon1));
                             break;
+
                         case PlayerPlaceHolder p:
                             p.player.map = room.map;
                             p.player.troop.Map = room.map;
                             room.AddEntity(p.player.troop);
                             break;
+
                         default:
                             throw new NotImplementedException();
                     }

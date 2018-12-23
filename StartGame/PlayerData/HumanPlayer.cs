@@ -53,7 +53,7 @@ namespace StartGame.PlayerData
             worldActionPoints += newWorldActionPoints;
             availableActions = possibleActions.Where(a => a.Available(this)).ToList();
             if (toMove.Count == 0) worldActionPoints = 0; //TODO: Find a better system to handle actions which need more action points than available in one step
-            
+
             //What action to do?
             if (availableActions.Exists(a => (a is StartMission m) && m.Forced))
                 return;
@@ -75,7 +75,7 @@ namespace StartGame.PlayerData
                 Point point = toMove.First();
                 points -= World.World.Instance.worldMap.Get(point).movementCost;
                 World.World.Instance.Move(this, point);
-                if(worldRenderer != null)
+                if (worldRenderer != null)
                 {
                     worldRenderer.overlayObjects.RemoveAll(o => (o is OverlayLine l) && l.start == point.Mult(20).Add(10, 10));
                 }

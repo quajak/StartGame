@@ -1,12 +1,9 @@
-﻿using System;
+﻿using StartGame.Items;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using StartGame.Items;
 using static StartGame.MainGameWindow;
 
 namespace StartGame.PlayerData

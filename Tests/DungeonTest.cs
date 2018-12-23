@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Resources;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StartGame;
 using StartGame.Dungeons;
 using StartGame.Entities;
 using StartGame.Items;
 using StartGame.PlayerData;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 namespace Tests
 {
@@ -80,7 +78,6 @@ namespace Tests
             Assert.IsTrue(dungeon.customEntities.Count == 1);
             Assert.IsTrue(dungeon.customEntities[0].Name == "spider");
             Assert.IsTrue(dungeon.active.map.entities.Count == 1);
-           
         }
 
         [TestMethod]

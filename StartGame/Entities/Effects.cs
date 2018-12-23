@@ -1,13 +1,11 @@
-﻿using StartGame.Properties;
+﻿using StartGame.PlayerData;
+using StartGame.Properties;
+using StartGame.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StartGame.PlayerData;
-using StartGame.Rendering;
 
 namespace StartGame.Entities
 {

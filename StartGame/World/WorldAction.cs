@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using StartGame.PlayerData;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StartGame.Mission;
-using StartGame.PlayerData;
 
 namespace StartGame.World
 {
@@ -13,6 +7,7 @@ namespace StartGame.World
     {
         public int cost;
         internal Point position;
+
         public WorldAction(Point Position, int Cost)
         {
             position = Position;

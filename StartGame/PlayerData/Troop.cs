@@ -1,6 +1,5 @@
 ﻿using StartGame.Entities;
 using StartGame.Items;
-using StartGame.Properties;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -83,6 +82,5 @@ namespace StartGame.PlayerData
             //type name x y blocking (all from base) [name of player]
             return base.RawValue() + " " + player.Name;
         }
-
     }
 }

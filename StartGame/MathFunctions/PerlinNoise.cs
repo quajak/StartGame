@@ -2,14 +2,14 @@
 {
 	public class PerlinNoise
 	{
-		readonly int repeat;
+		private readonly int repeat;
 
 		public PerlinNoise(int repeat = -1)
 		{
 			this.repeat = repeat;
 		}
 
-		double OctavePerlin(double x, double y, double z, int octaves, double persistence)
+		public double OctavePerlin(double x, double y, double z, int octaves, double persistence)
 		{
 			double total = 0;
 			double frequency = 1;
@@ -104,7 +104,7 @@
 			return (Lerp(y1, y2, w) + 1) / 2;                       // For convenience we bound it to 0 - 1 (theoretical min/max before is -1 - 1)
 		}
 
-		int Inc(int num)
+		private int Inc(int num)
 		{
 			num++;
 			if (repeat > 0) num %= repeat;
@@ -112,7 +112,7 @@
 			return num;
 		}
 
-		static double Grad(int hash, double x, double y, double z)
+		private static double Grad(int hash, double x, double y, double z)
 		{
 			int h = hash & 15;                                  // Take the hashed value and take the first 4 bits of it (15 == 0b1111)
 			double u = h < 8 /* 0b1000 */ ? x : y;              // If the most significant bit (MSB) of the hash is 0 then set u = x.  Otherwise y.
@@ -130,7 +130,7 @@
 			return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v); // Use the last 2 bits to decide if u and v are positive or negative.  Then return their addition.
 		}
 
-		static double Fade(double t)
+		private static double Fade(double t)
 		{
 			// Fade function as defined by Ken Perlin.  This eases coordinate values
 			// so that they will "ease" towards integral values.  This ends up smoothing
@@ -138,7 +138,7 @@
 			return t * t * t * (t * (t * 6 - 15) + 10);         // 6t^5 - 15t^4 + 10t^3
 		}
 
-		static double Lerp(double a, double b, double x)
+		private static double Lerp(double a, double b, double x)
 		{
 			return a + x * (b - a);
 		}

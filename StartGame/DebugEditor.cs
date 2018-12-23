@@ -1,12 +1,6 @@
 ﻿using StartGame.PlayerData;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StartGame
@@ -36,8 +30,7 @@ namespace StartGame
         {
             main.actionOccuring = true;
             List<Player> players = new List<Player>(main.players);
-            players.ForEach(p =>
-            {
+            players.ForEach(p => {
                 if (p.Name != main.humanPlayer.Name)
                 {
                     main.DamagePlayer(100, DamageType.unblockable, p);

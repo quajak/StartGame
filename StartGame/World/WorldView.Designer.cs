@@ -34,6 +34,8 @@
             this.gameRunningControl = new System.Windows.Forms.Button();
             this.worldTimeLabel = new System.Windows.Forms.Label();
             this.startMission = new System.Windows.Forms.Button();
+            this.generateNewWorld = new System.Windows.Forms.Button();
+            this.coords = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.worldMapView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -99,11 +101,32 @@
             this.startMission.Visible = false;
             this.startMission.Click += new System.EventHandler(this.StartMission_Click);
             // 
+            // generateNewWorld
+            // 
+            this.generateNewWorld.Location = new System.Drawing.Point(94, 368);
+            this.generateNewWorld.Name = "generateNewWorld";
+            this.generateNewWorld.Size = new System.Drawing.Size(75, 23);
+            this.generateNewWorld.TabIndex = 6;
+            this.generateNewWorld.Text = "Generate";
+            this.generateNewWorld.UseVisualStyleBackColor = true;
+            this.generateNewWorld.Click += new System.EventHandler(this.GenerateNewWorld_Click);
+            // 
+            // coords
+            // 
+            this.coords.AutoSize = true;
+            this.coords.Location = new System.Drawing.Point(94, 405);
+            this.coords.Name = "coords";
+            this.coords.Size = new System.Drawing.Size(35, 13);
+            this.coords.TabIndex = 7;
+            this.coords.Text = "label1";
+            // 
             // WorldView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.coords);
+            this.Controls.Add(this.generateNewWorld);
             this.Controls.Add(this.startMission);
             this.Controls.Add(this.worldTimeLabel);
             this.Controls.Add(this.gameRunningControl);
@@ -127,5 +150,7 @@
         private System.Windows.Forms.Button gameRunningControl;
         private System.Windows.Forms.Label worldTimeLabel;
         private System.Windows.Forms.Button startMission;
+        private System.Windows.Forms.Button generateNewWorld;
+        private System.Windows.Forms.Label coords;
     }
 }

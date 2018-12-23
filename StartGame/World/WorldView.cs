@@ -6,25 +6,23 @@ using StartGame.Properties;
 using StartGame.Rendering;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StartGame.World
 {
     public partial class WorldView : Form
     {
-        bool running = false;
-        World world = World.Instance;
-        WorldRenderer worldRenderer;
-        Timer controller = new Timer();
+        Random random = new Random();
+        private bool running = false;
+        private World world = World.Instance;
+        private WorldRenderer worldRenderer;
+        private Timer controller = new Timer();
+
         //Todo: Use better zoom system
-        int zoom = 0; //Should be between -15 and 30 
+        private int zoom = 0; //Should be between -15 and 30
+
         public WorldView(HumanPlayer player = null)
         {
             if (player is null)
@@ -32,7 +30,7 @@ namespace StartGame.World
                 player = new HumanPlayer(PlayerType.localHuman, "Player", null, new Player[0], null, 0);
                 Troop playerTroop = new Troop("Player", new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0
                         , null, player) {
-                armours = new List<Armour>
+                    armours = new List<Armour>
                     {
                         new Armour("Woolen Tunic", 50, new List<BodyParts>{BodyParts.LeftUpperArm,BodyParts.RightUpperArm,BodyParts.Torso}, Material.Materials.First(m => m.name == "Wool"),Quality.Common, ArmourLayer.clothing),
                         new Armour("Old Pants", 40, new List<BodyParts> { BodyParts.UpperLegs, BodyParts.LeftLowerLeg, BodyParts.RightLowerLeg, BodyParts.LeftShin, BodyParts.RightShin }, Material.Materials.First(m => m.name == "Cloth"), Quality.Poor, ArmourLayer.clothing),
@@ -46,7 +44,17 @@ namespace StartGame.World
             this.player = player;
             //determine player spawnpoint
             worldRenderer = new WorldRenderer(world, player);
-            player.WorldPosition = new Point(10, 10);
+            List<City> small = world.nation.cities.Where(c => c is SmallCity).ToList();
+            Point point = small[random.Next(small.Count)].position;
+            Point spawn = point.Copy();
+            do
+            {
+                spawn = point.Copy();
+                spawn.X += random.Next(10) - 5;
+                spawn.Y += random.Next(10) - 5;
+            } while (!World.IsLand(world.worldMap.Get(point).type));
+            player.WorldPosition = spawn;
+
             player.worldRenderer = worldRenderer;
             world.InitialisePlayer(player);
             world.actors.Add(player);
@@ -56,6 +64,7 @@ namespace StartGame.World
             worldMapView.MouseWheel += WorldMapView_MouseWheel;
             controller.Interval = 1000;
             controller.Tick += Controller_Tick;
+            FocusOnPlayer();
         }
 
         private void Controller_Tick(object sender, EventArgs e)
@@ -71,10 +80,10 @@ namespace StartGame.World
             //pre zoom position
             double posX = (double)(e.X + worldRenderer.Position.X) / ((20 + zoom) * World.WORLD_SIZE);
             double posY = (double)(e.Y + worldRenderer.Position.Y) / ((20 + zoom) * World.WORLD_SIZE);
-            
+
             //Zoom in or out
-            zoom += e.Delta / 40;
-            zoom = zoom < -19 ? -19 : zoom;
+            zoom += 2 * e.Delta / Math.Abs(e.Delta);
+            zoom = zoom < -18 ? -18 : zoom;
             zoom = zoom > 30 ? 30 : zoom;
 
             //We center around pixel the mouse is focused on
@@ -89,10 +98,9 @@ namespace StartGame.World
 
         private void WorldView_Load(object sender, EventArgs e)
         {
-
         }
 
-        void Render()
+        private void Render()
         {
             worldMapView.Image = worldRenderer.Render(worldMapView.Width, worldMapView.Height, 20 + zoom);
             if (running)
@@ -108,10 +116,9 @@ namespace StartGame.World
 
         private void WorldMapView_MouseMove(object sender, MouseEventArgs e)
         {
-
         }
 
-        Point mouseDownPosition;
+        private Point mouseDownPosition;
         public readonly HumanPlayer player;
 
         private void WorldMapView_MouseDown(object sender, MouseEventArgs e)
@@ -135,20 +142,30 @@ namespace StartGame.World
 
         private void FocusOnPlayer_Click(object sender, EventArgs e)
         {
-            worldRenderer.Position.X = player.troop.Position.X * (20 + zoom) - worldMapView.Width / 2;
-            worldRenderer.Position.Y = player.troop.Position.Y * (20 + zoom) - worldMapView.Height / 2;
+            FocusOnPlayer();
+        }
+
+        private void FocusOnPlayer()
+        {
+            worldRenderer.Position.X = player.WorldPosition.X * (20 + zoom) - worldMapView.Width / 2;
+            worldRenderer.Position.Y = player.WorldPosition.Y * (20 + zoom) - worldMapView.Height / 2;
             worldRenderer.Position = Cut();
             zoom = 0;
             Render();
         }
 
-        Point selected;
+        private Point selected;
+
         private void WorldMapView_Click(object sender, EventArgs e)
         {
         }
 
         private void WorldMapView_MouseClick(object sender, MouseEventArgs e)
         {
+            int tileSize = (20 + zoom);
+            int x = (worldRenderer.Position.X + e.X) / tileSize;
+            int y = (worldRenderer.Position.Y + e.Y) / tileSize;
+            coords.Text = $"{x} {y}";
         }
 
         private void WorldMapView_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -157,6 +174,8 @@ namespace StartGame.World
             int x = (worldRenderer.Position.X + e.X) / tileSize;
             int y = (worldRenderer.Position.Y + e.Y) / tileSize;
             selected = new Point(x, y);
+            if (x != x.Cut(0, World.WORLD_SIZE) || y != y.Cut(0, World.WORLD_SIZE))
+                return;
             //TODO: If entity at position show info
 
             //Find route from player
@@ -168,7 +187,7 @@ namespace StartGame.World
             }
             foreach (var point in route.Skip(1).ToList())
             {
-                worldRenderer.overlayObjects.Add(new OverlayLine(previous.Mult(20).Add(10,10), point.Mult(20).Add(10,10), Color.Red, false));
+                worldRenderer.overlayObjects.Add(new OverlayLine(previous.Mult(20).Add(10, 10), point.Mult(20).Add(10, 10), Color.Red, false));
                 previous = point;
             }
             player.toMove = route.Skip(1).ToList();
@@ -176,7 +195,6 @@ namespace StartGame.World
             worldRenderer.Redraw = true;
 
             Render();
-
         }
 
         private void GameRunningControl_Click(object sender, EventArgs e)
@@ -204,6 +222,14 @@ namespace StartGame.World
             player.possibleActions.Remove(startMission1);
             world.actors.RemoveAll(p => (p is MissionWorldPlayer wp) && wp.WorldPosition == player.WorldPosition);
             world.GenerateNewMission();
+            Render();
+        }
+
+        private void GenerateNewWorld_Click(object sender, EventArgs e)
+        {
+            World.NewWorld();
+            world = World.Instance;
+            worldRenderer = new WorldRenderer(World.Instance, player);
             Render();
         }
     }

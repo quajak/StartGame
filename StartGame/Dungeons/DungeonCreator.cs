@@ -4,14 +4,11 @@ using StartGame.Properties;
 using StartGame.Rendering;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StartGame.Dungeons
@@ -691,11 +688,11 @@ namespace StartGame.Dungeons
             RenderMap();
             CommandBarDrawActive();
         }
+
         #endregion Command Bar
 
         private void DungeonCreator_Load(object sender, EventArgs e)
         {
-
         }
     }
 }

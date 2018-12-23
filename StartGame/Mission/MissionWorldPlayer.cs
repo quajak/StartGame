@@ -1,15 +1,11 @@
 ﻿using StartGame.PlayerData;
 using StartGame.Properties;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StartGame.Mission
 {
-    class MissionWorldPlayer : WorldPlayer
+    internal class MissionWorldPlayer : WorldPlayer
     {
         public static int counter = 0;
         public readonly Mission mission;

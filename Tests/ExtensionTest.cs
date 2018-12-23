@@ -1,7 +1,6 @@
-﻿using System;
-using System.Drawing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StartGame;
+using System.Drawing;
 
 namespace Tests
 {

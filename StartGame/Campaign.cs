@@ -1,16 +1,10 @@
 ﻿using StartGame.Items;
+using StartGame.Mission;
 using StartGame.PlayerData;
-using StartGame.Properties;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using StartGame.Mission;
-
-using System.Windows.Forms;
 
 namespace StartGame
 {

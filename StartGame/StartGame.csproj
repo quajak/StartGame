@@ -224,10 +224,19 @@
     <Compile Include="WeaponView.Designer.cs">
       <DependentUpon>WeaponView.cs</DependentUpon>
     </Compile>
+    <Compile Include="World\City.cs" />
+    <Compile Include="World\Island.cs" />
+    <Compile Include="World\Nation.cs" />
     <Compile Include="World\World.cs" />
     <Compile Include="World\WorldAction.cs" />
     <Compile Include="World\WorldFeature.cs" />
     <Compile Include="Rendering\WorldRenderer.cs" />
+    <Compile Include="World\WorldGenerationViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="World\WorldGenerationViewer.Designer.cs">
+      <DependentUpon>WorldGenerationViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="World\WorldTile.cs" />
     <Compile Include="Mission\MissionResult.cs">
       <SubType>Form</SubType>
@@ -302,6 +311,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mission\MissionResult.resx">
       <DependentUpon>MissionResult.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="World\WorldGenerationViewer.resx">
+      <DependentUpon>WorldGenerationViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="World\WorldView.resx">
       <DependentUpon>WorldView.cs</DependentUpon>
@@ -396,6 +408,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Mission.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SmallCity.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MediumCity.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BigCity.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CapitalCity.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Road.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

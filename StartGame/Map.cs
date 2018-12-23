@@ -1,10 +1,10 @@
-﻿using System;
+﻿using StartGame.Entities;
+using StartGame.MathFunctions;
+using StartGame.PlayerData;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using StartGame.Entities;
-using StartGame.MathFunctions;
-using StartGame.PlayerData;
 
 namespace StartGame
 {
@@ -801,5 +801,4 @@ namespace StartGame
 
     public enum SpawnType
     { road, random, randomLand, heighestField };
-
 }

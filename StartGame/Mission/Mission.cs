@@ -2,14 +2,11 @@
 using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
+using StartGame.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StartGame.World;
-using StartGame.Rendering;
 
 namespace StartGame.Mission
 {
@@ -116,7 +113,6 @@ namespace StartGame.Mission
     {
         public DebugMission() : base("Debug Mission")
         {
-
         }
 
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
@@ -187,7 +183,6 @@ namespace StartGame.Mission
 
         public DragonFight() : base("Dragon Fight!")
         {
-
         }
 
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
@@ -296,7 +291,6 @@ namespace StartGame.Mission
     {
         public BanditMission() : base("Bandit Fight", Forced: true)
         {
-
         }
 
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
@@ -423,7 +417,6 @@ namespace StartGame.Mission
     {
         public SpiderNestMission() : base("Destroy a spider nest")
         {
-
         }
 
         //Long term: Allow more than one spider nest to spawn
@@ -621,9 +614,8 @@ namespace StartGame.Mission
 
     internal class AttackCampMission : Mission
     {
-
         //TODO: Trigger aggresive AI when casting spell to hurt bandit
-        public AttackCampMission(): base("Camp attacked")
+        public AttackCampMission() : base("Camp attacked")
         {
             heightDiff = -0.2;
         }

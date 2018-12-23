@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StartGame.AI
 {
@@ -26,16 +22,17 @@ namespace StartGame.AI
                 Point checking = toCheck[0];
                 toCheck.RemoveAt(0);
                 //left
-                if(checking.X != 0)
+                if (checking.X != 0)
                 {
                     Point left = checking.Add(new Point(-1, 0));
-                    if (fields.Get(left) > fields.Get(checking) + cost.Get(left)){
+                    if (fields.Get(left) > fields.Get(checking) + cost.Get(left))
+                    {
                         fields[checking.X - 1, checking.Y] = fields.Get(checking) + cost[checking.X - 1, checking.Y];
                         toCheck.Add(left);
                     }
                 }
                 //right
-                if(checking.X != cost.GetUpperBound(0))
+                if (checking.X != cost.GetUpperBound(0))
                 {
                     Point right = checking.Add(new Point(1, 0));
                     if (fields.Get(right) > fields.Get(checking) + cost.Get(right))
@@ -45,7 +42,7 @@ namespace StartGame.AI
                     }
                 }
                 //top
-                if(checking.Y != 0)
+                if (checking.Y != 0)
                 {
                     Point top = checking.Add(new Point(0, -1));
                     if (fields.Get(top) > fields.Get(checking) + cost.Get(top))
@@ -75,7 +72,7 @@ namespace StartGame.AI
                 double minV = 1000000000000;
                 Point tryP;
                 double tryV;
-                if(active.X != 0)
+                if (active.X != 0)
                 {
                     tryP = active.Add(-1, 0);
                     tryV = fields.Get(tryP);
@@ -89,13 +86,13 @@ namespace StartGame.AI
                 {
                     tryP = active.Add(1, 0);
                     tryV = fields.Get(tryP);
-                    if (tryV<minV)
+                    if (tryV < minV)
                     {
                         minV = tryV;
                         min = tryP;
                     }
                 }
-                if(active.Y != 0)
+                if (active.Y != 0)
                 {
                     tryP = active.Add(0, -1);
                     tryV = fields.Get(tryP);
@@ -105,7 +102,7 @@ namespace StartGame.AI
                         min = tryP;
                     }
                 }
-                if(active.Y != fields.GetUpperBound(1))
+                if (active.Y != fields.GetUpperBound(1))
                 {
                     tryP = active.Add(0, 1);
                     tryV = fields.Get(tryP);

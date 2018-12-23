@@ -1,22 +1,16 @@
 ﻿using StartGame.Items;
+using StartGame.Mission;
 using StartGame.PlayerData;
+using StartGame.Rendering;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using StartGame.Mission;
-using StartGame.Rendering;
 
 namespace StartGame.World
 {
     partial class MissionResult : Form
     {
-        WorldRenderer worldRenderer;
+        private WorldRenderer worldRenderer;
         private readonly HumanPlayer player;
         private readonly CampaignController controller;
         private readonly Campaign campaign;
@@ -204,7 +198,6 @@ namespace StartGame.World
 
         private void LootList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
         }
     }
 }

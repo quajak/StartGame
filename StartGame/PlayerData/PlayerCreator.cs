@@ -1,12 +1,7 @@
 ﻿using StartGame.Properties;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StartGame.PlayerData
@@ -17,12 +12,11 @@ namespace StartGame.PlayerData
 
         public PlayerCreator()
         {
-            player = new CustomPlayer("Custom", "enemyScout", 
+            player = new CustomPlayer("Custom", "enemyScout",
                 new Items.Weapon(5, Items.BaseAttackType.melee, Items.BaseDamageType.blunt, 1, "Hit", 1, false), 0);
             InitializeComponent();
             playerView1.Activate(player, null, false);
             ShowImage();
-
         }
 
         private void StrengthValue_ValueChanged(object sender, EventArgs e)

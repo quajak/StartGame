@@ -6,9 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace StartGame.Entities
@@ -75,7 +72,7 @@ namespace StartGame.Entities
             get => name; set
             {
                 //if we have an entity render object, rename it first+
-                if(Map != null)
+                if (Map != null)
                 {
                     EntityRenderObject entity = Map.EntityRenderObjects.Find(o => o.Name == Name);
                     if (entity != null)
