@@ -36,6 +36,7 @@
             this.startMission = new System.Windows.Forms.Button();
             this.generateNewWorld = new System.Windows.Forms.Button();
             this.coords = new System.Windows.Forms.Label();
+            this.enterCity = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.worldMapView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -120,11 +121,23 @@
             this.coords.TabIndex = 7;
             this.coords.Text = "label1";
             // 
+            // enterCity
+            // 
+            this.enterCity.Location = new System.Drawing.Point(559, 368);
+            this.enterCity.Name = "enterCity";
+            this.enterCity.Size = new System.Drawing.Size(75, 50);
+            this.enterCity.TabIndex = 8;
+            this.enterCity.Text = "Enter City";
+            this.enterCity.UseVisualStyleBackColor = true;
+            this.enterCity.Visible = false;
+            this.enterCity.Click += new System.EventHandler(this.Button1_Click);
+            // 
             // WorldView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.enterCity);
             this.Controls.Add(this.coords);
             this.Controls.Add(this.generateNewWorld);
             this.Controls.Add(this.startMission);
@@ -152,5 +165,6 @@
         private System.Windows.Forms.Button startMission;
         private System.Windows.Forms.Button generateNewWorld;
         private System.Windows.Forms.Label coords;
+        private System.Windows.Forms.Button enterCity;
     }
 }

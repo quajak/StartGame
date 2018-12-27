@@ -87,8 +87,8 @@ namespace StartGame
             players.ForEach(p => { if (!map.troops.Contains(p.troop)) map.troops.Add(p.troop); }); //Sometimes may already have been added in a map
             players.ForEach(p => { if (!map.entities.Contains(p.troop)) map.entities.Add(p.troop); });
             players.ForEach(p => {
-                if (!map.renderObjects.Exists(e => e.Name == p.troop.Name)) map.renderObjects.Add(
-new EntityRenderObject(p.troop, new TeleportPointAnimation(new Point(0, 0), p.troop.Position)));
+                if (!map.renderObjects.Exists(e => e.Name == p.troop.Name))
+                    map.renderObjects.Add(new EntityRenderObject(p.troop, new TeleportPointAnimation(new Point(0, 0), p.troop.Position)));
             });
 
             InitializeComponent();

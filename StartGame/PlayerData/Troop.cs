@@ -12,11 +12,12 @@ namespace StartGame.PlayerData
         public List<Weapon> weapons = new List<Weapon>();
         public List<Armour> armours = new List<Armour>();
         public List<Jewelry> jewelries = new List<Jewelry>();
+        public List<Item> items = new List<Item>();
 
         /// <summary>
         /// List of all items player has
         /// </summary>
-        public List<Item> Items => armours.Concat<Item>(jewelries).ToList();
+        public List<Item> Items => armours.Concat<Item>(jewelries).Concat(items).ToList();
 
         public Health health;
         public Defense defense;

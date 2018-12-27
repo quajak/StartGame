@@ -15,7 +15,7 @@ namespace StartGame
     internal enum PlayerTab
     { stats, items, statuses, weapons, trees, spells };
 
-    partial class PlayerView : UserControl
+    public partial class PlayerView : UserControl
     {
         private PlayerBaseStats playerProfile;
         private PlayerItemView itemView;

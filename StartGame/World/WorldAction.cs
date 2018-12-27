@@ -1,5 +1,8 @@
 ﻿using StartGame.PlayerData;
+using StartGame.World.Cities;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace StartGame.World
 {
@@ -32,6 +35,31 @@ namespace StartGame.World
         public override bool Available(WorldPlayer player)
         {
             return position == player.WorldPosition;
+        }
+    }
+
+    public class InteractCity : WorldAction
+    {
+        public Point[] points;
+        public City city;
+
+        public InteractCity(City city) : base(city.position, 0)
+        {
+            this.city = city;   
+            List<Point> tP = new List<Point>();
+            for (int x = 0; x < city.size.X; x++)
+            {
+                for (int y = 0; y < city.size.Y; y++)
+                {
+                    tP.Add(new Point(city.position.X - city.size.X / 2 + x, city.position.Y - city.size.Y / 2 + y));
+                }
+            }
+            points = tP.ToArray();
+        }
+
+        public override bool Available(WorldPlayer player)
+        {
+            return points.Contains(player.WorldPosition);
         }
     }
 }

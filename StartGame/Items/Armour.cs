@@ -59,7 +59,7 @@ namespace StartGame.Items
             this.material = material;
         }
 
-        public string Description => $"This a piece of {layer.Description()} made out of {material.name}. It is of {Enum.GetName(typeof(Quality), quality)} quality and has a value of {Value} coins. It weighs {weight} grams.\n" +
+        public new string Description => $"This a piece of {layer.Description()} made out of {material.name}. It is of {Enum.GetName(typeof(Quality), quality)} quality and has a value of {Value} coins. It weighs {weight} grams.\n" +
             $"Blunt defense: {bluntDefense}\nSharp defense: {sharpDefense}\nMagic defense: {magicDefense}\nDurability: {durability}/{maxDurability}";
     }
 }

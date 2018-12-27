@@ -4,6 +4,7 @@ using StartGame.Mission;
 using StartGame.PlayerData;
 using StartGame.Properties;
 using StartGame.Rendering;
+using StartGame.World.Cities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -28,6 +29,7 @@ namespace StartGame.World
             if (player is null)
             {
                 player = new HumanPlayer(PlayerType.localHuman, "Player", null, new Player[0], null, 0);
+                player.money.rawValue = 1000;
                 Troop playerTroop = new Troop("Player", new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0
                         , null, player) {
                     armours = new List<Armour>
@@ -44,7 +46,7 @@ namespace StartGame.World
             this.player = player;
             //determine player spawnpoint
             worldRenderer = new WorldRenderer(world, player);
-            List<City> small = world.nation.cities.Where(c => c is SmallCity).ToList();
+            List<City> small = world.nation.cities.Where(c => c is SmallCity && c.IsPort).ToList();
             Point point = small[random.Next(small.Count)].position;
             Point spawn = point.Copy();
             do
@@ -52,7 +54,9 @@ namespace StartGame.World
                 spawn = point.Copy();
                 spawn.X += random.Next(10) - 5;
                 spawn.Y += random.Next(10) - 5;
-            } while (!World.IsLand(world.worldMap.Get(point).type));
+                spawn.X = spawn.X.Cut(0, World.WORLD_SIZE);
+                spawn.Y = spawn.Y.Cut(0, World.WORLD_SIZE);
+            } while (!World.IsLand(world.worldMap.Get(spawn).type));
             player.WorldPosition = spawn;
 
             player.worldRenderer = worldRenderer;
@@ -73,6 +77,7 @@ namespace StartGame.World
             worldRenderer.Redraw = true; //Is there a way we can avoid this?
             Render();
             startMission.Visible = player.availableActions.Exists(a => a is StartMission);
+            enterCity.Visible = player.availableActions.Exists(a => a is InteractCity);
         }
 
         private void WorldMapView_MouseWheel(object sender, MouseEventArgs e)
@@ -100,8 +105,9 @@ namespace StartGame.World
         {
         }
 
-        private void Render()
+        public void Render()
         {
+            worldMapView.Image?.Dispose();
             worldMapView.Image = worldRenderer.Render(worldMapView.Width, worldMapView.Height, 20 + zoom);
             if (running)
             {
@@ -145,7 +151,7 @@ namespace StartGame.World
             FocusOnPlayer();
         }
 
-        private void FocusOnPlayer()
+        public void FocusOnPlayer()
         {
             worldRenderer.Position.X = player.WorldPosition.X * (20 + zoom) - worldMapView.Width / 2;
             worldRenderer.Position.Y = player.WorldPosition.Y * (20 + zoom) - worldMapView.Height / 2;
@@ -216,7 +222,8 @@ namespace StartGame.World
             MainGameWindow mainGame = new MainGameWindow(map, player, selected, world.trees, World.WORLD_DIFFICULTY, startMission1.difficulty);
             controller.Stop();
             mainGame.ShowDialog();
-            controller.Start();
+            if (running)
+                controller.Start();
             world.missionsCompleted++;
             player.availableActions.Remove(startMission1);
             player.possibleActions.Remove(startMission1);
@@ -231,6 +238,16 @@ namespace StartGame.World
             world = World.Instance;
             worldRenderer = new WorldRenderer(World.Instance, player);
             Render();
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            City city = (player.availableActions.First(a => a is InteractCity) as InteractCity).city;
+            CityView cityView = new CityView(city, player, this);
+            controller.Stop();
+            cityView.ShowDialog();
+            if (running)
+                controller.Start();
         }
     }
 }

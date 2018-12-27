@@ -1,4 +1,5 @@
 ﻿using StartGame.World;
+using StartGame.World.Cities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,7 +26,10 @@ namespace StartGame.Rendering
         public Bitmap Render(int renderWidth, int renderHeight, int size = 20)
         {
             if (Redraw || currentMap == null)
+            {
+                currentMap?.Dispose();
                 currentMap = DrawMap();
+            }
             Redraw = false;
             Bitmap toReturn = new Bitmap(renderWidth, renderHeight);
             Bitmap toDraw = currentMap.ResizeImage((int)(currentMap.Width * (double)size / 20d), (int)(currentMap.Height * size / 20d));
@@ -33,6 +37,7 @@ namespace StartGame.Rendering
             {
                 g.DrawImage(toDraw, Position.Mult(-1));
             }
+            toDraw.Dispose();
             return toReturn;
         }
 
@@ -46,7 +51,14 @@ namespace StartGame.Rendering
                 Trace.TraceInformation($"Rendering {world.features.Count} features!");
                 foreach (var feature in world.features.OrderBy(f => f.level))
                 {
-                    g.DrawImage(feature.image, feature.position.X * size, feature.position.Y * size, size, size);
+                    if(feature.alignment == RenderingAlignment.Left)
+                        g.DrawImage(feature.image, feature.position.X * size, feature.position.Y * size, size, size);
+                    else if(feature.alignment == RenderingAlignment.Center)
+                    {
+                        int x = (feature.position.X - feature.size.X / 2) * size;
+                        int y = (feature.position.Y - feature.size.Y / 2) * size;
+                        g.DrawImage(feature.image, x, y, size * feature.size.X, size * feature.size.Y);
+                    }
                 }
                 //Draw actors
                 Trace.TraceInformation($"Rendering {world.actors.Count} actors!");

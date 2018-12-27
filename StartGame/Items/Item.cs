@@ -7,6 +7,8 @@ namespace StartGame.Items
 {
     public abstract class Item
     {
+        public string Description { get; set; } = "";
+
         public static readonly List<JewelryType> JewelryTypes = new List<JewelryType>()
         {
             new JewelryType("Necklace", 2),
@@ -32,10 +34,22 @@ namespace StartGame.Items
         }
     }
 
+    public abstract class SellableItem : Item
+    {
+        public int cost;
+        public int amount;
+
+        public SellableItem(int cost, int amount, string name) : base(name)
+        {
+            this.cost = cost;
+            this.amount = amount;
+        }
+    }
+
     /// <summary>
     /// Coin is a item representation for money
     /// </summary>
-    internal class Coin : Item
+    public class Coin : Item
     {
         public readonly int amount;
 

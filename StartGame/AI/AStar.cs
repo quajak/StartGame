@@ -7,6 +7,70 @@ namespace StartGame.AI
     {
         public static Point[] FindOptimalRoute(double[,] cost, Point start, Point end)
         {
+            double[,] fields = GenerateCostMap(cost, ref start);
+            return FindPath(start, end, fields);
+        }
+
+        public static Point[] FindPath(Point start, Point end, double[,] fields)
+        {
+            //now we backtrace from end to start
+            List<Point> path = new List<Point> { end };
+            Point active = end;
+            while (active != start)
+            {
+                Point min = new Point(-1, -1);
+                double minV = 1000000000000;
+                Point tryP;
+                double tryV;
+                if (active.X != 0)
+                {
+                    tryP = active.Add(-1, 0);
+                    tryV = fields.Get(tryP);
+                    if (tryV < minV)
+                    {
+                        minV = tryV;
+                        min = tryP;
+                    }
+                }
+                if (active.X != fields.GetUpperBound(0))
+                {
+                    tryP = active.Add(1, 0);
+                    tryV = fields.Get(tryP);
+                    if (tryV < minV)
+                    {
+                        minV = tryV;
+                        min = tryP;
+                    }
+                }
+                if (active.Y != 0)
+                {
+                    tryP = active.Add(0, -1);
+                    tryV = fields.Get(tryP);
+                    if (tryV < minV)
+                    {
+                        minV = tryV;
+                        min = tryP;
+                    }
+                }
+                if (active.Y != fields.GetUpperBound(1))
+                {
+                    tryP = active.Add(0, 1);
+                    tryV = fields.Get(tryP);
+                    if (tryV < minV)
+                    {
+                        minV = tryV;
+                        min = tryP;
+                    }
+                }
+                path.Add(min);
+                active = min;
+            }
+            path.Reverse();
+            return path.ToArray();
+        }
+
+        public static double[,] GenerateCostMap(double[,] cost, ref Point start)
+        {
             double[,] fields = new double[cost.GetUpperBound(0) + 1, cost.GetUpperBound(1) + 1];
             for (int x = 0; x <= fields.GetUpperBound(0); x++)
             {
@@ -63,60 +127,7 @@ namespace StartGame.AI
                 }
             }
 
-            //now we backtrace from end to start
-            List<Point> path = new List<Point> { end };
-            Point active = end;
-            while (active != start)
-            {
-                Point min = new Point(-1, -1);
-                double minV = 1000000000000;
-                Point tryP;
-                double tryV;
-                if (active.X != 0)
-                {
-                    tryP = active.Add(-1, 0);
-                    tryV = fields.Get(tryP);
-                    if (tryV < minV)
-                    {
-                        minV = tryV;
-                        min = tryP;
-                    }
-                }
-                if (active.X != fields.GetUpperBound(0))
-                {
-                    tryP = active.Add(1, 0);
-                    tryV = fields.Get(tryP);
-                    if (tryV < minV)
-                    {
-                        minV = tryV;
-                        min = tryP;
-                    }
-                }
-                if (active.Y != 0)
-                {
-                    tryP = active.Add(0, -1);
-                    tryV = fields.Get(tryP);
-                    if (tryV < minV)
-                    {
-                        minV = tryV;
-                        min = tryP;
-                    }
-                }
-                if (active.Y != fields.GetUpperBound(1))
-                {
-                    tryP = active.Add(0, 1);
-                    tryV = fields.Get(tryP);
-                    if (tryV < minV)
-                    {
-                        minV = tryV;
-                        min = tryP;
-                    }
-                }
-                path.Add(min);
-                active = min;
-            }
-            path.Reverse();
-            return path.ToArray();
+            return fields;
         }
     }
 }

@@ -2,6 +2,7 @@
 using StartGame.Mission;
 using StartGame.PlayerData;
 using StartGame.Properties;
+using StartGame.World.Cities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -44,7 +45,7 @@ namespace StartGame.World
         public double[,] mineralMap;
         public double[,] valueMap;
         public double[,] agriculturalMap;
-        private static Random random = new Random();
+        public static Random random = new Random();
 
         public List<WorldPlayer> actors = new List<WorldPlayer>();
         public List<WorldFeature> features = new List<WorldFeature>();
@@ -169,6 +170,8 @@ namespace StartGame.World
                     agriculturalMap[x, y] = agriculturalValue.Cut(0,1);
                     valueMap[x, y] = value.Cut(0,1);
 
+                    cost += (int)(mHeight * 10) / 10d;
+
                     worldMap[x, y] = new WorldTile(mHeight, type, cost, new Point(x, y));
                     costMap[x, y] = cost;
                 }
@@ -193,7 +196,7 @@ namespace StartGame.World
             //large: 5
             //medium: 10
             //small: a lot - generate close to areas of high resources
-            int[] numbers = new[] { 1, 5, 10 };
+            int[] numbers = new[] { 1, 4, 8 };
             int total = numbers.Sum();
             for (int i = 0; i < total; i++)
             {
@@ -205,25 +208,29 @@ namespace StartGame.World
                 numbers[type]--;
                 City city;
                 Point p;
+                bool v;
                 do
                 {
                     p = new Point(random.Next(WORLD_SIZE), random.Next(WORLD_SIZE));
-                } while (TileTypeInfo(worldMap[p.X, p.Y].type).cityDensity < random.NextDouble());
+                    v = (nation.cities.Count != 0 && (nation.cities.Select(c2 => AIUtility.Distance(c2.position, p)).Min() < 20));
+                } while (TileTypeInfo(worldMap[p.X, p.Y].type).cityDensity < random.NextDouble() || v);
+                int value = (int)(valueMap[p.X, p.Y] * 100);
                 if (type == 0)
                 {
-                    city = new CapitalCity(p);
+                    city = new CapitalCity(p, value + 50);
                 }
                 else if (type == 1)
                 {
-                    city = new LargeCity(p);
+                    city = new LargeCity(p, value + 30);
                 }
                 else
                 {
-                    city = new MediumCity(p);
+                    city = new MediumCity(p, value + 20);
                 }
                 Trace.TraceInformation($"Generated {city.GetType().Name} at {p} of type {worldMap.Get(p).type} and {worldMap.Get(p).height}");
                 features.Add(city);
                 nation.cities.Add(city);
+                
             }
 
             //Generate small cities in valuable areas
@@ -245,7 +252,7 @@ namespace StartGame.World
                     regionalValue[x, y] = average;
                 }
             }
-            int cityNum = random.Next(10, 30);
+            int cityNum = random.Next(10, 15); //TODO: Better way to solve overpopulation of cities
             while (cityNum > 0)
             {
                 int xS = random.Next(WORLD_SIZE / 10);
@@ -255,9 +262,9 @@ namespace StartGame.World
                     int i = random.Next(10);
                     int j = random.Next(10);
                     Point position1 = new Point(xS * 10 + i, yS * 10 + j);
-                    if (IsLand(worldMap.Get(position1).type))
+                    if (IsLand(worldMap.Get(position1).type) &&  nation.cities.Select(city => AIUtility.Distance(city.position, position1)).Min() > 10)
                     {
-                        City city = new SmallCity(position1);
+                        City city = new SmallCity(position1, (int)(100 * regionalValue[xS, yS]));
                         features.Add(city);
                         nation.cities.Add(city);
                         Trace.TraceInformation($"Added small city at {position1} where average value is {regionalValue[xS, yS]}");
@@ -268,20 +275,21 @@ namespace StartGame.World
 
             //Add ports and other connections
             nation.Intialise(new List<City>());
-            nation.DetermineConnections();
+            
             List<Island> toBuild = nation.DetermineNeededPorts();
             foreach (var island in toBuild)
             {
                 Point p = island.border[random.Next(island.border.Count)].position;
-                City port = new SmallCity(p) {
-                    priority = 4
+                City port = new SmallCity(p, (int)(100 * valueMap[p.X, p.Y]) + 20) {
+                    priority = 4,
                 };
                 features.Add(port);
+                port.IsPort = true;
                 nation.cities.Add(port);
                 Trace.TraceInformation($"Port added at {p}");
             }
             nation.UpdateIslandData();
-
+            nation.DetermineConnections();
             //Generate roads
             nation.GenerateRoads();
 
@@ -374,6 +382,10 @@ namespace StartGame.World
                 {
                     player.possibleActions.Add(new StartMission(missionPlayer.mission, missionPlayer.difficulty, missionPlayer.WorldPosition));
                 }
+            }
+            foreach (var city in nation.cities)
+            {
+                player.possibleActions.Add(new InteractCity(city));
             }
         }
 

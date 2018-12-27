@@ -1,4 +1,7 @@
 ﻿using StartGame.AI;
+using StartGame.Items;
+using StartGame.PlayerData;
+using StartGame.World.Cities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,6 +14,18 @@ namespace StartGame.World
 {
     public class Nation
     {
+        public static List<SellableItem> prices = new List<SellableItem> {
+                new Food("Bread", 1, 4),
+                new Food("Carrot", 1, 2),
+                new Food("Sausage", 1, 8),
+                new Food("Apple", 1, 2),
+                new Resource(1, 1, "Grain"),
+                new Resource(1, 10, "Iron"),
+                new Resource(1, 30 ,"Gold"),
+                new Resource(1, 5, "Wood"),
+                new Resource(1, 3, "Stone")
+        };
+
         public List<NationIslandInfo> islands = new List<NationIslandInfo>();
         public List<City> cities = new List<City>();
         public City Captial => cities.Find(c => c is CapitalCity);
@@ -19,6 +34,7 @@ namespace StartGame.World
         {
             cities.AddRange(existingCities);
             UpdateIslandData();
+            DetermineConnections();
         }
 
         public void UpdateIslandData()
@@ -31,7 +47,7 @@ namespace StartGame.World
         }
 
         /// <summary>
-        /// Determins which cities are connected with which others due to roads or being poarts on same water body
+        /// Determins which cities are connected with which others by being poarts on same water body
         /// </summary>
         public void DetermineConnections()
         {
@@ -40,7 +56,7 @@ namespace StartGame.World
                 List<City> ports = cities.Where(c => c.access.Contains(ocean)).ToList();
                 foreach (var port in ports)
                 {
-                    port.connected.AddRange(ports.Where(c => c != port));
+                    port.portConnections.AddRange(ports.Where(c => c != port));
                 }
             }
         }
@@ -60,13 +76,19 @@ namespace StartGame.World
             foreach (var island in islands.Where(i => i.Settled))
             {
                 List<City> order = island.cities.OrderByDescending(c => c.priority).ToList();
-                foreach (var city in island.cities)
+                foreach (var city in island.cities.OrderBy(c => AIUtility.Distance(order[0].position, c.position)))
                 {
                     for (int i = 0; i < Math.Min(city.connections, island.cities.Count); i++)
                     {
+                        if (city.roadConnections.Contains(order[i]) || order[i].roadConnections.Contains(city))
+                            continue;
                         Trace.TraceInformation($"Generated road between {city.position} and {order[i].position}");
+                        city.roadConnections.Add(order[i]);
+                        order[i].roadConnections.Add(city);
                         roads++;
-                        Point[] route = AStar.FindOptimalRoute(World.Instance.costMap, city.position, order[i].position);
+                        if (order[i].costMap is null)
+                            order[i].costMap = AStar.GenerateCostMap(World.Instance.costMap, ref order[i].position);
+                        Point[] route = AStar.FindPath(order[i].position, city.position, order[i].costMap);
                         foreach (var point in route)
                         {
                             if (!World.Instance.features.Exists(f => f is Road && f.position == point))
@@ -74,7 +96,7 @@ namespace StartGame.World
                                 World.Instance.features.Add(new Road(point));
                             }
                         }
-                    }   
+                    }
                 }
             }
             Trace.TraceInformation($"Generated {roads} roads!");
@@ -86,21 +108,22 @@ namespace StartGame.World
         public bool Settled => cities.Count != 0;
         public List<City> cities;
         public List<City> ports;
-        public List<Island> ConnectedIslands => ports.SelectMany(p => p.connected.Select(c => c.Located)).Distinct().ToList();
-        public List<City> ConnectedCities => ports.SelectMany(p => p.connected).Distinct().ToList();
+        public List<Island> ConnectedIslands => ports.SelectMany(p => p.portConnections.Select(c => c.Located)).Distinct().ToList();
+        public List<City> ConnectedCities => ports.SelectMany(p => p.portConnections).Distinct().ToList();
         public Island island;
 
         public NationIslandInfo(Island island, List<City> cities)
         {
             this.island = island;
-            this.cities = new List<City> ();
+            this.cities = new List<City>();
             this.cities.AddRange(cities);
             ports = new List<City>();
             foreach (var city in cities)
             {
-                if(World.Instance.worldMap.Get(city.position).sorroundingTiles.rawMaptiles.Any(t => !World.IsLand(t.type)))
+                if (World.Instance.worldMap.Get(city.position).sorroundingTiles.rawMaptiles.Any(t => !World.IsLand(t.type)))
                 {
                     ports.Add(city);
+                    city.IsPort = true;
                 }
             }
         }

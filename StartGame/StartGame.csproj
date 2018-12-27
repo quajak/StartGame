@@ -95,7 +95,9 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Items\ArmorPrefabs.cs" />
     <Compile Include="Items\Armour.cs" />
+    <Compile Include="Items\Food.cs" />
     <Compile Include="Items\Jewelry.cs" />
+    <Compile Include="Items\Resource.cs" />
     <Compile Include="Mission\MissionWorldPlayer.cs" />
     <Compile Include="PlayerData\AIUtility.cs" />
     <Compile Include="PlayerData\Attribute.cs" />
@@ -224,7 +226,15 @@
     <Compile Include="WeaponView.Designer.cs">
       <DependentUpon>WeaponView.cs</DependentUpon>
     </Compile>
-    <Compile Include="World\City.cs" />
+    <Compile Include="World\Cities\City.cs" />
+    <Compile Include="World\Cities\CityBuilding.cs" />
+    <Compile Include="World\Cities\CityView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="World\Cities\CityView.Designer.cs">
+      <DependentUpon>CityView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="World\Cities\Store.cs" />
     <Compile Include="World\Island.cs" />
     <Compile Include="World\Nation.cs" />
     <Compile Include="World\World.cs" />
@@ -311,6 +321,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Mission\MissionResult.resx">
       <DependentUpon>MissionResult.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="World\Cities\CityView.resx">
+      <DependentUpon>CityView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="World\WorldGenerationViewer.resx">
       <DependentUpon>WorldGenerationViewer.cs</DependentUpon>
