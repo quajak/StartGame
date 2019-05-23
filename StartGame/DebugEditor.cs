@@ -22,7 +22,7 @@ namespace StartGame
         private void IncActionPoints_Click(object sender, EventArgs e)
         {
             if (main.humanPlayer != null)
-                main.humanPlayer.actionPoints.rawValue += 10;
+                main.humanPlayer.actionPoints.RawValue += 10;
             main.ShowPlayerStats();
         }
 
@@ -54,7 +54,7 @@ namespace StartGame
 
         private void GainHealth_Click(object sender, EventArgs e)
         {
-            main.humanPlayer.troop.health.rawValue += 10;
+            main.humanPlayer.troop.health.RawValue += 10;
             main.ShowPlayerStats();
         }
 
@@ -66,13 +66,13 @@ namespace StartGame
 
         private void GainMana_Click(object sender, EventArgs e)
         {
-            main.humanPlayer.mana.rawValue += 10;
+            main.humanPlayer.mana.RawValue += 10;
             main.ShowPlayerStats();
         }
 
         private void GainMoney_Click(object sender, EventArgs e)
         {
-            main.humanPlayer.money.rawValue += 10;
+            main.humanPlayer.Money.RawValue += 10;
         }
     }
 }

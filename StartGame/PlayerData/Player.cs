@@ -5,26 +5,40 @@ using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
 using static StartGame.MainGameWindow;
+using StartGame.GameMap;
+using System.Diagnostics;
 
 namespace StartGame.PlayerData
 {
     public abstract class Player
     {
         public PlayerType type;
-        private string name;
         public ActionPoint actionPoints;
         public bool active = false;
         public Map map;
         internal Player[] enemies;
         public int XP;
+        public readonly bool constantMovementFunction;
         internal readonly List<Spell> spells;
+
+        public bool Hidden = false;
+        public bool Dangerous = true;
 
         //Derived stats
         public Troop troop;
 
         public bool Dead => troop.health.Value == 0;
 
-        public string Name { get => name; set => name = value; }
+        public string Name { get; set; }
+        public Attribute Money
+        {
+            get => money; set
+            {
+                if(value != null)
+                    Trace.TraceInformation($"Setting player money to {value.Value}");
+                money = value;
+            }
+        }
 
         public List<JewelryType> JewelryTypes = new List<JewelryType>()
         {
@@ -53,7 +67,7 @@ namespace StartGame.PlayerData
         public Attribute intelligence; //improves the effectivness of spells
 
         public Mana mana;
-        public Attribute money;
+        private Attribute money;
         public MovementPoints movementPoints;
 
         public List<Tree> trees = new List<Tree>();
@@ -61,9 +75,10 @@ namespace StartGame.PlayerData
         public GearWeight gearWeight;
 
         public Player(PlayerType Type, string name, Map Map, Player[] Enemies, int XP, int Intelligence,
-            int Strength, int Endurance, int Wisdom, int Agility, int Vitality, List<Spell> spells = null)
+            int Strength, int Endurance, int Wisdom, int Agility, int Vitality, List<Spell> spells = null, bool constantMovementFunction = true)
         {
             this.XP = XP;
+            this.constantMovementFunction = constantMovementFunction;
             actionPoints = new ActionPoint(this, 4);
             intelligence = new Attribute(Intelligence, "Intelligence");
             strength = new Attribute(Strength, "Strength");
@@ -104,7 +119,7 @@ namespace StartGame.PlayerData
         /// </summary>
         public event EventHandler InitialiseTurnHandler = (sender, e) => {
             Player player = (sender as Player);
-            player.actionPoints.rawValue = player.actionPoints.MaxValue().Value;
+            player.actionPoints.RawValue = player.actionPoints.MaxValue().Value;
             player.movementPoints.Reset();
         };
 
@@ -146,7 +161,7 @@ namespace StartGame.PlayerData
         /// <param name="path">Path of movement</param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public double CalculateStep(MapTile start, MapTile active, MapTile next, int distance, MovementType type, bool allowBlockedEnd = false)
+        public double CalculateStep(MapTile start, MapTile active, MapTile next, int distance, MovementType type)
         {
             Contract.Assert(start != null);
             Contract.Assert(next != null);

@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using StartGame.GameMap;
+
 
 namespace StartGame.PlayerData
 {
     internal class ElementalWizard : Player
     {
         //TODO: Make the AI more difficult by adding more spells, or making him move
-        private readonly int difficulty;
+        //private readonly int difficulty;
 
         private int lastHealth;
-        private readonly int round;
 
         public ElementalWizard(PlayerType Type, string Name, Map Map, Player[] Enemies, int Difficulty, int Round) : base(Type, Name, Map, Enemies, 10,
             3 + Round + Difficulty / 2, 1, 1, 5, 1, 10,
@@ -19,8 +20,6 @@ namespace StartGame.PlayerData
             })
         {
             map = Map;
-            round = Round;
-            difficulty = Difficulty;
         }
 
         public override void Initialise(MainGameWindow main)

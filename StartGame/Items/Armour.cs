@@ -25,7 +25,7 @@ namespace StartGame.Items
     public class Armour : Item
     {
         public readonly List<BodyParts> affected;
-        private List<BodyPart> parts;
+        private readonly List<BodyPart> parts;
         private readonly Material material;
         public int sharpDefense; //Blocks a flat number of damage
         public int bluntDefense; //Decreases by a percentage
@@ -50,7 +50,7 @@ namespace StartGame.Items
             sharpDefense += (int)(sharpDefense * ((double)(int)quality) / 100d) / 10;
             bluntDefense = material.density;
             bluntDefense += (int)(bluntDefense * ((double)(int)quality) / 100d);
-            durability = material.durability * Affected.Count + baseDurability;
+            durability = (material.durability * Affected.Count + baseDurability) / 10;
             durability += (int)(durability * ((double)(int)quality * 2) / 100d);
             maxDurability = durability;
             affected = Affected;

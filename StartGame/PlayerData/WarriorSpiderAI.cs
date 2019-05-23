@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using static StartGame.MainGameWindow;
+using StartGame.GameMap;
+
 
 namespace StartGame.PlayerData
 {
@@ -17,7 +19,7 @@ namespace StartGame.PlayerData
 
         public override void PlayTurn(MainGameWindow main, bool SingleTurn)
         {
-            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, enemies[0].troop.Position.X, enemies[0].troop.Position.Y, map, false);
+            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, map, false);
             Thread path = new Thread(distanceGraph.CreateGraph);
             path.Start();
             path.Join();
@@ -32,7 +34,7 @@ namespace StartGame.PlayerData
                 //Check if it can attack player
                 int playerDistance = AIUtility.Distance(playerPos, troop.Position);
                 if (playerDistance <= troop.activeWeapon.range &&
-                    troop.activeWeapon.attacks > 0)
+                    troop.activeWeapon.Attacks() > 0)
                 {
                     //Attack
                     var (damage, killed, hit) = main.Attack(this, enemies[0]);
@@ -45,12 +47,12 @@ namespace StartGame.PlayerData
                         main.PlayerDied($"You have been killed by {Name}!");
                         break;
                     }
-                    actionPoints.rawValue--;
-                    troop.activeWeapon.attacks--;
+                    actionPoints.RawValue--;
+                    troop.activeWeapon.UseWeapon(enemies[0], main);
                     main.RenderMap();
                     continue;
                 }
-                else if (troop.weapons.Exists(t => t.range >= playerDistance && t.attacks > 0))
+                else if (troop.weapons.Exists(t => t.range >= playerDistance && t.Attacks() > 0))
                 {
                     //Change weapon
                     Weapon best = troop.weapons.FindAll(t => t.range >= playerDistance)
@@ -96,7 +98,7 @@ namespace StartGame.PlayerData
                 if (closestDistance >= playerDistance) break;
 
                 //Generate path of movement
-                DistanceGraphCreator movementGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, closestField.X, closestField.Y, map, false, false);
+                DistanceGraphCreator movementGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, map, false);
                 movementGraph.CreateGraph();
 
                 List<Point> movement = new List<Point>() { };
@@ -113,16 +115,15 @@ namespace StartGame.PlayerData
 
                 main.MovePlayer(closestField, troop.Position, this, MovementType.walk, path: movement);
 
-                distanceGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y,
-                    playerPos.X, playerPos.Y, map, false);
+                distanceGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, map, false);
                 distanceGraph.CreateGraph();
             }
             if (SingleTurn)
             {
                 if (damageDealt != 0)
-                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
                 else if (dodged != 0)
-                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
             }
             else
             {

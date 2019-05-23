@@ -8,12 +8,13 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using StartGame.Mission;
 
 namespace StartGame
 {
     partial class CampaignController : Form
     {
-        private HumanPlayer player;
+        private readonly HumanPlayer player;
         private Campaign campaign;
 
         public CampaignController(HumanPlayer _player)
@@ -64,44 +65,52 @@ namespace StartGame
                     MessageBox.Show("You have lost the campaign as you have died! Good luck next time!");
                     return;
                 }
-
-                //Reset troop stats
-                foreach (Weapon weapon in player.troop.weapons)
+                if (campaign.activeGame.giveReward)
                 {
-                    if (weapon.type != BaseAttackType.range)
-                        weapon.attacks = weapon.maxAttacks;
+                    MissionResult worldView = GenerateRewardAndHeal(player, campaign.activeGame, campaign.mission, campaign.healthRegen, (double)(campaign.Round - 1)/ campaign.numberOfGames, "Next Mission");
+                    worldView.ShowDialog();
                 }
-
-                player.mana.rawValue = player.mana.MaxValue().Value;
-                player.troop.health.rawValue += campaign.healthRegen;
-                player.troop.health.rawValue = player.troop.health.Value > player.troop.health.MaxValue().Value ? player.troop.health.MaxValue().Value : player.troop.health.Value;
-
-                List<Armour> lootableArmour = new List<Armour>();
-                foreach (var deadPlayer in campaign.activeGame.killedPlayers)
-                {
-                    lootableArmour.AddRange(deadPlayer.troop.armours);
-                }
-
-                Random random = new Random();
-                lootableArmour = lootableArmour.OrderBy(a => random.Next()).ToList(); // I know it is not the most effiecent but that does not matter here
-
-                int chosen = 0;
-                List<Armour> loot = new List<Armour>();
-                foreach (var lootpiece in lootableArmour)
-                {
-                    if (random.NextDouble() < 1d / (chosen + 2d))
-                    {
-                        lootpiece.active = false;
-                        loot.Add(lootpiece);
-                        chosen++;
-                    }
-                }
-                //Show world map
-                MissionResult worldView = new MissionResult(player, this, campaign, campaign.mission, loot);
-                worldView.ShowDialog();
             } while (campaign.Next());
 
             MessageBox.Show("You have won!");
+        }
+
+        public static MissionResult GenerateRewardAndHeal(HumanPlayer player, MainGameWindow mainWindow, Mission.Mission mission, int healthRegen, double progression, string closeButtonText)
+        {
+            //Reset troop stats
+            foreach (Weapon weapon in player.troop.weapons)
+            {
+                if (weapon.type != BaseAttackType.range)
+                    weapon.SetAttacks(weapon.MaxAttacks());
+            }
+
+            player.mana.RawValue = player.mana.MaxValue().Value;
+            player.troop.health.RawValue += healthRegen;
+            player.troop.health.RawValue = player.troop.health.Value > player.troop.health.MaxValue().Value ? player.troop.health.MaxValue().Value : player.troop.health.Value;
+
+            //Generate loot from dead players
+            List<Armour> lootableArmour = new List<Armour>();
+            foreach (var deadPlayer in mainWindow.killedPlayers)
+            {
+                lootableArmour.AddRange(deadPlayer.troop.armours);
+            }
+
+            lootableArmour = lootableArmour.OrderBy(a => World.World.random.Next()).ToList(); // I know it is not the most effiecent but that does not matter here
+
+            int chosen = 0;
+            List<Armour> loot = new List<Armour>();
+            foreach (var lootpiece in lootableArmour)
+            {
+                if (World.World.random.NextDouble() < 1d / (chosen + 1d))
+                {
+                    lootpiece.active = false;
+                    loot.Add(lootpiece);
+                    chosen++;
+                }
+            }
+            //Show world map
+            MissionResult worldView = new MissionResult(player, progression, mission, loot, closeButtonText);
+            return worldView;
         }
     }
 }

@@ -69,7 +69,6 @@ namespace StartGame.Items
             new Bone()
         };
 
-        private static Random random = new Random();
 
         /// <summary>
         /// Returns random Armour Layer from material, excluding jewelry
@@ -78,7 +77,7 @@ namespace StartGame.Items
         public ArmourLayer GetArmourLayer()
         {
             armourLayers.Remove(ArmourLayer.jewelry);
-            ArmourLayer layer = armourLayers[random.Next(armourLayers.Count)];
+            ArmourLayer layer = armourLayers[World.World.random.Next(armourLayers.Count)];
             armourLayers.Add(ArmourLayer.jewelry);
             return layer;
         }
@@ -114,7 +113,7 @@ namespace StartGame.Items
                 default:
                     throw new NotImplementedException();
             }
-            return allowed[random.Next(allowed.Count)];
+            return allowed[World.World.random.Next(allowed.Count)];
         }
     }
 

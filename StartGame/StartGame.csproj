@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>StartGame</RootNamespace>
     <AssemblyName>StartGame</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -92,16 +92,26 @@
     <Compile Include="Entities\EntityEditor.cs" />
     <Compile Include="Entities\EntityFactory.cs" />
     <Compile Include="Entities\PlaceHolder.cs" />
+    <Compile Include="Forms\SelectItem.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SelectItem.Designer.cs">
+      <DependentUpon>SelectItem.cs</DependentUpon>
+    </Compile>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Items\ArmorPrefabs.cs" />
+    <Compile Include="Items\Ammo.cs" />
+    <Compile Include="Items\ArmourPrefabs.cs" />
     <Compile Include="Items\Armour.cs" />
     <Compile Include="Items\Food.cs" />
     <Compile Include="Items\Jewelry.cs" />
     <Compile Include="Items\Resource.cs" />
+    <Compile Include="MapBiome.cs" />
+    <Compile Include="Mission\AnimalFightMissions.cs" />
     <Compile Include="Mission\MissionWorldPlayer.cs" />
+    <Compile Include="PlayerData\AI.cs" />
     <Compile Include="PlayerData\AIUtility.cs" />
     <Compile Include="PlayerData\Attribute.cs" />
-    <Compile Include="PlayerData\BanditAI.cs" />
+    <Compile Include="PlayerData\SimpleAI.cs" />
     <Compile Include="PlayerData\Body.cs" />
     <Compile Include="Campaign.cs" />
     <Compile Include="CampaignController.cs">
@@ -127,6 +137,7 @@
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\Modifiers.cs" />
     <Compile Include="Items\Weapon.cs" />
+    <Compile Include="PlayerData\MapTrees.cs" />
     <Compile Include="PlayerData\LevelUp.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -153,6 +164,8 @@
       <DependentUpon>MapCreator.cs</DependentUpon>
     </Compile>
     <Compile Include="MapParts.cs" />
+    <Compile Include="PlayerData\Skills and Trees\Skill.cs" />
+    <Compile Include="PlayerData\Skills and Trees\Title.cs" />
     <Compile Include="PlayerData\WorldPlayer.cs" />
     <Compile Include="Rendering\MapRenderer.cs" />
     <Compile Include="Mission\Mission.cs" />
@@ -212,7 +225,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Spell.cs" />
-    <Compile Include="Trees.cs" />
+    <Compile Include="PlayerData\Skills and Trees\Trees.cs" />
     <Compile Include="PlayerData\Troop.cs" />
     <Compile Include="User Controls\PlayerWeaponView.cs">
       <SubType>UserControl</SubType>
@@ -274,6 +287,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dungeons\DungeonCreator.resx">
       <DependentUpon>DungeonCreator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SelectItem.resx">
+      <DependentUpon>SelectItem.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PlayerData\LevelUp.resx">
       <DependentUpon>LevelUp.cs</DependentUpon>
@@ -417,9 +433,6 @@
     <None Include="Resources\Slime.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Mission.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Mission.png" />
   </ItemGroup>
   <ItemGroup>
@@ -436,6 +449,52 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Road.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Forest1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\CityNames.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\IslandNames.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\Savanna3.png" />
+    <None Include="Resources\Savanna2.png" />
+    <None Include="Resources\Savanna1.png" />
+    <None Include="Resources\Savanna4.png" />
+    <None Include="Resources\Mine1.png" />
+    <None Include="Resources\RainforestTree4.png" />
+    <None Include="Resources\Rainforest2.png" />
+    <None Include="Resources\Rainforest1.png" />
+    <None Include="Resources\RainforestTree3.png" />
+    <None Include="Resources\RainforestTree2.png" />
+    <None Include="Resources\RainforestTree1.png" />
+    <None Include="Resources\Rainforest3.png" />
+    <None Include="Resources\Grassland2.png" />
+    <None Include="Resources\Grassland1.png" />
+    <None Include="Resources\Grassland3.png" />
+    <None Include="Resources\IceElemental.png" />
+    <None Include="Resources\IceSpike.png" />
+    <None Include="Resources\snowyTree2.png" />
+    <None Include="Resources\snowyTree1.png" />
+    <None Include="Resources\snowyTree3.png" />
+    <None Include="Resources\Tree3.png" />
+    <None Include="Resources\Tree2.png" />
+    <None Include="Resources\Tree1.png" />
+    <None Include="Resources\Bear.png" />
+    <None Include="Resources\Desert2.png" />
+    <None Include="Resources\Desert1.png" />
+    <None Include="Resources\Desert3.png" />
+    <None Include="Resources\Cactus.png" />
+    <None Include="Resources\Farm1.png" />
+    <Content Include="Resources\Forest2.png" />
+    <None Include="Resources\Ocean2.png" />
+    <None Include="Resources\Ocean1.png" />
+    <None Include="Resources\Ocean3.png" />
+    <None Include="Resources\Forest4.png" />
+    <None Include="Resources\Forest3.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

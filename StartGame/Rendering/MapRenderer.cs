@@ -73,12 +73,12 @@ namespace StartGame.Rendering
                         rendered = true;
                         break;
 
-                    case ListPointAnimation b:
+                    case ListPointAnimation _:
                         rendered = true;
                         Animation = new ListPointAnimation(new List<Point>() { new Point(0, 0) }, toRender);
                         break;
 
-                    case TeleportPointAnimation c:
+                    case TeleportPointAnimation _:
                         rendered = true;
                         Animation = new TeleportPointAnimation(position, toRender);
                         break;
@@ -97,13 +97,13 @@ namespace StartGame.Rendering
                         rendered = false; //TODO: Actually be able to create animations with length 0
                         break;
 
-                    case ListPointAnimation b:
+                    case ListPointAnimation _:
                         animation = new LinearPointAnimation(position, toRender); //List points animations are turned into linaer point animations
                         movementAnimationPoints = (animation as LinearPointAnimation).Animate().GetEnumerator();
                         rendered = false; //TODO: Actually be able to create animations with length 0
                         break;
 
-                    case TeleportPointAnimation c:
+                    case TeleportPointAnimation _:
                         rendered = true;
                         Animation = new TeleportPointAnimation(position, toRender);
                         break;
@@ -162,7 +162,7 @@ namespace StartGame.Rendering
             }
         }
 
-        public EntityRenderObject(Entity entity, Animation animation = null) : base(entity.Position, entity.image, entity.blocking)
+        public EntityRenderObject(Entity entity, Animation animation = null) : base(entity.Position, entity.Image, entity.blocking)
         {
             Trace.TraceInformation($"Created new render object for entity name {entity.Name} - {entity}");
             Name = entity.Name;
@@ -178,7 +178,7 @@ namespace StartGame.Rendering
     }
 }
 
-namespace StartGame
+namespace StartGame.GameMap
 {
     partial class Map
     {
@@ -232,7 +232,7 @@ namespace StartGame
         /// <param name="showGoal"></param>
         /// <param name="colorAlpha"></param>
         /// <param name="showInverseHeight"></param>
-        public void Render(PictureBox gameBoard, List<Bitmap> frames, bool forceEntityRendering = false, int frameTime = 100,
+        public void Render(PictureBox gameBoard, List<Bitmap> frames, bool forceEntityRendering = false,
             bool debug = false, int size = MapCreator.fieldSize, int continentAlpha = 0, int showGoal = 1, int colorAlpha = 255, bool showInverseHeight = false,
             bool forceDrawBackground = false)
         {

@@ -17,6 +17,53 @@ namespace StartGame
 {
     public static class E
     {
+        public static bool TryGet<T>(this List<T> values, Predicate<T> check, out T value)
+        {
+            if (values.Exists(check))
+            {
+                value = values.Find(check);
+                return true;
+            }
+            value = default;
+            return false;
+        }
+        public static T[] To1D<T>(this T[,] a)
+        {
+            T[] b = new T[a.Length];
+            int k = 0;
+            for (int i = 0; i < a.GetUpperBound(0); i++)
+            {
+                for (int j = 0; j < a.GetUpperBound(0); j++)
+                {
+                    b[k++] = a[i, j];
+                }
+            }
+            return b;
+        }
+        public static bool Between(this int a, int low, int high, bool inclusive = true)
+        {
+            if (inclusive)
+            {
+                return low <= a && a <= high;
+            }
+            else
+            {
+                return low < a && a < high;
+            }
+        }
+        public static string SplitWords(this string a)
+        {
+            string output = "";
+            foreach (char c in a)
+            {
+                if (char.IsUpper(c) && output.Length != 0)
+                {
+                    output += " " ;
+                }
+                output += c;
+            }
+            return output;
+        }
         public static Point Mult(this Point point, int Size)
         {
             return new Point(point.X * Size, point.Y * Size);
@@ -50,6 +97,11 @@ namespace StartGame
         public static Point Add(this Point point, int x, int y)
         {
             return new Point(point.X + x, point.Y + y);
+        }
+
+        public static Point Remainder(this Point point, int divisor)
+        {
+            return new Point(point.X % divisor, point.Y % divisor);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -88,7 +140,7 @@ namespace StartGame
             return "";
         }
 
-        private static Quality[] qualities = new Quality[] { Quality.Broken, Quality.Poor, Quality.Simple, Quality.Common, Quality.Good, Quality.Superior, Quality.Exceptional, Quality.Legendary };
+        private static readonly Quality[] qualities = new Quality[] { Quality.Broken, Quality.Poor, Quality.Simple, Quality.Common, Quality.Good, Quality.Superior, Quality.Exceptional, Quality.Legendary };
 
         public static Quality GetQuality(int num)
         {
@@ -166,6 +218,24 @@ namespace StartGame
                 return destImage;
             }
 
+        }
+
+        internal static void TraceFunction(string args)
+        {
+            StackTrace stackTrace = new StackTrace();
+            StackFrame caller = stackTrace.GetFrame(1);
+            Trace.TraceInformation($"{caller.GetMethod().DeclaringType.Name}::{caller.GetMethod().Name}({args})");
+        }
+
+        internal static string GetCaller()
+        {
+            StackTrace stackTrace = new StackTrace();
+            StackFrame caller = stackTrace.GetFrame(2);
+            return caller.GetMethod().DeclaringType.Name+ "::" + caller.GetMethod().Name;
+        }
+        public static T GetRandom<T>(this List<T> list)
+        {
+            return list[World.World.random.Next(list.Count)];
         }
     }
 }

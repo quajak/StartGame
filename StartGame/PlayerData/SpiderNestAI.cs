@@ -1,6 +1,8 @@
 ﻿using StartGame.Items;
 using StartGame.Properties;
 using System.Drawing;
+using StartGame.GameMap;
+
 
 namespace StartGame.PlayerData
 {

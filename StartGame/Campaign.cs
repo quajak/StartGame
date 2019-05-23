@@ -1,6 +1,8 @@
-﻿using StartGame.Items;
+﻿using StartGame.GameMap;
+using StartGame.Items;
 using StartGame.Mission;
 using StartGame.PlayerData;
+using StartGame.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +14,9 @@ namespace StartGame
     {
         public Mission.Mission mission;
         public HumanPlayer player;
-        private List<MainGameWindow> playedGames = new List<MainGameWindow>();
-        private readonly int numberOfGames;
+        private readonly List<MainGameWindow> playedGames = new List<MainGameWindow>();
+        public readonly int numberOfGames;
         public MainGameWindow activeGame;
-        private Random random = new Random();
         public int difficulty;
         public int Round => playedGames.Count + 1;
 
@@ -31,17 +32,25 @@ namespace StartGame
             healthRegen = 10 - Difficulty;
             if (player != null && Difficulty < 6)
             {
-                player.vitality.rawValue += 6 - Difficulty;
+                player.vitality.RawValue += 6 - Difficulty;
             }
         }
 
         public Mission.Mission DecideMission(int Round)
         {
-            List<Mission.Mission> missions = new List<Mission.Mission> { new ElementalWizardFight(), new AttackCampMission(), new SpiderNestMission(), new BanditMission(), new DragonFight()
+            List<Mission.Mission> missions = new List<Mission.Mission> { new BearMission(), new ElementalWizardFight(), new AttackCampMission(), new SpiderNestMission(), new BanditMission(), new DragonFight()
             };
             missions = missions.Where(m => m.MissionAllowed(Round)).ToList();
-            int id = random.Next(missions.Count);
+            int id = World.World.random.Next(missions.Count);
             return missions[id];
+        }
+
+        public Mission.Mission DecideMission(WorldTileType type, int Wealth)
+        {
+            List<Mission.Mission> missions = new List<Mission.Mission> { new BearMission(), new ElementalWizardFight(), new AttackCampMission(), new SpiderNestMission(), new BanditMission(), new DragonFight()
+            };
+            missions = missions.Where(m => m.MissionAllowed(type, Wealth)).ToList();
+            return missions.GetRandom();
         }
 
         /// <summary>
@@ -59,18 +68,20 @@ namespace StartGame
             activeGame = new MainGameWindow(map, player, mission, trees, difficulty, Round);
         }
 
-        public Map GenerateMap()
+        public Map GenerateMap(MapBiome mapBiome = null)
         {
+            if (mapBiome is null)
+                mapBiome = new GrasslandMapBiome();
             Map map = new Map();
-            Thread mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), mission.heightDiff)));
+            Thread mapCreator = new Thread(() => map.SetupMap(mapBiome.DefaultParameters().PerlinDiff, World.World.random.Next(), mapBiome.DefaultParameters().HeightDiff + mission.heightDiff, mapBiome));
             mapCreator.Start();
             mapCreator.Priority = ThreadPriority.Highest;
             bool validMap = false;
             bool finished = mapCreator.Join(Map.creationTime);
             while (!(finished && validMap))
             {
-                int seed = random.Next();
-                mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, seed, mission.heightDiff)));
+                int seed = World.World.random.Next();
+                mapCreator = new Thread(() => map.SetupMap(mapBiome.DefaultParameters().PerlinDiff, World.World.random.Next(), mapBiome.DefaultParameters().HeightDiff + mission.heightDiff, mapBiome));
                 mapCreator.Start();
                 mapCreator.Priority = ThreadPriority.Highest;
                 finished = mapCreator.Join(Map.creationTime);
@@ -96,7 +107,7 @@ namespace StartGame
             Thread mapCreator;
             do
             {
-                mapCreator = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, random.Next(), 0))) {
+                mapCreator = new Thread(() => map.SetupMap(0.1, World.World.random.Next(), 0)) {
                     Priority = ThreadPriority.Highest
                 };
                 mapCreator.Start();
@@ -112,28 +123,14 @@ namespace StartGame
             return true;
         }
 
-        public Weapon CalculateWeaponReward(WeaponReward weaponReward)
+        public static Weapon CalculateWeaponReward(WeaponReward weaponReward, int playedGames, int numberOfGames)
         {
             if (!weaponReward.random) return weaponReward.reward;
 
-            List<Weapon> weapons = new List<Weapon>
-            {
-                new Weapon(6, BaseAttackType.melee, BaseDamageType.blunt, 2, "Stick", 2, true),
-                new Weapon(8, BaseAttackType.melee,BaseDamageType.blunt, 1, "Large rock", 1, true),
-                new Weapon(4, BaseAttackType.range, BaseDamageType.blunt, 5, "Rock", 1, true),
-                new Weapon(11, BaseAttackType.melee,BaseDamageType.sharp,  1, "Dagger", 1, true),
-                new Weapon(12, BaseAttackType.melee,BaseDamageType.sharp, 2, "Axe", 1, true, 2),
-                new Weapon(9, BaseAttackType.melee,BaseDamageType.sharp, 2, "Sword", 2, true),
-                new Weapon(8, BaseAttackType.melee, BaseDamageType.sharp, 4, "Spear", 2, true),
-                new Weapon(12, BaseAttackType.melee,BaseDamageType.sharp, 2, "Long sword", 2, true),
-                new Weapon(7, BaseAttackType.melee, BaseDamageType.sharp, 1, "Short Sword", 4, true),
-                new Weapon(15, BaseAttackType.magic,BaseDamageType.magic, 7, "Firewand", 1, true, 2),
-                new Weapon(11, BaseAttackType.range,BaseDamageType.sharp, 11, "Bow", 8, true, 2),
-                new Weapon(15, BaseAttackType.range,BaseDamageType.sharp, 20, "Long bow", 5, true, 3),
-                new Weapon(4, BaseAttackType.range, BaseDamageType.blunt, 8, "Slingshot", 7, true)
-            };
-            weapons.Sort((w1, w2) => (w1.attackDamage * w1.attacks * w1.range / 4) > (w2.attackDamage * w2.attacks * w2.range / 4) ? 1 : -1);
-            return weapons[random.Next(weapons.Count / numberOfGames * playedGames.Count + weaponReward.rarity, Math.Min(weapons.Count / numberOfGames * (playedGames.Count + 1) + weaponReward.rarity, weapons.Count))];
+            List<Weapon> weapons = Weapon.GetWeaponTypes();
+            weapons.Sort((w1, w2) => (w1.attackDamage.Value * w1.Attacks() * w1.range / 4) > (w2.attackDamage.Value * w2.Attacks() * w2.range / 4) ? 1 : -1);
+            return weapons[World.World.random.Next(weapons.Count / numberOfGames * playedGames + weaponReward.rarity,
+                Math.Min(weapons.Count / numberOfGames * (playedGames + 1) + weaponReward.rarity, weapons.Count))];
         }
 
         public bool IsFinished()

@@ -1,8 +1,10 @@
 ﻿using StartGame.Entities;
+using StartGame.GameMap;
 using StartGame.Items;
 using StartGame.PlayerData;
 using StartGame.Properties;
 using StartGame.Rendering;
+using StartGame.World;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,16 +18,28 @@ namespace StartGame.Mission
         public WeaponReward weaponReward;
         public int XP;
         public SpellReward spellReward;
+        public ItemReward itemReward;
         public int Money;
 
-        public Reward(JewelryReward jewelryReward, WeaponReward weaponReward, int xP, SpellReward spellReward, int money)
+        public Reward(JewelryReward jewelryReward, WeaponReward weaponReward, int xP, SpellReward spellReward, int money, ItemReward itemReward)
         {
             this.jewelryReward = jewelryReward;
             this.weaponReward = weaponReward;
             XP = xP;
             this.spellReward = spellReward;
             Money = money;
+            this.itemReward = itemReward;
         }
+    }
+
+    public class ItemReward
+    {
+        public SellableItem reward;
+        public ItemReward(SellableItem item)
+        {
+            reward = item;
+        }
+
     }
 
     public class JewelryReward
@@ -82,22 +96,24 @@ namespace StartGame.Mission
     {
         public string Name;
         public bool forced = false;
+        public readonly bool canPlayerEscape;
         public double heightDiff = 0;
         public bool EnemyMoveTogether = false;
 
         public abstract (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
             string description) GenerateMission(int difficulty, int Round, ref Map map, Player player);
 
-        public static WinCheck deathCheck = ((_map, main) => main.players.Count == 1 && main.players.Exists(p => p == main.humanPlayer));
+        public static WinCheck deathCheck = ((_map, main) => main.players.Where(p => p.Dangerous).ToList().Count == 1 && main.players.Exists(p => p == main.humanPlayer));
 
         public static WinCheck playerDeath = ((_map, main) => main.humanPlayer == null || main.humanPlayer.troop.health.Value <= 0);
         public readonly bool useWinChecks;
 
-        public Mission(string name, bool UseWinChecks = true, bool Forced = false)
+        public Mission(string name, bool UseWinChecks = true, bool Forced = false, bool canPlayerEscape = true)
         {
             Name = name;
             useWinChecks = UseWinChecks;
             forced = Forced;
+            this.canPlayerEscape = canPlayerEscape;
         }
 
         public abstract bool MapValidity(Map map);
@@ -105,11 +121,13 @@ namespace StartGame.Mission
         public abstract Reward Reward();
 
         public abstract bool MissionAllowed(int Round);
+
+        public abstract bool MissionAllowed(WorldTileType type, int wealth);
     }
 
     //TODO: Underwater mission
 
-    internal class DebugMission : Mission
+    public class DebugMission : Mission
     {
         public DebugMission() : base("Debug Mission")
         {
@@ -118,8 +136,6 @@ namespace StartGame.Mission
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
             string description) GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
-            Random rng = new Random();
-            rng.Next();
 
             string desc = "Debug mission ";
 
@@ -168,16 +184,22 @@ namespace StartGame.Mission
                 new WeaponReward(true, 0, null),
                 5,
                 new SpellReward(World.World.Instance.GainSpell<TeleportSpell>()),
-                0);
+                0,
+                null);
         }
 
         public override bool MissionAllowed(int Round)
         {
             return true;
         }
+
+        public override bool MissionAllowed(WorldTileType type, int wealth)
+        {
+            return false;
+        }
     }
 
-    internal class DragonFight : Mission
+    public class DragonFight : Mission
     {
         private int xp;
 
@@ -188,15 +210,12 @@ namespace StartGame.Mission
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
             string description) GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
-            Random rng = new Random();
-            rng.Next();
-
             string desc = "Welcome to an epic dragon fight! Reach the dragons nest to win! ";
 
             #region Player Creation
 
             List<Player> players = new List<Player>() { player };
-            xp = (int)((player as HumanPlayer).levelXP * (rng.NextDouble() + 2));
+            xp = (int)((player as HumanPlayer).levelXP * (World.World.random.NextDouble() + 2));
 
             //Set player position
             players[0].troop.Position = map.DeterminSpawnPoint(1, SpawnType.road)[0];
@@ -210,7 +229,7 @@ namespace StartGame.Mission
             map.renderObjects.Add(new EntityRenderObject(egg, new TeleportPointAnimation(new Point(0, 0), egg.Position)));
 
             //Spawn dragon close to the highest peak
-            Point dragonSpawn = new Point(peak.X + rng.Next(3), peak.Y + rng.Next(3));
+            Point dragonSpawn = new Point(peak.X + World.World.random.Next(3), peak.Y + World.World.random.Next(3));
             while (dragonSpawn.X >= map.map.GetUpperBound(0) && dragonSpawn.Y >= map.map.GetUpperBound(1))
             {
                 dragonSpawn.X = dragonSpawn.X >= map.map.GetUpperBound(0) ? dragonSpawn.X - 1 : dragonSpawn.X;
@@ -277,7 +296,8 @@ namespace StartGame.Mission
                 new WeaponReward(true, 2, null),
                 xp,
                 new SpellReward(World.World.Instance.GainSpell<FireBall>()),
-                80
+                80,
+                null
             );
         }
 
@@ -285,9 +305,14 @@ namespace StartGame.Mission
         {
             return Round > 7;
         }
+
+        public override bool MissionAllowed(WorldTileType type, int wealth)
+        {
+            return type == WorldTileType.Alpine;
+        }
     }
 
-    internal class BanditMission : Mission
+    public class BanditMission : Mission
     {
         public BanditMission() : base("Bandit Fight", Forced: true)
         {
@@ -296,9 +321,6 @@ namespace StartGame.Mission
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions,
             string description) GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
-            Random rng = new Random();
-            rng.Next();
-
             string desc = "Welcome to the mission. ";
 
             #region Player Creation
@@ -320,7 +342,7 @@ namespace StartGame.Mission
 
             for (int i = 0; i < enemyNumber; i++)
             {
-                string name = botNames[rng.Next(botNames.Count)];
+                string name = botNames[World.World.random.Next(botNames.Count)];
                 botNames.Remove(name);
                 BanditAI item = new BanditAI(PlayerType.computer, name, map, new Player[] { player });
                 item.troop = new Troop(name,
@@ -403,7 +425,8 @@ namespace StartGame.Mission
                 new WeaponReward(true, 0, null),
                 5,
                 new SpellReward(World.World.Instance.GainSpell<DebuffSpell>()),
-                12
+                12,
+                null
             );
         }
 
@@ -411,9 +434,13 @@ namespace StartGame.Mission
         {
             return Round < 5;
         }
+        public override bool MissionAllowed(WorldTileType type, int wealth)
+        {
+            return type != WorldTileType.Ocean;
+        }
     }
 
-    internal class SpiderNestMission : Mission
+    public class SpiderNestMission : Mission
     {
         public SpiderNestMission() : base("Destroy a spider nest")
         {
@@ -424,9 +451,6 @@ namespace StartGame.Mission
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description)
             GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
-            Random rng = new Random();
-            rng.Next();
-
             EnemyMoveTogether = true;
 
             string desc = "Welcome to the mission. ";
@@ -514,7 +538,8 @@ namespace StartGame.Mission
                 new WeaponReward(true, 0, null),
                 2,
                 null,
-                0
+                0,
+                null
             );
         }
 
@@ -522,9 +547,14 @@ namespace StartGame.Mission
         {
             return Round > 1;
         }
+
+        public override bool MissionAllowed(WorldTileType type, int wealth)
+        {
+            return type == WorldTileType.TemperateForest;
+        }
     }
 
-    internal class ElementalWizardFight : Mission
+    public class ElementalWizardFight : Mission
     {
         public ElementalWizardFight() : base("Elemental Wizard Fight", Forced: true)
         {
@@ -533,9 +563,6 @@ namespace StartGame.Mission
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description)
             GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
-            Random rng = new Random();
-            rng.Next();
-
             string desc = "Welcome to the mission. ";
 
             #region Player Creation
@@ -602,7 +629,8 @@ namespace StartGame.Mission
                 new WeaponReward(true, 3, null),
                 5,
                 new SpellReward(World.World.Instance.GainSpell<TeleportSpell>()),
-                48
+                48,
+                null
             );
         }
 
@@ -610,9 +638,14 @@ namespace StartGame.Mission
         {
             return Round > 3;
         }
+
+        public override bool MissionAllowed(WorldTileType type, int wealth)
+        {
+            return wealth > 30;
+        }
     }
 
-    internal class AttackCampMission : Mission
+    public class AttackCampMission : Mission
     {
         //TODO: Trigger aggresive AI when casting spell to hurt bandit
         public AttackCampMission() : base("Camp attacked")
@@ -623,9 +656,6 @@ namespace StartGame.Mission
         public override (List<Player> players, List<WinCheck> winConditions, List<WinCheck> lossConditions, string description)
             GenerateMission(int difficulty, int Round, ref Map map, Player player)
         {
-            Random rng = new Random();
-            rng.Next();
-
             string desc = "Welcome to the mission. ";
 
             #region Player Creation
@@ -675,7 +705,7 @@ namespace StartGame.Mission
                 //If no path left remove random
                 else
                 {
-                    startPos.RemoveAt(rng.Next(startPos.Count));
+                    startPos.RemoveAt(World.World.random.Next(startPos.Count));
                 }
             }
 
@@ -740,13 +770,19 @@ namespace StartGame.Mission
                 new WeaponReward(true, 3, null),
                 5,
                 null,
-                34
+                34,
+                null
             );
         }
 
         public override bool MissionAllowed(int Round)
         {
             return Round > 2;
+        }
+
+        public override bool MissionAllowed(WorldTileType type, int wealth)
+        {
+            return type == WorldTileType.TemperateForest || type == WorldTileType.TemperateGrassland || type == WorldTileType.Alpine;
         }
     }
 }

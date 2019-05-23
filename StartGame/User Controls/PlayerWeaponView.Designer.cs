@@ -37,11 +37,12 @@
             this.playerPossibleWeaponName = new System.Windows.Forms.Label();
             this.playerWeaponList = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.ammoList = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // dumpWeapon
             // 
-            this.dumpWeapon.Location = new System.Drawing.Point(222, 218);
+            this.dumpWeapon.Location = new System.Drawing.Point(251, 216);
             this.dumpWeapon.Name = "dumpWeapon";
             this.dumpWeapon.Size = new System.Drawing.Size(75, 31);
             this.dumpWeapon.TabIndex = 26;
@@ -60,7 +61,7 @@
             // 
             // changeWeapon
             // 
-            this.changeWeapon.Location = new System.Drawing.Point(222, 168);
+            this.changeWeapon.Location = new System.Drawing.Point(251, 166);
             this.changeWeapon.Name = "changeWeapon";
             this.changeWeapon.Size = new System.Drawing.Size(75, 43);
             this.changeWeapon.TabIndex = 24;
@@ -123,11 +124,21 @@
             this.label1.TabIndex = 27;
             this.label1.Text = "Weapons";
             // 
+            // ammoList
+            // 
+            this.ammoList.FormattingEnabled = true;
+            this.ammoList.Location = new System.Drawing.Point(224, 65);
+            this.ammoList.Name = "ammoList";
+            this.ammoList.Size = new System.Drawing.Size(102, 95);
+            this.ammoList.TabIndex = 28;
+            this.ammoList.SelectedIndexChanged += new System.EventHandler(this.AmmoList_SelectedIndexChanged);
+            // 
             // PlayerWeaponView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.Controls.Add(this.ammoList);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dumpWeapon);
             this.Controls.Add(this.playerPossibleWeaponAttacks);
@@ -138,7 +149,7 @@
             this.Controls.Add(this.playerPossibleWeaponName);
             this.Controls.Add(this.playerWeaponList);
             this.Name = "PlayerWeaponView";
-            this.Size = new System.Drawing.Size(300, 250);
+            this.Size = new System.Drawing.Size(338, 250);
             this.Load += new System.EventHandler(this.PlayerWeaponView_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -156,5 +167,6 @@
         private System.Windows.Forms.Label playerPossibleWeaponName;
         private System.Windows.Forms.ListBox playerWeaponList;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ListBox ammoList;
     }
 }

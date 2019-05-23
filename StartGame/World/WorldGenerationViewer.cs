@@ -10,7 +10,7 @@ namespace StartGame.World
 
         public WorldGenerationViewer()
         {
-            worldRenderer = new WorldRenderer(World.Instance, null);
+            worldRenderer = new WorldRenderer(World.Instance);
             InitializeComponent();
             Render();
         }
@@ -48,7 +48,7 @@ namespace StartGame.World
         {
             label5.Text = $"{trackBar1.Value} {trackBar2.Value} {trackBar3.Value} {trackBar5.Value} {trackBar4.Value}";
             World.NewWorld(trackBar1.Value / 100d, trackBar2.Value / 100d, trackBar3.Value / 100d, trackBar5.Value, trackBar4.Value / 100d);
-            worldRenderer = new WorldRenderer(World.Instance, null);
+            worldRenderer = new WorldRenderer(World.Instance);
             Render();
         }
 

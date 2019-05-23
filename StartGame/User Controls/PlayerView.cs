@@ -26,7 +26,6 @@ namespace StartGame
 
         private UserControl active;
         private PlayerTab tab;
-        private Player player;
 
         private bool allowAction;
 
@@ -38,7 +37,6 @@ namespace StartGame
         public void Activate(Player player, MainGameWindow main, bool AllowAction)
         {
             allowAction = AllowAction;
-            this.player = player;
             Point spawnPoint = new Point(0, 20);
             playerProfile = new PlayerBaseStats
             {
@@ -51,7 +49,7 @@ namespace StartGame
             {
                 Location = spawnPoint
             };
-            itemView.Activate(player);
+            itemView.Activate(player, main);
             itemView.Visible = false;
             Controls.Add(itemView);
 
@@ -76,7 +74,7 @@ namespace StartGame
                 Location = spawnPoint
             };
             playerWeapon.Visible = false;
-            playerWeapon.Activate(player, main, allowAction);
+            playerWeapon.Activate(player, allowAction);
             Controls.Add(playerWeapon);
 
             playerTree = new PlayerTreeView

@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using StartGame;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace Tests
@@ -19,6 +20,22 @@ namespace Tests
         }
 
         [TestMethod]
+        public void TestGetRandom()
+        {
+            List<int> i = new List<int> { 1 };
+            Assert.IsTrue(i.GetRandom() == 1);
+        }
+
+        [TestMethod]
+        public void TestTryGet()
+        {
+            List<int> i = new List<int> { 1, 2, 3 };
+            Assert.IsTrue(i.TryGet(I => I == 2, out int value));
+            Assert.IsTrue(value == 2);
+            Assert.IsFalse(i.TryGet(I => I == 4, out value));
+        }
+
+        [TestMethod]
         public void TestCut()
         {
             Point p = new Point(10, 20);
@@ -32,6 +49,20 @@ namespace Tests
             Assert.IsTrue(p.Cut(0, 100, 30, 100).Y == 30);
             Assert.IsTrue(p.Cut(0, 5, 0, 100).X == 5);
             Assert.IsTrue(p.Cut(0, 100, 0, 15).Y == 15);
+        }
+
+        public void TestBetween()
+        {
+            Assert.IsTrue(10.Between(0, 100));
+            Assert.IsTrue(10.Between(10, 10, true));
+            Assert.IsFalse(10.Between(10, 20, false));
+            Assert.IsFalse(10.Between(0, 10, false));
+        }
+
+        public void TestSplitWord()
+        {
+            Assert.IsTrue("ACar".SplitWords() == "A Car");
+
         }
     }
 }

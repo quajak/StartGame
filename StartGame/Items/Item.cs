@@ -7,7 +7,7 @@ namespace StartGame.Items
 {
     public abstract class Item
     {
-        public string Description { get; set; } = "";
+        public virtual string Description { get; set; } = "";
 
         public static readonly List<JewelryType> JewelryTypes = new List<JewelryType>()
         {
@@ -43,6 +43,11 @@ namespace StartGame.Items
         {
             this.cost = cost;
             this.amount = amount;
+        }
+
+        public override string ToString()
+        {
+            return $"{name} {amount}";
         }
     }
 

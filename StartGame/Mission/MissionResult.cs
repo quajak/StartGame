@@ -10,25 +10,16 @@ namespace StartGame.World
 {
     partial class MissionResult : Form
     {
-        private WorldRenderer worldRenderer;
         private readonly HumanPlayer player;
-        private readonly CampaignController controller;
-        private readonly Campaign campaign;
-        private readonly Mission.Mission lastMission;
-        private Random random = new Random();
-
-        private List<Item> reward = new List<Item>();
+        private readonly List<Item> reward = new List<Item>();
 
         //TODO: Add discounts
 
-        public MissionResult(HumanPlayer player, CampaignController controller, Campaign campaign, Mission.Mission lastMission, List<Armour> loot)
+        public MissionResult(HumanPlayer player, double progression, Mission.Mission lastMission, List<Armour> loot, string closeButtonText)
         {
-            worldRenderer = new WorldRenderer(World.Instance, player);
             InitializeComponent();
             this.player = player;
-            this.controller = controller;
-            this.campaign = campaign;
-            this.lastMission = lastMission;
+            nextMission.Text = closeButtonText;
 
             //Enable level up
             levelUpButton.Enabled = player.storedLevelUps != 0;
@@ -47,7 +38,7 @@ namespace StartGame.World
                 {
                     //Determine the quality
                     MathNet.Numerics.Distributions.Normal normal = new MathNet.Numerics.Distributions.Normal();
-                    int offset = (int)normal.InverseCumulativeDistribution(random.NextDouble());
+                    int offset = (int)normal.InverseCumulativeDistribution(World.random.NextDouble());
                     int num = E.GetQualityPos(_reward.jewelryReward.quality) + offset;
                     num = Math.Min(Math.Max(num, 0), Enum.GetNames(typeof(Quality)).Length); //Bound the value
                     Quality quality = E.GetQuality(num);
@@ -57,7 +48,7 @@ namespace StartGame.World
             }
             if (!(_reward.weaponReward is null))
             {
-                reward.Add(campaign.CalculateWeaponReward(_reward.weaponReward));
+                reward.Add(Campaign.CalculateWeaponReward(_reward.weaponReward, (int)(progression * 10), 10));
             }
             if (!(_reward.spellReward is null))
             {
@@ -71,7 +62,10 @@ namespace StartGame.World
             {
                 reward.Add(new Coin(_reward.Money));
             }
-
+            if (_reward.itemReward != null)
+            {
+                reward.Add(_reward.itemReward.reward);
+            }
             reward.AddRange(loot);
 
             //Populate reward list
@@ -131,13 +125,13 @@ namespace StartGame.World
                         if (weaponView.decision)
                         {
                             player.troop.weapons.Add(w);
+                            lootList.Items.Remove(w);
+                            reward.Remove(w);
                         }
-                        lootList.Items.Remove(w);
-                        reward.Remove(w);
                         break;
 
                     case Coin c:
-                        player.money.rawValue += c.amount;
+                        player.Money.RawValue += c.amount;
                         lootList.Items.Remove(c);
                         reward.Remove(c);
                         Render();
@@ -155,9 +149,19 @@ namespace StartGame.World
                         reward.Remove(j);
                         break;
 
+                    case SellableItem s:
+                        player.troop.items.Add(s);
+                        reward.Remove(s);
+                        lootList.Items.Remove(s);
+                        break;
+
                     default:
                         throw new NotImplementedException($"Reward must be spell, coin or weapon not: {item.GetType()}");
                 }
+                if (lootList.Items.Count != 0)
+                    lootList.SelectedIndex = 0;
+                else
+                    gainAllLoot.Enabled = false;
             }
         }
 
@@ -176,7 +180,7 @@ namespace StartGame.World
                         break;
 
                     case Coin c:
-                        player.money.rawValue += c.amount;
+                        player.Money.RawValue += c.amount;
                         break;
 
                     case Armour a:
@@ -198,6 +202,7 @@ namespace StartGame.World
 
         private void LootList_SelectedIndexChanged(object sender, EventArgs e)
         {
+            gainLoot.Enabled = lootList.SelectedItem != null;
         }
     }
 }

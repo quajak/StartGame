@@ -29,8 +29,7 @@ namespace StartGame.PlayerData
 
         public override void PlayTurn(MainGameWindow main, bool SingleTurn)
         {
-            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, enemies[0].troop.Position.X,
-                enemies[0].troop.Position.Y, map, true);
+            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, map, true);
             Thread path = new Thread(distanceGraph.CreateGraph);
             path.Start();
             path.Join();
@@ -45,7 +44,7 @@ namespace StartGame.PlayerData
                 //Check if it can attack player
                 int playerDistance = AIUtility.Distance(playerPos, troop.Position);
                 if (playerDistance <= troop.activeWeapon.range &&
-                    troop.activeWeapon.attacks > 0)
+                    troop.activeWeapon.Attacks() > 0)
                 {
                     //Attack
                     var (damage, killed, hit) = main.Attack(this, enemies[0]);
@@ -54,15 +53,15 @@ namespace StartGame.PlayerData
 
                     if (killed)
                     {
-                        map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
+                        map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, Color.Red, $"-{damageDealt}"));
                         main.PlayerDied($"You have been killed by {Name}!");
                         break;
                     }
-                    actionPoints.rawValue--;
-                    troop.activeWeapon.attacks--;
+                    actionPoints.RawValue--;
+                    troop.activeWeapon.UseWeapon(enemies[0], main);
                     continue;
                 }
-                else if (troop.weapons.Exists(t => t.range >= playerDistance && t.attacks > 0))
+                else if (troop.weapons.Exists(t => t.range >= playerDistance && t.Attacks() > 0))
                 {
                     //Change weapon
                     Weapon best = troop.weapons.FindAll(t => t.range >= playerDistance)
@@ -118,7 +117,7 @@ namespace StartGame.PlayerData
                 if (closestDistance >= playerDistance) break;
 
                 //Generate path of movement
-                DistanceGraphCreator movementGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, closestField.X, closestField.Y, map, true, false);
+                DistanceGraphCreator movementGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, map, true);
                 movementGraph.CreateGraph();
 
                 List<Point> movement = new List<Point>() { };
@@ -135,16 +134,15 @@ namespace StartGame.PlayerData
 
                 main.MovePlayer(closestField, troop.Position, this, MovementType.walk, path: movement);
 
-                distanceGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y,
-                    playerPos.X, playerPos.Y, map, true);
+                distanceGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, map, true);
                 distanceGraph.CreateGraph();
             }
             if (SingleTurn)
             {
                 if (damageDealt != 0)
-                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
                 else if (dodged != 0)
-                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
             }
             else
             {
@@ -156,14 +154,14 @@ namespace StartGame.PlayerData
         public object Clone()
         {
             CustomPlayer toReturn = new CustomPlayer(Name, bitmap, troop.activeWeapon, defense);
-            toReturn.strength.rawValue = strength.rawValue;
-            toReturn.agility.rawValue = agility.rawValue;
-            toReturn.vitality.rawValue = vitality.rawValue;
-            toReturn.intelligence.rawValue = intelligence.rawValue;
-            toReturn.wisdom.rawValue = wisdom.rawValue;
-            toReturn.endurance.rawValue = endurance.rawValue;
+            toReturn.strength.RawValue = strength.RawValue;
+            toReturn.agility.RawValue = agility.RawValue;
+            toReturn.vitality.RawValue = vitality.RawValue;
+            toReturn.intelligence.RawValue = intelligence.RawValue;
+            toReturn.wisdom.RawValue = wisdom.RawValue;
+            toReturn.endurance.RawValue = endurance.RawValue;
             toReturn.XP = XP;
-            toReturn.money = money;
+            toReturn.Money = Money;
             toReturn.enemies = enemies;
 
             return toReturn;

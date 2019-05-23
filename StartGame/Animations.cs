@@ -65,11 +65,11 @@ namespace StartGame
         private Point end;
         private Point current;
         public readonly int step;
-        private LinearAnimation xAnimation;
-        private LinearAnimation yAnimation;
+        private readonly LinearAnimation xAnimation;
+        private readonly LinearAnimation yAnimation;
 
-        private IEnumerator<int> xChange;
-        private IEnumerator<int> yChange;
+        private readonly IEnumerator<int> xChange;
+        private readonly IEnumerator<int> yChange;
 
         public LinearPointAnimation(Point start, Point end, int step = 1) : base()
         {

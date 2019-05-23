@@ -13,7 +13,7 @@ namespace StartGame
 {
     partial class LevelUp : Form
     {
-        private Player player;
+        private readonly Player player;
 
         private int StrengthUp = 0;
         private int AgilityUp = 0;
@@ -49,12 +49,12 @@ namespace StartGame
             string intelligence = player.intelligence.ToString();
 
             //Now simulate player change
-            player.vitality.rawValue += VitatlityUp;
-            player.endurance.rawValue += EnduranceUp;
-            player.agility.rawValue += AgilityUp;
-            player.wisdom.rawValue += WisdomUp;
-            player.intelligence.rawValue += IntelligenceUp;
-            player.strength.rawValue += StrengthUp;
+            player.vitality.RawValue += VitatlityUp;
+            player.endurance.RawValue += EnduranceUp;
+            player.agility.RawValue += AgilityUp;
+            player.wisdom.RawValue += WisdomUp;
+            player.intelligence.RawValue += IntelligenceUp;
+            player.strength.RawValue += StrengthUp;
 
             playerStrength.Text = $"{strength} ({player.strength.Value})";
             playerAgiltiy.Text = $"{agility} ({player.agility.Value})";
@@ -84,12 +84,12 @@ namespace StartGame
             playerMana.Text = $"{actualMana} ({player.mana.MaxValue().Value})";
 
             //Undo changes
-            player.vitality.rawValue -= VitatlityUp;
-            player.endurance.rawValue -= EnduranceUp;
-            player.agility.rawValue -= AgilityUp;
-            player.wisdom.rawValue -= WisdomUp;
-            player.intelligence.rawValue -= IntelligenceUp;
-            player.strength.rawValue -= StrengthUp;
+            player.vitality.RawValue -= VitatlityUp;
+            player.endurance.RawValue -= EnduranceUp;
+            player.agility.RawValue -= AgilityUp;
+            player.wisdom.RawValue -= WisdomUp;
+            player.intelligence.RawValue -= IntelligenceUp;
+            player.strength.RawValue -= StrengthUp;
 
             ok.Enabled = points == 0;
         }
@@ -160,12 +160,12 @@ namespace StartGame
         private void DistributePoints()
         {
             finished = true;
-            player.strength.rawValue += StrengthUp;
-            player.agility.rawValue += AgilityUp;
-            player.endurance.rawValue += EnduranceUp;
-            player.vitality.rawValue += VitatlityUp;
-            player.wisdom.rawValue += WisdomUp;
-            player.intelligence.rawValue += IntelligenceUp;
+            player.strength.RawValue += StrengthUp;
+            player.agility.RawValue += AgilityUp;
+            player.endurance.RawValue += EnduranceUp;
+            player.vitality.RawValue += VitatlityUp;
+            player.wisdom.RawValue += WisdomUp;
+            player.intelligence.RawValue += IntelligenceUp;
             Close();
         }
 

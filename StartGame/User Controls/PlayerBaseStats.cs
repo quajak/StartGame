@@ -36,7 +36,7 @@ namespace StartGame.User_Controls
             playerActionPoints.Text = player.actionPoints.ToString();
             playerMovementPoints.Text = player.movementPoints.ToString();
             playerHealth.Text = player.troop.health.ToString();
-            playerWeaponAttacks.Text = $"Attacks: {player.troop.activeWeapon.attacks} / {player.troop.activeWeapon.maxAttacks}";
+            playerWeaponAttacks.Text = $"Attacks: {player.troop.activeWeapon.Attacks()} / {player.troop.activeWeapon.MaxAttacks()}";
             playerDefense.Text = $"{player.troop.defense}";
             playerDodge.Text = player.troop.dodge.ToString();
             playerStrength.Text = player.strength.ToString();
@@ -47,7 +47,7 @@ namespace StartGame.User_Controls
             {
                 playerLevel.Text = $"Level: {h.level} + ({h.storedLevelUps})";
                 playerXP.Text = $"XP: {h.xp} / {h.levelXP}";
-                playerMoney.Text = player.money.ToString();
+                playerMoney.Text = player.Money.ToString();
             }
             else
             {

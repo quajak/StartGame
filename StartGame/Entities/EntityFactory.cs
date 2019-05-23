@@ -45,7 +45,7 @@ namespace StartGame.Entities
         private readonly Dungeon dungeon;
         public CustomPlayer customPlayer;
         private DungeonCreator dungeonC;
-        private List<Control> inputs = new List<Control>();
+        private readonly List<Control> inputs = new List<Control>();
 
         public EntityFactory(EntityTemplate type, Dungeon dungeon)
         {

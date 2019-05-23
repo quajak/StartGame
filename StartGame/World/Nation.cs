@@ -15,19 +15,26 @@ namespace StartGame.World
     public class Nation
     {
         public static List<SellableItem> prices = new List<SellableItem> {
-                new Food("Bread", 1, 4),
-                new Food("Carrot", 1, 2),
-                new Food("Sausage", 1, 8),
-                new Food("Apple", 1, 2),
+                new Food("Bread", 1, 4, 3),
+                new Food("Carrot", 1, 2, 2),
+                new Food("Sausage", 1, 8, 5),
+                new Food("Apple", 1, 1, 1),
+                new Food("Pear", 1, 2, 2),
+                new Food("Turnip", 1, 1, 1),
                 new Resource(1, 1, "Grain"),
                 new Resource(1, 10, "Iron"),
                 new Resource(1, 30 ,"Gold"),
                 new Resource(1, 5, "Wood"),
-                new Resource(1, 3, "Stone")
+                new Resource(1, 3, "Stone"),
+                new Food("Bear Meat", 1, 6, 2),
+                new Resource(1, 50, "Ice Core")
         };
 
         public List<NationIslandInfo> islands = new List<NationIslandInfo>();
         public List<City> cities = new List<City>();
+        public List<Farm> farms = new List<Farm>();
+        public List<Mine> mines = new List<Mine>();
+
         public City Captial => cities.Find(c => c is CapitalCity);
 
         public void Intialise(List<City> existingCities)
@@ -70,25 +77,30 @@ namespace StartGame.World
             return islands.Where(i => i.Settled && i.ConnectedCities.Count == 0).Select(i => i.island).ToList();
         }
 
+        /// <summary>
+        /// Generates roads between cities where it makes sense
+        /// </summary>
         public void GenerateRoads()
         {
             int roads = 0;
             foreach (var island in islands.Where(i => i.Settled))
             {
+                Trace.TraceInformation($"Generating roads for island {island.island.Name} \t Cities: {island.cities.Count}");
                 List<City> order = island.cities.OrderByDescending(c => c.priority).ToList();
                 foreach (var city in island.cities.OrderBy(c => AIUtility.Distance(order[0].position, c.position)))
-                {
-                    for (int i = 0; i < Math.Min(city.connections, island.cities.Count); i++)
+                { 
+                    List<City> allowedCities = order.Where(c => c != city && AIUtility.Distance(c.position, city.position) < Math.Max(c.Wealth, 15)).ToList();
+                    for (int i = 0; i < Math.Min(city.connections, allowedCities.Count()); i++)
                     {
-                        if (city.roadConnections.Contains(order[i]) || order[i].roadConnections.Contains(city))
+                        City toCity = allowedCities[i];
+                        if (city.roadConnections.Contains(toCity) || toCity.roadConnections.Contains(city))
                             continue;
-                        Trace.TraceInformation($"Generated road between {city.position} and {order[i].position}");
-                        city.roadConnections.Add(order[i]);
-                        order[i].roadConnections.Add(city);
+                        Trace.TraceInformation($"Generated road between {city.position} and {toCity.position}");
+                        city.roadConnections.Add(toCity);
+                        toCity.roadConnections.Add(city);
                         roads++;
-                        if (order[i].costMap is null)
-                            order[i].costMap = AStar.GenerateCostMap(World.Instance.costMap, ref order[i].position);
-                        Point[] route = AStar.FindPath(order[i].position, city.position, order[i].costMap);
+                        toCity.costMap = AStar.GenerateCostMap(World.Instance.costMap, ref toCity.position, AIUtility.Distance(toCity.position, city.position) * 10);
+                        Point[] route = AStar.FindPath(toCity.position, city.position, toCity.costMap);
                         foreach (var point in route)
                         {
                             if (!World.Instance.features.Exists(f => f is Road && f.position == point))

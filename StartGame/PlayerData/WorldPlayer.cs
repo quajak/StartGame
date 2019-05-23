@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StartGame.GameMap;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -11,8 +12,9 @@ namespace StartGame.PlayerData
         public List<Point> toMove = new List<Point>();
         public double worldActionPoints = 0;
 
-        public WorldPlayer(PlayerType playerType, string name, Map map, Player[] enemies, int XP, int intelligence, int strength, int endurance, int wisdom, int agility, int vitality, List<Spell> spells = null)
-            : base(playerType, name, map, enemies, XP, intelligence, strength, endurance, wisdom, agility, vitality, spells)
+        public WorldPlayer(PlayerType playerType, string name, Map map, Player[] enemies, int XP, int intelligence, int strength, 
+            int endurance, int wisdom, int agility, int vitality, List<Spell> spells = null, bool constantMovementFunction = true)
+            : base(playerType, name, map, enemies, XP, intelligence, strength, endurance, wisdom, agility, vitality, spells, constantMovementFunction)
         {
         }
 

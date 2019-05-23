@@ -1,4 +1,5 @@
 ﻿using StartGame.Entities;
+using StartGame.GameMap;
 using StartGame.PlayerData;
 using StartGame.Properties;
 using StartGame.Rendering;
@@ -178,7 +179,7 @@ namespace StartGame.Dungeons
                 animating = true;
                 frames = new List<Bitmap>();
                 animator = new Thread(() => dungeon.active.map.Render(dungeonPicture, frames,
-                    forceEntityRedrawing, frameTime: 100, debug: false,
+                    forceEntityRedrawing, debug: false,
                     forceDrawBackground: forceDrawBackground)) {
                     Name = "Animator Thread"
                 };
@@ -584,7 +585,8 @@ namespace StartGame.Dungeons
 
         private void SelectedEntityDelete_Click(object sender, EventArgs e)
         {
-            Entity entity = selectedEntities.SelectedItem as Entity;
+            throw new NotImplementedException("What is this function doing? Sorry, I did not bother figuring that out right now");
+
         }
 
         #endregion Event Handler
@@ -594,7 +596,7 @@ namespace StartGame.Dungeons
         public enum Command
         { Paint, AddEntity, Select, ShowBlocking }
 
-        private (Bitmap image, bool active, Command command)[] commandBarItems = new[] {
+        private readonly (Bitmap image, bool active, Command command)[] commandBarItems = new[] {
             (Resources.PaintTool, false, Command.Paint),
             (Resources.EntityAdderTool, false, Command.AddEntity),
             (Resources.SelectionTool, true, Command.Select),

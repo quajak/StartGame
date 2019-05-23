@@ -1,4 +1,5 @@
 ﻿using StartGame.Dungeons;
+using StartGame.GameMap;
 using StartGame.PlayerData;
 using StartGame.Properties;
 using StartGame.Rendering;
@@ -14,7 +15,6 @@ namespace StartGame.Entities
     {
         private string name;
         private Point position;
-        public Bitmap image;
         public readonly bool blocking;
         private Map map;
         public bool finishedInitialisation = true;
@@ -81,6 +81,23 @@ namespace StartGame.Entities
                 name = value;
             }
         }
+        Bitmap image;
+        public Bitmap Image
+        {
+            get
+            {
+                if (Map != null && Map.EntityRenderObjects.Exists(o => o.Name == Name))
+                    return Map.EntityRenderObjects.Find(o => o.Name == Name).image;
+                return image;
+            }
+
+            set
+            {
+                image = value;
+                if (Map != null && Map.EntityRenderObjects.Exists(o => o.Name == Name))
+                    Map.EntityRenderObjects.Find(o => o.Name == Name).image = value;
+            }
+        }
 
         public Entity(string Name, Point Position, Bitmap Image, bool Blocking, Map map)
         {
@@ -89,7 +106,7 @@ namespace StartGame.Entities
             Map = map;
             blocking = Blocking;
             this.Position = Position;
-            image = Image;
+            this.Image = Image;
         }
 
         public virtual Entity Load()
@@ -176,7 +193,7 @@ namespace StartGame.Entities
 
         public Door(Dungeon dungeon, (Room, Door) next, Room from, Point position, bool assingID = true, int id = 0) : base("Door" + (assingID ? from.DoorID + 1 : id), position, Resources.Door, from.map, false)
         {
-            var (room, door) = next;
+            var (_, door) = next;
             unlinked = door == null;
             this.dungeon = dungeon;
             this.from = from;
@@ -198,9 +215,8 @@ namespace StartGame.Entities
         {
             if (unlinked)
                 throw new Exception();
-
-            if (player is HumanPlayer humanPlayer)
-                dungeon.MoveTo(from, Next);
+            if (player is HumanPlayer)
+                dungeon.MoveTo(Next);
         }
 
         public override List<Control> GenerateFieldEditors(Point position, Form form)

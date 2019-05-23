@@ -2,6 +2,7 @@
 using StartGame;
 using StartGame.Dungeons;
 using StartGame.Entities;
+using StartGame.GameMap;
 using StartGame.Items;
 using StartGame.PlayerData;
 using System.Collections.Generic;
@@ -162,7 +163,7 @@ namespace Tests
             Map map = dungeon.active.map;
             HumanPlayer player = new HumanPlayer(PlayerType.localHuman, "Test", map, new Player[] { }, null, 0);
             player.troop = new Troop("Test", null, null, 0, map, player);
-            (List<Player> players, List<WinCheck> winCondition, List<WinCheck> loss, string description) =
+            (List<Player> players, List<WinCheck> winCondition, List<WinCheck> _, string description) =
                 dungeon.GenerateMission(1, 1, ref map, player);
             Assert.IsNotNull(map);
             Assert.IsTrue(players.Count == 1);

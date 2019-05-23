@@ -1,4 +1,5 @@
-﻿namespace StartGame.MathFunctions
+﻿
+namespace StartGame.MathFunctions
 {
 	public class PerlinNoise
 	{
@@ -58,9 +59,9 @@
 		{
 			if (repeat > 0)
 			{                                   // If we have any repeat on, change the coordinates to their "local" repetitions
-				x = x % repeat;
-				y = y % repeat;
-				z = z % repeat;
+				x %= repeat;
+				y %= repeat;
+				z %= repeat;
 			}
 
 			int xi = (int)x & 255;                              // Calculate the "unit cube" that the point asked will be located in

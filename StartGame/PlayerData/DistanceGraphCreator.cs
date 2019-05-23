@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using StartGame.GameMap;
+
 using static StartGame.MainGameWindow;
 
 namespace StartGame.PlayerData
@@ -12,43 +14,31 @@ namespace StartGame.PlayerData
         private readonly Player player;
         private readonly int sX;
         private readonly int sY;
-        private Map map;
-        private readonly int eX;
-        private readonly int eY;
+        private readonly Map map;
         public double[,] graph;
         private readonly bool allowWater;
-        private readonly bool needFree;
 
         /// <summary>
         /// Create a double map of the distance cost to get to field from a certain point
         /// </summary>
-        /// <param name="EX"></param>
-        /// <param name="EY"></param>
         /// <param name="Map"></param>
         /// <param name="AllowWater"></param>
-        /// <param name="needFree"></param>
-        public DistanceGraphCreator(Player Player, int SX, int SY, int EX, int EY, Map Map, bool AllowWater, bool needFree = true)
+        public DistanceGraphCreator(Player Player, int SX, int SY, Map Map, bool AllowWater)
         {
             map = Map;
             player = Player;
             sX = SX;
             sY = SY;
-            eX = EX;
-            eY = EY;
             allowWater = AllowWater;
-            this.needFree = needFree;
         }
 
-        public DistanceGraphCreator(Player Player, Point S, Point E, Map Map, bool AllowWater, bool needFree = true)
+        public DistanceGraphCreator(Player Player, Point S, Map Map, bool AllowWater)
         {
             player = Player;
             map = Map;
             sX = S.X;
             sY = S.Y;
-            eX = E.X;
-            eY = E.Y;
             allowWater = AllowWater;
-            this.needFree = needFree;
         }
 
         private double[,] mapValues;
@@ -56,12 +46,12 @@ namespace StartGame.PlayerData
 
         public void CreateGraph()
         {
-            //TODO: Slowly create a graph of the difference costs - or set static calculation or dynamic
             lock (this) lock (map)
                 {
-                    graph = new double[map.map.GetUpperBound(0) + 1, map.map.GetUpperBound(1) + 1];
+                    //I think the +1 on size was done so some checks can be avoided. Is most likely a hack
+                    graph = new double[map.map.GetUpperBound(0)+ 1, map.map.GetUpperBound(1) + 1];
                     mapValues = new double[map.map.GetUpperBound(0) + 1, map.map.GetUpperBound(1) + 1];
-                    free = new bool[map.map.GetUpperBound(0) + 1, map.map.GetUpperBound(1) + 1];
+                    free = new bool[map.map.GetUpperBound(0)+ 1, map.map.GetUpperBound(1) + 1];
                     for (int x = 0; x <= mapValues.GetUpperBound(0); x++)
                     {
                         for (int y = 0; y <= mapValues.GetUpperBound(1); y++)
@@ -108,16 +98,22 @@ namespace StartGame.PlayerData
                             }
                             else if (graph[field[0], field[1]] > 0)
                             {
-                                MapTile[] path = GeneratePath(new Point(field[0], field[1]), start, map);
+                                double newCost;
+                                if (player.constantMovementFunction)
+                                {
+                                    newCost = graph[checking[0], checking[1]] + mapValues[field[0], field[1]];
+                                }
+                                else
+                                {
+                                    MapTile[] path = GeneratePath(new Point(field[0], field[1]), start, map);
 
-                                double newCost = graph.Get(checking) + player.CalculateStep(startTile, map.map.Get(checking), map.map.Get(field), path.Length - 1, walk, true);
+                                    newCost = graph.Get(checking) + player.CalculateStep(startTile, map.map.Get(checking), map.map.Get(field), path.Length - 1, walk);
+
+                                }
                                 if (newCost < graph[field[0], field[1]])
                                 {
                                     graph[field[0], field[1]] = newCost;
                                     toAdd.Add(field);
-                                }
-                                else
-                                {
                                 }
                             }
                         }

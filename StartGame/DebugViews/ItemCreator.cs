@@ -11,13 +11,13 @@ namespace StartGame.DebugViews
 {
     public partial class ItemCreator : Form
     {
-        private HumanPlayer player;
-        private List<CheckBox> bodyPartAffected = new List<CheckBox>();
+        private readonly HumanPlayer player;
+        private readonly List<CheckBox> bodyPartAffected = new List<CheckBox>();
 
-        private List<NumericUpDown> jewelryBuffValues = new List<NumericUpDown>();
-        private List<ListBox> jewelryBuffType = new List<ListBox>();
+        private readonly List<NumericUpDown> jewelryBuffValues = new List<NumericUpDown>();
+        private readonly List<ListBox> jewelryBuffType = new List<ListBox>();
 
-        private List<string> jewelryBuffs = new List<string>()
+        private readonly List<string> jewelryBuffs = new List<string>()
         {
             "Strength",
             "Agility",

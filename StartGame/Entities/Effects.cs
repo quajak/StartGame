@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using StartGame.GameMap;
+
 
 namespace StartGame.Entities
 {
@@ -77,6 +79,43 @@ namespace StartGame.Entities
     {
         public LightningBolt(int Turns, Point point, Map map, MainGameWindow main) : base("LightningBolt", point, Resources.LightningBolt, map, Turns, main, render: false)
         {
+        }
+
+        internal override void Delete()
+        {
+        }
+    }
+
+    internal class IceSpike : Effect
+    {
+        public IceSpike(int Turns, Point point, Point SpawnPosition, Map map, MainGameWindow main) : base("Ice Spike", SpawnPosition, Resources.IceSpike, map, Turns, main, render: false)
+        {
+            //TODO: Do this for every single step of the animation
+            int dX = SpawnPosition.X - point.X;
+            int dY = SpawnPosition.Y - point.Y;
+            if (Math.Abs(dX) > Math.Abs(dY))
+            {
+                if (dX < 0)
+                {
+                    Image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                }
+                else
+                {
+                    Image.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                }
+            }
+            else
+            {
+                if (dY < 0)
+                {
+                    Image.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                }
+                else
+                {
+                }
+            }
+
+            Position = point; //So animation is created
         }
 
         internal override void Delete()
@@ -211,8 +250,14 @@ namespace StartGame.Entities
     internal class FireStatus : Status
     {
         private readonly int damage;
-
-        public FireStatus(int? Turns, int Damage, MainGameWindow main, Player player) : base("Fire", Turns, player)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Turns"></param>
+        /// <param name="Damage"></param>
+        /// <param name="main"></param>
+        /// <param name="affected">The player who was affected</param>
+        public FireStatus(int? Turns, int Damage, MainGameWindow main, Player affected) : base("Fire", Turns, affected)
         {
             main.Turn += Main_Turn;
             main.PlayerMoved += Main_PlayerMoved;
@@ -282,7 +327,7 @@ namespace StartGame.Entities
         private void Player_InitialiseTurnHandler(object sender, EventArgs e)
         {
             CalculateLevel();
-            player.actionPoints.rawValue -= level;
+            player.actionPoints.RawValue -= level;
         }
 
         private void CalculateLevel()

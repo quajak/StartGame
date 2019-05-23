@@ -1,8 +1,10 @@
 ﻿using StartGame.Entities;
 using StartGame.Extra.Loading;
+using StartGame.GameMap;
 using StartGame.Mission;
 using StartGame.PlayerData;
 using StartGame.Rendering;
+using StartGame.World;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -86,7 +88,7 @@ namespace StartGame.Dungeons
             mainGame = gameWindow;
         }
 
-        public void MoveTo(Room from, (Room, Door) to)
+        public void MoveTo((Room, Door) to)
         {
             var (room, door) = to;
             active.map.troops.Remove(player.troop);
@@ -257,6 +259,11 @@ namespace StartGame.Dungeons
         {
             string dir = Directory.GetCurrentDirectory();
             return Directory.EnumerateDirectories(dir).Select(d => new DirectoryInfo(d).Name).ToList();
+        }
+
+        public override bool MissionAllowed(WorldTileType type, int wealth)
+        {
+            throw new NotImplementedException();
         }
     }
 }

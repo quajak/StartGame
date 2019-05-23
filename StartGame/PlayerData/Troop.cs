@@ -3,6 +3,8 @@ using StartGame.Items;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using StartGame.GameMap;
+
 
 namespace StartGame.PlayerData
 {
@@ -54,7 +56,7 @@ namespace StartGame.PlayerData
         }
 
         public readonly Player player;
-        private Dictionary<DamageType, double> vurneabilites;
+        private readonly Dictionary<DamageType, double> vurneabilites;
 
         public double GetVurneability(DamageType damageType)
         {

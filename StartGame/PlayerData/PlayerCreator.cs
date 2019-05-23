@@ -21,37 +21,37 @@ namespace StartGame.PlayerData
 
         private void StrengthValue_ValueChanged(object sender, EventArgs e)
         {
-            player.strength.rawValue = (int)strengthValue.Value;
+            player.strength.RawValue = (int)strengthValue.Value;
             playerView1.Render();
         }
 
         private void IntelligenceValue_ValueChanged(object sender, EventArgs e)
         {
-            player.intelligence.rawValue = (int)intelligenceValue.Value;
+            player.intelligence.RawValue = (int)intelligenceValue.Value;
             playerView1.Render();
         }
 
         private void VitalityValue_ValueChanged(object sender, EventArgs e)
         {
-            player.vitality.rawValue = (int)vitalityValue.Value;
+            player.vitality.RawValue = (int)vitalityValue.Value;
             playerView1.Render();
         }
 
         private void EnduranceValue_ValueChanged(object sender, EventArgs e)
         {
-            player.endurance.rawValue = (int)enduranceValue.Value;
+            player.endurance.RawValue = (int)enduranceValue.Value;
             playerView1.Render();
         }
 
         private void AgilityValue_ValueChanged(object sender, EventArgs e)
         {
-            player.agility.rawValue = (int)agilityValue.Value;
+            player.agility.RawValue = (int)agilityValue.Value;
             playerView1.Render();
         }
 
         private void WisdomValue_ValueChanged(object sender, EventArgs e)
         {
-            player.wisdom.rawValue = (int)wisdomValue.Value;
+            player.wisdom.RawValue = (int)wisdomValue.Value;
             playerView1.Render();
         }
 
@@ -73,7 +73,7 @@ namespace StartGame.PlayerData
 
         private int imageIndex = 0;
 
-        private List<(Bitmap, string)> images = new List<(Bitmap, string)>() {
+        private readonly List<(Bitmap, string)> images = new List<(Bitmap, string)>() {
             (Resources.spiderWarrior, "spiderWarrior"),
             (Resources.enemyScout, "enemyScout"),
             (Resources.Slime, "Slime")
@@ -94,7 +94,7 @@ namespace StartGame.PlayerData
         private void ShowImage()
         {
             imageSelected.Image = images[imageIndex].Item1;
-            player.troop.image = images[imageIndex].Item1;
+            player.troop.Image = images[imageIndex].Item1;
             player.bitmap = images[imageIndex].Item2;
         }
     }

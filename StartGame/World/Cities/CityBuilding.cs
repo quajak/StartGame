@@ -34,6 +34,15 @@ namespace StartGame.World.Cities
         }
     }
 
+    public class MayorHouse : CityBuilding
+    {
+
+        public MayorHouse(City city) : base(++ID, "Mayor House", "This is the mayor speaking.", new List<CityBuildingAction> { })
+        {
+            description = $"The agricultural value of the town is {city.agriculturalProduction} and the mineral value is {city.mineralProduction}.";
+        }
+    }
+
     public class Port : CityBuilding
     {
         public Port(City city) : base(++ID, "Port", "It is a port.", new List<CityBuildingAction> { new CityBuildingAction("Fast Travel") })

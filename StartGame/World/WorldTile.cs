@@ -2,7 +2,7 @@
 
 namespace StartGame.World
 {
-    public enum WorldTileType { Ocean, River, TemperateGrassland, Rainforest, Desert, Tundra, TemperateForest, Savanna, Alpine }
+    public enum WorldTileType { Ocean, River, TemperateGrassland, Rainforest, Desert, Tundra, TemperateForest, Savanna, Alpine, SeaIce }
 
     public class WorldTile
     {

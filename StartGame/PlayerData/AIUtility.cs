@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
+using StartGame.GameMap;
+
 
 namespace StartGame.PlayerData
 {
@@ -19,7 +22,7 @@ namespace StartGame.PlayerData
 
                     if (!withCenter && point == center) continue;
 
-                    int dis = AIUtility.Distance(point, center);
+                    int dis = Distance(point, center);
                     if (dis <= radius)
                     {
                         //Damage fields

@@ -11,7 +11,7 @@ namespace StartGame
         public WeaponView(Weapon weapon, bool isQuestion = false)
         {
             InitializeComponent();
-            attacks.Text = $"Attacks: {weapon.maxAttacks}";
+            attacks.Text = $"Attacks: {weapon.MaxAttacks()}";
             damage.Text = $"Damage: {weapon.attackDamage}";
             name.Text = $"{weapon.name}";
             range.Text = $"Range: {weapon.range}";

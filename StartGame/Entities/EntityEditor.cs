@@ -97,7 +97,7 @@ namespace StartGame.Entities
         private readonly Dungeon dungeon;
         private ListBox doorList;
         private ListBox roomList;
-        private Door door;
+        private readonly Door door;
 
         public DoorChooser(Dungeon dungeon, Point point, Form form, Door entity) : base(point, form)
         {

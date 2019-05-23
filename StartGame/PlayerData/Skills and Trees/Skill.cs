@@ -1,40 +1,8 @@
-﻿using StartGame.PlayerData;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using static StartGame.MainGameWindow;
 
 namespace StartGame
 {
-    public abstract class Tree
-    {
-        public string name;
-
-        public readonly string description;
-        public readonly string reason;
-
-        public Tree(string Name, string Description, string Reason)
-        {
-            name = Name;
-            description = Description;
-            reason = Reason;
-        }
-
-        public abstract void Initialise(MainGameWindow mainGame);
-
-        public abstract void Activate();
-
-        public static List<Tree> GenerateTrees()
-        {
-            return new List<Tree>()
-            {
-                new Sprinter(),
-                new Rampage(),
-                new SpiderKiller(),
-                new Fighter()
-            };
-        }
-    }
-
     //TODO: Description of skills are not hard coded but a function
     public abstract class Skill : Tree
     {
@@ -76,13 +44,6 @@ namespace StartGame
         }
     }
 
-    internal abstract class Title : Tree
-    {
-        public Title(string Name, string Description, string Reason) : base(Name, Description, Reason)
-        {
-        }
-    }
-
     internal class Rampage : Skill
     {
         private int succesiveTurns = 0;
@@ -107,7 +68,7 @@ namespace StartGame
             {
                 if (active)
                 {
-                    main.humanPlayer.actionPoints.rawValue += level;
+                    main.humanPlayer.actionPoints.RawValue += level;
                     main.ShowPlayerStats();
                 }
                 hasKilled = true;
@@ -152,39 +113,37 @@ namespace StartGame
         }
     }
 
-    internal class SpiderKiller : Title
+    internal class Tank : Skill
     {
-        private MainGameWindow mainGame;
-        private int toKill = 5;
+        private int activation = 40;
 
-        public SpiderKiller() : base("Spider Killer", "Do 1 extra damage against spiders.", "Kill 5 spiders.")
+        public Tank() : base("Tank", "Absorb more damage.", "Loose 40 health.", 2, 40)
         {
+            activateOnLevelUp = true;
         }
 
         public override void Initialise(MainGameWindow mainGame)
         {
-            this.mainGame = mainGame;
-            if (!mainGame.humanPlayer.trees.Exists(t => t.name == name))
-                mainGame.Combat += Update;
+            main = mainGame;
+            main.Combat += CombatUpdate;
         }
 
-        public void Update(object sender, CombatData data)
+        public void CombatUpdate(object sender, CombatData data)
         {
-            if (data.killed && data.attacked.GetType() == typeof(WarriorSpiderAI))
+            if (main.humanPlayer.Name == data.attacked.Name && !data.doged)
             {
-                toKill--;
-                if (toKill == 0)
-
+                if(level == 0)
                 {
-                    mainGame.humanPlayer.trees.Add(this);
-                    mainGame.UpdatePlayerView();
-                    //Pop up for title notice
-                    mainGame.TreeGained(this);
-
-                    //Remove listener
-                    mainGame.Combat -= Update;
-
-                    Activate();
+                    activation -= data.damage;
+                    if(activation <= 0)
+                    {
+                        Activate();
+                        main.TreeGained(this);
+                    }
+                }
+                else
+                {
+                    Xp += data.damage;
                 }
             }
         }
@@ -192,17 +151,27 @@ namespace StartGame
         public override void Activate()
         {
             //Add effect
-            mainGame.CalculatePlayerAttackDamage.Add((da) => (da.attacked.GetType() == typeof(WarriorSpiderAI) ? da.damage + 1 : da.damage));
+            main.humanPlayer.trees.Add(this);
+
+            main.UpdatePlayerView();
+            level = level == 0 ? 1 : level;
+            if(main.humanPlayer.endurance.buffs.Exists(b => b.Name == name))
+            {
+                main.humanPlayer.endurance.buffs.Find(b => b.Name == name).value = level * 3;
+            }
+            else
+            {
+                main.humanPlayer.endurance.buffs.Add(new PlayerData.Buff(PlayerData.BuffType.Constant, 3, name));
+            }
         }
     }
-
     internal class Sprinter : Skill
     {
-        private static int distanceNeeded = 10;
+        private static readonly int distanceNeeded = 100;
         private int totalDistance = 0;
         private int lastLevel = 0;
 
-        public Sprinter() : base("Sprinter", "Improved ability to run long distances. Increases the movement points", $"Moving {distanceNeeded} fields!", 2, 20, 10)
+        public Sprinter() : base("Sprinter", "Improved ability to run long distances. Increases the movement points", $"Moving {distanceNeeded} fields!", 2, distanceNeeded, 10)
         {
             activateOnLevelUp = true;
         }
@@ -215,6 +184,7 @@ namespace StartGame
 
         public void Update(object sender, PlayerMovementData e)
         {
+            if (main.humanPlayer is null) return;
             if (e.player.Name == main.humanPlayer.Name && e.movementType == MovementType.walk)
             {
                 totalDistance += e.distance;
@@ -244,47 +214,111 @@ namespace StartGame
         }
     }
 
-    internal class Fighter : Skill
+    internal class Mage : Skill
     {
-        private static int DamageNeeded = 40;
-        private int damageDealt = 0;
+        private static int manaNeeded = 10;
 
-        public Fighter() : base("Fighter", "Deal more damage against all enemies.", $"Deal {DamageNeeded} damage.", 1.2, 40, 5)
+        public Mage() : base("Mage", "Improved availability of mana.", $"Using {manaNeeded} mana!", 3, manaNeeded, 10)
         {
+            activateOnLevelUp = true;
         }
 
         public override void Initialise(MainGameWindow mainGame)
         {
             main = mainGame;
-            main.Combat += Combat;
+            main.SpellCasted += Main_SpellCasted; ;
         }
 
-        private void Combat(object sender, CombatData e)
+        private void Main_SpellCasted(object sender, SpellCast e)
         {
-            if (e.attacker.Name == main.humanPlayer.Name && e.doged != false)
+            if(e.caster.Name == main.humanPlayer.Name)
             {
-                damageDealt += e.damage;
-                if (damageDealt >= DamageNeeded && level == 0)
+                manaNeeded -= e.spell.manaCost;
+                if(manaNeeded <= 0 && level == 0)
                 {
                     level = 1;
                     main.humanPlayer.trees.Add(this);
                     main.UpdatePlayerView();
 
-                    //Pop up
                     main.TreeGained(this);
-
-                    Activate();
-                }
-                else
+                } else if(manaNeeded <= 0)
                 {
-                    Xp += e.damage;
+                    Xp += e.spell.manaCost;
                 }
             }
         }
 
         public override void Activate()
         {
-            main.CalculatePlayerAttackDamage.Add((cd) => cd.damage += level);
+            //Add effect
+            main.humanPlayer.mana.rawMaxValue += level;
         }
     }
+
+    internal class Acrobat : Skill
+    {
+        private static int minimumDodges = 4;
+
+        public Acrobat() : base("Acrobat", "Improved your dodging ability.", $"Dodge some attacks!", 1.4, minimumDodges, 5)
+        {
+            activateOnLevelUp = true;
+        }
+
+        public override void Initialise(MainGameWindow mainGame)
+        {
+            main = mainGame;
+            main.Combat += Main_Combat;
+        }
+
+        private void Main_Combat(object sender, CombatData e)
+        {
+            if(e.attacked.Name == main.humanPlayer.Name && e.doged)
+            {
+                minimumDodges--;
+                if(minimumDodges <= 0 && level == 0)
+                {
+                    level = 1;
+                    main.humanPlayer.trees.Add(this);
+                    main.UpdatePlayerView();
+
+                    main.TreeGained(this);
+                } else if( minimumDodges <= 0)
+                {
+                    Xp++;
+                }
+            }
+        }
+
+        private void Main_SpellCasted(object sender, SpellCast e)
+        {
+            if (e.caster.Name == main.humanPlayer.Name)
+            {
+                minimumDodges -= e.spell.manaCost;
+                if (minimumDodges <= 0 && level == 0)
+                {
+                    level = 1;
+                    main.humanPlayer.trees.Add(this);
+                    main.UpdatePlayerView();
+
+                    main.TreeGained(this);
+                }
+                else if (minimumDodges <= 0)
+                {
+                    Xp += e.spell.manaCost;
+                }
+            }
+        }
+
+        public override void Activate()
+        {
+            //Add effect
+            if (!main.humanPlayer.agility.buffs.Exists(b => b.Name == name))
+                main.humanPlayer.agility.buffs.Add(new PlayerData.Buff(PlayerData.BuffType.Constant, 3, name));
+            else
+                main.humanPlayer.agility.buffs.Find(b => b.Name == name).value++;
+        }
+    }
+
+
+
 }

@@ -1,4 +1,5 @@
-﻿using StartGame.Rendering;
+﻿using StartGame.GameMap;
+using StartGame.Rendering;
 using StartGame.World;
 using System;
 using System.Collections.Generic;
@@ -20,10 +21,12 @@ namespace StartGame.PlayerData
         public int levelXP = 5;
         public int storedLevelUps = 0;
 
-        public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window, int Money) : base(Type, Name, Map, Enemies, 0, 1, 1, 1, 1, 1, 10)
+        public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window, int Money) 
+            : base(Type, Name, Map, Enemies, 0, 1, 1, 1, 1, 1, 10, constantMovementFunction: false)
         {
             main = window;
-            money = new Attribute(Money, "Money", "Coins");
+            base.Money = new Attribute(Money, "Money", "Coins");
+            mana.RawValue = (int)mana.MaxValue();
         }
 
         public void GainXP(int XP)
@@ -39,7 +42,7 @@ namespace StartGame.PlayerData
                 main.SetUpdateState(storedLevelUps > 0);
 
                 //Immediate effect
-                troop.health.rawValue = troop.health.MaxValue().Value;
+                troop.health.RawValue = troop.health.MaxValue().Value;
                 main.WriteConsole("Level Up! Healing to max hp!");
             }
         }

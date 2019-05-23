@@ -48,12 +48,27 @@ Add cities as map features
 
 Add shops to cities, where items can be built
 
-Give cities economic values which affect shops
+Give cities economic values which affect shops - Done
 
-Add streets between cities
+Add streets between cities - Done
 
-Add forests
+Add forests - As biome
 
 Add rivers?
 
-Add time?
+Add time
+
+Add food and water consumption
+
+Add traders who move between cities
+
+Make cities produce goods
+
+Add goblin tribes to deserts
+* Single gobling
+* Goblin party
+* Goblin tent attack
+
+Add hunts
+
+Add castles - not only cities

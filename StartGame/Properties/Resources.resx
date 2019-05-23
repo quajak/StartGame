@@ -190,4 +190,112 @@
   <data name="Road" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Road.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Bear" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Bear.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Desert1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Desert1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Desert2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Desert2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Desert3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Desert3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Forest1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Forest1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Forest2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\forest2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Forest3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Forest3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Forest4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Forest4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Ocean1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Ocean1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Ocean2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Ocean2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Ocean3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Ocean3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Cactus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Cactus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Farm1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Farm1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Grassland1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Grassland1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Grassland2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Grassland2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Grassland3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Grassland3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="IceElemental" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\IceElemental.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="IceSpike" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\IceSpike.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mine1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mine1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Rainforest1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Rainforest1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Rainforest2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Rainforest2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Rainforest3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Rainforest3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RainforestTree1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RainforestTree1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RainforestTree2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RainforestTree2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RainforestTree3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RainforestTree3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RainforestTree4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RainforestTree4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="snowyTree1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\snowyTree1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="snowyTree2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\snowyTree2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="snowyTree3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\snowyTree3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tree1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tree1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tree2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tree2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tree3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tree3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Savanna1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Savanna1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Savanna2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Savanna2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Savanna3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Savanna3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Savanna4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Savanna4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

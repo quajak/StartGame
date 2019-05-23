@@ -6,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using static StartGame.MainGameWindow;
+using StartGame.GameMap;
+
 
 namespace StartGame.PlayerData
 {
@@ -21,7 +23,7 @@ namespace StartGame.PlayerData
         private readonly int maxFireBombCooldown = 4;
 
         private int bombNumber = 3;
-        private List<Point> fireBombPlaces = new List<Point>();
+        private readonly List<Point> fireBombPlaces = new List<Point>();
 
         private readonly int jumpDamage = 3;
         private int jumpCooldown = 3;
@@ -50,9 +52,9 @@ namespace StartGame.PlayerData
 
         public override void PlayTurn(MainGameWindow main, bool SingleTurn)
         {
-            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(this, troop.Position, enemies[0].troop.Position, map, true);
+            DistanceGraphCreator distanceGraph = new DistanceGraphCreator(this, troop.Position, map, true);
             Thread path = new Thread(distanceGraph.CreateGraph);
-            DistanceGraphCreator eggGraph = new DistanceGraphCreator(this, troop.Position, egg, map, true);
+            DistanceGraphCreator eggGraph = new DistanceGraphCreator(this, troop.Position, map, true);
             Thread pathE = new Thread(eggGraph.CreateGraph);
             path.Start();
             pathE.Start();
@@ -61,8 +63,6 @@ namespace StartGame.PlayerData
             int dodged = 0;
 
             Point player = enemies[0].troop.Position;
-
-            Random rng = new Random();
 
             int playerDistance = AIUtility.Distance(player, troop.Position);
 
@@ -80,7 +80,7 @@ namespace StartGame.PlayerData
                 foreach (var weapon in troop.weapons)
                 {
                     if (playerDistance <= weapon.range &&
-                        weapon.attacks > 0)
+                        weapon.Attacks() > 0)
                     {
                         //Attack
                         troop.activeWeapon = weapon;
@@ -90,11 +90,11 @@ namespace StartGame.PlayerData
 
                         if (killed)
                         {
-                            map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}"));
+                            map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, Color.Red, $"-{damageDealt}"));
                             main.PlayerDied($"You have been killed by {Name} using {weapon.name}!");
                         }
-                        actionPoints.rawValue--;
-                        weapon.attacks--;
+                        actionPoints.RawValue--;
+                        weapon.UseWeapon(enemies[0],main);
                         attacked = true;
                     }
                 }
@@ -111,7 +111,7 @@ namespace StartGame.PlayerData
                     //Spew fire
 
                     //Shoot fire line - will most likely not kill but be in the area
-                    Point end = new Point(player.X + (rng.Next(0, 2) == 1 ? -2 : 2), player.Y + (rng.Next(0, 2) == 1 ? -2 : 2));
+                    Point end = new Point(player.X + (World.World.random.Next(0, 2) == 1 ? -2 : 2), player.Y + (World.World.random.Next(0, 2) == 1 ? -2 : 2));
 
                     Point diff = end.Sub(troop.Position);
                     Point start = troop.Position.Add(diff.Div(5));
@@ -125,7 +125,7 @@ namespace StartGame.PlayerData
                         for (int i = 0; i < time; i++)
                         {
                             Point position = new Point(Math.Max(start.X + (int)(((double)diffX / time) * i), 0), Math.Max(start.Y + (int)(((double)diffY / time) * i), 0));
-                            new Fire(rng.Next(5) + 2, 5, position, troop.Position, map, main);
+                            new Fire(World.World.random.Next(5) + 2, 5, position, troop.Position, map, main);
                         }
                     }
                     main.actionOccuring = false;
@@ -157,7 +157,7 @@ namespace StartGame.PlayerData
                                     if (dis <= appliedRadius)
                                     {
                                         //Damage fields
-                                        new Fire(rng.Next(0, 6), fireDamage, point, point, map, main);
+                                        new Fire(World.World.random.Next(0, 6), fireDamage, point, point, map, main);
                                     }
                                 }
                             }
@@ -174,7 +174,7 @@ namespace StartGame.PlayerData
                     int tries = 0; //Longerm: Create deterministic version
                     while (tries != 100 && fireBombPlaces.Count < bombNumber)
                     {
-                        Point test = new Point(rng.Next(0, map.map.GetUpperBound(0)), rng.Next(map.map.GetUpperBound(1)));
+                        Point test = new Point(World.World.random.Next(0, map.map.GetUpperBound(0)), World.World.random.Next(map.map.GetUpperBound(1)));
                         if (AIUtility.Distance(test, player) < 20 && AIUtility.Distance(test, troop.Position) > 3)
                         {
                             fireBombPlaces.Add(test);
@@ -189,7 +189,7 @@ namespace StartGame.PlayerData
                     {
                         foreach (var point in fireBombPlaces)
                         {
-                            new Fire(rng.Next(3, 8), fireDamage, point, troop.Position, map, main);
+                            new Fire(World.World.random.Next(3, 8), fireDamage, point, troop.Position, map, main);
                         }
                     }
                     fireBombCoolDown = maxFireBombCooldown;
@@ -278,7 +278,7 @@ namespace StartGame.PlayerData
                     });
 
                 //Generate path of movement
-                DistanceGraphCreator movementGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, closestField.X, closestField.Y, map, true, false);
+                DistanceGraphCreator movementGraph = new DistanceGraphCreator(this, troop.Position.X, troop.Position.Y, map, true);
                 movementGraph.CreateGraph();
 
                 List<Point> movement = new List<Point>() { };
@@ -303,9 +303,9 @@ namespace StartGame.PlayerData
             if (SingleTurn)
             {
                 if (damageDealt != 0)
-                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, Color.Red, $"-{damageDealt}" + (dodged != 0 ? $" and dodged {dodged} times!" : "")));
                 else if (dodged != 0)
-                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, System.Drawing.Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
+                    map.overlayObjects.Add(new OverlayText(enemies[0].troop.Position.X * MapCreator.fieldSize, enemies[0].troop.Position.Y * MapCreator.fieldSize, Color.Red, $" Doged {dodged} {(dodged > 1 ? "times" : "time")}!"));
             }
             else
             {

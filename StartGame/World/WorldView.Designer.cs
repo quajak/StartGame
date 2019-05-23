@@ -130,7 +130,7 @@
             this.enterCity.Text = "Enter City";
             this.enterCity.UseVisualStyleBackColor = true;
             this.enterCity.Visible = false;
-            this.enterCity.Click += new System.EventHandler(this.Button1_Click);
+            this.enterCity.Click += new System.EventHandler(this.CityView_Click);
             // 
             // WorldView
             // 
@@ -148,6 +148,7 @@
             this.Controls.Add(this.playerView);
             this.Name = "WorldView";
             this.Text = "WorldView";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.WorldView_FormClosing);
             this.Load += new System.EventHandler(this.WorldView_Load);
             ((System.ComponentModel.ISupportInitialize)(this.worldMapView)).EndInit();
             this.ResumeLayout(false);

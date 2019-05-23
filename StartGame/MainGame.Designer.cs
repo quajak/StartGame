@@ -50,8 +50,9 @@
             this.ShowBlockedFields = new System.Windows.Forms.Button();
             this.enemyMovement = new System.Windows.Forms.CheckBox();
             this.debugButton = new System.Windows.Forms.Button();
-            this.playerView = new StartGame.PlayerView();
             this.exitMission = new System.Windows.Forms.Button();
+            this.fleeButton = new System.Windows.Forms.Button();
+            this.playerView = new StartGame.PlayerView();
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).BeginInit();
             this.playerInfo.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -274,16 +275,6 @@
             this.debugButton.UseVisualStyleBackColor = true;
             this.debugButton.Click += new System.EventHandler(this.DebugButton_Click);
             // 
-            // playerView
-            // 
-            this.playerView.BackColor = System.Drawing.SystemColors.ActiveBorder;
-            this.playerView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.playerView.Location = new System.Drawing.Point(825, 12);
-            this.playerView.Name = "playerView";
-            this.playerView.Size = new System.Drawing.Size(413, 350);
-            this.playerView.TabIndex = 10;
-            this.playerView.Load += new System.EventHandler(this.PlayerView1_Load);
-            // 
             // exitMission
             // 
             this.exitMission.Location = new System.Drawing.Point(1065, 598);
@@ -294,11 +285,32 @@
             this.exitMission.UseVisualStyleBackColor = true;
             this.exitMission.Click += new System.EventHandler(this.ExitMission_Click);
             // 
+            // fleeButton
+            // 
+            this.fleeButton.Location = new System.Drawing.Point(982, 598);
+            this.fleeButton.Name = "fleeButton";
+            this.fleeButton.Size = new System.Drawing.Size(77, 27);
+            this.fleeButton.TabIndex = 12;
+            this.fleeButton.Text = "Flee";
+            this.fleeButton.UseVisualStyleBackColor = true;
+            this.fleeButton.Click += new System.EventHandler(this.FleeButton_Click);
+            // 
+            // playerView
+            // 
+            this.playerView.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.playerView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.playerView.Location = new System.Drawing.Point(825, 12);
+            this.playerView.Name = "playerView";
+            this.playerView.Size = new System.Drawing.Size(413, 350);
+            this.playerView.TabIndex = 10;
+            this.playerView.Load += new System.EventHandler(this.PlayerView1_Load);
+            // 
             // MainGameWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1250, 637);
+            this.Controls.Add(this.fleeButton);
             this.Controls.Add(this.exitMission);
             this.Controls.Add(this.playerView);
             this.Controls.Add(this.debugButton);
@@ -312,11 +324,13 @@
             this.Controls.Add(this.playerInfo);
             this.Controls.Add(this.troopList);
             this.Controls.Add(this.gameBoard);
+            this.KeyPreview = true;
             this.Name = "MainGameWindow";
             this.Text = "Start Game";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainGameWindow_FormClosing);
             this.Load += new System.EventHandler(this.MainGameWindow_Load);
             this.Shown += new System.EventHandler(this.MainGameWindow_Shown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainGameWindow_KeyUp);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainGameWindow_MouseMove);
             ((System.ComponentModel.ISupportInitialize)(this.gameBoard)).EndInit();
             this.playerInfo.ResumeLayout(false);
@@ -353,6 +367,7 @@
         private System.Windows.Forms.Button debugButton;
         private PlayerView playerView;
         private System.Windows.Forms.Button exitMission;
+        private System.Windows.Forms.Button fleeButton;
     }
 }
 

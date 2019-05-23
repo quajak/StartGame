@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StartGame.GameMap;
+using System;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -10,7 +11,6 @@ namespace StartGame
         public Map map;
         private double seed;
 
-        private Random rng;
         public const int fieldSize = 20;
 
         public double Seed
@@ -25,7 +25,6 @@ namespace StartGame
 
         public MapCreator()
         {
-            rng = new Random();
             Seed = 0;
             InitializeComponent();
         }
@@ -64,7 +63,7 @@ namespace StartGame
                 }
                 times++;
                 double heightDif = (heightDifference.Value - 4) / 20d;
-                thread = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, Seed, heightDif)));
+                thread = new Thread(() => map.SetupMap(0.1, Seed, heightDif));
                 thread.Start();
                 finished = thread.Join(Map.creationTime);
             } while (times < 10 && (!map.created || !finished));
@@ -112,7 +111,7 @@ namespace StartGame
             string[] data = new string[length];
             for (int i = 0; i < length; i++)
             {
-                Seed = rng.Next();
+                Seed = World.World.random.Next();
                 Recalulate(true);
                 data[i] = map.RawStats();
             }
@@ -122,7 +121,7 @@ namespace StartGame
 
         private void Randomise_Click(object sender, EventArgs e)
         {
-            Seed = rng.Next();
+            Seed = World.World.random.Next();
             Recalulate(true);
         }
 

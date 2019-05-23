@@ -73,6 +73,7 @@ namespace StartGame.User_Controls
 
         private void CastSpell_Click(object sender, EventArgs e)
         {
+            main.CastSpell(player.spells.Find(s => s.name == spellList.SelectedItem as string), castSpell);
         }
 
         private void SpellList_SelectedIndexChanged(object sender, EventArgs e)

@@ -1,6 +1,7 @@
 ﻿using StartGame.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace StartGame.PlayerData
@@ -8,11 +9,11 @@ namespace StartGame.PlayerData
     public class Attribute
     {
         public string name;
-        public int rawValue;
+        private int rawValue;
 
-        public virtual int RawValue()
+        public virtual int GetRawValue()
         {
-            return rawValue;
+            return RawValue;
         }
 
         public string unit = "";
@@ -30,10 +31,26 @@ namespace StartGame.PlayerData
         {
             get
             {
-                int value = RawValue();
+                int value = GetRawValue();
                 value = ApplyBonus(value);
-
                 return value;
+            }
+        }
+
+        public int RawValue
+        {
+            get => rawValue; set
+            {
+                rawValue = value;
+                if(!allowOverflow && MaxValue() != null)
+                {
+                    int diff = ApplyBonus(rawValue, false) - (int)MaxValue();
+                    if(diff > 0)
+                    {
+                        rawValue -= diff;
+                    }
+
+                }
             }
         }
 
@@ -107,20 +124,20 @@ namespace StartGame.PlayerData
 
         public Attribute(int rawValue, string name)
         {
-            this.rawValue = rawValue;
+            RawValue = rawValue;
             this.name = name;
         }
 
         public Attribute(int rawValue, List<Buff> buffs, string name)
         {
-            this.rawValue = rawValue;
+            RawValue = rawValue;
             this.buffs = buffs;
             this.name = name;
         }
 
         public Attribute(int rawValue, int maxValue, bool allowOverflow, string name)
         {
-            this.rawValue = rawValue;
+            RawValue = rawValue;
             rawMaxValue = maxValue;
             this.allowOverflow = allowOverflow;
             this.name = name;
@@ -128,7 +145,7 @@ namespace StartGame.PlayerData
 
         public Attribute(int rawValue, int maxValue, bool allowOverflow, List<Buff> buffs, string name)
         {
-            this.rawValue = rawValue;
+            RawValue = rawValue;
             rawMaxValue = maxValue;
             this.allowOverflow = allowOverflow;
             this.buffs = buffs;
@@ -137,14 +154,14 @@ namespace StartGame.PlayerData
 
         public Attribute(int rawValue, string name, string unit)
         {
-            this.rawValue = rawValue;
+            RawValue = rawValue;
             this.name = name;
             this.unit = unit;
         }
 
         public Attribute(int rawValue, string name, string unit, List<Buff> buffs)
         {
-            this.rawValue = rawValue;
+            RawValue = rawValue;
             this.name = name;
             this.unit = unit;
             this.buffs = buffs;
@@ -152,7 +169,7 @@ namespace StartGame.PlayerData
 
         public Attribute(int rawValue, string name, string unit, List<Buff> buffs, int? maxValue, bool allowOverflow)
         {
-            this.rawValue = rawValue;
+            RawValue = rawValue;
             this.name = name;
             this.unit = unit;
             this.buffs = buffs;
@@ -172,7 +189,7 @@ namespace StartGame.PlayerData
     {
         internal Player player;
 
-        new public virtual int RawValue()
+        new public virtual int GetRawValue()
         {
             throw new NotImplementedException();
         }
@@ -195,21 +212,21 @@ namespace StartGame.PlayerData
 
     public class Health : DerivedAttribute
     {
-        public Health(Player player, int bonusMaxValue) : base(player, "Health", 0, bonusMaxValue, true)
+        public Health(Player player, int bonusMaxValue) : base(player, "Health", 0, bonusMaxValue, false)
         {
-            rawValue = MaxValue().Value;
+            RawValue = MaxValue().Value;
         }
 
-        public override int RawValue()
+        public override int GetRawValue()
         {
-            return rawValue;
+            return RawValue; //Todo fix this
         }
 
-        public override int Value => RawValue();
+        public override int Value => GetRawValue();
 
         public override int? MaxValue()
         {
-            return ApplyBonus(player.vitality.Value * 2 + rawMaxValue ?? 0, false);
+            return player is null ? (int?)null : ApplyBonus(player.vitality.Value * 2 + rawMaxValue ?? 0, false);
         }
 
         public override string ToString()
@@ -224,12 +241,12 @@ namespace StartGame.PlayerData
         {
         }
 
-        public override int RawValue()
+        public override int GetRawValue()
         {
-            return rawValue + player.endurance.Value / 5;
+            return RawValue + player.endurance.Value / 5;
         }
 
-        public override int Value => ApplyBonus(RawValue());
+        public override int Value => ApplyBonus(GetRawValue());
 
         public override int? MaxValue()
         {
@@ -248,12 +265,12 @@ namespace StartGame.PlayerData
         {
         }
 
-        public override int RawValue()
+        public override int GetRawValue()
         {
-            return player.agility.Value * 2 + rawValue;
+            return player.agility.Value * 2 + RawValue;
         }
 
-        public override int Value => ApplyBonus(RawValue());
+        public override int Value => ApplyBonus(GetRawValue());
 
         public override string ToString()
         {
@@ -269,15 +286,15 @@ namespace StartGame.PlayerData
 
         public override int? MaxValue()
         {
-            return ApplyBonus(player.wisdom.Value * 2 + rawMaxValue.Value, false);
+            return player is null ? (int?)null : ApplyBonus(player.wisdom.Value * 2 + rawMaxValue.Value, false);
         }
 
-        public override int RawValue()
+        public override int GetRawValue()
         {
-            return rawValue;
+            return RawValue;
         }
 
-        public override int Value => RawValue();
+        public override int Value => GetRawValue();
 
         public override string ToString()
         {
@@ -287,7 +304,7 @@ namespace StartGame.PlayerData
 
     public class ActionPoint : DerivedAttribute
     {
-        new public double rawValue;
+        new public double RawValue;
 
         public ActionPoint(Player player, int baseActionPoints) : base(player, "Action Points", 0, baseActionPoints, true)
         {
@@ -298,11 +315,11 @@ namespace StartGame.PlayerData
             return ApplyBonus(player.endurance.Value / 10 + rawMaxValue.Value, false);
         }
 
-        new public double Value => RawValue();
+        new public double Value => GetRawValue();
 
-        new public double RawValue()
+        new public double GetRawValue()
         {
-            return rawValue;
+            return RawValue;
         }
 
         public override string ToString()
@@ -323,16 +340,18 @@ namespace StartGame.PlayerData
             lastMaxGearWeight = MaxValue().Value;
         }
 
-        public override int RawValue()
+        public override int GetRawValue()
         {
             if (player.troop == null) return 0;
             return ApplyBonus(player.troop.armours.Sum(a => a.active ? a.weight : 0), false, itemGearWeight);
         }
 
-        public override int Value => RawValue();
+        public override int Value => GetRawValue();
 
         public override int? MaxValue()
         {
+            if (player is null)
+                return (int?)null;
             int max = ApplyBonus(player.strength.Value * 1000 + rawMaxValue.Value, false, maxGearWeight);
             if (max != lastMaxGearWeight)
             {
@@ -365,7 +384,7 @@ namespace StartGame.PlayerData
     /// </summary>
     public class MovementPoints : DerivedAttribute
     {
-        public new double rawValue;
+        public new double RawValue;
         public double maxExtraMovement = 0;
 
         /// <summary>
@@ -375,47 +394,47 @@ namespace StartGame.PlayerData
         /// <param name="rawValue">Extra movements a unit has in a turn</param>
         public MovementPoints(Player player, double rawValue) : base(player, "Movement Distance", 0)
         {
-            this.rawValue = rawValue;
+            RawValue = rawValue;
             maxExtraMovement = rawValue;
         }
 
-        public new double Value => RawValue() + player.actionPoints.Value;
+        public new double Value => GetRawValue() + player.actionPoints.Value;
 
         public override int? MaxValue()
         {
             return null;
         }
 
-        public new double RawValue()
+        public new double GetRawValue()
         {
-            return rawValue;
+            return RawValue;
         }
 
         public void Reset()
         {
-            rawValue = ApplyBonus(maxExtraMovement);
+            RawValue = ApplyBonus(maxExtraMovement);
         }
 
         public void MoveUnit(double cost)
         {
-            double diff = cost - rawValue;
+            double diff = cost - RawValue;
             if (diff == 0)
             {
                 cost = 0;
-                rawValue = 0;
+                RawValue = 0;
             }
             else if (diff > 0)
             {
-                cost -= rawValue;
-                rawValue = 0;
+                cost -= RawValue;
+                RawValue = 0;
             }
             else
             {
-                rawValue = rawValue - cost;
+                RawValue -= cost;
                 cost = 0;
             }
-            player.actionPoints.rawValue -= cost;
-            if (rawValue < 0) throw new Exception("Value can not be negative!");
+            player.actionPoints.RawValue -= cost;
+            if (RawValue < 0) throw new Exception("Value can not be negative!");
         }
 
         public override string ToString()
@@ -434,18 +453,22 @@ namespace StartGame.PlayerData
     public class Buff
     {
         public readonly BuffType type;
-        public readonly int value;
+        public int value;
         public double Value => type == BuffType.Percentage ? value / 100d : value;
 
         /// <summary>
-        /// Value which is comparable between types
+        /// Value which is comparable between types. As percentage scaled by 1/5 otherwise raw value
         /// </summary>
         public int CValue => type == BuffType.Percentage ? value / 5 : value;
 
-        public Buff(BuffType type, int value)
+        public string Name { get; }
+        public static Buff Zero => new Buff(BuffType.Absolute, 0);
+
+        public Buff(BuffType type, int value, string name = "")
         {
             this.type = type;
             this.value = value;
+            Name = name;
         }
 
         /// <summary>

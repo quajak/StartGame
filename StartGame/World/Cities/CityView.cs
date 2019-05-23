@@ -13,7 +13,6 @@ namespace StartGame.World.Cities
 {
     public partial class CityView : Form
     {
-        private readonly City city;
         public readonly HumanPlayer player;
         public readonly WorldView worldView;
         CityBuilding last;
@@ -22,9 +21,8 @@ namespace StartGame.World.Cities
         {
             InitializeComponent();
             cityName.Text = city.name;
-            cityWealth.Text = city.value.ToString();
+            cityDescription.Text = $"City size: {city.GetType().Name.SplitWords()} Population: {city.Population} City Wealth: {city.Wealth}";
             playerView.Activate(player, null, false);
-            this.city = city;
             this.player = player;
             this.worldView = worldView;
             foreach (var b in city.buildings)

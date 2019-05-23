@@ -1,5 +1,6 @@
 ﻿using StartGame.Entities;
 using StartGame.Extra.Loading;
+using StartGame.GameMap;
 using StartGame.PlayerData;
 using StartGame.Rendering;
 using System;
@@ -16,10 +17,9 @@ namespace StartGame.Dungeons
         private int height;
         public Map map;
         public List<Door> doors = new List<Door>();
-        private List<Entity> entities = new List<Entity>();
+        private readonly List<Entity> entities = new List<Entity>();
         public List<EntityPlaceHolder> entityPlaceHolders = new List<EntityPlaceHolder>();
         public List<Player> players = new List<Player>();
-        private Player player;
         public int DoorID = 0;
 
         public Room(int Width, int Height, string Name)
@@ -155,7 +155,6 @@ namespace StartGame.Dungeons
 
         public void PlayerEnter(Room from, Player player)
         {
-            this.player = player ?? throw new ArgumentNullException(nameof(player));
             AddEntity(player.troop);
 
             var door = doors.Find(d => d.from == from);
@@ -189,10 +188,6 @@ namespace StartGame.Dungeons
                 default:
                     break;
             }
-        }
-
-        public void RemoveEntity(Entity entity)
-        {
         }
 
         public override string ToString()

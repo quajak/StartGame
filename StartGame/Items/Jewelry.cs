@@ -31,23 +31,24 @@ namespace StartGame.Items
         {
             get
             {
-                double pricePerAttribute = 1.5;
+                double pricePerAttribute = 2;
+                int scaler = 2;
                 int cost = 0;
-                cost += (int)Math.Pow(strength.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(agility.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(endurance.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(intelligence.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(wisdom.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(strength.CValue, pricePerAttribute) * scaler;
+                cost += (int)Math.Pow(agility.CValue, pricePerAttribute)* scaler;
+                cost += (int)Math.Pow(endurance.CValue, pricePerAttribute)* scaler;
+                cost += (int)Math.Pow(intelligence.CValue, pricePerAttribute)* scaler;
+                cost += (int)Math.Pow(wisdom.CValue, pricePerAttribute)* scaler;
 
-                cost += (int)Math.Pow(defense.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(health.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(movementDistance.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(dodge.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(mana.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(carryCapacity.CValue, pricePerAttribute);
-                cost += (int)Math.Pow(weight.CValue, pricePerAttribute);
+                cost += (int)Math.Pow(defense.CValue, pricePerAttribute)* scaler;
+                cost += (int)Math.Pow(health.CValue, pricePerAttribute)* scaler;
+                cost += (int)Math.Pow(movementDistance.CValue, pricePerAttribute)* scaler;
+                cost += (int)Math.Pow(dodge.CValue, pricePerAttribute)* scaler;
+                cost += (int)Math.Pow(mana.CValue, pricePerAttribute)* scaler;
+                cost += (int)Math.Pow(carryCapacity.CValue, pricePerAttribute)* scaler;
+                cost += (int)Math.Pow(weight.CValue, pricePerAttribute)* scaler;
 
-                cost += material.value;
+                cost *= material.value;
                 cost = (int)(cost * (100d - (int)quality) / 100d);
                 return cost;
             }
@@ -60,7 +61,7 @@ namespace StartGame.Items
         {
             get => active; set
             {
-                //DEBUG - ensure that player has jewlery in jewlerry list
+                //DEBUG - ensure that player has jewlery in jewlery list
                 if (player != null && !player.troop.jewelries.Exists(j => j == this)) throw new Exception("Can not activate a jewelry on a player who does not have it!");
                 active = value;
                 if (Player != null)
@@ -145,7 +146,7 @@ namespace StartGame.Items
             this.material = material;
         }
 
-        public string Description
+        public new string Description
         {
             get
             {
@@ -195,7 +196,6 @@ namespace StartGame.Items
             }
         }
 
-        private static Random random = new Random();
 
         public static Jewelry GenerateJewelry(Quality quality)
         {
@@ -221,13 +221,13 @@ namespace StartGame.Items
 
             for (int i = 0; i < buffNumber; i++)
             {
-                int position = positions[random.Next(positions.Count)];
+                int position = positions[World.World.random.Next(positions.Count)];
                 positions.Remove(position);
-                int points = buffNumber - i == 1 ? totalPoints : random.Next(totalPoints);
+                int points = buffNumber - i == 1 ? totalPoints : World.World.random.Next(totalPoints);
                 if (names[i] == "Weight") points *= -1;
                 totalPoints -= points;
                 //0 is absolute, this is not used in this case
-                BuffType buffType = (BuffType)random.Next(1, 3);
+                BuffType buffType = (BuffType)World.World.random.Next(1, 3);
                 buffs[position] = new Buff(buffType, points * (buffType == BuffType.Percentage ? 5 : 1));
             }
             for (int i = 0; i < buffs.Length; i++)
@@ -235,8 +235,8 @@ namespace StartGame.Items
                 buffs[i] = buffs[i] is null ? new Buff(BuffType.Constant, 0) : buffs[i];
             }
             //Buffs are now created now decide material and type
-            Material material = Material.Materials.Where(m => m.armourLayers.Exists(l => l == ArmourLayer.jewelry)).OrderBy(x => random.Next()).First();
-            JewelryType jewelryType = JewelryTypes.OrderBy(_ => random.Next()).First();
+            Material material = Material.Materials.Where(m => m.armourLayers.Exists(l => l == ArmourLayer.jewelry)).OrderBy(x => World.World.random.Next()).First();
+            JewelryType jewelryType = JewelryTypes.OrderBy(_ => World.World.random.Next()).First();
 
             //Generate name
             //TODO: Improve the name generation

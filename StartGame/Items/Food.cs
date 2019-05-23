@@ -1,11 +1,28 @@
-﻿namespace StartGame.Items
+﻿using StartGame.PlayerData;
+using System;
+
+namespace StartGame.Items
 {
     public class Food : SellableItem
     {
-        public Food(string name, int amount, int value) : base(value, amount, name)
-        {
+        public readonly int healAmount;
 
+        public Food(string name, int amount, int value, int healAmount) : base(value, amount, name)
+        {
+            this.healAmount = healAmount;
         }
+
+        public void UseFood(Player player)
+        {
+            amount--;
+            player.troop.health.RawValue += healAmount;
+            if(amount == 0)
+            {
+                player.troop.items.Remove(this);
+            }
+        }
+
+        public override string Description { get => $"Amount: {amount}. It heals the player by {healAmount}."; set => throw new NotImplementedException(); }
     }
 
 }

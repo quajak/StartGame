@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using static StartGame.MainGameWindow;
+using StartGame.GameMap;
+
 
 namespace StartGame
 {
@@ -43,7 +45,7 @@ namespace StartGame
             map = Map;
         }
 
-        public string Description(bool meta)
+        public new string Description(bool meta)
         {
             if (meta) return $"Mana: {manaCost} Cooldown: {MaxCoolDown}";
             else return $"Mana: {manaCost} Cooldown: {coolDown}/{MaxCoolDown}";
@@ -95,7 +97,7 @@ namespace StartGame
 
             coolDown = MaxCoolDown;
 
-            main.humanPlayer.troop.health.rawValue = Math.Min(information.mage.intelligence.Value + gainHealth + main.humanPlayer.troop.health.Value, main.humanPlayer.troop.health.MaxValue().Value);
+            main.humanPlayer.troop.health.RawValue = Math.Min(information.mage.intelligence.Value + gainHealth + main.humanPlayer.troop.health.Value, main.humanPlayer.troop.health.MaxValue().Value);
             return $"{main.humanPlayer.Name} has healed for {gainHealth}";
         }
     }
@@ -124,6 +126,42 @@ namespace StartGame
             new LightningBolt(1, hit, map, main);
 
             if (main.DamageAtField(appliedDamage, DamageType.air, hit))
+            {
+                return $"Hit troop at {hit} for {appliedDamage}!";
+            }
+            else
+            {
+                return "The spell missed!";
+            }
+        }
+    }
+
+    internal class IceSpikeSpell : Spell
+    {
+        private readonly int damage;
+
+        public IceSpikeSpell(int damage, int Cost) : base("Ice Spike Spell", 1, 0, new SpellInformationFormat() { Positions = 1 }, 4, Cost)
+        {
+            this.damage = damage;
+        }
+
+        public override string Activate(SpellInformation information)
+        {
+            if (!Ready) throw new Exception("Spell is not ready");
+            if (!CheckFormat(information)) throw new Exception("Information is incomplete!");
+
+            coolDown = MaxCoolDown;
+
+            Point hit = information.positions[0];
+
+            int distance = AIUtility.Distance(information.mage.troop.Position, hit);
+
+            int appliedDamage = damage + information.mage.intelligence.Value / 2 - distance / 5; // Every five fields loose one damage
+            appliedDamage = appliedDamage.Cut(1, 100);
+
+            new IceSpike(1, hit, information.mage.troop.Position, map, main);
+
+            if (main.DamageAtField(appliedDamage, DamageType.water, hit))
             {
                 return $"Hit troop at {hit} for {appliedDamage}!";
             }
@@ -241,12 +279,12 @@ namespace StartGame
 
             if (map.map[information.positions[0].X, information.positions[0].Y].type.FType != FieldType.water)
             {
-                new Fire(turns, damage, information.positions[0], information.mage.troop.Position, map, main);
+                new Fire(appliedTurns, appliedDamage, information.positions[0], information.mage.troop.Position, map, main);
                 return $"Created a Fireball at {information.positions[0]}";
             }
             else
             {
-                main.DamageAtField(damage, DamageType.fire, information.positions[0]);
+                main.DamageAtField(appliedDamage, DamageType.fire, information.positions[0]);
                 return $"Tried to create a fireball at {information.positions[0]}";
             }
         }

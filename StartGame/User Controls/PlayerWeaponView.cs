@@ -11,7 +11,6 @@ namespace StartGame.User_Controls
     partial class PlayerWeaponView : UserControl
     {
         private Player player;
-        private MainGameWindow main;
         private bool allowAction = false;
 
         public PlayerWeaponView()
@@ -19,11 +18,10 @@ namespace StartGame.User_Controls
             InitializeComponent();
         }
 
-        public void Activate(Player Player, MainGameWindow Main, bool AllowAction)
+        public void Activate(Player Player, bool AllowAction)
         {
             allowAction = AllowAction;
             player = Player;
-            main = Main;
         }
 
         public void Render()
@@ -71,9 +69,22 @@ namespace StartGame.User_Controls
                 playerPossibleWeaponDamage.Text = $"Damage: {weapon.attackDamage}";
                 playerPossibleWeaponName.Text = $"{weapon.name}";
                 playerPossibleWeaponType.Text = $"Type: {weapon.type}";
-                playerPossibleWeaponAttacks.Text = $"Attacks: {weapon.attacks} / {weapon.maxAttacks}";
+                playerPossibleWeaponAttacks.Text = $"Attacks: {weapon.Attacks()} / {weapon.MaxAttacks()}";
                 dumpWeapon.Enabled = weapon.discardeable && player.active;
                 changeWeapon.Enabled = (weapon != player.troop.activeWeapon) && player.active;
+                if(weapon is RangedWeapon w)
+                {
+                    ammoList.Visible = true;
+                    ammoList.Items.Clear();
+                    ammoList.Items.AddRange(w.Ammo.ToArray());
+                    int index = w.Ammo.IndexOf(w.Ammo.Find(a => a.Selected.ContainsKey(w) && a.Selected[w]));
+                    if(ammoList.SelectedIndex != index)
+                        ammoList.SelectedIndex = index;
+                }
+                else
+                {
+                    ammoList.Visible = false;
+                }
             }
             else
             {
@@ -84,6 +95,7 @@ namespace StartGame.User_Controls
                 playerPossibleWeaponAttacks.Text = "";
                 dumpWeapon.Enabled = false;
                 changeWeapon.Enabled = false;
+                ammoList.Visible = false;
             }
         }
 
@@ -114,6 +126,16 @@ namespace StartGame.User_Controls
         private void PlayerWeaponList_SelectedIndexChanged(object sender, EventArgs e)
         {
             Render();
+        }
+
+        private void AmmoList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(ammoList.SelectedItem != null && player.troop.weapons[playerWeaponList.SelectedIndex] is RangedWeapon w)
+            {
+                w.DeselectCurrent();
+                (ammoList.SelectedItem as Ammo).Select(w);
+                Render();
+            }
         }
     }
 }

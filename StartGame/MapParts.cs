@@ -1,4 +1,5 @@
 ﻿using StartGame.Extra.Loading;
+using StartGame.GameMap;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,7 +38,6 @@ namespace StartGame
         public Color color;
         public Color shader;
 
-        private static Random random = new Random();
 
         public MapTile(Point Position, MapTileType Type, double Height, bool Free = true)
         {
@@ -69,7 +69,7 @@ namespace StartGame
             bool free = parts[5].GetBool();
             Color color = parts[6].GetColor();
             Color shader = parts[7].GetColor();
-            return new MapTile(pos, new MapTileType() { type = typeEnum }, height, free, color, shader);
+            return new MapTile(pos, new MapTileType() { type = typeEnum }, height, free, color, shader) { Cost = cost };
         }
 
         private void CalculateDerivedStats()
@@ -107,8 +107,38 @@ namespace StartGame
                     break;
 
                 case MapTileTypeEnum.wall:
-                    shader = Color.FromArgb(random.Next(100, 150), 0, 0, 0);
+                    shader = Color.FromArgb(World.World.random.Next(100, 150), 0, 0, 0);
                     MovementCost = 20;
+                    break;
+
+                case MapTileTypeEnum.looseSand:
+                    MovementCost = 2;
+                    shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
+                    break;
+
+                case MapTileTypeEnum.sand:
+                    MovementCost = 1.5;
+                    shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
+                    break;
+
+                case MapTileTypeEnum.dune:
+                    MovementCost = 2;
+                    shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
+                    break;
+
+                case MapTileTypeEnum.snow:
+                    MovementCost = 2.5;
+                    shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
+                    break;
+
+                case MapTileTypeEnum.ice:
+                    MovementCost = 0.5;
+                    shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
+                    break;
+
+                case MapTileTypeEnum.snowyLand:
+                    MovementCost = 1.5;
+                    shader = Color.FromArgb((int)(Height * 255), 100, 100, 100);
                     break;
 
                 default:
@@ -253,10 +283,22 @@ namespace StartGame
         path,
 
         [Description("Wall")]
-        wall
+        wall,
+        [Description("Loose Sand")]
+        looseSand,
+        [Description("Sand")]
+        sand,
+        [Description("Dune")]
+        dune,
+        [Description("Snow")]
+        snow,
+        [Description("Ice")]
+        ice,
+        [Description("Snowy Land")]
+        snowyLand
     }
 
-    public enum FieldType { water, land, mountain, wall }
+    public enum FieldType { water, land, special, wall }
 
     [DebuggerDisplay("Type: {type}")]
     public struct MapTileType
@@ -306,6 +348,24 @@ namespace StartGame
                     case MapTileTypeEnum.wall:
                         return Color.Gray;
 
+                    case MapTileTypeEnum.looseSand:
+                        return Color.FromArgb(249, 215, 159);
+
+                    case MapTileTypeEnum.sand:
+                        return Color.FromArgb(255, 204, 122);
+
+                    case MapTileTypeEnum.dune:
+                        return Color.FromArgb(255, 171, 38);
+
+                    case MapTileTypeEnum.snow:
+                        return Color.FromArgb(198, 198, 198);
+
+                    case MapTileTypeEnum.ice:
+                        return Color.FromArgb(142, 255, 253);
+
+                    case MapTileTypeEnum.snowyLand:
+                        return Color.FromArgb(179, 255, 168);
+
                     default:
                         throw new NotImplementedException();
                 }
@@ -322,10 +382,10 @@ namespace StartGame
                         return FieldType.land;
 
                     case MapTileTypeEnum.mountain:
-                        return FieldType.mountain;
+                        return FieldType.special;
 
                     case MapTileTypeEnum.hill:
-                        return FieldType.mountain;
+                        return FieldType.special;
 
                     case MapTileTypeEnum.shallowWater:
                         return FieldType.water;
@@ -338,6 +398,24 @@ namespace StartGame
 
                     case MapTileTypeEnum.wall:
                         return FieldType.wall;
+
+                    case MapTileTypeEnum.looseSand:
+                        return FieldType.special;
+
+                    case MapTileTypeEnum.sand:
+                        return FieldType.land;
+
+                    case MapTileTypeEnum.dune:
+                        return FieldType.special;
+
+                    case MapTileTypeEnum.snow:
+                        return FieldType.special;
+
+                    case MapTileTypeEnum.ice:
+                        return FieldType.special;
+
+                    case MapTileTypeEnum.snowyLand:
+                        return FieldType.land;
 
                     default:
                         throw new NotImplementedException();
@@ -366,17 +444,15 @@ namespace StartGame
     {
         public List<MapTile> tiles;
         public MapTileTypeEnum Type { get; private set; }
-        private string id;
         public EdgeArray<MapTile> edges;
         public Color color;
 
         //Internal
         private List<MapTile> toCheck;
 
-        public Map NewContinent(Map map, Point point, string ID, Random rng)
+        public Map NewContinent(Map map, Point point)
         {
-            color = Color.FromArgb(100, rng.Next(255), rng.Next(255), rng.Next(255));
-            id = ID;
+            color = Color.FromArgb(100, World.World.random.Next(255), World.World.random.Next(255), World.World.random.Next(255));
 
             MapTile activeTile = map.map[point.X, point.Y];
             Type = activeTile.type.type;

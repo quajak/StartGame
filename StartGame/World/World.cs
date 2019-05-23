@@ -31,9 +31,8 @@ namespace StartGame.World
             set => world = value;
         }
 
-        public List<Spell> Spells => spells;
+        public List<Spell> Spells { get; }
 
-        private List<Spell> spells;
         public List<Tree> trees = Tree.GenerateTrees();
 
         public WorldTile[,] worldMap;
@@ -56,15 +55,21 @@ namespace StartGame.World
         private World(double a = 0.30, double b = 0.14, double c = 0.31, double Seed = 0, int octaves = 4, double persistance = 0.26)
         {
             Trace.TraceInformation($"World::ctor");
+            DateTime time = DateTime.Now;
             world = this;
-            spells = new List<Spell>()
+            Spells = new List<Spell>()
             {
                 new HealingSpell(5, 500),
                 new EarthQuakeSpell(5, 5, 4500),
                 new LightningBoltSpell(15, 4000),
+                new LightningBoltSpell(40, 7000),
                 new DebuffSpell(2, 1, 5, 0, 800),
+                new DebuffSpell(5, 3, 5, 0, 2400),
                 new TeleportSpell(2, 0, 9600),
-                new FireBall(8, 3, 4, 0, 2300)
+                new FireBall(8, 3, 4, 0, 2300),
+                new FireBall(2, 2, 5, 0, 700),
+                new IceSpikeSpell(4, 3000),
+                new IceSpikeSpell(10, 12000),
             };
 
             //Generate the terrain
@@ -110,7 +115,7 @@ namespace StartGame.World
                     temperature = temperature.Cut(-1, 1);
 
                     double minerals = Math.Pow(perlin.OctavePerlin(s2 + x * (perlinDiff * 0.4), y * (perlinDiff * 0.4), Seed, 4, 0.4), 3) * 2;
-                    double agriculturalValue = rainfall * -2 * (rainfall - 1) * Math.Pow(Math.E, rainfall); //y = -2x(x-1)*e^x
+                    double agriculturalValue = rainfall * -4 * (rainfall - 1) * Math.Pow(Math.E, rainfall); //y = -2x(x-1)*e^x
                     agriculturalValue *= -3 * mHeight * (mHeight - 1) * Math.Pow(Math.E, -1 * mHeight); // y = -6x(x-1)*e^-x
 
                     heightMap[x, y] = mHeight;
@@ -123,7 +128,14 @@ namespace StartGame.World
                     double rrain = rainfall * 1000;
                     if (mHeight < 0.42)
                     {
-                        type = WorldTileType.Ocean;
+                        if(temperature < 0)
+                        {
+                            type = WorldTileType.SeaIce;
+                        }
+                        else
+                        {
+                            type = WorldTileType.Ocean;
+                        }
                         cost = 20;
                         minerals = 0;
                         agriculturalValue = 0;
@@ -166,9 +178,9 @@ namespace StartGame.World
                     }
                     double value = Math.Max(minerals, agriculturalValue);
 
-                    mineralMap[x, y] = minerals.Cut(0,1);
-                    agriculturalMap[x, y] = agriculturalValue.Cut(0,1);
-                    valueMap[x, y] = value.Cut(0,1);
+                    mineralMap[x, y] = minerals.Cut(0, 1);
+                    agriculturalMap[x, y] = agriculturalValue.Cut(0, 1);
+                    valueMap[x, y] = value.Cut(0, 1);
 
                     cost += (int)(mHeight * 10) / 10d;
 
@@ -186,6 +198,38 @@ namespace StartGame.World
             }
             DesignateIsland(false);
             islands.ForEach(i => i.DetermineOceans());
+
+            //Make the world nicer by generating features which make the landscape nicer
+            Dictionary<WorldTileType, List<Bitmap>> natureFeatures = new Dictionary<WorldTileType, List<Bitmap>> {
+                {
+                    WorldTileType.TemperateForest, new List<Bitmap>{Resources.Forest1,Resources.Forest2,Resources.Forest3,Resources.Forest4 }
+                },
+                {
+                    WorldTileType.Ocean, new List<Bitmap>{Resources.Ocean1,Resources.Ocean2,Resources.Ocean3}
+                },
+                {
+                    WorldTileType.Desert, new List<Bitmap>{Resources.Desert1,Resources.Desert2,Resources.Desert3}
+                },
+                {
+                    WorldTileType.TemperateGrassland, new List<Bitmap>{Resources.Grassland1,Resources.Grassland2,Resources.Grassland3}
+                },
+                {
+                    WorldTileType.Rainforest, new List<Bitmap>{Resources.Rainforest1,Resources.Rainforest2,Resources.Rainforest3}
+                },
+                {
+                    WorldTileType.Savanna, new List<Bitmap>{Resources.Savanna1, Resources.Savanna2, Resources.Savanna3, Resources.Savanna4}
+                }
+            };
+
+            for (int i = 0; i < WORLD_SIZE*10; i++)
+            {
+                Point p = new Point(random.Next(WORLD_SIZE), random.Next(WORLD_SIZE));
+                var type = worldMap[p.X, p.Y].type;
+                if (natureFeatures.ContainsKey(type) && !features.Exists(f => f.Blocks(p)))
+                {
+                    features.Add(new WorldFeature(++WorldFeature.ID, p, natureFeatures[type].GetRandom()));
+                }
+            }
 
             //Generate nation
             nation = new Nation();
@@ -217,20 +261,21 @@ namespace StartGame.World
                 int value = (int)(valueMap[p.X, p.Y] * 100);
                 if (type == 0)
                 {
-                    city = new CapitalCity(p, value + 50);
+                    city = new CapitalCity(p, value + 50, (int)(100 * agriculturalMap.Get(p)),(int)(100 * mineralMap.Get(p)));
                 }
                 else if (type == 1)
                 {
-                    city = new LargeCity(p, value + 30);
+                    city = new LargeCity(p, value + 30, (int)(100 * agriculturalMap.Get(p)),(int)(100 * mineralMap.Get(p)));
                 }
                 else
                 {
-                    city = new MediumCity(p, value + 20);
+                    city = new MediumCity(p, value + 20, (int)(100 * agriculturalMap.Get(p)),(int)(100 * mineralMap.Get(p)));
                 }
-                Trace.TraceInformation($"Generated {city.GetType().Name} at {p} of type {worldMap.Get(p).type} and {worldMap.Get(p).height}");
+                Trace.TraceInformation($"Generated {city.GetType().Name.Substring(0, 8)} \t Position: {p} \t Height: {worldMap.Get(p).height.ToString("0.00")}" +
+                    $" \t Value: {city.value} \t Wealth: {city.Wealth} \t Type: {worldMap.Get(p).type}");
                 features.Add(city);
                 nation.cities.Add(city);
-                
+
             }
 
             //Generate small cities in valuable areas
@@ -257,30 +302,61 @@ namespace StartGame.World
             {
                 int xS = random.Next(WORLD_SIZE / 10);
                 int yS = random.Next(WORLD_SIZE / 10);
-                if(regionalValue[xS, yS] > random.NextDouble() + 0.2)
+                if (regionalValue[xS, yS] > random.NextDouble() + 0.2)
                 {
                     int i = random.Next(10);
                     int j = random.Next(10);
                     Point position1 = new Point(xS * 10 + i, yS * 10 + j);
-                    if (IsLand(worldMap.Get(position1).type) &&  nation.cities.Select(city => AIUtility.Distance(city.position, position1)).Min() > 10)
+                    if (IsLand(worldMap.Get(position1).type) && nation.cities.Select(city => AIUtility.Distance(city.position, position1)).Min() > 10)
                     {
-                        City city = new SmallCity(position1, (int)(100 * regionalValue[xS, yS]));
+                        City city = new SmallCity(position1, (int)(100 * regionalValue[xS, yS]), (int)(100 * agriculturalMap.Get(position1)),(int)(100 * mineralMap.Get(position1)));
                         features.Add(city);
                         nation.cities.Add(city);
-                        Trace.TraceInformation($"Added small city at {position1} where average value is {regionalValue[xS, yS]}");
+                        Trace.TraceInformation($"Generated SmallCity \t Position: {position1} \t Value: {city.value} \t Wealth: {city.Wealth}");
                         cityNum--;
+                    }
+                    //Generate farms on agricultural hotspots
+                    int _x = xS * 10 + random.Next(10);
+                    int _y = yS * 10 + random.Next(10);
+                    Point p = new Point(_x, _y);
+                    if (agriculturalMap[_x, _y] > 0.4f && !world.features.Exists(f => f.Blocks(p)))
+                    {
+                        Farm farm = new Farm(p, (int)(agriculturalMap[_x, _y] * 100));
+                        features.Add(farm);
+                        nation.farms.Add(farm);
+                    }
+
+                    //Generate mine on mineral hotspots
+                    _x = xS * 10 + random.Next(10);
+                    _y = yS * 10 + random.Next(10);
+                    p = new Point(_x, _y);
+                    if (mineralMap[_x, _y] > 0.7f && !world.features.Exists(f => f.Blocks(p)))
+                    {
+                        Mine mine = new Mine(p, (int)(mineralMap[_x, _y] * 100));
+                        features.Add(mine);
+                        nation.mines.Add(mine);
                     }
                 }
             }
 
+
+
             //Add ports and other connections
             nation.Intialise(new List<City>());
-            
+
             List<Island> toBuild = nation.DetermineNeededPorts();
             foreach (var island in toBuild)
             {
                 Point p = island.border[random.Next(island.border.Count)].position;
-                City port = new SmallCity(p, (int)(100 * valueMap[p.X, p.Y]) + 20) {
+                int tries = 10;
+                while (nation.cities.Select(city => AIUtility.Distance(city.position, p)).Min() < 5 && tries > 0)
+                {
+                    tries--;
+                    p = island.border[random.Next(island.border.Count)].position;
+                }
+                if (tries == 0)
+                    continue;
+                City port = new SmallCity(p, (int)(100 * valueMap[p.X, p.Y]) + 20, (int)(100 * agriculturalMap.Get(p)),(int)(100 * mineralMap.Get(p))) {
                     priority = 4,
                 };
                 features.Add(port);
@@ -293,22 +369,35 @@ namespace StartGame.World
             //Generate roads
             nation.GenerateRoads();
 
+            //Add labels to each city
+            nation.cities.ForEach(ci => features.Add(new WorldMapText(ci.name, ci.position)));
+
             //Generate missions
             for (int i = 0; i < WORLD_SIZE / 4; i++)
             {
                 Point position = new Point(random.Next(0, WORLD_SIZE), random.Next(0, WORLD_SIZE));
-                Mission.Mission mission = campaign.DecideMission(missionsCompleted + 1);
+                while (!IsLand(worldMap[position.X, position.Y].type))
+                {
+                    position = new Point(random.Next(0, WORLD_SIZE), random.Next(0, WORLD_SIZE));
+                }
+                //TODO: Find a better way to describe wealth
+                Mission.Mission mission = campaign.DecideMission(worldMap[position.X, position.Y].type, (int)(valueMap[position.X, position.Y] * 100));
                 actors.Add(new MissionWorldPlayer(mission, missionsCompleted + 1, position));
             }
+
+            Trace.TraceInformation($"Created world in {(DateTime.Now - time).TotalMilliseconds}");
         }
 
+        /// <summary>
+        /// Scan the world to find islands
+        /// </summary>
+        /// <param name="one"></param>
         public void DesignateIsland(bool one = false)
         {
             List<WorldTile> toCheck = worldMap.Cast<WorldTile>().Where(t => t.island is null).ToList();
-            while (toCheck.Count != 0)
+            for (int i = 0; i < toCheck.Count; i++)
             {
-                WorldTile checking = toCheck[0];
-                toCheck.RemoveAt(0);
+                WorldTile checking = toCheck[i];
                 List<WorldTile> sameCheck = new List<WorldTile> { checking };
                 while (sameCheck.Count != 0)
                 {
@@ -367,10 +456,10 @@ namespace StartGame.World
                 if (one)
                     break;
             }
-            Trace.TraceInformation($"Generated {islands.Count} islands!");
+            Trace.TraceInformation($"Found {islands.Count} islands!");
             foreach (var island in islands)
             {
-                Trace.TraceInformation($"Island Size: {island.tiles.Count} Land: {island.land}");
+                Trace.TraceInformation($"Island: {island.Name} - Size: {island.tiles.Count} Land: {island.land}");
             }
         }
 
@@ -391,15 +480,15 @@ namespace StartGame.World
 
         public Spell GainSpell<T>() where T : Spell
         {
-            Spell spell = spells.Where(s => s is T).FirstOrDefault();
-            spells.Remove(spell);
+            Spell spell = Spells.Where(s => s is T).FirstOrDefault();
+            Spells.Remove(spell);
             return spell;
         }
 
         public Spell GainSpell(string name)
         {
-            Spell spell = spells.Where(s => s.name == name).FirstOrDefault();
-            spells.Remove(spell);
+            Spell spell = Spells.Where(s => s.name == name).FirstOrDefault();
+            Spells.Remove(spell);
             return spell;
         }
 
@@ -452,6 +541,9 @@ namespace StartGame.World
                 case WorldTileType.River:
                     return (0, 0);
 
+                case WorldTileType.SeaIce:
+                    return (0, 0);
+
                 case WorldTileType.TemperateGrassland:
                     return (0.01, 0.05);
 
@@ -480,7 +572,7 @@ namespace StartGame.World
 
         public static bool IsLand(WorldTileType type)
         {
-            return !(type == WorldTileType.Ocean || type == WorldTileType.River);
+            return !(type == WorldTileType.Ocean || type == WorldTileType.River || type == WorldTileType.SeaIce);
         }
     }
 }

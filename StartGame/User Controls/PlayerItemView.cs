@@ -1,4 +1,5 @@
-﻿using StartGame.Items;
+﻿using StartGame.Forms;
+using StartGame.Items;
 using StartGame.PlayerData;
 using System;
 using System.Collections.Generic;
@@ -11,15 +12,20 @@ namespace StartGame.User_Controls
     partial class PlayerItemView : UserControl
     {
         private Player player;
-        private List<Item> items = new List<Item>();
-
+        private readonly List<Item> items = new List<Item>();
+        MainGameWindow mainGame;
         private Item active;
-
-        public void Activate(Player player)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="mainGame">If set it is taken that the player is in battle</param>
+        public void Activate(Player player, MainGameWindow mainGame)
         {
             InitializeComponent();
             this.player = player;
             items.AddRange(player.troop.Items);
+            this.mainGame = mainGame;
         }
 
         private void PlayerItemView_Load(object sender, EventArgs e)
@@ -54,7 +60,7 @@ namespace StartGame.User_Controls
                         itemButton1.Visible = true;
                         itemButton1.Text = a.active ? "Unequip" : "Equip";
                         itemButton2.Visible = true;
-                        itemButton2.Text = "Sell";
+                        itemButton2.Text = "Drop";
                         break;
 
                     case Jewelry j:
@@ -65,7 +71,29 @@ namespace StartGame.User_Controls
                         itemButton1.Visible = true;
                         itemButton1.Text = !j.Active ? "Equip" : "Unequip";
                         itemButton2.Visible = true;
-                        itemButton2.Text = "Sell";
+                        itemButton2.Text = "Drop";
+                        break;
+
+                    case Ammo a:
+                        itemName.Text = a.name;
+                        itemDescription.Text = a.description;
+                        itemImage.Image = new Bitmap(1, 1);
+                        itemButton1.Enabled = player.troop.weapons.Exists(w => w is RangedWeapon);
+                        itemButton1.Text = "Load Weapon";
+                        itemButton1.Visible = true;
+                        itemButton2.Visible = true;
+                        itemButton2.Text = "Drop";
+                        break;
+
+                    case Food f:
+                        itemName.Text = f.name;
+                        itemDescription.Text = f.Description;
+                        itemImage.Image = new Bitmap(1, 1);
+                        itemButton1.Enabled = true;
+                        itemButton1.Text = "Eat Food";
+                        itemButton1.Visible = true;
+                        itemButton2.Visible = true;
+                        itemButton2.Text = "Drop";
                         break;
 
                     default:
@@ -102,6 +130,25 @@ namespace StartGame.User_Controls
                     Render();
                     break;
 
+                case Ammo a:
+                    SelectItem selectItem = new SelectItem(player.troop.weapons.Where(w => w is RangedWeapon rw && rw.AmmoType == a.ammoType).Select(w => w as Item).ToList(), true);
+                    selectItem.ShowDialog();
+                    RangedWeapon r = selectItem.Selected as RangedWeapon;
+                    if (r is null)
+                        break;
+                    r.AddAmo(a);
+                    Render();
+                    break;
+
+                case Food f:
+                    f.UseFood(player);
+                    Render();
+                    if(mainGame != null)
+                    {
+                        player.actionPoints.RawValue -= 0.5;
+                    }
+                    break;
+
                 default:
                     throw new NotImplementedException("This type of item does not support button 1");
             }
@@ -109,25 +156,31 @@ namespace StartGame.User_Controls
 
         private void ItemButton2_Click(object sender, EventArgs e)
         {
+            //The button simply means drop the item
             switch (active)
             {
                 case Armour a:
-                    //Sell the armour
                     a.active = false;
                     player.troop.armours.Remove(a);
-                    player.money.rawValue += a.Value;
                     Render();
                     break;
 
                 case Jewelry j:
                     j.Active = false;
                     player.troop.jewelries.Remove(j);
-                    player.money.rawValue += j.Value;
                     Render();
                     break;
 
+                case Ammo am:
+                    player.troop.items.Remove(am);
+                    Render();
+                    break;
+                case Food f:
+                    player.troop.items.Remove(f);
+                    Render();
+                    break;
                 default:
-                    throw new NotImplementedException("This type of item does nt support button 2");
+                    throw new NotImplementedException("This type of item does not support button 2");
             }
         }
     }

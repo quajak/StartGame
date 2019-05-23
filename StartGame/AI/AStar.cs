@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
+using StartGame;
 
 namespace StartGame.AI
 {
@@ -58,19 +62,20 @@ namespace StartGame.AI
                     tryV = fields.Get(tryP);
                     if (tryV < minV)
                     {
-                        minV = tryV;
                         min = tryP;
                     }
                 }
                 path.Add(min);
                 active = min;
+                if (path.Count > 500) throw new Exception();
             }
             path.Reverse();
             return path.ToArray();
         }
 
-        public static double[,] GenerateCostMap(double[,] cost, ref Point start)
+        public static double[,] GenerateCostMap(double[,] cost, ref Point start, double maxCost = 1000)
         {
+            DateTime t = DateTime.Now;
             double[,] fields = new double[cost.GetUpperBound(0) + 1, cost.GetUpperBound(1) + 1];
             for (int x = 0; x <= fields.GetUpperBound(0); x++)
             {
@@ -91,8 +96,10 @@ namespace StartGame.AI
                     Point left = checking.Add(new Point(-1, 0));
                     if (fields.Get(left) > fields.Get(checking) + cost.Get(left))
                     {
-                        fields[checking.X - 1, checking.Y] = fields.Get(checking) + cost[checking.X - 1, checking.Y];
-                        toCheck.Add(left);
+                        double v = fields.Get(checking) + cost[checking.X - 1, checking.Y];
+                        fields[checking.X - 1, checking.Y] = v;
+                        if(maxCost > v)
+                           toCheck.Add(left);
                     }
                 }
                 //right
@@ -101,8 +108,10 @@ namespace StartGame.AI
                     Point right = checking.Add(new Point(1, 0));
                     if (fields.Get(right) > fields.Get(checking) + cost.Get(right))
                     {
-                        fields[checking.X + 1, checking.Y] = fields.Get(checking) + cost[checking.X + 1, checking.Y];
-                        toCheck.Add(right);
+                        double v = fields.Get(checking) + cost[checking.X + 1, checking.Y];
+                        fields[checking.X + 1, checking.Y] = v;
+                        if(maxCost > v)
+                            toCheck.Add(right);
                     }
                 }
                 //top
@@ -111,8 +120,10 @@ namespace StartGame.AI
                     Point top = checking.Add(new Point(0, -1));
                     if (fields.Get(top) > fields.Get(checking) + cost.Get(top))
                     {
-                        fields[checking.X, checking.Y - 1] = fields.Get(checking) + cost[checking.X, checking.Y - 1];
-                        toCheck.Add(top);
+                        double v = fields.Get(checking) + cost[checking.X, checking.Y - 1];
+                        fields[checking.X, checking.Y - 1] = v;
+                        if (maxCost > v)
+                            toCheck.Add(top);
                     }
                 }
                 //bottom
@@ -121,12 +132,14 @@ namespace StartGame.AI
                     Point bottom = checking.Add(new Point(0, 1));
                     if (fields.Get(bottom) > fields.Get(checking) + cost.Get(bottom))
                     {
-                        fields[checking.X, checking.Y + 1] = fields.Get(checking) + cost[checking.X, checking.Y + 1];
-                        toCheck.Add(bottom);
+                        double v = fields.Get(checking) + cost[checking.X, checking.Y + 1];
+                        fields[checking.X, checking.Y + 1] = v;
+                        if (maxCost > v)
+                            toCheck.Add(bottom);
                     }
                 }
             }
-
+            Trace.TraceInformation($"AStar::GenerateCostMap completed in {(DateTime.Now - t).TotalMilliseconds}");
             return fields;
         }
     }

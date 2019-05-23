@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.cityName = new System.Windows.Forms.Label();
-            this.cityWealth = new System.Windows.Forms.Label();
+            this.cityDescription = new System.Windows.Forms.Label();
             this.buildingList = new System.Windows.Forms.ListBox();
             this.buildingInfo = new System.Windows.Forms.Label();
             this.buildingOptionList = new System.Windows.Forms.ListBox();
@@ -50,14 +50,15 @@
             this.cityName.TabIndex = 0;
             this.cityName.Text = "cityName";
             // 
-            // cityWealth
+            // cityDescription
             // 
-            this.cityWealth.AutoSize = true;
-            this.cityWealth.Location = new System.Drawing.Point(13, 45);
-            this.cityWealth.Name = "cityWealth";
-            this.cityWealth.Size = new System.Drawing.Size(57, 13);
-            this.cityWealth.TabIndex = 1;
-            this.cityWealth.Text = "cityWealth";
+            this.cityDescription.AutoSize = true;
+            this.cityDescription.Location = new System.Drawing.Point(13, 45);
+            this.cityDescription.MaximumSize = new System.Drawing.Size(400, 0);
+            this.cityDescription.Name = "cityDescription";
+            this.cityDescription.Size = new System.Drawing.Size(76, 13);
+            this.cityDescription.TabIndex = 1;
+            this.cityDescription.Text = "cityDescription";
             // 
             // buildingList
             // 
@@ -150,7 +151,7 @@
             this.Controls.Add(this.buildingOptionList);
             this.Controls.Add(this.buildingInfo);
             this.Controls.Add(this.buildingList);
-            this.Controls.Add(this.cityWealth);
+            this.Controls.Add(this.cityDescription);
             this.Controls.Add(this.cityName);
             this.Name = "CityView";
             this.Text = "CityView";
@@ -163,7 +164,7 @@
         #endregion
 
         private System.Windows.Forms.Label cityName;
-        private System.Windows.Forms.Label cityWealth;
+        private System.Windows.Forms.Label cityDescription;
         private System.Windows.Forms.ListBox buildingList;
         private System.Windows.Forms.Label buildingInfo;
         private System.Windows.Forms.ListBox buildingOptionList;

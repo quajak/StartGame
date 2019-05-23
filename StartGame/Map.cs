@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace StartGame
+namespace StartGame.GameMap
 {
     public partial class Map
     {
@@ -29,8 +29,6 @@ namespace StartGame
 
         private List<Continent> continents;
 
-        private Random random = new Random();
-
         public List<Troop> troops = new List<Troop>();
 
         public List<Entity> entities = new List<Entity>();
@@ -47,7 +45,7 @@ namespace StartGame
 
         public string Stats()
         {
-            string type = "";
+            string type;
             if ((double)hillTile / (flatTile + hillTile + waterTile) > 0.2)
             {
                 type = "Hilly";
@@ -71,9 +69,10 @@ namespace StartGame
         /// Seed Determines the seed of the rng
         /// HeightBias Increases all values by this amount
         /// </summary>
-        public void SetupMap(Tuple<double, double, double> data)
+        public void SetupMap(double PerlinDiff, double Seed, double HeightBias, MapBiome biome = null)
         {
-            (double PerlinDiff, double Seed, double HeightBias) = data;
+            if (biome is null)
+                biome = new GrasslandMapBiome();
             //Reset lists
             goals = new List<MapTile>();
             continents = new List<Continent>();
@@ -93,17 +92,10 @@ namespace StartGame
                     double mHeight = p.Perlin(x * PerlinDiff, y * PerlinDiff, Seed);
 
                     //Modify perlin value for more extremes
-                    mHeight = mHeight - HeightBias;
-                    mHeight = mHeight < 0 ? 0 : mHeight; //Remove negative values
-                    mHeight = mHeight > 1 ? 1 : mHeight; //Remove values larger than 1
+                    mHeight += HeightBias;
+                    mHeight = mHeight.Cut(0,1);
 
-                    MapTileTypeEnum mapTileEnum = MapTileTypeEnum.land;
-
-                    if (mHeight < 0.2) mapTileEnum = MapTileTypeEnum.deepWater;
-                    else if (mHeight < 0.4) mapTileEnum = MapTileTypeEnum.shallowWater;
-                    else if (mHeight < 0.6) mapTileEnum = MapTileTypeEnum.land;
-                    else if (mHeight < 0.8) mapTileEnum = MapTileTypeEnum.hill;
-                    else if (mHeight <= 1.0) mapTileEnum = MapTileTypeEnum.mountain;
+                    MapTileTypeEnum mapTileEnum = biome.DetermineType(mHeight);
 
                     map[x, y] = new MapTile(new Point(x, y), new MapTileType {
                         type = mapTileEnum
@@ -121,8 +113,6 @@ namespace StartGame
             }
 
             //Generate continents
-            int counter = 0;
-            Random colorGenerator = new Random();
             continents = new List<Continent>();
             for (int x = 0; x < width; x++)
             {
@@ -131,7 +121,7 @@ namespace StartGame
                     if (map[x, y].continent == null)
                     {
                         Continent continent = new Continent();
-                        map = continent.NewContinent(this, new Point(x, y), counter++.ToString(), colorGenerator).map;
+                        map = continent.NewContinent(this, new Point(x, y)).map;
                         continents.Add(continent);
                     }
                 }
@@ -163,7 +153,7 @@ namespace StartGame
             {
                 if (maxContinent.edges.top.Count != 0)
                 {
-                    MapTile toAdd = maxContinent.edges.top[colorGenerator.Next(maxContinent.edges.top.Count)];
+                    MapTile toAdd = maxContinent.edges.top[World.World.random.Next(maxContinent.edges.top.Count)];
                     if (!goals.Contains(toAdd))
                     {
                         goals.Add(toAdd);
@@ -176,7 +166,7 @@ namespace StartGame
             {
                 if (maxContinent.edges.bottom.Count != 0)
                 {
-                    MapTile toAdd = maxContinent.edges.bottom[colorGenerator.Next(maxContinent.edges.bottom.Count)];
+                    MapTile toAdd = maxContinent.edges.bottom[World.World.random.Next(maxContinent.edges.bottom.Count)];
                     if (!goals.Contains(toAdd))
                     {
                         goals.Add(toAdd);
@@ -189,7 +179,7 @@ namespace StartGame
             {
                 if (maxContinent.edges.left.Count != 0)
                 {
-                    MapTile toAdd = maxContinent.edges.left[colorGenerator.Next(maxContinent.edges.left.Count)];
+                    MapTile toAdd = maxContinent.edges.left[World.World.random.Next(maxContinent.edges.left.Count)];
                     if (!goals.Contains(toAdd))
                     {
                         goals.Add(toAdd);
@@ -202,7 +192,7 @@ namespace StartGame
             {
                 if (maxContinent.edges.right.Count != 0)
                 {
-                    MapTile toAdd = maxContinent.edges.right[colorGenerator.Next(maxContinent.edges.right.Count)];
+                    MapTile toAdd = maxContinent.edges.right[World.World.random.Next(maxContinent.edges.right.Count)];
                     if (!goals.Contains(toAdd))
                     {
                         goals.Add(toAdd);
@@ -316,8 +306,6 @@ namespace StartGame
             }
 
             //Generate continents
-            int counter = 0;
-            Random colorGenerator = new Random();
             continents = new List<Continent>();
             for (int x = 0; x < width; x++)
             {
@@ -326,7 +314,7 @@ namespace StartGame
                     if (map[x, y].continent == null)
                     {
                         Continent continent = new Continent();
-                        map = continent.NewContinent(this, new Point(x, y), counter++.ToString(), colorGenerator).map;
+                        map = continent.NewContinent(this, new Point(x, y)).map;
                         continents.Add(continent);
                     }
                 }
@@ -412,7 +400,9 @@ namespace StartGame
             }
         }
 
+#pragma warning disable IDE0051 // Remove unused private members
         private void CleanPath()
+#pragma warning restore IDE0051 // Remove unused private members
         {
             int x;
             int y;
@@ -509,7 +499,6 @@ namespace StartGame
                     //Clean it up
                     if (width >= 2 && height >= 2)
                     {
-                        MapTileTypeEnum mapTileType;
                         Square<List<int>> paths = new Square<List<int>>(new List<int>(), new List<int>(), new List<int>(), new List<int>());
                         //Find top
                         if (y != 0)
@@ -517,7 +506,6 @@ namespace StartGame
                             //Iterate top
                             for (int xDiff = 0; xDiff < width; xDiff++)
                             {
-                                mapTileType = map[x + xDiff, y - 1].type.type;
                                 if (map[x + xDiff, y - 1].type.type == MapTileTypeEnum.path)
                                 {
                                     paths.top.Add(xDiff);
@@ -529,7 +517,6 @@ namespace StartGame
                             //Iterate bottom
                             for (int xDiff = 0; xDiff < width; xDiff++)
                             {
-                                mapTileType = map[x + xDiff, y + height].type.type;
                                 if (map[x + xDiff, y + height].type.type == MapTileTypeEnum.path)
                                 {
                                     paths.bottom.Add(xDiff);
@@ -541,7 +528,6 @@ namespace StartGame
                             //Iterate left
                             for (int yDiff = 0; yDiff < height; yDiff++)
                             {
-                                mapTileType = map[x - 1, y + yDiff].type.type;
                                 if (map[x - 1, y + yDiff].type.type == MapTileTypeEnum.path)
                                 {
                                     paths.left.Add(yDiff);
@@ -553,7 +539,6 @@ namespace StartGame
                             //Iterate right
                             for (int yDiff = 0; yDiff < height; yDiff++)
                             {
-                                mapTileType = map[x + width, y + yDiff].type.type;
                                 if (map[x + width, y + yDiff].type.type == MapTileTypeEnum.path)
                                 {
                                     paths.right.Add(yDiff);
@@ -580,7 +565,7 @@ namespace StartGame
                         if (paths.left.Count != 0) max.left = 0;
                         else max.left = Min(paths.top, paths.bottom);
                         //Calculate x offset to draw the top to bottom line
-                        int topPos = 0;
+                        int topPos;
                         if (paths.top.Count >= 1 && paths.bottom.Count >= 1) topPos = Min(paths.top, paths.bottom);
                         else if (paths.top.Count >= 1) topPos = paths.top.Min();
                         else if (paths.bottom.Count >= 1) topPos = paths.bottom.Min();
@@ -685,25 +670,25 @@ namespace StartGame
                         {
                             int x;
                             int y;
-                            int n = random.Next(4);
+                            int n = World.World.random.Next(4);
                             if (n == 0)
                             {
                                 x = 0;
-                                y = random.Next(map.GetUpperBound(1));
+                                y = World.World.random.Next(map.GetUpperBound(1));
                             }
                             else if (n == 1)
                             {
-                                x = random.Next(map.GetUpperBound(0));
+                                x = World.World.random.Next(map.GetUpperBound(0));
                                 y = 0;
                             }
                             else if (n == 2)
                             {
                                 x = map.GetUpperBound(0);
-                                y = random.Next(map.GetUpperBound(1));
+                                y = World.World.random.Next(map.GetUpperBound(1));
                             }
                             else
                             {
-                                x = random.Next(map.GetUpperBound(0));
+                                x = World.World.random.Next(map.GetUpperBound(0));
                                 y = map.GetUpperBound(1);
                             }
 
@@ -715,7 +700,7 @@ namespace StartGame
                     List<MapTile> _goals = new List<MapTile>(goals);
                     while (_goals.Count != 0 && playerNumber != 0)
                     {
-                        MapTile pathPoint = _goals[random.Next(_goals.Count)];
+                        MapTile pathPoint = _goals[World.World.random.Next(_goals.Count)];
                         _goals.Remove(pathPoint);
                         toReturn.Add(pathPoint.position);
                         playerNumber--;
@@ -735,8 +720,8 @@ namespace StartGame
                         Point p = new Point();
                         while (true)
                         {
-                            p = new Point(random.Next(map.GetUpperBound(0),
-                            random.Next(map.GetUpperBound(1))));
+                            p = new Point(World.World.random.Next(map.GetUpperBound(0)),
+                            World.World.random.Next(map.GetUpperBound(1)));
                             //Determine is viable
                             if (!troops.Exists(t => t.Position.X == p.X &&
                                  t.Position.Y == p.Y) &&
@@ -772,9 +757,8 @@ namespace StartGame
                 Point point;
                 while (true)
                 {
-                    point = new Point(random.Next(map.GetUpperBound(0)), random.Next(map.GetUpperBound(1)));
-                    if ((map[point.X, point.Y].type.type == MapTileTypeEnum.land
-                        || map[point.X, point.Y].type.type == MapTileTypeEnum.path) &&
+                    point = new Point(World.World.random.Next(map.GetUpperBound(0)), World.World.random.Next(map.GetUpperBound(1)));
+                    if ((map[point.X, point.Y].type.FType == FieldType.land) &&
                         !troops.Exists(t => t.Position.X == point.X && t.Position.Y == point.Y))
                     {
                         toReturn.Add(point);

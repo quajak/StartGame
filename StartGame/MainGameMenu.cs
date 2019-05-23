@@ -1,9 +1,11 @@
 ﻿using StartGame.DebugViews;
 using StartGame.Dungeons;
+using StartGame.GameMap;
 using StartGame.Items;
 using StartGame.Mission;
 using StartGame.PlayerData;
 using StartGame.Properties;
+using StartGame.World;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,18 +43,18 @@ namespace StartGame
 
         private void StartGame_Click(object sender, EventArgs e)
         {
+            MapBiome biome = new GrasslandMapBiome();
             //Long term: allow map selection
             if (map == null)
             {
                 if (MessageBox.Show("You have no map selected! \n Starting now will mean using a random map!", "Alert", MessageBoxButtons.OKCancel) == DialogResult.OK)
                 {
                     //Start game with random map
-                    Random rnd = new Random();
                     map = new Map();
                     Thread mapThread;
                     do
                     {
-                        mapThread = new Thread(() => map.SetupMap(new Tuple<double, double, double>(0.1, rnd.Next(), -0.2))) {
+                        mapThread = new Thread(() => map.SetupMap(0.1, World.World.random.Next(), -0.2, biome)) {
                             Priority = ThreadPriority.Highest
                         };
                         mapThread.Start();
@@ -82,30 +84,32 @@ namespace StartGame
             player.troop = playerTroop;
             player.troop.armours.ForEach(a => a.active = true);
 
-            player.agility.rawValue = 5;
-            player.strength.rawValue = 5;
-            player.vitality.rawValue = 20;
-            player.intelligence.rawValue = 5;
-            player.wisdom.rawValue = 5;
-            player.endurance.rawValue = 5;
+            player.agility.RawValue = 5;
+            player.strength.RawValue = 5;
+            player.vitality.RawValue = 20;
+            player.intelligence.RawValue = 5;
+            player.wisdom.RawValue = 5;
+            player.endurance.RawValue = 5;
 
             Hide();
             //Long term: Make form to allow use to choose mission and difficulty
 
-            Mission.Mission mission = new DragonFight();
+            Mission.Mission mission = new SpiderNestMission();
 
             List<Tree> trees = Tree.GenerateTrees();
 
             MainGameWindow mainGameWindow = new MainGameWindow(map, player, mission, trees, 5, 1);
-            try
-            {
+            biome.ManipulateMission(mainGameWindow, mission);
+            mainGameWindow.RenderMap(true, true, true);
+            //try
+            //{
                 mainGameWindow.ShowDialog();
-            }
-            catch (Exception f)
-            {
-                Trace.TraceError(f.ToString());
-                MessageBox.Show(f.ToString());
-            }
+            //}
+            //catch (Exception f)
+            //{
+            //    Trace.TraceError(f.ToString());
+            //    MessageBox.Show(f.ToString());
+            //}
             Show();
 
             //Reset all variables
@@ -172,6 +176,22 @@ namespace StartGame
             DungeonCreator dungeonCreator = new DungeonCreator();
             Hide();
             dungeonCreator.ShowDialog();
+            Show();
+        }
+
+        private void StartWorldGame_Click(object sender, EventArgs e)
+        {
+            WorldView worldView = new WorldView();
+            Hide();
+            worldView.ShowDialog();
+            Show();
+        }
+
+        private void ShowWorldGeneration_Click(object sender, EventArgs e)
+        {
+            WorldGenerationViewer generationViewer = new WorldGenerationViewer();
+            Hide();
+            generationViewer.ShowDialog();
             Show();
         }
     }
