@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StartGame.Items;
 
 namespace StartGame.World.Cities
 {
@@ -14,6 +16,7 @@ namespace StartGame.World.Cities
         public string name;
         public string description;
         public List<CityBuildingAction> actions;
+        public int Priority = 10;
 
         public CityBuilding(int id, string name, string description, List<CityBuildingAction> actions)
         {
@@ -32,16 +35,16 @@ namespace StartGame.World.Cities
         {
             return name;
         }
-    }
-
-    public class MayorHouse : CityBuilding
-    {
-
-        public MayorHouse(City city) : base(++ID, "Mayor House", "This is the mayor speaking.", new List<CityBuildingAction> { })
+        /// <summary>
+        /// This is called once a week
+        /// </summary>
+        public virtual void WorldAction()
         {
-            description = $"The agricultural value of the town is {city.agriculturalProduction} and the mineral value is {city.mineralProduction}.";
+            
         }
     }
+
+
 
     public class Port : CityBuilding
     {

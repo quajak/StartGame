@@ -39,7 +39,7 @@ namespace StartGame.Items
         public int cost;
         public int amount;
 
-        public SellableItem(int cost, int amount, string name) : base(name)
+        public SellableItem(string name, int amount, int cost) : base(name)
         {
             this.cost = cost;
             this.amount = amount;

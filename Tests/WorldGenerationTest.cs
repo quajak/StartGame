@@ -19,6 +19,7 @@ namespace Tests
                 Trace.TraceInformation($"City value is {value}");
                 City city = new CapitalCity(new System.Drawing.Point(1,1), value, World.random.Next(0,100), World.random.Next(0,100));
                 Assert.IsTrue(city.buildings.Where(b => b is Store).Count() > 2);
+                Assert.IsTrue(city.Population > 100);
             }
         }
     }

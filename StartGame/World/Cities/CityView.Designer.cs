@@ -59,6 +59,7 @@
             this.cityDescription.Size = new System.Drawing.Size(76, 13);
             this.cityDescription.TabIndex = 1;
             this.cityDescription.Text = "cityDescription";
+            this.cityDescription.Click += new System.EventHandler(this.CityDescription_Click);
             // 
             // buildingList
             // 

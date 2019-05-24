@@ -167,7 +167,7 @@ namespace StartGame.Mission
                 20,
                 null,
                 12,
-                new ItemReward(new Resource(1, 50, "Ice Core"))
+                new ItemReward(new Resource("Ice Core", 1, 50))
             );
         }
 

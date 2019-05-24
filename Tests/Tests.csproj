@@ -60,6 +60,7 @@
     <Compile Include="PlayGameTest.cs" />
     <Compile Include="StoreTest.cs" />
     <Compile Include="HumanPlayerTest.cs" />
+    <Compile Include="RunningWorld.cs" />
     <Compile Include="WorldGenerationTest.cs" />
     <Compile Include="WordMapTest.cs" />
   </ItemGroup>

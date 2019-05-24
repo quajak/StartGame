@@ -16,7 +16,7 @@ namespace StartGame.World
         public const int WORLD_SIZE = 200;
         public const int WORLD_DIFFICULTY = 5;
         private static World world;
-        public DateTime time = new DateTime(2000, 1, 1, 0, 0, 0, 0);
+        public DateTime time = new DateTime(1000, 1, 1, 0, 0, 0, 0);
         public Campaign campaign; //Get a better system to generate mission
         public int missionsCompleted = 0;
 
@@ -90,12 +90,12 @@ namespace StartGame.World
             double perlinDiff = 0.045;
             double s2 = random.Next(1000);
 
-            //Generate continents
+            //Generate continents in the center of the world
             int continentNumber = 3;
             Point[] continentPositions = new Point[continentNumber];
             for (int i = 0; i < continentNumber; i++)
             {
-                continentPositions[i] = new Point(random.Next(WORLD_SIZE), random.Next(WORLD_SIZE));
+                continentPositions[i] = new Point(random.Next(50, WORLD_SIZE - 50), random.Next(50, WORLD_SIZE - 50));
             }
 
             //Generate each tile
@@ -184,7 +184,7 @@ namespace StartGame.World
 
                     cost += (int)(mHeight * 10) / 10d;
 
-                    worldMap[x, y] = new WorldTile(mHeight, type, cost, new Point(x, y));
+                    worldMap[x, y] = new WorldTile(mHeight, type, cost, new Point(x, y), rainfall);
                     costMap[x, y] = cost;
                 }
             }
@@ -272,7 +272,7 @@ namespace StartGame.World
                     city = new MediumCity(p, value + 20, (int)(100 * agriculturalMap.Get(p)),(int)(100 * mineralMap.Get(p)));
                 }
                 Trace.TraceInformation($"Generated {city.GetType().Name.Substring(0, 8)} \t Position: {p} \t Height: {worldMap.Get(p).height.ToString("0.00")}" +
-                    $" \t Value: {city.value} \t Wealth: {city.Wealth} \t Type: {worldMap.Get(p).type}");
+                    $" \t Value: {city.value} \t Wealth: {city.Wealth} \t Type: {worldMap.Get(p).type} \t Population: {city.Population}");
                 features.Add(city);
                 nation.cities.Add(city);
 
@@ -309,26 +309,38 @@ namespace StartGame.World
                     Point position1 = new Point(xS * 10 + i, yS * 10 + j);
                     if (IsLand(worldMap.Get(position1).type) && nation.cities.Select(city => AIUtility.Distance(city.position, position1)).Min() > 10)
                     {
-                        City city = new SmallCity(position1, (int)(100 * regionalValue[xS, yS]), (int)(100 * agriculturalMap.Get(position1)),(int)(100 * mineralMap.Get(position1)));
+                        City city = new SmallCity(position1, (int)(100 * regionalValue[xS, yS]), (int)(100 * agriculturalMap.Get(position1)), (int)(100 * mineralMap.Get(position1)));
                         features.Add(city);
                         nation.cities.Add(city);
                         Trace.TraceInformation($"Generated SmallCity \t Position: {position1} \t Value: {city.value} \t Wealth: {city.Wealth}");
                         cityNum--;
                     }
+                }
+            }
+
+            nation.Intialise(new List<City>());
+
+
+            int farms = nation.cities.Count + 20;
+            while (farms > 0)
+            {
+                int xS = random.Next(WORLD_SIZE / 10);
+                int yS = random.Next(WORLD_SIZE / 10);
+                int _x = xS * 10 + random.Next(10);
+                int _y = yS * 10 + random.Next(10);
+                if(nation.islands.Exists(isl => isl.island == worldMap.Get(_x, _y).island))
+                {
                     //Generate farms on agricultural hotspots
-                    int _x = xS * 10 + random.Next(10);
-                    int _y = yS * 10 + random.Next(10);
                     Point p = new Point(_x, _y);
                     if (agriculturalMap[_x, _y] > 0.4f && !world.features.Exists(f => f.Blocks(p)))
                     {
                         Farm farm = new Farm(p, (int)(agriculturalMap[_x, _y] * 100));
                         features.Add(farm);
                         nation.farms.Add(farm);
+                        farms--;
                     }
 
                     //Generate mine on mineral hotspots
-                    _x = xS * 10 + random.Next(10);
-                    _y = yS * 10 + random.Next(10);
                     p = new Point(_x, _y);
                     if (mineralMap[_x, _y] > 0.7f && !world.features.Exists(f => f.Blocks(p)))
                     {
@@ -342,8 +354,6 @@ namespace StartGame.World
 
 
             //Add ports and other connections
-            nation.Intialise(new List<City>());
-
             List<Island> toBuild = nation.DetermineNeededPorts();
             foreach (var island in toBuild)
             {
@@ -365,7 +375,7 @@ namespace StartGame.World
                 Trace.TraceInformation($"Port added at {p}");
             }
             nation.UpdateIslandData();
-            nation.DetermineConnections();
+            nation.DeterminePortConnections();
             //Generate roads
             nation.GenerateRoads();
 
@@ -386,6 +396,14 @@ namespace StartGame.World
             }
 
             Trace.TraceInformation($"Created world in {(DateTime.Now - time).TotalMilliseconds}");
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Temperature in °C Humidity 0 -> 1</returns>
+        internal (double temperature, double humidity) GetWeather(Point point)
+        {
+            return (temperatureMap[point.X, point.Y], rainfallMap[point.X, point.Y]);
         }
 
         /// <summary>
@@ -509,6 +527,7 @@ namespace StartGame.World
         {
             time += timePassed;
             double actions = Math.Round(timePassed.TotalHours * 2, MidpointRounding.AwayFromZero) / 2;
+            nation.WorldAction(actions);
             actors.ForEach(a => a.WorldAction(actions));
         }
 
@@ -573,6 +592,17 @@ namespace StartGame.World
         public static bool IsLand(WorldTileType type)
         {
             return !(type == WorldTileType.Ocean || type == WorldTileType.River || type == WorldTileType.SeaIce);
+        }
+
+        //TODO: Maybe I should change the temperature range to include negatives
+        /// <summary>
+        /// Converts temp from 0->1 to 0 -> 35 
+        /// </summary>
+        /// <param name="temperature"></param>
+        /// <returns></returns>
+        public static int GetCelsius(double temperature)
+        {
+            return (int)(35 * temperature);
         }
     }
 }

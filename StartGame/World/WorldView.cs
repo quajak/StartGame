@@ -18,7 +18,6 @@ namespace StartGame.World
     public partial class WorldView : Form
     {
         private bool running = false;
-        private World world = World.Instance;
         private WorldRenderer worldRenderer;
         private Timer controller = new Timer();
 
@@ -48,8 +47,8 @@ namespace StartGame.World
             }
             this.player = player;
             //determine player spawnpoint
-            worldRenderer = new WorldRenderer(world);
-            List<City> small = world.nation.cities.Where(c => c is SmallCity && c.IsPort).ToList();
+            worldRenderer = new WorldRenderer();
+            List<City> small = World.Instance.nation.cities.Where(c => c is SmallCity && c.IsPort).ToList();
             Point point = new Point(0, 0);
             if(small.Count != 0)
             {
@@ -58,7 +57,7 @@ namespace StartGame.World
             else
             {
                 Trace.TraceWarning("Unable to determine good spawnpoint for player!");
-                point = world.nation.cities.GetRandom().position;
+                point = World.Instance.nation.cities.GetRandom().position;
             }
             Point spawn = point.Copy();
             do
@@ -68,12 +67,12 @@ namespace StartGame.World
                 spawn.Y += World.random.Next(10) - 5;
                 spawn.X = spawn.X.Cut(5, World.WORLD_SIZE - 5);
                 spawn.Y = spawn.Y.Cut(5, World.WORLD_SIZE - 5);
-            } while (!World.IsLand(world.worldMap.Get(spawn).type));
+            } while (!World.IsLand(World.Instance.worldMap.Get(spawn).type));
             player.WorldPosition = spawn;
 
             player.worldRenderer = worldRenderer;
-            world.InitialisePlayer(player);
-            world.actors.Add(player);
+            World.Instance.InitialisePlayer(player);
+            World.Instance.actors.Add(player);
             InitializeComponent();
             playerView.Activate(player, null, false);
             Render();
@@ -85,7 +84,7 @@ namespace StartGame.World
 
         private void Controller_Tick(object sender, EventArgs e)
         {
-            world.ProgressTime(new TimeSpan(0, 2, 0, 0));
+            World.Instance.ProgressTime(new TimeSpan(0, 2, 0, 0));
             worldRenderer.Redraw = true; //Is there a way we can avoid this?
             Render();
             startMission.Visible = player.availableActions.Exists(a => a is StartMission);
@@ -128,7 +127,7 @@ namespace StartGame.World
             {
                 gameRunningControl.Text = "Run";
             }
-            worldTimeLabel.Text = world.time.ToString("MM/dd/yyyy H:mm");
+            worldTimeLabel.Text = World.Instance.time.ToString("MM/dd/yyyy H:mm");
         }
 
         private void WorldMapView_MouseMove(object sender, MouseEventArgs e)
@@ -196,7 +195,7 @@ namespace StartGame.World
             //TODO: If entity at position show info
 
             //Find route from player
-            Point[] route = AStar.FindOptimalRoute(world.MovementCost(), player.WorldPosition, selected);
+            Point[] route = AStar.FindOptimalRoute(World.Instance.MovementCost(), player.WorldPosition, selected);
             if (route.Length > 1)
             {
                 Point previous = route[1];
@@ -238,16 +237,16 @@ namespace StartGame.World
         {
             StartMission startMission1 = (player.availableActions.Find(a => a is StartMission) as StartMission);
             Mission.Mission selected = startMission1.mission;
-            world.campaign.mission = selected;
+            World.Instance.campaign.mission = selected;
             MapBiome biome = new GrasslandMapBiome();
-            if (mapBiomes.ContainsKey(world.worldMap[player.WorldPosition.X, player.WorldPosition.Y].type))
+            if (mapBiomes.ContainsKey(World.Instance.worldMap[player.WorldPosition.X, player.WorldPosition.Y].type))
             {
-                biome = mapBiomes[world.worldMap[player.WorldPosition.X, player.WorldPosition.Y].type];
+                biome = mapBiomes[World.Instance.worldMap[player.WorldPosition.X, player.WorldPosition.Y].type];
             }
-            Map map = world.campaign.GenerateMap(biome);
+            Map map = World.Instance.campaign.GenerateMap(biome);
             player.map = map;
             player.troop.Map = map;
-            MainGameWindow mainGame = new MainGameWindow(map, player, selected, world.trees, World.WORLD_DIFFICULTY, startMission1.difficulty);
+            MainGameWindow mainGame = new MainGameWindow(map, player, selected, World.Instance.trees, World.WORLD_DIFFICULTY, startMission1.difficulty);
             biome.ManipulateMission(mainGame, selected);
             mainGame.RenderMap(true, true, true);
             controller.Stop();
@@ -266,19 +265,18 @@ namespace StartGame.World
             }
             if (running)
                 controller.Start();
-            world.missionsCompleted++;
+            World.Instance.missionsCompleted++;
             player.availableActions.Remove(startMission1);
             player.possibleActions.Remove(startMission1);
-            world.actors.RemoveAll(p => (p is MissionWorldPlayer wp) && wp.WorldPosition == player.WorldPosition);
-            world.GenerateNewMission();
+            World.Instance.actors.RemoveAll(p => (p is MissionWorldPlayer wp) && wp.WorldPosition == player.WorldPosition);
+            World.Instance.GenerateNewMission();
             Render();
         }
 
         private void GenerateNewWorld_Click(object sender, EventArgs e)
         {
             World.NewWorld();
-            world = World.Instance;
-            worldRenderer = new WorldRenderer(World.Instance);
+            worldRenderer = new WorldRenderer();
             Render();
         }
 

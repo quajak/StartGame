@@ -3,11 +3,11 @@ using System;
 
 namespace StartGame.Items
 {
-    public class Food : SellableItem
+    public class Food : Resource
     {
         public readonly int healAmount;
 
-        public Food(string name, int amount, int value, int healAmount) : base(value, amount, name)
+        public Food(string name, int amount, int value, int healAmount) : base(name, amount, value)
         {
             this.healAmount = healAmount;
         }

@@ -2,6 +2,7 @@
 using StartGame.Properties;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -16,19 +17,10 @@ namespace StartGame.World.Cities
         {
             this.name = name;
         }
-    }
-    public class Farm : Settlement
-    {
-        private readonly int agriculturalValue;
 
-        public Farm(Point position, int agriculturalValue) : base("Farm", ++ID, position, Resources.Farm1, 1)
+        internal virtual void WorldAction()
         {
-            this.agriculturalValue = agriculturalValue;
-        }
 
-        public Food GetFood()
-        {
-            return new Food("Apple", agriculturalValue, 1, 1);
         }
     }
 
@@ -70,13 +62,17 @@ namespace StartGame.World.Cities
         public List<City> roadConnections = new List<City>();
         public readonly int connections;
         public double[,] costMap = null;
+
+
+
         public int priority;
         public readonly int value;
         public readonly int agriculturalProduction;
         public readonly int mineralProduction;
 
-        //Has no value now, but is more realistic and may be important later
+        public int lastPopulation = 0;
         public int Population;
+
 
         public int Wealth => priority * value / 10;
 
@@ -90,6 +86,7 @@ namespace StartGame.World.Cities
                 Names = File.ReadAllLines(@"./Resources/CityNames.txt").ToList();
             }
             Population = priority * 1000 + World.random.Next(1000);
+            lastPopulation = Population;
             foreach (var tile in World.Instance.worldMap.Get(position).sorroundingTiles.rawMaptiles)
             {
                 if (!access.Contains(tile.island))
@@ -104,8 +101,10 @@ namespace StartGame.World.Cities
             //World rendering
             size = new Point(3, 2);
             alignment = RenderingAlignment.Center;
-            //Add mayor
+            //Add base buildings
             buildings.Add(new MayorHouse(this));
+            //Add producers
+            buildings.Add(new Logger(this));
             //Generate shops
             List<Type> possibleStores = new List<Type> { typeof(ConvenienceStore), typeof(FoodMarket), typeof(JewleryStore), typeof(MagicStore), typeof(SmithStore) };
             possibleStores = possibleStores.Where(p => (int)p.GetMethod("RequiredWealth").Invoke(null, new object[] { }) < Wealth).ToList();
@@ -142,6 +141,25 @@ namespace StartGame.World.Cities
             }
         }
 
+        double day = 0;
+        internal override void WorldAction()
+        {
+            day++;
+            //Run once a day
+            buildings.OrderBy(b => b.Priority).ToList().ForEach(b => b.WorldAction());
+            if(day % 365 == 0)
+            {
+                //Do yearly action
+                //Calculate population change
+                int growth = (int)(Population * 0.021);
+                //Trace.TraceInformation($"{name} grew by {growth} people");
+                Trace.TraceInformation($"{name} Population Change: From {lastPopulation} to {Population} Change is {Population - lastPopulation}");
+                lastPopulation = Population;
+                Population += growth;
+            }
+            day %= 365;
+        }
+
         public override string ToString()
         {
             return name;
@@ -149,8 +167,9 @@ namespace StartGame.World.Cities
 
         public int DetermineLocalFoodPrice(SellableItem item)
         {
-            return (int)(item.cost / 2 + ((100 - agriculturalProduction) / 100d) * item.cost);
+            return (int)(item.cost / 2 + ((100 - agriculturalProduction) / 100d) * item.cost).Cut(1, 10000);
         }
+
     }
 
     public class SmallCity : City

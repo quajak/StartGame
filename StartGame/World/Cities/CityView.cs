@@ -68,5 +68,10 @@ namespace StartGame.World.Cities
                 buildingInfo.Visible = false;
             }
         }
+
+        private void CityDescription_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

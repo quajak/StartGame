@@ -8,7 +8,7 @@ namespace StartGame.Items
 {
     public class Resource : SellableItem
     {
-        public Resource(int amount, int cost, string name) : base(cost, amount, name)
+        public Resource(string name, int amount, int cost) : base(name, amount, cost)
         {
 
         }

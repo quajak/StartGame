@@ -111,6 +111,12 @@ namespace StartGame
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T Get<T>(this T[,] map, int x, int y)
+        {
+            return map[x, y];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Get<T>(this T[,] map, int[] pos)
         {
             return map[pos[0], pos[1]];
@@ -187,6 +193,11 @@ namespace StartGame
             return v < min ? min : (v > max ? max : v);
         }
 
+        public static int Min(this int v, int min)
+        {
+            return v > min ? v : min;
+        }
+
         public static Bitmap ResizeImage(this Image image, int width, int height)
         {
             Bitmap destImage = new Bitmap(width, height);
@@ -235,6 +246,7 @@ namespace StartGame
         }
         public static T GetRandom<T>(this List<T> list)
         {
+            if (list.Count == 0) throw new ArgumentException();
             return list[World.World.random.Next(list.Count)];
         }
     }

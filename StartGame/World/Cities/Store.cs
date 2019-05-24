@@ -16,19 +16,18 @@ namespace StartGame.World.Cities
 
         public int money;
         private readonly City city;
-        private List<InventoryItem> items;
 
         public Store(List<InventoryItem> items, int money, string name, string desc, City city) : base(++ID, name, desc,
             new List<CityBuildingAction> { new CityBuildingAction("Buy"), new CityBuildingAction("Sell") })
         {
-            this.items = items;
+            Items = items;
             this.money = money;
             this.city = city;
         }
 
         CityView cityView;
 
-        public List<InventoryItem> Items => items;
+        public List<InventoryItem> Items { get; private set; }
 
         public override void OnAction(CityBuildingAction action, CityView cityView)
         {
@@ -38,7 +37,7 @@ namespace StartGame.World.Cities
             {
                 cityView.actionOptionList.Visible = true;
                 cityView.actionOptionList.Items.Clear();
-                foreach (var item in items)
+                foreach (var item in Items)
                 {
                     cityView.actionOptionList.Items.Add(item);
                 }
@@ -115,9 +114,9 @@ namespace StartGame.World.Cities
             int selected = cityView.actionOptionList.SelectedIndex;
             cityView.actionOptionList.Items.Clear();
             bool add = false;
-            for (int i1 = 0; i1 < items.Count; i1++)
+            for (int i1 = 0; i1 < Items.Count; i1++)
             {
-                InventoryItem i = items[i1];
+                InventoryItem i = Items[i1];
                 if (i.item == item)
                     i.Amount++;
                 else
@@ -131,13 +130,13 @@ namespace StartGame.World.Cities
                     cityView.player.Money.RawValue += sellPrice;
                     cityView.player.troop.jewelries.Remove(j);
                     if (add)
-                        items.Add(new InventoryItem(item, 1, price));
+                        Items.Add(new InventoryItem(item, 1, price));
                     break;
                 case Armour a:
                     cityView.player.Money.RawValue += sellPrice;
                     cityView.player.troop.armours.Remove(a);
                     if (add)
-                        items.Add(new InventoryItem(item, 1, price));
+                        Items.Add(new InventoryItem(item, 1, price));
                     break;
                 case Weapon w:
                     cityView.player.troop.weapons.Remove(w);
@@ -149,13 +148,13 @@ namespace StartGame.World.Cities
                     cityView.player.Money.RawValue += sellPrice;
                     if (add)
                     {
-                        if (items.TryGet(i => i.item is Food fo && fo.name == f.name, out InventoryItem it))
+                        if (Items.TryGet(i => i.item is Food fo && fo.name == f.name, out InventoryItem it))
                         {
                             it.Amount++;
                         }
                         else
                         {
-                            items.Add(new InventoryItem(item, 1, price));
+                            Items.Add(new InventoryItem(item, 1, price));
                         }
                     }
                     break;
@@ -163,7 +162,7 @@ namespace StartGame.World.Cities
                     cityView.player.troop.items.Remove(i);
                     cityView.player.Money.RawValue += sellPrice;
                     if (add)
-                        items.Add(new InventoryItem(item, 1, price));
+                        Items.Add(new InventoryItem(item, 1, price));
                     break;
             }
             foreach (var pitem in cityView.player.troop.Items)
@@ -244,7 +243,7 @@ namespace StartGame.World.Cities
             else
             {
                 cityView.actionOptionLabel.Visible = true;
-                Item item = items[selected].item;
+                Item item = Items[selected].item;
                 cityView.actionOptionLabel.Text = item.Description;
                 if (item is Jewelry j)
                     cityView.actionOptionLabel.Text = j.Description;
@@ -252,7 +251,7 @@ namespace StartGame.World.Cities
                     cityView.actionOptionLabel.Text = a.Description;
                 else if (item is Weapon w)
                     cityView.actionOptionLabel.Text = w.Description;
-                if (items[selected].Cost <= cityView.player.Money.Value)
+                if (Items[selected].Cost <= cityView.player.Money.Value)
                 {
                     Trace.TraceInformation("Adding");
                     cityView.button1.Visible = true;
@@ -275,20 +274,20 @@ namespace StartGame.World.Cities
             int selected = cityView.actionOptionList.SelectedIndex;
             if (selected == -1)
                 return;
-            InventoryItem inventoryItem = items[selected];
-            int c = items.Count;
-            items = BuyItem(inventoryItem, items, cityView.player, this);
+            InventoryItem inventoryItem = Items[selected];
+            int c = Items.Count;
+            Items = BuyItem(inventoryItem, Items, cityView.player, this);
             cityView.actionOptionList.Items.Clear();
-            foreach (var item in items)
+            foreach (var item in Items)
             {
                 cityView.actionOptionList.Items.Add(item);
             }
-            if (c != items.Count)
+            if (c != Items.Count)
             {
                 selected--;
                 selected = selected.Cut(0, 100);
             }
-            if (items.Count != 0)
+            if (Items.Count != 0)
             {
                 cityView.actionOptionList.SetSelected(selected, true);
             }
@@ -332,17 +331,7 @@ namespace StartGame.World.Cities
                     }
                     else
                     {
-                        player.troop.items.Add(new Resource(1, r.cost, r.name));
-                    }
-                    break;
-                case Food s:
-                    if (player.troop.items.Exists(it => it.name == s.name))
-                    {
-                        (player.troop.items.Find(it => it.name == s.name) as SellableItem).amount++;
-                    }
-                    else
-                    {
-                        player.troop.items.Add(new Food(s.name, 1, s.cost, s.healAmount));
+                        player.troop.items.Add(new Resource(r.name, 1, r.cost));
                     }
                     break;
                 case Item i:
@@ -351,6 +340,7 @@ namespace StartGame.World.Cities
             }
             return items;
         }
+
     }
 
     public class ConvenienceStore : Store
@@ -377,11 +367,11 @@ namespace StartGame.World.Cities
                 new Food("Carrot", 1, 2, 2),
                 new Food("Sausage", 1, 8, 5),
                 new Food("Apple", 1, 2, 1),
-                new Resource(1, 1, "Grain"),
-                new Resource(1, 10, "Iron"),
-                new Resource(1, 30 ,"Gold"),
-                new Resource(1, 5, "Wood"),
-                new Resource(1, 3, "Stone")
+                new Resource("Grain", 1, 1),
+                new Resource("Iron", 1, 10),
+                new Resource("Gold", 1,30 ),
+                new Resource("Wood", 1, 5),
+                new Resource("Stone", 1, 3)
             };
             items = items.Where(i => i.cost < value / 2).ToList();
 
@@ -431,7 +421,7 @@ namespace StartGame.World.Cities
                 new Food("Apple", 1, 2, 1),
                 new Food("Pear", 1, 2, 2),
                 new Food("Turnip", 1, 1, 1),
-                new Resource(1, 1, "Grain")
+                new Resource("Grain", 1, 1)
             };
             items = items.Where(i => i.cost < value / 2).ToList();
 
@@ -446,6 +436,11 @@ namespace StartGame.World.Cities
             }
 
             return sold;
+        }
+
+        public override void WorldAction()
+        {
+
         }
     }
 

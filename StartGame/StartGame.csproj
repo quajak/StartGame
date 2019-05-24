@@ -61,6 +61,26 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web.DataVisualization, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Chart.Controls.4.7.2046\lib\net35\System.Web.DataVisualization.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.DataVisualization.Design, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Chart.Controls.4.7.2046\lib\net35\System.Web.DataVisualization.Design.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Chart.Controls.4.7.2046\lib\net35\System.Windows.Forms.DataVisualization.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization.Design, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Chart.Controls.4.7.2046\lib\net35\System.Windows.Forms.DataVisualization.Design.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -106,6 +126,7 @@
     <Compile Include="Items\Jewelry.cs" />
     <Compile Include="Items\Resource.cs" />
     <Compile Include="MapBiome.cs" />
+    <Compile Include="MathFunctions\Range.cs" />
     <Compile Include="Mission\AnimalFightMissions.cs" />
     <Compile Include="Mission\MissionWorldPlayer.cs" />
     <Compile Include="PlayerData\AI.cs" />
@@ -247,6 +268,10 @@
     <Compile Include="World\Cities\CityView.Designer.cs">
       <DependentUpon>CityView.cs</DependentUpon>
     </Compile>
+    <Compile Include="World\Cities\Crop.cs" />
+    <Compile Include="World\Cities\Farm.cs" />
+    <Compile Include="World\Cities\MayorHouse.cs" />
+    <Compile Include="World\Cities\Producer.cs" />
     <Compile Include="World\Cities\Store.cs" />
     <Compile Include="World\Island.cs" />
     <Compile Include="World\Nation.cs" />

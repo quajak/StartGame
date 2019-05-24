@@ -1,5 +1,4 @@
-﻿Edagas
-Aqewell
+﻿Aqewell
 Chueginia
 Navine
 Cofield
@@ -48,16 +47,6 @@ Nico
 Neley
 Andorough
 Olnphia
-Zruhull
-Birora
-Zinstead
-Plaeburgh
-Polas
-Pence
-Srouver
-Flolk
-Oriagow
-Eighcester
 Zruhull
 Birora
 Zinstead
