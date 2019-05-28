@@ -27,7 +27,7 @@ namespace StartGame.World
                 new Food("Corn", 1, 3, 1),
                 new Food("Rice", 1, 3, 1),
                 new Food("Cacoa", 1, 12, 6),
-                new Food("Bannana", 1, 4, 2),
+                new Food("Banana", 1, 4, 2),
                 new Food("Tomato", 1, 3, 1),
                 new Food("Potato", 1, 3, 1),
                 new Resource("Grain", 1, 2),

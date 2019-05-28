@@ -15,7 +15,7 @@ namespace Tests
 
             Assert.IsNotNull(World.Instance.MovementCost());
 
-            WorldRenderer worldRenderer = new WorldRenderer(World.Instance);
+            WorldRenderer worldRenderer = new WorldRenderer();
             Assert.IsNotNull(worldRenderer);
             Bitmap b = worldRenderer.Render(200, 200);
             Assert.IsNotNull(b);
@@ -35,7 +35,7 @@ namespace Tests
 
         public void CheckZoomLevels()
         {
-            WorldRenderer renderer = new WorldRenderer(World.Instance);
+            WorldRenderer renderer = new WorldRenderer();
             for (int i = 0; i < 38; i++)
             {
                 int zoom = 40 - i;

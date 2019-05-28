@@ -9,33 +9,6 @@ using System.Linq;
 
 namespace StartGame.World.Cities
 {
-    public abstract class Settlement : WorldFeature
-    {
-        public Island Located => World.Instance.worldMap.Get(position).island;
-        public string name;
-        public Settlement(string name, int id, Point position, Bitmap image, int level = 0) : base(id, position, image, level: level)
-        {
-            this.name = name;
-        }
-
-        internal virtual void WorldAction()
-        {
-
-        }
-    }
-
-    public class Mine : Settlement
-    {
-#pragma warning disable IDE0052 // Remove unread private members
-        private readonly int materialValue;
-#pragma warning restore IDE0052 // Remove unread private members
-
-        public Mine(Point position, int materialValue) : base("Farm", ++ID, position, Resources.Mine1, 1)
-        {
-            this.materialValue = materialValue;
-        }
-    }
-
     public abstract class City : Settlement
     {
         private bool isPort = false;
@@ -76,6 +49,8 @@ namespace StartGame.World.Cities
 
         public int Wealth => priority * value / 10;
 
+        public int RequiredFood => Population / 100;
+
         public List<CityBuilding> buildings = new List<CityBuilding>();
 
         public City(Point position, Bitmap bitmap, int connections, int priority, int value, int agriculturalProduction, int mineralProduction) : base(Names.GetRandom(), ++ID, position, bitmap, 1)
@@ -103,10 +78,11 @@ namespace StartGame.World.Cities
             alignment = RenderingAlignment.Center;
             //Add base buildings
             buildings.Add(new MayorHouse(this));
+            buildings.Add(FoodMarket.GenerateStore(value * 10, this));
             //Add producers
             buildings.Add(new Logger(this));
             //Generate shops
-            List<Type> possibleStores = new List<Type> { typeof(ConvenienceStore), typeof(FoodMarket), typeof(JewleryStore), typeof(MagicStore), typeof(SmithStore) };
+            List<Type> possibleStores = new List<Type> { typeof(ConvenienceStore), typeof(JewleryStore), typeof(MagicStore), typeof(SmithStore) };
             possibleStores = possibleStores.Where(p => (int)p.GetMethod("RequiredWealth").Invoke(null, new object[] { }) < Wealth).ToList();
             if(possibleStores.Count > 0)
             {
@@ -116,10 +92,6 @@ namespace StartGame.World.Cities
                     if(store == typeof(ConvenienceStore))
                     {
                         buildings.Add(ConvenienceStore.GenerateStore(value, this));
-                    }
-                    else if (store == typeof(FoodMarket))
-                    {
-                        buildings.Add(FoodMarket.GenerateStore(value, this));
                     }
                     else if (store == typeof(JewleryStore))
                     {
@@ -147,15 +119,21 @@ namespace StartGame.World.Cities
             day++;
             //Run once a day
             buildings.OrderBy(b => b.Priority).ToList().ForEach(b => b.WorldAction());
+            if(day % 7 == 0)
+            {
+                //Do weekly action
+                //population is calculated weekly for nicer curves
+                //do an exponential
+                int growth = ((int)(Math.Pow(Population, 1.006d)) - Population) / 50;
+                Population += growth;
+            }
             if(day % 365 == 0)
             {
                 //Do yearly action
                 //Calculate population change
-                int growth = (int)(Population * 0.021);
                 //Trace.TraceInformation($"{name} grew by {growth} people");
-                Trace.TraceInformation($"{name} Population Change: From {lastPopulation} to {Population} Change is {Population - lastPopulation}");
+                Trace.TraceInformation($"{name} Population Change: From {lastPopulation} to {Population} Change is {Population - lastPopulation} or {((double)(Population - lastPopulation)/ Population).ToString("0.00")}");
                 lastPopulation = Population;
-                Population += growth;
             }
             day %= 365;
         }

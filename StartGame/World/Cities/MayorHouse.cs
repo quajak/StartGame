@@ -16,6 +16,7 @@ namespace StartGame.World.Cities
         int money;
         public MayorHouse(City city) : base(++ID, "Mayor House", "This is the mayor speaking.", new List<CityBuildingAction> { })
         {
+            allowMultiple = false;
             Priority = 1;
             this.city = city;
             description = $"The agricultural value of the town is {city.agriculturalProduction} and the mineral value is {city.mineralProduction}. The city requires {FoodRequirement()} food per week.";
@@ -24,14 +25,17 @@ namespace StartGame.World.Cities
 
         int FoodRequirement()
         {
-            return city.Population / 100;
+            return city.RequiredFood;
         }
 
         int day = 0;
         private readonly City city;
 
+        bool dead = false;
         public override void WorldAction()
         {
+            if (dead)
+                return;
             day++;
             description = $"The agricultural value of the town is {city.agriculturalProduction} and the mineral value is {city.mineralProduction}. The city requires {FoodRequirement()} food per week and is getting food from {farms.Count}. It has {money} coins.";
             if (day % 7 == 0)
@@ -41,36 +45,47 @@ namespace StartGame.World.Cities
                 farms = World.Instance.nation.farms.Where(f => World.Instance.worldMap.Get(f.position).island == island).OrderBy(f => AIUtility.Distance(city.position, f.position)).ToList();
                 int foodRequirement = FoodRequirement();
                 int initialFoodRequirement = foodRequirement;
-                int counter = 0;
+                FoodMarket market = city.buildings.Find(f => f is FoodMarket) as FoodMarket;
                 while (foodRequirement != 0)
                 {
-                    if(farms.Count == counter)
+                    if (market.Items.Count == 0 || !market.Items.Exists(i => market.GetBuyPrice(i.item) <= money))
                     {
                         //People are going hungry
-                        city.Population -= foodRequirement;
+                        Trace.TraceInformation($"In {city.name} {foodRequirement} died from hunger - Wealth {money} - Market Items: {market.Items.Sum(i => i.Amount)}" +
+                            $" Market Money: {market.money}");
+                        checked
+                        {
+                            city.Population -= foodRequirement;
+                        }
                         break;
                     }
-                    List<Resource> foodList = farms[counter].Items().OrderBy(r => r.cost).ToList();
+                    List<InventoryItem> foodList = market.Items.OrderBy(r => r.Cost).ToList();
                     foreach (var food in foodList)
                     {
-                        int amount = Math.Min(food.amount, foodRequirement);
-                        if (amount != 0)
+                        int amount = Math.Min(food.Amount, foodRequirement);
+                        int individualPrice = market.GetBuyPrice(food.item);
+                        amount = Math.Min(money / individualPrice, amount);
+                        int price = individualPrice * amount;
+                        if (money >= price)
                         {
                             foodRequirement -= amount;
-                            if (money > farms[counter].GetPrice(food.name, amount))
-                                money -= farms[counter].Buy(food.name, amount);
-                            //Trace.TraceInformation($"{city.name} is buying x{amount} {food.name} for {money} from {farms[counter].name}");
+                            money -= price;
+                            market.money += price;
+                            food.Amount -= amount;
+                            if (food.Amount == 0)
+                                market.Items.Remove(food);
                         }
+                        if (foodRequirement == 0)
+                            break;
                     }
-                    counter++;
                 }
             }
 
-            if(day % 365 == 0)
+            if (day % 365 == 0)
             {
-                money += city.Population;
+                money += city.Population * 2;
                 Trace.TraceInformation($"City: {city.name} Wealth: {money}");
-                if(city.Population < city.lastPopulation)
+                if (city.Population < city.lastPopulation || (city.buildings.Find(f => f is FoodMarket) as FoodMarket).Items.Count == 0)
                 {
                     //Find close tile and build new farm
                     WorldTile tile = null;
@@ -88,16 +103,17 @@ namespace StartGame.World.Cities
                             }
                         }
                     }
-                    if(tile != null && maxAgri > 0)
+                    if (tile != null && maxAgri > 0)
                     {
                         Trace.TraceInformation($"{city.name} created a new farm at {tile.position}");
                         World.Instance.nation.toChange.Add(new Farm(tile.position, (int)(maxAgri * 100)));
                     }
                 }
             }
-            if(city.Population < 100)
+            if (city.Population < 100)
             {
                 Trace.TraceInformation($"The city {city.name} is dead!");
+                dead = true;
                 //The city is dead
                 World.Instance.nation.toChange.Add(city);
             }

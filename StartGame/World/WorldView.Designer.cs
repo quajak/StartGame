@@ -34,16 +34,16 @@
             this.gameRunningControl = new System.Windows.Forms.Button();
             this.worldTimeLabel = new System.Windows.Forms.Label();
             this.startMission = new System.Windows.Forms.Button();
-            this.generateNewWorld = new System.Windows.Forms.Button();
             this.coords = new System.Windows.Forms.Label();
             this.enterCity = new System.Windows.Forms.Button();
+            this.generateNewWorld = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.worldMapView)).BeginInit();
             this.SuspendLayout();
             // 
             // playerView
             // 
             this.playerView.BackColor = System.Drawing.SystemColors.ActiveBorder;
-            this.playerView.Location = new System.Drawing.Point(380, 12);
+            this.playerView.Location = new System.Drawing.Point(640, 12);
             this.playerView.Name = "playerView";
             this.playerView.Size = new System.Drawing.Size(408, 350);
             this.playerView.TabIndex = 0;
@@ -52,7 +52,7 @@
             // 
             this.worldMapView.Location = new System.Drawing.Point(12, 12);
             this.worldMapView.Name = "worldMapView";
-            this.worldMapView.Size = new System.Drawing.Size(347, 350);
+            this.worldMapView.Size = new System.Drawing.Size(622, 551);
             this.worldMapView.TabIndex = 1;
             this.worldMapView.TabStop = false;
             this.worldMapView.Click += new System.EventHandler(this.WorldMapView_Click);
@@ -64,7 +64,7 @@
             // 
             // focusOnPlayer
             // 
-            this.focusOnPlayer.Location = new System.Drawing.Point(12, 369);
+            this.focusOnPlayer.Location = new System.Drawing.Point(12, 570);
             this.focusOnPlayer.Name = "focusOnPlayer";
             this.focusOnPlayer.Size = new System.Drawing.Size(75, 23);
             this.focusOnPlayer.TabIndex = 2;
@@ -74,7 +74,7 @@
             // 
             // gameRunningControl
             // 
-            this.gameRunningControl.Location = new System.Drawing.Point(721, 368);
+            this.gameRunningControl.Location = new System.Drawing.Point(982, 368);
             this.gameRunningControl.Name = "gameRunningControl";
             this.gameRunningControl.Size = new System.Drawing.Size(66, 51);
             this.gameRunningControl.TabIndex = 3;
@@ -85,7 +85,7 @@
             // worldTimeLabel
             // 
             this.worldTimeLabel.AutoSize = true;
-            this.worldTimeLabel.Location = new System.Drawing.Point(12, 405);
+            this.worldTimeLabel.Location = new System.Drawing.Point(12, 606);
             this.worldTimeLabel.Name = "worldTimeLabel";
             this.worldTimeLabel.Size = new System.Drawing.Size(26, 13);
             this.worldTimeLabel.TabIndex = 4;
@@ -93,7 +93,7 @@
             // 
             // startMission
             // 
-            this.startMission.Location = new System.Drawing.Point(640, 369);
+            this.startMission.Location = new System.Drawing.Point(901, 369);
             this.startMission.Name = "startMission";
             this.startMission.Size = new System.Drawing.Size(75, 49);
             this.startMission.TabIndex = 5;
@@ -102,20 +102,10 @@
             this.startMission.Visible = false;
             this.startMission.Click += new System.EventHandler(this.StartMission_Click);
             // 
-            // generateNewWorld
-            // 
-            this.generateNewWorld.Location = new System.Drawing.Point(94, 368);
-            this.generateNewWorld.Name = "generateNewWorld";
-            this.generateNewWorld.Size = new System.Drawing.Size(75, 23);
-            this.generateNewWorld.TabIndex = 6;
-            this.generateNewWorld.Text = "Generate";
-            this.generateNewWorld.UseVisualStyleBackColor = true;
-            this.generateNewWorld.Click += new System.EventHandler(this.GenerateNewWorld_Click);
-            // 
             // coords
             // 
             this.coords.AutoSize = true;
-            this.coords.Location = new System.Drawing.Point(94, 405);
+            this.coords.Location = new System.Drawing.Point(94, 606);
             this.coords.Name = "coords";
             this.coords.Size = new System.Drawing.Size(35, 13);
             this.coords.TabIndex = 7;
@@ -123,7 +113,7 @@
             // 
             // enterCity
             // 
-            this.enterCity.Location = new System.Drawing.Point(559, 368);
+            this.enterCity.Location = new System.Drawing.Point(820, 368);
             this.enterCity.Name = "enterCity";
             this.enterCity.Size = new System.Drawing.Size(75, 50);
             this.enterCity.TabIndex = 8;
@@ -132,11 +122,21 @@
             this.enterCity.Visible = false;
             this.enterCity.Click += new System.EventHandler(this.CityView_Click);
             // 
+            // generateNewWorld
+            // 
+            this.generateNewWorld.Location = new System.Drawing.Point(94, 569);
+            this.generateNewWorld.Name = "generateNewWorld";
+            this.generateNewWorld.Size = new System.Drawing.Size(75, 23);
+            this.generateNewWorld.TabIndex = 6;
+            this.generateNewWorld.Text = "Generate";
+            this.generateNewWorld.UseVisualStyleBackColor = true;
+            this.generateNewWorld.Click += new System.EventHandler(this.GenerateNewWorld_Click);
+            // 
             // WorldView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1055, 628);
             this.Controls.Add(this.enterCity);
             this.Controls.Add(this.coords);
             this.Controls.Add(this.generateNewWorld);
@@ -164,8 +164,8 @@
         private System.Windows.Forms.Button gameRunningControl;
         private System.Windows.Forms.Label worldTimeLabel;
         private System.Windows.Forms.Button startMission;
-        private System.Windows.Forms.Button generateNewWorld;
         private System.Windows.Forms.Label coords;
         private System.Windows.Forms.Button enterCity;
+        private System.Windows.Forms.Button generateNewWorld;
     }
 }

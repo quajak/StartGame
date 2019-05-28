@@ -354,6 +354,8 @@ namespace StartGame
                 nextAction.Enabled = true;
             }
             nextAction.Focus();
+            fleeButton.Enabled = canPlayerEscape && (humanPlayer.troop.Position.X == 0 || humanPlayer.troop.Position.X == map.map.GetUpperBound(0) ||
+                humanPlayer.troop.Position.Y == 0 || humanPlayer.troop.Position.Y == map.map.GetUpperBound(1));
         }
 
         #endregion Game Loop

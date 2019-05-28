@@ -21,7 +21,7 @@ namespace StartGame.World
             Render();
         }
 
-        int zoom = 0;
+        int zoom = -16;
         private void WorldMapBox_MouseWheel(object sender, MouseEventArgs e)
         {
             //pre zoom snap to grid and center on mouse
@@ -115,6 +115,14 @@ namespace StartGame.World
             ProgressTime(new TimeSpan(365, 0, 0, 0, 0));
             Render();
         }
+        private void RunTenYears_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                ProgressTime(new TimeSpan(365, 0, 0, 0, 0));
+            }
+            Render();
+        }
 
         private void RunDay_Click(object sender, EventArgs e)
         {
@@ -174,5 +182,6 @@ namespace StartGame.World
         {
             return worldRenderer.Position.Cut(0, (20 + zoom) * World.WORLD_SIZE - worldMapBox.Width, 0, (20 + zoom) * World.WORLD_SIZE - worldMapBox.Height);
         }
+
     }
 }

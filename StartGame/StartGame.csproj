@@ -272,6 +272,7 @@
     <Compile Include="World\Cities\Farm.cs" />
     <Compile Include="World\Cities\MayorHouse.cs" />
     <Compile Include="World\Cities\Producer.cs" />
+    <Compile Include="World\Cities\Settlement.cs" />
     <Compile Include="World\Cities\Store.cs" />
     <Compile Include="World\Island.cs" />
     <Compile Include="World\Nation.cs" />

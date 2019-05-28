@@ -241,6 +241,10 @@ namespace StartGame.World
             //medium: 10
             //small: a lot - generate close to areas of high resources
             int[] numbers = new[] { 1, 4, 8 };
+            //int[] numbers = new[] { 1, 2, 4 };
+            int cityNum = random.Next(10, 15); //Small city number - TODO: Better way to solve overpopulation of cities
+            //int cityNum = random.Next(2, 5); //Small city number - TODO: Better way to solve overpopulation of cities
+
             int total = numbers.Sum();
             for (int i = 0; i < total; i++)
             {
@@ -297,7 +301,6 @@ namespace StartGame.World
                     regionalValue[x, y] = average;
                 }
             }
-            int cityNum = random.Next(10, 15); //TODO: Better way to solve overpopulation of cities
             while (cityNum > 0)
             {
                 int xS = random.Next(WORLD_SIZE / 10);

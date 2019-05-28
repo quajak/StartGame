@@ -15,7 +15,7 @@ namespace StartGame.World.Cities
         }
 
         public int money;
-        private readonly City city;
+        internal readonly City city;
 
         public Store(List<InventoryItem> items, int money, string name, string desc, City city) : base(++ID, name, desc,
             new List<CityBuildingAction> { new CityBuildingAction("Buy"), new CityBuildingAction("Sell") })
@@ -184,7 +184,12 @@ namespace StartGame.World.Cities
         {
             return GetBuyPrice(item, city);
         }
-
+        /// <summary>
+        /// The price it costs an entitiy to buy the item from the shop
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="city"></param>
+        /// <returns></returns>
         public static int GetBuyPrice(Item item, City city)
         {
             switch (item)
@@ -205,7 +210,11 @@ namespace StartGame.World.Cities
                     throw new NotImplementedException();
             }
         }
-
+        /// <summary>
+        /// The money a player gets for selling an item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public int GetSellPrice(Item item)
         {
             switch (item)
@@ -397,7 +406,7 @@ namespace StartGame.World.Cities
         }
         FoodMarket(List<InventoryItem> items, int money, City city) : base(items, money, "Food Market", "A small market selling local produce", city)
         {
-
+            allowMultiple = false;
         }
 
         /// <summary>
@@ -434,12 +443,56 @@ namespace StartGame.World.Cities
                 item.cost = GetBuyPrice(item, city);
                 sold.Add(new InventorySellableItem(item));
             }
+            sold.Add(new InventoryItem(new Food("Apple", 1, 1, 0), city.RequiredFood, 1)); // to feed all the people at first
 
             return sold;
         }
 
         public override void WorldAction()
         {
+            //Trace.TraceInformation($"{city.name} had {Items.Sum(i => i.Amount)} food left over");
+            //The food market will buy from the sorrounding farms and will collect it for the town
+            Island island = World.Instance.worldMap.Get(city.position).island;
+            List<Farm> farms = World.Instance.nation.farms.Where(f => World.Instance.worldMap.Get(f.position).island == island && AIUtility.Distance(city.position, f.position) < 25)
+                .OrderBy(f => AIUtility.Distance(city.position, f.position)).ToList();
+            farms.ForEach(f => f.SortItems());
+            int toBuy = (int)(city.RequiredFood - Items.Sum(i => i.Amount)  * 1.8);
+            if(farms.Count != 0)
+            {
+                while (toBuy > 0 && money >= 0)
+                {
+                    Farm bestFarm = farms[0];
+                    int minPrice = int.MaxValue;
+                    foreach (var farm in farms)
+                    {
+                        if(farm.Items().Count > 0 && minPrice > farm.Items()[0].cost)
+                        {
+                            minPrice = farm.Items()[0].cost;
+                            bestFarm = farm;
+                        }
+                    }
+                    if (minPrice == int.MaxValue)
+                        break;
+                    Resource resource = bestFarm.Items()[0];
+                    int amount = resource.amount;
+                    if (bestFarm.GetPrice(resource.name, amount) <= money)
+                    {
+                        toBuy -= amount;
+                        money -= bestFarm.Buy(bestFarm.Items()[0].name, bestFarm.Items()[0].amount);
+                        if (Items.TryGet(i => i.item.name == resource.name, out InventoryItem inventoryItem))
+                        {
+                            inventoryItem.Amount += amount;
+                        }
+                        else
+                        {
+                            Items.Add(new InventoryItem(resource, amount, city.DetermineLocalFoodPrice(resource)));
+                        }
+                    }
+                    else
+                        break; ;
+                }
+            }
+            //Trace.TraceInformation($"{city.name} has {Items.Sum(i => i.Amount)} after buying");
 
         }
     }

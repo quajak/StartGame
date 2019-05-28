@@ -17,6 +17,7 @@ namespace StartGame.World.Cities
         public string description;
         public List<CityBuildingAction> actions;
         public int Priority = 10;
+        public bool allowMultiple = true;
 
         public CityBuilding(int id, string name, string description, List<CityBuildingAction> actions)
         {
@@ -51,6 +52,7 @@ namespace StartGame.World.Cities
         public Port(City city) : base(++ID, "Port", "It is a port.", new List<CityBuildingAction> { new CityBuildingAction("Fast Travel") })
         {
             this.city = city;
+            allowMultiple = false;
         }
 
         CityView cityV;

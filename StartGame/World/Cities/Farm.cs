@@ -14,12 +14,17 @@ namespace StartGame.World.Cities
     public class Farm : Settlement, IProducer
     {
         private int workers = 10;
-        readonly List<Resource> items = new List<Resource>();
-        int money = 100000;
+        List<Resource> items = new List<Resource>();
+        int money = 20000;
         List<Crop> growingCrops = new List<Crop>();
         int yearlyProduction = 0;
         private readonly int agriculturalValue;
         bool dead = false;
+
+        public void SortItems()
+        {
+            items = items.OrderBy(i => i.cost).ToList();
+        }
 
         readonly City city;
         public Farm(Point position, int agriculturalValue) : base("Farm", ++ID, position, Resources.Farm1, 1)
@@ -96,9 +101,11 @@ namespace StartGame.World.Cities
             return GetPrice(amount, item);
         }
 
-        internal int Buy(string name, int amount)
+        public int Buy(string name, int amount)
         {
             Resource item = items.Find(i => i.name == name);
+            if (item is null)
+                throw new Exception();
             item.amount -= amount;
             if (item.amount < 0) throw new Exception();
             if (item.amount == 0)
