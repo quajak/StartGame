@@ -1,6 +1,6 @@
 ﻿using StartGame.Items;
 using StartGame.Items.Crops;
-using StartGame.MathFunctions;
+using StartGame.Functions;
 using StartGame.PlayerData;
 using StartGame.Properties;
 using System;

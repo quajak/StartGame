@@ -118,6 +118,7 @@
     <Compile Include="Forms\SelectItem.Designer.cs">
       <DependentUpon>SelectItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Functions\Forker.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Items\Ammo.cs" />
     <Compile Include="Items\ArmourPrefabs.cs" />
@@ -126,7 +127,7 @@
     <Compile Include="Items\Jewelry.cs" />
     <Compile Include="Items\Resource.cs" />
     <Compile Include="MapBiome.cs" />
-    <Compile Include="MathFunctions\Range.cs" />
+    <Compile Include="Functions\Range.cs" />
     <Compile Include="Mission\AnimalFightMissions.cs" />
     <Compile Include="Mission\MissionWorldPlayer.cs" />
     <Compile Include="PlayerData\AI.cs" />
@@ -190,7 +191,7 @@
     <Compile Include="PlayerData\WorldPlayer.cs" />
     <Compile Include="Rendering\MapRenderer.cs" />
     <Compile Include="Mission\Mission.cs" />
-    <Compile Include="MathFunctions\PerlinNoise.cs" />
+    <Compile Include="Functions\PerlinNoise.cs" />
     <Compile Include="PlayerData\CustomPlayer.cs" />
     <Compile Include="PlayerData\DefensiveBanditAI.cs" />
     <Compile Include="PlayerData\DistanceGraphCreator.cs" />

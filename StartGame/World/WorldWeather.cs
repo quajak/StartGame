@@ -1,16 +1,18 @@
-﻿using System;
+﻿using StartGame.Functions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 //This file is used to do the weather calculations
 
 namespace StartGame.World
 {
-    public struct WeatherPoint
+    public class WeatherPoint
     {
         /// <summary>
         /// East-west speed 
@@ -102,6 +104,8 @@ namespace StartGame.World
             dP = 0;
             dT = 0;
         }
+
+        public WeatherPoint() { }
     }
 
     public partial class World
@@ -120,12 +124,12 @@ namespace StartGame.World
         /// <summary>
         /// In hours
         /// </summary>
-        public const double atmosphereTimeStep = 1;
+        public const double atmosphereTimeStep = 2;
         //Weather variables
         public const int DX = 20; // Every box is 20 km wide
         public const int DY = 20; // Every box is 20 km up
         public const int DZ = 1; //Every box is 1 km up
-        public const int MaxZ = 10;
+        public const int MaxZ = 1;
 
         /// <summary>
         /// 3D array so index = z + x * 20 / DZ + y * WORLD_SIZE * 20
@@ -180,83 +184,97 @@ namespace StartGame.World
             }
         }
 
+        //void CalculateAtmosphereTimeStep(bool debug = false)
+        //{
+        //    DateTime time = DateTime.Now;
+        //    //We simply calculate each one from the values around them, so they will have old and new value used
+        //    for (int x = 0; x < WORLD_SIZE; x++)
+        //    {
+        //        for (int y = 0; y < WORLD_SIZE; y++)
+        //        {
+        //            for (int z = 0; z < 20 / DZ; z++)
+        //            {
+        //                //See https://en.wikipedia.org/wiki/Primitive_equations
+        //                int position = z + 20 * x + y * WORLD_SIZE * 20;
+        //                WeatherPoint point = atmosphere[position];
+
+        //                // du/dt -fv = -d geopotential / dx
+        //                WeatherPoint right = atmosphere[z + 20 * (x + 1) + y + WORLD_SIZE * 20];
+        //                WeatherPoint left = atmosphere[z + 20 * (x - 1) + y + WORLD_SIZE * 20];
+        //                double dU = atmosphereTimeStep * point.f * (point.v + 0.001) - (right.geopotential - left.geopotential) / (2 * DX);
+        //                point.u += dU;
+        //                // dv/dt + fu = -d geopotential / dy
+        //                WeatherPoint bottom = atmosphere[z + 20 * x + (y + 1) + WORLD_SIZE * 20];
+        //                WeatherPoint top = atmosphere[z + 20 * x + (y - 1) + WORLD_SIZE * 20];
+        //                double dV = atmosphereTimeStep * point.f * point.u - (bottom.geopotential - top.geopotential) / (2 * DX);
+        //                point.v += dV;
+        //                // p = air densiy * R * T
+        //                double pressure = point.pressure;
+        //                point.pressure = 1013 * Math.Exp(-0.02896 * 9.807 / (R * 288.15) * (273 + point.temperature)); //See https://www.math24.net/barometric-formula/;
+        //                double dPressures = pressure - point.pressure;
+        //                // d geopotential = d pressure * ( R * T / p)
+        //                double dGeoPotential = dPressures * (R * point.temperature / point.pressure);
+        //                point.geopotential += dGeoPotential;
+        //                // d vertical = d pressure * ( -dU / dx -dV / dy)
+        //                double dW = dPressures * (-dU / DX - dV / DY);
+        //                point.w += dW;
+        //                // dT (1 /dt + u/dx + v/dy + w/dp - w*R*T/(p*cp)) = J/cp
+        //                // dT = J / (cp * (1 / dt + u/dx + v/dy +w /dp - w*R*T/(p * pc))
+        //                // I guess J is simply energy balance
+        //                double dT = point.EnergyBalance / (10 * WeatherPoint.specificHeat *
+        //                    (1d / atmosphereTimeStep + point.u / dU + point.v / dV + point.w / dPressures - point.w * R * point.temperature / (point.pressure * WeatherPoint.specificHeat)));
+        //                if (!double.IsNaN(dT))
+        //                {
+        //                    if (Math.Abs(dT) > 4)
+        //                        point.temperature += Math.Sign(dT) * 4;
+        //                    //throw new Exception();
+        //                    point.temperature += dT;
+        //                }
+        //                else
+        //                    point.temperature += 0.0001;
+        //                if (point.temperature == 0 && point.pressure == 0 && point.u == 0 && point.v == 0 &&
+        //                    point.geopotential == 0 && point.w == 0)
+        //                    throw new Exception();
+        //                if (double.IsNaN(point.temperature))
+        //                    throw new Exception();
+        //                if (double.IsNaN(point.pressure))
+        //                    throw new Exception();
+        //                if (double.IsNaN(point.u))
+        //                    throw new Exception();
+        //                if (double.IsNaN(point.v))
+        //                    throw new Exception();
+        //                if (double.IsNaN(point.geopotential))
+        //                    throw new Exception();
+        //                if (double.IsNaN(point.w))
+        //                    throw new Exception();
+        //                atmosphere[position] = point;
+        //            }
+        //        }
+        //    }
+        //    if (debug)
+        //        Trace.TraceInformation($"Atmosphere calculation in {(DateTime.Now - time).TotalMilliseconds}");
+        //}
         void CalculateAtmosphereTimeStep(bool debug = false)
         {
             DateTime time = DateTime.Now;
-            //We simply calculate each one from the values around them, so they will have old and new value used
-            for (int x = 0; x < WORLD_SIZE; x++)
+            Forker forker = new Forker();
+            for (int i = 0; i < 9; i++)
             {
-                for (int y = 0; y < WORLD_SIZE; y++)
-                {
-                    for (int z = 0; z < 20 / DZ; z++)
-                    {
-                        //See https://en.wikipedia.org/wiki/Primitive_equations
-                        int position = z + 20 * x + y * WORLD_SIZE * 20;
-                        WeatherPoint point = atmosphere[position];
-
-                        // du/dt -fv = -d geopotential / dx
-                        WeatherPoint right = atmosphere[z + 20 * (x + 1) + y + WORLD_SIZE * 20];
-                        WeatherPoint left = atmosphere[z + 20 * (x - 1) + y + WORLD_SIZE * 20];
-                        double dU = atmosphereTimeStep * point.f * (point.v + 0.001) - (right.geopotential - left.geopotential) / (2 * DX);
-                        point.u += dU;
-                        // dv/dt + fu = -d geopotential / dy
-                        WeatherPoint bottom = atmosphere[z + 20 * x + (y + 1) + WORLD_SIZE * 20];
-                        WeatherPoint top = atmosphere[z + 20 * x + (y - 1) + WORLD_SIZE * 20];
-                        double dV = atmosphereTimeStep * point.f * point.u - (bottom.geopotential - top.geopotential) / (2 * DX);
-                        point.v += dV;
-                        // p = air densiy * R * T
-                        double pressure = point.pressure;
-                        point.pressure = 1013 * Math.Exp(-0.02896 * 9.807 / (R * 288.15) * (273 + point.temperature)); //See https://www.math24.net/barometric-formula/;
-                        double dPressures = pressure - point.pressure;
-                        // d geopotential = d pressure * ( R * T / p)
-                        double dGeoPotential = dPressures * (R * point.temperature / point.pressure);
-                        point.geopotential += dGeoPotential;
-                        // d vertical = d pressure * ( -dU / dx -dV / dy)
-                        double dW = dPressures * (-dU / DX - dV / DY);
-                        point.w += dW;
-                        // dT (1 /dt + u/dx + v/dy + w/dp - w*R*T/(p*cp)) = J/cp
-                        // dT = J / (cp * (1 / dt + u/dx + v/dy +w /dp - w*R*T/(p * pc))
-                        // I guess J is simply energy balance
-                        double dT = point.EnergyBalance / (10 * WeatherPoint.specificHeat *
-                            (1d / atmosphereTimeStep + point.u / dU + point.v / dV + point.w / dPressures - point.w * R * point.temperature / (point.pressure * WeatherPoint.specificHeat)));
-                        if (!double.IsNaN(dT))
-                        {
-                            if (Math.Abs(dT) > 4)
-                                point.temperature += Math.Sign(dT) * 4;
-                            //throw new Exception();
-                            point.temperature += dT;
-                        }
-                        else
-                            point.temperature += 0.0001;
-                        if (point.temperature == 0 && point.pressure == 0 && point.u == 0 && point.v == 0 &&
-                            point.geopotential == 0 && point.w == 0)
-                            throw new Exception();
-                        if (double.IsNaN(point.temperature))
-                            throw new Exception();
-                        if (double.IsNaN(point.pressure))
-                            throw new Exception();
-                        if (double.IsNaN(point.u))
-                            throw new Exception();
-                        if (double.IsNaN(point.v))
-                            throw new Exception();
-                        if (double.IsNaN(point.geopotential))
-                            throw new Exception();
-                        if (double.IsNaN(point.w))
-                            throw new Exception();
-                        atmosphere[position] = point;
-                    }
-                }
+                int startY = i * WORLD_SIZE / 10;
+                int endY = (i + 1) * WORLD_SIZE / 10;
+                forker.Fork(() => CalculateWeather(startY, endY));
             }
+            forker.Join();
             if (debug)
                 Trace.TraceInformation($"Atmosphere calculation in {(DateTime.Now - time).TotalMilliseconds}");
         }
-        void NewCalculateAtmosphereTimeStep(bool debug = false)
+
+        private void CalculateWeather(int startY, int endY)
         {
-            DateTime time = DateTime.Now;
             //We simply calculate each one from the values around them, so they will have old and new value used
             for (int x = 0; x < WORLD_SIZE; x++)
             {
-                for (int y = 0; y < WORLD_SIZE; y++)
+                for (int y = startY; y < endY; y++)
                 {
                     for (int z = 0; z < MaxZ / DZ; z++)
                     {
@@ -284,7 +302,7 @@ namespace StartGame.World
                             left = atmosphere[z + MaxZ * (x - 1) + y * WORLD_SIZE * MaxZ];
                         }
                         double moveU = (point.u * atmosphereTimeStep * 4) / DX;
-                        if(point.u > 0)
+                        if (point.u > 0)
                         {
                             right.u += moveU;
                         }
@@ -378,9 +396,6 @@ namespace StartGame.World
                     }
                 }
             }
-            if (debug)
-                Trace.TraceInformation($"Atmosphere calculation in {(DateTime.Now - time).TotalMilliseconds}");
         }
-
     }
 }

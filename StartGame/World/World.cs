@@ -1,4 +1,4 @@
-﻿using StartGame.MathFunctions;
+﻿using StartGame.Functions;
 using StartGame.Mission;
 using StartGame.PlayerData;
 using StartGame.Properties;
@@ -533,21 +533,14 @@ namespace StartGame.World
         public void ProgressTime(TimeSpan timePassed, bool debug = false)
         {
             TimeSpan counter = new TimeSpan(0);
-            int timeSeconds = (int)timePassed.TotalSeconds;
-            while (timeSeconds > 0)
+            int timeHours = (int)timePassed.TotalHours;
+            for (int i = 0; i < timeHours / atmosphereTimeStep; i++)
             {
-                TimeSpan timeSpan = new TimeSpan(0, (int)(60 * atmosphereTimeStep), 0);
-                time += timeSpan;
-                counter += timeSpan;
-                timeSeconds -= (int)timeSpan.TotalSeconds;
-                NewCalculateAtmosphereTimeStep(debug);
+                CalculateAtmosphereTimeStep(debug);
                 //CalculateAtmosphereTimeStep(debug);
-                if(counter.Hours >= 2)
-                {
-                    counter -= new TimeSpan(2, 0, 0);
-                    nation.WorldAction(1);
-                    actors.ForEach(a => a.WorldAction(1));
-                }
+                counter -= new TimeSpan(2, 0, 0);
+                nation.WorldAction(1);
+                actors.ForEach(a => a.WorldAction(1));
             }
         }
 

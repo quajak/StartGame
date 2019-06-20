@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StartGame.MathFunctions
+namespace StartGame.Functions
 {
     public class Range
     {

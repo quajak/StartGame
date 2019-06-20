@@ -1,5 +1,5 @@
 ﻿
-namespace StartGame.MathFunctions
+namespace StartGame.Functions
 {
 	public class PerlinNoise
 	{

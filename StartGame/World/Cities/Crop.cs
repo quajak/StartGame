@@ -1,4 +1,4 @@
-﻿using StartGame.MathFunctions;
+﻿using StartGame.Functions;
 using StartGame.World.Cities;
 using System;
 using System.Collections.Generic;

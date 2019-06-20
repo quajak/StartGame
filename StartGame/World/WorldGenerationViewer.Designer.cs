@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.label1 = new System.Windows.Forms.Label();
             this.heightMapBox = new System.Windows.Forms.PictureBox();
             this.temperatureMapBox = new System.Windows.Forms.PictureBox();
@@ -334,17 +334,17 @@
             // 
             // populationChart
             // 
-            chartArea1.Name = "ChartArea1";
-            this.populationChart.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.populationChart.Legends.Add(legend1);
+            chartArea2.Name = "ChartArea1";
+            this.populationChart.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.populationChart.Legends.Add(legend2);
             this.populationChart.Location = new System.Drawing.Point(746, 13);
             this.populationChart.Name = "populationChart";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.populationChart.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.populationChart.Series.Add(series2);
             this.populationChart.Size = new System.Drawing.Size(680, 309);
             this.populationChart.TabIndex = 817;
             this.populationChart.Text = "chart1";
@@ -446,7 +446,7 @@
             this.run6Min.Name = "run6Min";
             this.run6Min.Size = new System.Drawing.Size(75, 23);
             this.run6Min.TabIndex = 829;
-            this.run6Min.Text = "Run 6 Min";
+            this.run6Min.Text = "Run 2 Hours";
             this.run6Min.UseVisualStyleBackColor = true;
             this.run6Min.Click += new System.EventHandler(this.Run6Min_Click);
             // 

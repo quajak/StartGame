@@ -139,9 +139,9 @@ namespace StartGame.World
 
         void ProgressTime(TimeSpan time)
         {
-            for (int i = 0; i < time.TotalDays; i++)
+            for (int i = 0; i < time.TotalHours; i++)
             {
-                World.Instance.ProgressTime(new TimeSpan(0, Math.Min(time.Hours, 1), Math.Min(time.Minutes, 60), 0));
+                World.Instance.ProgressTime(new TimeSpan(0, 1, 0, 0));
                 if(World.Instance.time.DayOfYear % 7 == 0)
                 {
                     AddDataPoints();

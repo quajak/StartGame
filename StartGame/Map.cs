@@ -1,5 +1,5 @@
 ﻿using StartGame.Entities;
-using StartGame.MathFunctions;
+using StartGame.Functions;
 using StartGame.PlayerData;
 using System;
 using System.Collections.Generic;
