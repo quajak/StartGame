@@ -58,6 +58,12 @@ namespace StartGame.World
             mineralMapBox.Image = worldRenderer.DrawMineralMap(size);
             agriculturalMapBox.Image = worldRenderer.DrawAgriculturalMap(size);
             valueMapBox.Image = worldRenderer.DrawValueMap(size);
+            temperatureMap.Image = worldRenderer.DrawAtmosphereTemperatureMap(size);
+            pressureMap.Image = worldRenderer.DrawPressureMap(size);
+            latWindMap.Image = worldRenderer.DrawLatWindMap(size);
+            lonWindMap.Image = worldRenderer.DrawLonWindMap(size);
+            dPressureMap.Image = worldRenderer.DrawDPMap(size);
+            dTemperatureMap.Image = worldRenderer.DrawDTMap(size);
         }
 
         private void TrackBar1_Scroll(object sender, EventArgs e)
@@ -135,7 +141,7 @@ namespace StartGame.World
         {
             for (int i = 0; i < time.TotalDays; i++)
             {
-                World.Instance.ProgressTime(new TimeSpan(1, 0, 0, 0));
+                World.Instance.ProgressTime(new TimeSpan(0, Math.Min(time.Hours, 1), Math.Min(time.Minutes, 60), 0));
                 if(World.Instance.time.DayOfYear % 7 == 0)
                 {
                     AddDataPoints();
@@ -183,5 +189,10 @@ namespace StartGame.World
             return worldRenderer.Position.Cut(0, (20 + zoom) * World.WORLD_SIZE - worldMapBox.Width, 0, (20 + zoom) * World.WORLD_SIZE - worldMapBox.Height);
         }
 
+        private void Run6Min_Click(object sender, EventArgs e)
+        {
+            ProgressTime(new TimeSpan(0, 6, 0));
+            Render();
+        }
     }
 }

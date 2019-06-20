@@ -99,6 +99,150 @@ namespace StartGame.Rendering
             return worldImage;
         }
 
+        internal Image DrawLatWindMap(int size)
+        {
+            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    {
+
+                        WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ];
+                        double v = point.u;
+                        if (v > 0)
+                        {
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size, y * size, size, size);
+                        }
+                        else if (v == 0)
+                        {
+
+                        }
+                        else
+                        {
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255),0, 255, 0)), x * size, y * size, size, size);
+                        }
+                    }
+                }
+            }
+            return worldImage;
+        }
+
+        internal Image DrawLonWindMap(int size)
+        {
+            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    {
+
+                        WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ];
+                        double v = point.v;
+                        if(v > 0)
+                        {
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0,255),0, 0, 255)), x * size, y * size, size, size);
+                        }
+                        else if(v == 0)
+                        {
+
+                        }
+                        else
+                        {
+                            v = Math.Abs(v);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0,255),0,255, 0)), x * size, y * size, size, size);
+                        }
+                    }
+                }
+            }
+            return worldImage;
+        }
+
+        internal Image DrawDTMap(int size)
+        {
+            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    {
+
+                        WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ];
+                        double v = 10 * point.dT;
+                        if (v > 0)
+                        {
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 255, 0, 0)), x * size, y * size, size, size);
+                        }
+                        else if (v == 0)
+                        {
+
+                        }
+                        else
+                        {
+                            v = Math.Abs(v);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255 - (int)v.Cut(0, 255), 255 - (int)v.Cut(0, 255), 255)), x * size, y * size, size, size);
+                        }
+                    }
+                }
+            }
+            return worldImage;
+        }
+
+        internal Image DrawDPMap(int size)
+        {
+            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    {
+
+                        WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ];
+                        double v = 10 * point.dP;
+                        if (v > 0)
+                        {
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size, y * size, size, size);
+                        }
+                        else if (v == 0)
+                        {
+
+                        }
+                        else
+                        {
+                            v = Math.Abs(v);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb(0,(int)v.Cut(0, 255), 255, 255)), x * size, y * size, size, size);
+                        }
+                    }
+                }
+            }
+            return worldImage;
+        }
+
+        internal Image DrawPressureMap(int size)
+        {
+            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    {
+                        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(Math.Min(2 * (World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ].pressure - 960).Cut(0,255), 255)), 255, 0, 255)), x * size, y * size, size, size);
+                    }
+                }
+            }
+            return worldImage;
+        }
+
         public Bitmap DrawHeightMap(int size = 20)
         {
             Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
@@ -158,6 +302,26 @@ namespace StartGame.Rendering
                 }
             }
             return worldImage;
+        }
+
+        public Bitmap DrawAtmosphereTemperatureMap(int size = 20)
+        {
+            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    {
+                        g.FillRectangle(new SolidBrush(
+                            Color.FromArgb((int)((World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ].temperature + 40)/ 100d * 255).Cut(0, 255), 0, 0, 255)),
+                            x * size, y * size, size, size);
+                    }
+                }
+            }
+            return worldImage;
+
         }
 
         public Bitmap DrawRainfallMap(int size = 20)

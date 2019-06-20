@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace StartGame.World
 {
-    public class World
+    public partial class World
     {
         public const int WORLD_SIZE = 200;
         public const int WORLD_DIFFICULTY = 5;
@@ -188,6 +188,10 @@ namespace StartGame.World
                     costMap[x, y] = cost;
                 }
             }
+
+            //Initialise atmosphere
+            InitialiseAtmosphere();
+
             //Calculate connections
             for (int x = 0; x < WORLD_SIZE; x++)
             {
@@ -526,12 +530,25 @@ namespace StartGame.World
             return values;
         }
 
-        public void ProgressTime(TimeSpan timePassed)
+        public void ProgressTime(TimeSpan timePassed, bool debug = false)
         {
-            time += timePassed;
-            double actions = Math.Round(timePassed.TotalHours * 2, MidpointRounding.AwayFromZero) / 2;
-            nation.WorldAction(actions);
-            actors.ForEach(a => a.WorldAction(actions));
+            TimeSpan counter = new TimeSpan(0);
+            int timeSeconds = (int)timePassed.TotalSeconds;
+            while (timeSeconds > 0)
+            {
+                TimeSpan timeSpan = new TimeSpan(0, (int)(60 * atmosphereTimeStep), 0);
+                time += timeSpan;
+                counter += timeSpan;
+                timeSeconds -= (int)timeSpan.TotalSeconds;
+                NewCalculateAtmosphereTimeStep(debug);
+                //CalculateAtmosphereTimeStep(debug);
+                if(counter.Hours >= 2)
+                {
+                    counter -= new TimeSpan(2, 0, 0);
+                    nation.WorldAction(1);
+                    actors.ForEach(a => a.WorldAction(1));
+                }
+            }
         }
 
         public void Move(WorldPlayer actor, Point position)

@@ -274,6 +274,7 @@
     <Compile Include="World\Cities\Producer.cs" />
     <Compile Include="World\Cities\Settlement.cs" />
     <Compile Include="World\Cities\Store.cs" />
+    <Compile Include="World\WorldWeather.cs" />
     <Compile Include="World\Island.cs" />
     <Compile Include="World\Nation.cs" />
     <Compile Include="World\World.cs" />

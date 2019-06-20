@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.label1 = new System.Windows.Forms.Label();
             this.heightMapBox = new System.Windows.Forms.PictureBox();
             this.temperatureMapBox = new System.Windows.Forms.PictureBox();
@@ -62,6 +62,19 @@
             this.runMonth = new System.Windows.Forms.Button();
             this.runYear = new System.Windows.Forms.Button();
             this.runTenYears = new System.Windows.Forms.Button();
+            this.pressureMap = new System.Windows.Forms.PictureBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.temperatureMap = new System.Windows.Forms.PictureBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.latWindMap = new System.Windows.Forms.PictureBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.run6Min = new System.Windows.Forms.Button();
+            this.dPressureMap = new System.Windows.Forms.PictureBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.dTemperatureMap = new System.Windows.Forms.PictureBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.lonWindMap = new System.Windows.Forms.PictureBox();
+            this.label16 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.heightMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.temperatureMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.rainfallMapBox)).BeginInit();
@@ -77,6 +90,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.agriculturalMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.valueMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.populationChart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pressureMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.temperatureMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.latWindMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dPressureMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dTemperatureMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lonWindMap)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -98,7 +117,7 @@
             // 
             // temperatureMapBox
             // 
-            this.temperatureMapBox.Location = new System.Drawing.Point(1003, 785);
+            this.temperatureMapBox.Location = new System.Drawing.Point(819, 785);
             this.temperatureMapBox.Name = "temperatureMapBox";
             this.temperatureMapBox.Size = new System.Drawing.Size(200, 200);
             this.temperatureMapBox.TabIndex = 3;
@@ -107,7 +126,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(1003, 768);
+            this.label2.Location = new System.Drawing.Point(819, 768);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(91, 13);
             this.label2.TabIndex = 2;
@@ -115,7 +134,7 @@
             // 
             // rainfallMapBox
             // 
-            this.rainfallMapBox.Location = new System.Drawing.Point(1229, 785);
+            this.rainfallMapBox.Location = new System.Drawing.Point(1045, 785);
             this.rainfallMapBox.Name = "rainfallMapBox";
             this.rainfallMapBox.Size = new System.Drawing.Size(200, 200);
             this.rainfallMapBox.TabIndex = 5;
@@ -124,7 +143,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(1229, 768);
+            this.label3.Location = new System.Drawing.Point(1045, 768);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(65, 13);
             this.label3.TabIndex = 4;
@@ -227,7 +246,7 @@
             // 
             // nationMapBox
             // 
-            this.nationMapBox.Location = new System.Drawing.Point(1004, 565);
+            this.nationMapBox.Location = new System.Drawing.Point(820, 565);
             this.nationMapBox.Name = "nationMapBox";
             this.nationMapBox.Size = new System.Drawing.Size(200, 200);
             this.nationMapBox.TabIndex = 808;
@@ -236,7 +255,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(1004, 548);
+            this.label8.Location = new System.Drawing.Point(820, 548);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(62, 13);
             this.label8.TabIndex = 807;
@@ -263,7 +282,7 @@
             // 
             // mineralMapBox
             // 
-            this.mineralMapBox.Location = new System.Drawing.Point(1003, 342);
+            this.mineralMapBox.Location = new System.Drawing.Point(819, 342);
             this.mineralMapBox.Name = "mineralMapBox";
             this.mineralMapBox.Size = new System.Drawing.Size(200, 200);
             this.mineralMapBox.TabIndex = 812;
@@ -273,7 +292,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(1003, 325);
+            this.label9.Location = new System.Drawing.Point(819, 325);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(65, 13);
             this.label9.TabIndex = 811;
@@ -281,7 +300,7 @@
             // 
             // agriculturalMapBox
             // 
-            this.agriculturalMapBox.Location = new System.Drawing.Point(1226, 342);
+            this.agriculturalMapBox.Location = new System.Drawing.Point(1042, 342);
             this.agriculturalMapBox.Name = "agriculturalMapBox";
             this.agriculturalMapBox.Size = new System.Drawing.Size(200, 200);
             this.agriculturalMapBox.TabIndex = 814;
@@ -290,7 +309,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(1226, 325);
+            this.label10.Location = new System.Drawing.Point(1042, 325);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(83, 13);
             this.label10.TabIndex = 813;
@@ -298,7 +317,7 @@
             // 
             // valueMapBox
             // 
-            this.valueMapBox.Location = new System.Drawing.Point(1229, 565);
+            this.valueMapBox.Location = new System.Drawing.Point(1045, 565);
             this.valueMapBox.Name = "valueMapBox";
             this.valueMapBox.Size = new System.Drawing.Size(200, 200);
             this.valueMapBox.TabIndex = 816;
@@ -307,7 +326,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(1229, 548);
+            this.label11.Location = new System.Drawing.Point(1045, 548);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(58, 13);
             this.label11.TabIndex = 815;
@@ -315,17 +334,17 @@
             // 
             // populationChart
             // 
-            chartArea2.Name = "ChartArea1";
-            this.populationChart.ChartAreas.Add(chartArea2);
-            legend2.Name = "Legend1";
-            this.populationChart.Legends.Add(legend2);
+            chartArea1.Name = "ChartArea1";
+            this.populationChart.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.populationChart.Legends.Add(legend1);
             this.populationChart.Location = new System.Drawing.Point(746, 13);
             this.populationChart.Name = "populationChart";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.populationChart.Series.Add(series2);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.populationChart.Series.Add(series1);
             this.populationChart.Size = new System.Drawing.Size(680, 309);
             this.populationChart.TabIndex = 817;
             this.populationChart.Text = "chart1";
@@ -370,11 +389,136 @@
             this.runTenYears.UseVisualStyleBackColor = true;
             this.runTenYears.Click += new System.EventHandler(this.RunTenYears_Click);
             // 
+            // pressureMap
+            // 
+            this.pressureMap.Location = new System.Drawing.Point(1251, 565);
+            this.pressureMap.Name = "pressureMap";
+            this.pressureMap.Size = new System.Drawing.Size(200, 200);
+            this.pressureMap.TabIndex = 828;
+            this.pressureMap.TabStop = false;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(1251, 548);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(72, 13);
+            this.label7.TabIndex = 827;
+            this.label7.Text = "Pressure Map";
+            // 
+            // temperatureMap
+            // 
+            this.temperatureMap.Location = new System.Drawing.Point(1248, 342);
+            this.temperatureMap.Name = "temperatureMap";
+            this.temperatureMap.Size = new System.Drawing.Size(200, 200);
+            this.temperatureMap.TabIndex = 826;
+            this.temperatureMap.TabStop = false;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(1248, 325);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(91, 13);
+            this.label12.TabIndex = 825;
+            this.label12.Text = "Temperature Map";
+            // 
+            // latWindMap
+            // 
+            this.latWindMap.Location = new System.Drawing.Point(1251, 785);
+            this.latWindMap.Name = "latWindMap";
+            this.latWindMap.Size = new System.Drawing.Size(200, 200);
+            this.latWindMap.TabIndex = 824;
+            this.latWindMap.TabStop = false;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(1251, 768);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(74, 13);
+            this.label13.TabIndex = 823;
+            this.label13.Text = "Lat Wind Map";
+            // 
+            // run6Min
+            // 
+            this.run6Min.Location = new System.Drawing.Point(549, 42);
+            this.run6Min.Name = "run6Min";
+            this.run6Min.Size = new System.Drawing.Size(75, 23);
+            this.run6Min.TabIndex = 829;
+            this.run6Min.Text = "Run 6 Min";
+            this.run6Min.UseVisualStyleBackColor = true;
+            this.run6Min.Click += new System.EventHandler(this.Run6Min_Click);
+            // 
+            // dPressureMap
+            // 
+            this.dPressureMap.Location = new System.Drawing.Point(1457, 565);
+            this.dPressureMap.Name = "dPressureMap";
+            this.dPressureMap.Size = new System.Drawing.Size(200, 200);
+            this.dPressureMap.TabIndex = 835;
+            this.dPressureMap.TabStop = false;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(1457, 548);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(112, 13);
+            this.label14.TabIndex = 834;
+            this.label14.Text = "Pressure Change Map";
+            // 
+            // dTemperatureMap
+            // 
+            this.dTemperatureMap.Location = new System.Drawing.Point(1454, 342);
+            this.dTemperatureMap.Name = "dTemperatureMap";
+            this.dTemperatureMap.Size = new System.Drawing.Size(200, 200);
+            this.dTemperatureMap.TabIndex = 833;
+            this.dTemperatureMap.TabStop = false;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(1454, 325);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(131, 13);
+            this.label15.TabIndex = 832;
+            this.label15.Text = "Temperature Change Map";
+            // 
+            // lonWindMap
+            // 
+            this.lonWindMap.Location = new System.Drawing.Point(1457, 785);
+            this.lonWindMap.Name = "lonWindMap";
+            this.lonWindMap.Size = new System.Drawing.Size(200, 200);
+            this.lonWindMap.TabIndex = 831;
+            this.lonWindMap.TabStop = false;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(1457, 768);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(77, 13);
+            this.label16.TabIndex = 830;
+            this.label16.Text = "Lon Wind Map";
+            // 
             // WorldGenerationViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1438, 989);
+            this.ClientSize = new System.Drawing.Size(1668, 989);
+            this.Controls.Add(this.dPressureMap);
+            this.Controls.Add(this.label14);
+            this.Controls.Add(this.dTemperatureMap);
+            this.Controls.Add(this.label15);
+            this.Controls.Add(this.lonWindMap);
+            this.Controls.Add(this.label16);
+            this.Controls.Add(this.run6Min);
+            this.Controls.Add(this.pressureMap);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.temperatureMap);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.latWindMap);
+            this.Controls.Add(this.label13);
             this.Controls.Add(this.runTenYears);
             this.Controls.Add(this.runYear);
             this.Controls.Add(this.runMonth);
@@ -424,6 +568,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.agriculturalMapBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.valueMapBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.populationChart)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pressureMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.temperatureMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.latWindMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dPressureMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dTemperatureMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.lonWindMap)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -462,5 +612,18 @@
         private System.Windows.Forms.Button runMonth;
         private System.Windows.Forms.Button runYear;
         private System.Windows.Forms.Button runTenYears;
+        private System.Windows.Forms.PictureBox pressureMap;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.PictureBox temperatureMap;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.PictureBox latWindMap;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Button run6Min;
+        private System.Windows.Forms.PictureBox dPressureMap;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.PictureBox dTemperatureMap;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.PictureBox lonWindMap;
+        private System.Windows.Forms.Label label16;
     }
 }
