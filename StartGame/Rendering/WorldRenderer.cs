@@ -94,6 +94,19 @@ namespace StartGame.Rendering
 
                 //Update Overlay
                 overlayObjects = overlayObjects.Where(o => !o.once).ToList();
+
+                //Draw weather
+                for (int x = X; x < Math.Min(X + Width, World.World.WORLD_SIZE); x++)
+                {
+                    for (int y = Y; y < Math.Min(Y + Height, World.World.WORLD_SIZE); y++)
+                    {
+                        WeatherPoint weatherPoint = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.MaxZ * World.World.WORLD_SIZE];
+                        if(weatherPoint.precipitation == 0)
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(weatherPoint.humidity - (weatherPoint.minimumHumdity / 2) * 2).Cut(0,200), 255, 255, 255)), (x-X) * size, (y-Y) * size, size, size);
+                        else
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(weatherPoint.precipitation * 4).Cut(0, 200), 0, 0, 255)), (x - X) * size, (y - Y) * size, size, size);
+                    }
+                }
             }
             Trace.TraceInformation($"Finished in {(DateTime.Now - time).TotalMilliseconds}");
             return worldImage;
@@ -122,6 +135,7 @@ namespace StartGame.Rendering
                         }
                         else
                         {
+                            v = Math.Abs(v);
                             g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255),0, 255, 0)), x * size, y * size, size, size);
                         }
                     }
@@ -206,7 +220,7 @@ namespace StartGame.Rendering
                     {
 
                         WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ];
-                        double v = 10 * point.dP;
+                        double v = 20 * point.dP;
                         if (v > 0)
                         {
                             g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size, y * size, size, size);
@@ -334,7 +348,28 @@ namespace StartGame.Rendering
                 {
                     for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
                     {
-                        g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, (int)(255 * World.World.Instance.rainfallMap[x, y]))), x * size, y * size, size, size);
+                        g.FillRectangle(
+                            new SolidBrush(Color.FromArgb((int)(6 * (World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ].precipitation)),
+                            0, 0, 255)), x * size, y * size, size, size);
+                    }
+                }
+            }
+            return worldImage;
+        }
+
+        public Bitmap DrawHumidityMap(int size = 20)
+        {
+            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    {
+                        g.FillRectangle(
+                            new SolidBrush(Color.FromArgb((int)(2 * (World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ].humidity).Cut(0,100)),
+                            0, 0, 255)), x * size, y * size, size, size);
                     }
                 }
             }

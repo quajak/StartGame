@@ -541,9 +541,41 @@ namespace StartGame.World
                 counter -= new TimeSpan(2, 0, 0);
                 nation.WorldAction(1);
                 actors.ForEach(a => a.WorldAction(1));
+                foreach (var actor in toChange)
+                {
+                    if (actors.Contains(actor))
+                        actors.Remove(actor);
+                    else
+                        actors.Add(actor);
+                }
             }
         }
 
+        List<WorldPlayer> toChange = new List<WorldPlayer>();
+
+        public void RemovePlayer(WorldPlayer player)
+        {
+            if (actors.Contains(player) && !toChange.Contains(player))
+            {
+                toChange.Add(player);
+            }
+            else if (toChange.Contains(player) && !actors.Contains(player))
+            {
+                toChange.Remove(player);
+            }
+        }
+
+        public void AddPlayer(WorldPlayer player)
+        {
+            if (actors.Contains(player) && toChange.Contains(player))
+            {
+                toChange.Remove(player);
+            }
+            else
+            {
+                toChange.Add(player);
+            }
+        }
         public void Move(WorldPlayer actor, Point position)
         {
             Trace.TraceInformation($"{actor.Name} moved to {position} at {time.ToString("MM/dd/yyyy H:mm")}");

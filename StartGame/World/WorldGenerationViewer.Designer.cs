@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.label1 = new System.Windows.Forms.Label();
             this.heightMapBox = new System.Windows.Forms.PictureBox();
-            this.temperatureMapBox = new System.Windows.Forms.PictureBox();
+            this.humidityMapBox = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.rainfallMapBox = new System.Windows.Forms.PictureBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -76,7 +76,7 @@
             this.lonWindMap = new System.Windows.Forms.PictureBox();
             this.label16 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.heightMapBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.temperatureMapBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.humidityMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.rainfallMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.worldMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
@@ -115,22 +115,22 @@
             this.heightMapBox.TabIndex = 1;
             this.heightMapBox.TabStop = false;
             // 
-            // temperatureMapBox
+            // humidityMapBox
             // 
-            this.temperatureMapBox.Location = new System.Drawing.Point(819, 785);
-            this.temperatureMapBox.Name = "temperatureMapBox";
-            this.temperatureMapBox.Size = new System.Drawing.Size(200, 200);
-            this.temperatureMapBox.TabIndex = 3;
-            this.temperatureMapBox.TabStop = false;
+            this.humidityMapBox.Location = new System.Drawing.Point(819, 785);
+            this.humidityMapBox.Name = "humidityMapBox";
+            this.humidityMapBox.Size = new System.Drawing.Size(200, 200);
+            this.humidityMapBox.TabIndex = 3;
+            this.humidityMapBox.TabStop = false;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(819, 768);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(91, 13);
+            this.label2.Size = new System.Drawing.Size(71, 13);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Temperature Map";
+            this.label2.Text = "Humidity Map";
             // 
             // rainfallMapBox
             // 
@@ -334,17 +334,17 @@
             // 
             // populationChart
             // 
-            chartArea2.Name = "ChartArea1";
-            this.populationChart.ChartAreas.Add(chartArea2);
-            legend2.Name = "Legend1";
-            this.populationChart.Legends.Add(legend2);
+            chartArea1.Name = "ChartArea1";
+            this.populationChart.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.populationChart.Legends.Add(legend1);
             this.populationChart.Location = new System.Drawing.Point(746, 13);
             this.populationChart.Name = "populationChart";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.populationChart.Series.Add(series2);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.populationChart.Series.Add(series1);
             this.populationChart.Size = new System.Drawing.Size(680, 309);
             this.populationChart.TabIndex = 817;
             this.populationChart.Text = "chart1";
@@ -545,7 +545,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.rainfallMapBox);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.temperatureMapBox);
+            this.Controls.Add(this.humidityMapBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.heightMapBox);
             this.Controls.Add(this.label1);
@@ -554,7 +554,7 @@
             this.Text = "WorldGenerationViewer";
             this.Load += new System.EventHandler(this.WorldGenerationViewer_Load);
             ((System.ComponentModel.ISupportInitialize)(this.heightMapBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.temperatureMapBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.humidityMapBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.rainfallMapBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.worldMapBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
@@ -583,7 +583,7 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox heightMapBox;
-        private System.Windows.Forms.PictureBox temperatureMapBox;
+        private System.Windows.Forms.PictureBox humidityMapBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.PictureBox rainfallMapBox;
         private System.Windows.Forms.Label label3;

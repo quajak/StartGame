@@ -485,6 +485,7 @@
     <Content Include="Resources\CityNames.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\Cloud.png" />
     <Content Include="Resources\IslandNames.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

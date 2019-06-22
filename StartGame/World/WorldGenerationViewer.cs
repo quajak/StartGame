@@ -51,7 +51,7 @@ namespace StartGame.World
             int size = 1;
             worldMapBox.Image = worldRenderer.Render(800, 800, 20 + zoom);
             rainfallMapBox.Image = worldRenderer.DrawRainfallMap(size);
-            temperatureMapBox.Image = worldRenderer.DrawTemperatureMap(size);
+            humidityMapBox.Image = worldRenderer.DrawHumidityMap(size);
             heightMapBox.Image = worldRenderer.DrawHeightMap(size);
             rawHeightMapBox.Image = worldRenderer.DrawRawHeightMap(size);
             nationMapBox.Image = worldRenderer.DrawNationMap(size);

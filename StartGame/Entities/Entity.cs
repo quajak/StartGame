@@ -23,8 +23,8 @@ namespace StartGame.Entities
         {
             get => position; set
             {
-                StackTrace stackTrace = new StackTrace();
-                Trace.TraceInformation($"Changing position from {position} to {value} for {Name} - Called from {stackTrace.GetFrame(1).GetMethod().Name}");
+                //StackTrace stackTrace = new StackTrace();
+                //Trace.TraceInformation($"Changing position from {position} to {value} for {Name} - Called from {stackTrace.GetFrame(1).GetMethod().Name}");
                 if (Map != null && blocking)
                     Map.map[position.X, position.Y].free = true;
                 position = value;

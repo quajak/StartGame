@@ -112,6 +112,16 @@ namespace StartGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Cloud {
+            get {
+                object obj = ResourceManager.GetObject("Cloud", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Desert1 {
             get {
                 object obj = ResourceManager.GetObject("Desert1", resourceCulture);

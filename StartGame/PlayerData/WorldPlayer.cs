@@ -1,4 +1,5 @@
 ﻿using StartGame.GameMap;
+using StartGame.Properties;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
