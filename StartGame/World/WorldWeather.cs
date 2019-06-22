@@ -15,8 +15,18 @@ namespace StartGame.World
 {
     public class WeatherPoint
     {
+        /// <summary>
+        /// 0 -> 100
+        /// </summary>
+        double baseMinimumHumditiy;
+        // At -30°C no water in air, at 10°C 100% and at 40°C 200%?
+        public double MinimumHumditiy => baseMinimumHumditiy * (temperature.Cut(-30, 200) + 30) / 40;
         public double movedHumidity = 0;
         public double humidity = 0;
+        /// <summary>
+        /// % of sky covered 0 -> 100
+        /// </summary>
+        public double CloudCover => (humidity - (baseMinimumHumditiy / 2) / baseMinimumHumditiy * 2).Cut(0,100);
         /// <summary>
         /// East-west speed 
         /// </summary>
@@ -53,7 +63,8 @@ namespace StartGame.World
                     return 0;
                 }
                 double outgoing = (5.670367e-10 * Math.Pow(273 + temperature, 4) * World.DX * World.DY);
-                return income - outgoing;
+                //Cloud cover can at maximum decrease insolation by 10%
+                return (insolation * (1 - CloudCover / 1000)) - outgoing;
             }
         }
 
@@ -66,13 +77,11 @@ namespace StartGame.World
         public int X { get; }
         public int Y { get; }
 
-        double income;
-
-        double baseEvaporationRate;
-        public double EvaporationRate => baseEvaporationRate * Math.Max(temperature, 0) / 10;
+        double insolation;
+        readonly double baseEvaporationRate;
+        public double EvaporationRate => baseEvaporationRate * Math.Max(temperature-10, 0) / 10;
 
         public double precipitation;
-        public double minimumHumdity;
 
         /// <summary>
         /// 
@@ -97,11 +106,11 @@ namespace StartGame.World
             //    throw new Exception();
             if (height == 0)
             {
-                income = (-0.03 * latitude * latitude + 400) * 6 * (1 - albedo);
+                insolation = (-0.03 * latitude * latitude + 400) * 6 * (1 - albedo);
             }
             else
             {
-                income = 0;
+                insolation = 0;
             }
             f = 2 * 2 * Math.PI / 24 * World.atmosphereTimeStep * Math.Sin(latitude / 180d);
             pressure = 1013 * Math.Exp(-0.02896 * 9.807 / (World.R * 288.15) * (273 + temperature));//See https://www.math24.net/barometric-formula/
@@ -113,7 +122,7 @@ namespace StartGame.World
             baseEvaporationRate = EvaporationRate;
             dP = 0;
             dT = 0;
-            this.minimumHumdity = minimumHumdity;
+            this.baseMinimumHumditiy = minimumHumdity;
         }
 
         public WeatherPoint() { }
@@ -173,25 +182,25 @@ namespace StartGame.World
             switch (type)
             {
                 case WorldTileType.Ocean:
-                    return 100;
+                    return 95;
                 case WorldTileType.River:
-                    return 100;
+                    return 95;
                 case WorldTileType.TemperateGrassland:
                     return 60;
                 case WorldTileType.Rainforest:
-                    return 50;
+                    return 40;
                 case WorldTileType.Desert:
-                    return 100;
+                    return 98;
                 case WorldTileType.Tundra:
-                    return 70;
+                    return 50;
                 case WorldTileType.TemperateForest:
                     return 55;
                 case WorldTileType.Savanna:
-                    return 80;
+                    return 70;
                 case WorldTileType.Alpine:
-                    return 90;
+                    return 60;
                 case WorldTileType.SeaIce:
-                    return 100;
+                    return 95;
                 default:
                     throw new NotImplementedException();
             }
@@ -202,9 +211,9 @@ namespace StartGame.World
             switch (type)
             {
                 case WorldTileType.Ocean:
-                    return 1;
+                    return 0.8;
                 case WorldTileType.River:
-                    return 1;
+                    return 0.8;
                 case WorldTileType.TemperateGrassland:
                     return 0.3;
                 case WorldTileType.Rainforest:
@@ -327,15 +336,15 @@ namespace StartGame.World
         void CalculateAtmosphereTimeStep(bool debug = false)
         {
             DateTime time = DateTime.Now;
-            CalculateWeather(0, WORLD_SIZE);
-            //Forker forker = new Forker();
-            //for (int i = 0; i < 9; i++)
-            //{
-            //    int startY = i * WORLD_SIZE / 10;
-            //    int endY = (i + 1) * WORLD_SIZE / 10;
-            //    forker.Fork(() => CalculateWeather(startY, endY));
-            //}
-            //forker.Join();
+            //CalculateWeather(0, WORLD_SIZE);
+            Forker forker = new Forker();
+            for (int i = 0; i < 9; i++)
+            {
+                int startY = i * WORLD_SIZE / 10;
+                int endY = (i + 1) * WORLD_SIZE / 10;
+                forker.Fork(() => CalculateWeather(startY, endY));
+            }
+            forker.Join();
             if (debug)
                 Trace.TraceInformation($"Atmosphere calculation in {(DateTime.Now - time).TotalMilliseconds}");
         }
@@ -384,7 +393,7 @@ namespace StartGame.World
                             left.u += moveU;
                         }
                         point.u -= moveU;
-                        double friction = point.u * 0.05 * atmosphereTimeStep* 2 * point.mountain;
+                        double friction = point.u * 0.01 * atmosphereTimeStep * point.mountain;
                         //Go from high pressure to low pressure
                         double dU = /*atmosphereTimeStep * -point.f +*/ -(1.5 - point.mountain) * (right.pressure - left.pressure) - friction;
                         point.u += dU;
@@ -417,21 +426,21 @@ namespace StartGame.World
                             bottom.v += moveV;
                         }
                         point.v -= moveV;
-                        friction = point.v * 0.05 * atmosphereTimeStep * 2 * point.mountain;
+                        friction = point.v * 0.01 * atmosphereTimeStep * point.mountain;
                         double dV = -(1.5 - point.mountain) * (top.pressure - bottom.pressure) - friction;
                         point.v += dV;
 
                         // Pressure
                         double pressure = point.pressure;
-                        point.pressure = 1013 * Math.Exp(2.896 * (9.807 + point.temperature) / (R * (273 + point.temperature))) + point.humidity / 8; //See https://www.math24.net/barometric-formula/;
+                        point.pressure = 1013 * Math.Exp(2.896 * (9.807 + point.temperature) / (R * (273 + point.temperature))) + point.humidity / 4; //See https://www.math24.net/barometric-formula/;
                         point.dP = pressure - point.pressure;
                         // Vertical wind
                         double dW = point.dP * (-dU / DX - dV / DY);
                         point.w += dW;
                         // Change in temperature
-                        double radiation = point.EnergyBalance * atmosphereTimeStep / 100d;
-                        double latitudinalTemp = ((left.temperature + right.temperature) / 2 - point.temperature) / 10;
-                        double longitudinalTemp = ((top.temperature + bottom.temperature) / 2 - point.temperature) / 10;
+                        double radiation = point.EnergyBalance * atmosphereTimeStep / 150d;
+                        double latitudinalTemp = ((left.temperature + right.temperature) / 2 - point.temperature) / 20;
+                        double longitudinalTemp = ((top.temperature + bottom.temperature) / 2 - point.temperature) / 20;
                         WeatherPoint below;
                         if (z != 0)
                             below = atmosphere[(z - 1) + MaxZ * x + y * WORLD_SIZE * MaxZ];
@@ -448,14 +457,21 @@ namespace StartGame.World
 
                         // Calculate humidity
                         // First add new
-                        point.humidity += point.EvaporationRate * atmosphereTimeStep * (1 - point.humidity / 100d);
-                        point.humidity = point.humidity.Cut(0, 100); //Maybe not necessary anymore
+                        double dH = point.EvaporationRate * atmosphereTimeStep * (1 - point.CloudCover / 100) * 0.5;
+                        point.humidity += dH;
+                        //point.humidity = point.humidity.Cut(0, 100); //Maybe not necessary anymore
+                        //Change in humidity also affects temperature
+                        double dTfromdH = -dH / 10;
+                        point.temperature += dTfromdH;
+                        point.dT += dTfromdH;
                         //Now move it
                         //at speed < 2 all is moved over
                         int xMovement = Math.Abs(point.u) > 20 ? (point.u > 0 ? 1 : -1) : 0;
                         int yMovement = Math.Abs(point.v) > 20 ? (point.v > 0 ? -1 : 1) : 0;
                         double proportion = Math.Min(2, Math.Abs(point.u / 20d) + Math.Abs(point.v/ 20d)) / 8d;
                         double changed = Math.Round((point.humidity - point.movedHumidity).Cut(0,100) * proportion, 3);
+                        if (changed > 25)
+                            throw new Exception();
                         point.movedHumidity = 0;
                         point.humidity -= changed;
                         int gX = x + xMovement;
@@ -469,20 +485,23 @@ namespace StartGame.World
                         moveTo.movedHumidity += changed;
                         //Now rain
                         point.precipitation = 0;
-                        if(point.mountain > 0.45 && point.humidity > 60)
+                        if(point.humidity > point.MinimumHumditiy)
                         {
                             double v = random.NextDouble();
-                            double delta = Math.Round(v * (point.humidity - 60));
+                            double delta = Math.Round(v * (point.humidity - point.MinimumHumditiy - 20));
                             if(delta > 5)
                             {
                                 point.precipitation += delta;
                                 point.humidity -= delta;
+                                dTfromdH = -delta / 10;
+                                point.temperature += dTfromdH;
+                                point.dT += dTfromdH;
                             }
                         }
                         //point.humidity = Math.Round(point.humidity, 1);
                         if (point.humidity < 0)
                             throw new Exception();
-                        if (point.temperature < -60)
+                        if (point.temperature < -70)
                             throw new Exception();
                         if (double.IsNaN(point.temperature))
                             throw new Exception();

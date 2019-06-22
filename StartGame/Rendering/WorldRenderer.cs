@@ -102,7 +102,7 @@ namespace StartGame.Rendering
                     {
                         WeatherPoint weatherPoint = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.MaxZ * World.World.WORLD_SIZE];
                         if(weatherPoint.precipitation == 0)
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(weatherPoint.humidity - (weatherPoint.minimumHumdity / 2) * 2).Cut(0,200), 255, 255, 255)), (x-X) * size, (y-Y) * size, size, size);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(weatherPoint.CloudCover * 2), 255, 255, 255)), (x-X) * size, (y-Y) * size, size, size);
                         else
                             g.FillRectangle(new SolidBrush(Color.FromArgb((int)(weatherPoint.precipitation * 4).Cut(0, 200), 0, 0, 255)), (x - X) * size, (y - Y) * size, size, size);
                     }
@@ -349,7 +349,7 @@ namespace StartGame.Rendering
                     for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
                     {
                         g.FillRectangle(
-                            new SolidBrush(Color.FromArgb((int)(6 * (World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ].precipitation)),
+                            new SolidBrush(Color.FromArgb((int)(6 * (World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE * World.World.MaxZ].precipitation)).Cut(0,255),
                             0, 0, 255)), x * size, y * size, size, size);
                     }
                 }
