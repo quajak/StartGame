@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.label1 = new System.Windows.Forms.Label();
             this.heightMapBox = new System.Windows.Forms.PictureBox();
             this.humidityMapBox = new System.Windows.Forms.PictureBox();
@@ -68,13 +68,15 @@
             this.label12 = new System.Windows.Forms.Label();
             this.latWindMap = new System.Windows.Forms.PictureBox();
             this.label13 = new System.Windows.Forms.Label();
-            this.run6Min = new System.Windows.Forms.Button();
+            this.run2Hour = new System.Windows.Forms.Button();
             this.dPressureMap = new System.Windows.Forms.PictureBox();
             this.label14 = new System.Windows.Forms.Label();
             this.dTemperatureMap = new System.Windows.Forms.PictureBox();
             this.label15 = new System.Windows.Forms.Label();
             this.lonWindMap = new System.Windows.Forms.PictureBox();
             this.label16 = new System.Windows.Forms.Label();
+            this.pointInformation = new System.Windows.Forms.Label();
+            this.runSingleStep = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.heightMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.humidityMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.rainfallMapBox)).BeginInit();
@@ -334,17 +336,17 @@
             // 
             // populationChart
             // 
-            chartArea1.Name = "ChartArea1";
-            this.populationChart.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.populationChart.Legends.Add(legend1);
+            chartArea3.Name = "ChartArea1";
+            this.populationChart.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.populationChart.Legends.Add(legend3);
             this.populationChart.Location = new System.Drawing.Point(746, 13);
             this.populationChart.Name = "populationChart";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.populationChart.Series.Add(series1);
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.populationChart.Series.Add(series3);
             this.populationChart.Size = new System.Drawing.Size(680, 309);
             this.populationChart.TabIndex = 817;
             this.populationChart.Text = "chart1";
@@ -440,15 +442,15 @@
             this.label13.TabIndex = 823;
             this.label13.Text = "Lat Wind Map";
             // 
-            // run6Min
+            // run2Hour
             // 
-            this.run6Min.Location = new System.Drawing.Point(549, 42);
-            this.run6Min.Name = "run6Min";
-            this.run6Min.Size = new System.Drawing.Size(75, 23);
-            this.run6Min.TabIndex = 829;
-            this.run6Min.Text = "Run 2 Hours";
-            this.run6Min.UseVisualStyleBackColor = true;
-            this.run6Min.Click += new System.EventHandler(this.Run6Min_Click);
+            this.run2Hour.Location = new System.Drawing.Point(549, 42);
+            this.run2Hour.Name = "run2Hour";
+            this.run2Hour.Size = new System.Drawing.Size(75, 23);
+            this.run2Hour.TabIndex = 829;
+            this.run2Hour.Text = "Run 2 Hours";
+            this.run2Hour.UseVisualStyleBackColor = true;
+            this.run2Hour.Click += new System.EventHandler(this.Run2Hour_Click);
             // 
             // dPressureMap
             // 
@@ -501,18 +503,40 @@
             this.label16.TabIndex = 830;
             this.label16.Text = "Lon Wind Map";
             // 
+            // pointInformation
+            // 
+            this.pointInformation.AutoSize = true;
+            this.pointInformation.Location = new System.Drawing.Point(458, 105);
+            this.pointInformation.MaximumSize = new System.Drawing.Size(300, 400);
+            this.pointInformation.Name = "pointInformation";
+            this.pointInformation.Size = new System.Drawing.Size(82, 13);
+            this.pointInformation.TabIndex = 836;
+            this.pointInformation.Text = "pointInformation";
+            // 
+            // runSingleStep
+            // 
+            this.runSingleStep.Location = new System.Drawing.Point(549, 71);
+            this.runSingleStep.Name = "runSingleStep";
+            this.runSingleStep.Size = new System.Drawing.Size(75, 23);
+            this.runSingleStep.TabIndex = 837;
+            this.runSingleStep.Text = "Run Single Step";
+            this.runSingleStep.UseVisualStyleBackColor = true;
+            this.runSingleStep.Click += new System.EventHandler(this.RunSingleStep_Click);
+            // 
             // WorldGenerationViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1668, 989);
+            this.Controls.Add(this.runSingleStep);
+            this.Controls.Add(this.pointInformation);
             this.Controls.Add(this.dPressureMap);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.dTemperatureMap);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.lonWindMap);
             this.Controls.Add(this.label16);
-            this.Controls.Add(this.run6Min);
+            this.Controls.Add(this.run2Hour);
             this.Controls.Add(this.pressureMap);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.temperatureMap);
@@ -618,12 +642,14 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.PictureBox latWindMap;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.Button run6Min;
+        private System.Windows.Forms.Button run2Hour;
         private System.Windows.Forms.PictureBox dPressureMap;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.PictureBox dTemperatureMap;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.PictureBox lonWindMap;
         private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label pointInformation;
+        private System.Windows.Forms.Button runSingleStep;
     }
 }

@@ -74,6 +74,11 @@ namespace StartGame
             return new Point((int)(point.X * Size), (int)(point.Y * Size));
         }
 
+        public static double Mag(this Point point)
+        {
+            return Math.Sqrt(point.X * point.X + point.Y * point.Y);
+        }
+
         public static Point Div(this Point point, int value)
         {
             return new Point(point.X / value, point.Y / value);

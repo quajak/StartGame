@@ -16,10 +16,10 @@ namespace StartGame.Functions
         }
 
         /// <summary>The opaque state object that identifies the action (null otherwise).</summary>
-        public object State { get { return state; } }
+        public object State => state;
 
         /// <summary>The exception thrown by the parallel action, or null if it completed without exception.</summary>
-        public Exception Exception { get { return exception; } }
+        public Exception Exception => exception;
     }
 
     /// <summary>Provides a caller-friendly wrapper around parallel actions.</summary>
@@ -45,12 +45,10 @@ namespace StartGame.Functions
 
         private void OnItemComplete(object state, Exception exception)
         {
-            EventHandler<ParallelEventArgs> itemHandler = itemComplete; // don't need to lock
-            if (itemHandler != null) itemHandler(this, new ParallelEventArgs(state, exception));
+            itemComplete?.Invoke(this, new ParallelEventArgs(state, exception));
             if (Interlocked.Decrement(ref running) == 0)
             {
-                EventHandler allHandler = allComplete; // don't need to lock
-                if (allHandler != null) allHandler(this, EventArgs.Empty);
+                allComplete?.Invoke(this, EventArgs.Empty);
                 lock (joinLock)
                 {
                     Monitor.PulseAll(joinLock);

@@ -50,6 +50,9 @@ namespace StartGame.World
         public List<WorldFeature> features = new List<WorldFeature>();
         public List<Island> islands = new List<Island>();
         public List<Island> Oceans => islands.Where(i => !i.land).ToList();
+
+        public List<WorldPlayer> ToChange { get => toChange; set => toChange = value; }
+
         public Nation nation;
 
         private World(double a = 0.30, double b = 0.14, double c = 0.31, double Seed = 0, int octaves = 4, double persistance = 0.26)
@@ -541,7 +544,7 @@ namespace StartGame.World
                 counter -= new TimeSpan(2, 0, 0);
                 nation.WorldAction(1);
                 actors.ForEach(a => a.WorldAction(1));
-                foreach (var actor in toChange)
+                foreach (var actor in ToChange)
                 {
                     if (actors.Contains(actor))
                         actors.Remove(actor);
@@ -555,25 +558,25 @@ namespace StartGame.World
 
         public void RemovePlayer(WorldPlayer player)
         {
-            if (actors.Contains(player) && !toChange.Contains(player))
+            if (actors.Contains(player) && !ToChange.Contains(player))
             {
-                toChange.Add(player);
+                ToChange.Add(player);
             }
-            else if (toChange.Contains(player) && !actors.Contains(player))
+            else if (ToChange.Contains(player) && !actors.Contains(player))
             {
-                toChange.Remove(player);
+                ToChange.Remove(player);
             }
         }
 
         public void AddPlayer(WorldPlayer player)
         {
-            if (actors.Contains(player) && toChange.Contains(player))
+            if (actors.Contains(player) && ToChange.Contains(player))
             {
-                toChange.Remove(player);
+                ToChange.Remove(player);
             }
             else
             {
-                toChange.Add(player);
+                ToChange.Add(player);
             }
         }
         public void Move(WorldPlayer actor, Point position)

@@ -1,4 +1,5 @@
-﻿using StartGame.Rendering;
+﻿using StartGame.PlayerData;
+using StartGame.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -173,6 +174,8 @@ namespace StartGame.World
         private void WorldMapBox_MouseUp(object sender, MouseEventArgs e)
         {
             Point delta = e.Location.Sub(mouseDownPosition);
+            if (delta.Mag() < 5)
+                return;
             worldRenderer.Position = worldRenderer.Position.Sub(delta);
             worldRenderer.Position = Cut();
             Render();       
@@ -181,6 +184,10 @@ namespace StartGame.World
         Point mouseDownPosition;
         private void WorldMapBox_MouseDown(object sender, MouseEventArgs e)
         {
+            int x = (worldRenderer.Position.X + e.X)/(20 + zoom);
+            int y = (worldRenderer.Position.Y + e.Y)/(20 + zoom);
+            WeatherPoint wP = World.Instance.atmosphere[x * World.MaxZ + y * World.MaxZ * World.WORLD_SIZE];
+            pointInformation.Text = $"Co-ords: {x} {y} Temp: {wP.temperature} Pressure: {wP.pressure} Humidity: {wP.humidity} Lon Wind {wP.v} Lat Wind {wP.u}";
             if (e.Button == MouseButtons.Left)
                 mouseDownPosition = e.Location;
         }
@@ -189,9 +196,15 @@ namespace StartGame.World
             return worldRenderer.Position.Cut(0, (20 + zoom) * World.WORLD_SIZE - worldMapBox.Width, 0, (20 + zoom) * World.WORLD_SIZE - worldMapBox.Height);
         }
 
-        private void Run6Min_Click(object sender, EventArgs e)
+        private void Run2Hour_Click(object sender, EventArgs e)
         {
-            ProgressTime(new TimeSpan(0, 6, 0));
+            ProgressTime(new TimeSpan(2, 0, 0));
+            Render();
+        }
+
+        private void RunSingleStep_Click(object sender, EventArgs e)
+        {
+            ProgressTime(new TimeSpan((int)World.atmosphereTimeStep, (int)(World.atmosphereTimeStep * 60) - (60 * (int)World.atmosphereTimeStep) , 0));
             Render();
         }
     }
