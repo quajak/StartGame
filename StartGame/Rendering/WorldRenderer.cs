@@ -191,7 +191,7 @@ namespace StartGame.Rendering
                     {
 
                         WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE / World.World.RATIO  * World.World.MaxZ];
-                        double v = 20 * point.dT;
+                        double v = 40 * point.dT;
                         if (v > 0)
                         {
                             g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 255, 0, 0)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);

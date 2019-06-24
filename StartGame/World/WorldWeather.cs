@@ -594,12 +594,13 @@ namespace StartGame.World
                         point.u -= moveU;
                         //double friction = point.u * 0.05 * atmosphereTimeStep * point.mountain;
                         //Go from high pressure to low pressure
-                        double pressureDiff = -point.Resistance * 2 * WindStrength * (right.pressure - left.pressure) / (DX * RATIO);
+                        double pressureDiff = -point.Resistance * 1.5 * WindStrength * (right.pressure - left.pressure) / (DX * RATIO);
                         double coriolis = -atmosphereTimeStep * point.f;
                         double dU = coriolis + pressureDiff;// - friction;
                         if (Math.Sign(dU) == Math.Sign(point.u))
                             dU = Math.Sign(dU) * Math.Max(10 * Math.Abs(dU) - Math.Abs(point.u), 0);
                         point.u += dU;
+
                         // Vertical wind
                         WeatherPoint bottom;
                         if (y != WORLD_SIZE / RATIO - 1)
@@ -624,23 +625,23 @@ namespace StartGame.World
                         bottom.v += moveV / 2;
                         point.v -= moveV;
                         //friction = point.v * 0.05 * atmosphereTimeStep * point.mountain;
-                        double dV = -point.Resistance * WindStrength / 2 * (top.pressure - bottom.pressure) / (DY * RATIO);// - friction;
+                        double dV = -point.Resistance * 0.75 * WindStrength * (top.pressure - bottom.pressure) / (DY * RATIO);// - friction;
                         if (Math.Sign(dV) == Math.Sign(point.v))
                             dV = Math.Sign(dV) * Math.Max(10 * Math.Abs(dV) - Math.Abs(point.v), 0);
                         point.v += dV;
 
                         // Pressure
                         double pressure = point.pressure;
-                        point.pressure = 1013 * Math.Exp(4 * (9.807 + point.temperature) / (R * (273 + point.temperature))) + point.humidity / 15; //See https://www.math24.net/barometric-formula/;
+                        point.pressure = 1000 + point.temperature * 2;// + point.humidity / 10; 
                         point.dP = pressure - point.pressure;
                         // Vertical wind - as long as MaxZ is 1 this is not important
                         // double dW = point.dP * (-dU / DX - dV / DY);
                         // point.w += dW;
 
                         // Temperature
-                        double radiation = point.EnergyBalance * atmosphereTimeStep / (300d * point.groundHeatCapacity);
-                        double latitudinalTemp = 10 * ((left.temperature + right.temperature) / 2 - point.temperature) / (DX * (RATIO/2).Cut(1,10));
-                        double longitudinalTemp = 10 * ((top.temperature + bottom.temperature) / 2 - point.temperature) / (DY * (RATIO/2).Cut(1,10));
+                        double radiation = point.EnergyBalance * atmosphereTimeStep / (200d * point.groundHeatCapacity);
+                        double latitudinalTemp = 10 * ((left.temperature + right.temperature) / 2 - point.temperature) / (DX * (RATIO / 2).Cut(1, 10));
+                        double longitudinalTemp = 10 * ((top.temperature + bottom.temperature) / 2 - point.temperature) / (DY * (RATIO / 2).Cut(1, 10));
                         WeatherPoint below;
                         if (z != 0)
                             below = atmosphere[(z - 1) + MaxZ * x + y * WORLD_SIZE / RATIO * MaxZ];
@@ -675,16 +676,16 @@ namespace StartGame.World
 
                             //throw new Exception();
                         }
-                        int xMovement = Math.Abs(point.u) > 20 ? (point.u > 0 ? 1 : -1) : 0;
-                        int yMovement = Math.Abs(point.v) > 20 ? (point.v > 0 ? -1 : 1) : 0;
+                        int xMovement = (int)point.u / 20;
+                        int yMovement = (int)point.v / 20;
                         int gX = x + xMovement;
-                        gX = -1 == gX ? WORLD_SIZE / RATIO - 1 : gX;
-                        gX = WORLD_SIZE / RATIO == gX ? 1 : gX;
+                        gX = 0 > gX ? WORLD_SIZE / RATIO + gX : gX;
+                        gX = WORLD_SIZE / RATIO <= gX ? gX - (WORLD_SIZE / RATIO - 1): gX;
                         int gY = y + yMovement;
-                        gY = WORLD_SIZE / RATIO == gY ? 1 : gY;
-                        gY = -1 == gY ? WORLD_SIZE / RATIO - 1 : gY;
+                        gY = 0 > gY ? WORLD_SIZE / RATIO + gY : gY;
+                        gY = WORLD_SIZE / RATIO <= gY ? gY - (WORLD_SIZE / RATIO - 1) : gY;
                         WeatherPoint moveTo = atmosphere[z + gX * MaxZ + gY * MaxZ * WORLD_SIZE / RATIO];
-                        double proportion = Math.Min(2, Math.Abs(atmosphereTimeStep * point.u * 10 / (DX * RATIO)) + Math.Abs(atmosphereTimeStep * point.v * 10/ (DY * RATIO))) / 8d;
+                        double proportion = Math.Min(2, Math.Abs(atmosphereTimeStep * point.u * 10 / (DX * RATIO)) + Math.Abs(atmosphereTimeStep * point.v * 10 / (DY * RATIO))) / 8d;
                         double changed = Math.Round((point.humidity - point.movedHumidity).Cut(0, 100) * proportion, 3);
                         if (moveTo.humidity < point.humidity * 2)
                         {
