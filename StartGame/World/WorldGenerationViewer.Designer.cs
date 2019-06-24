@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.label1 = new System.Windows.Forms.Label();
             this.heightMapBox = new System.Windows.Forms.PictureBox();
             this.humidityMapBox = new System.Windows.Forms.PictureBox();
@@ -77,6 +77,7 @@
             this.label16 = new System.Windows.Forms.Label();
             this.pointInformation = new System.Windows.Forms.Label();
             this.runSingleStep = new System.Windows.Forms.Button();
+            this.atmosphereRatio = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.heightMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.humidityMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.rainfallMapBox)).BeginInit();
@@ -336,17 +337,17 @@
             // 
             // populationChart
             // 
-            chartArea3.Name = "ChartArea1";
-            this.populationChart.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.populationChart.Legends.Add(legend3);
+            chartArea1.Name = "ChartArea1";
+            this.populationChart.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.populationChart.Legends.Add(legend1);
             this.populationChart.Location = new System.Drawing.Point(746, 13);
             this.populationChart.Name = "populationChart";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.populationChart.Series.Add(series3);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.populationChart.Series.Add(series1);
             this.populationChart.Size = new System.Drawing.Size(680, 309);
             this.populationChart.TabIndex = 817;
             this.populationChart.Text = "chart1";
@@ -523,11 +524,20 @@
             this.runSingleStep.UseVisualStyleBackColor = true;
             this.runSingleStep.Click += new System.EventHandler(this.RunSingleStep_Click);
             // 
+            // atmosphereRatio
+            // 
+            this.atmosphereRatio.FormattingEnabled = true;
+            this.atmosphereRatio.Location = new System.Drawing.Point(57, 224);
+            this.atmosphereRatio.Name = "atmosphereRatio";
+            this.atmosphereRatio.Size = new System.Drawing.Size(121, 21);
+            this.atmosphereRatio.TabIndex = 838;
+            // 
             // WorldGenerationViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1668, 989);
+            this.Controls.Add(this.atmosphereRatio);
             this.Controls.Add(this.runSingleStep);
             this.Controls.Add(this.pointInformation);
             this.Controls.Add(this.dPressureMap);
@@ -651,5 +661,6 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label pointInformation;
         private System.Windows.Forms.Button runSingleStep;
+        private System.Windows.Forms.ComboBox atmosphereRatio;
     }
 }

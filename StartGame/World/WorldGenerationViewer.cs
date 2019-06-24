@@ -17,8 +17,17 @@ namespace StartGame.World
         {
             worldRenderer = new WorldRenderer();
             InitializeComponent();
+            atmosphereRatio.Items.AddRange(new object[] { 1, 2, 4, 5, 8 });
+            atmosphereRatio.SelectedIndexChanged += AtmosphereRatio_SelectedIndexChanged;
             InitialiseData();
             worldMapBox.MouseWheel += WorldMapBox_MouseWheel;
+            Render();
+        }
+
+        private void AtmosphereRatio_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int selected = (int)atmosphereRatio.SelectedItem;
+            World.Instance.InitialiseAtmosphere(selected);
             Render();
         }
 
@@ -186,7 +195,7 @@ namespace StartGame.World
         {
             int x = (worldRenderer.Position.X + e.X)/(20 + zoom);
             int y = (worldRenderer.Position.Y + e.Y)/(20 + zoom);
-            WeatherPoint wP = World.Instance.atmosphere[x * World.MaxZ + y * World.MaxZ * World.WORLD_SIZE];
+            WeatherPoint wP = World.Instance.atmosphere[x * World.MaxZ / World.RATIO + y / World.RATIO * World.MaxZ * World.WORLD_SIZE / World.RATIO];
             pointInformation.Text = $"Co-ords: {x} {y} Temp: {wP.temperature} Pressure: {wP.pressure} Humidity: {wP.humidity} Lon Wind {wP.v} Lat Wind {wP.u}";
             if (e.Button == MouseButtons.Left)
                 mouseDownPosition = e.Location;

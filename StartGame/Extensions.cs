@@ -17,6 +17,37 @@ namespace StartGame
 {
     public static class E
     {
+        public static double GetAverage<T>(this T[,] array, int sX, int eX, int sY, int eY, Func<T,double> func)
+        {
+            double value = 0;
+            for (int x = sX; x < eX; x++)
+            {
+                for (int y = sY; y < eY; y++)
+                {
+                    value += func.Invoke(array[x, y]);
+                }
+            }
+            value /= (eX - sX) * (eY - sY);
+            if (double.IsNaN(value))
+                throw new Exception();
+            return value;
+        }
+
+        public static double GetAverage<T>(this T[] array, int sX, int eX, int sY, int eY, Func<T, double> func, Func<int,int,int> getIndex)
+        {
+            double value = default;
+            for (int x = sX; x < eX; x++)
+            {
+                for (int y = sY; y < eY; y++)
+                {
+                    int index = getIndex.Invoke(x, y);
+                    value += func.Invoke(array[index]);
+                }
+            }
+            value /= (eX - sX) * (eY - sY);
+            return value;
+        }
+
         public static bool TryGet<T>(this List<T> values, Predicate<T> check, out T value)
         {
             if (values.Exists(check))

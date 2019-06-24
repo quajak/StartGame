@@ -26,5 +26,15 @@ namespace StartGame.Functions
         {
             return World.World.random.Next(lower, heigher + 1);
         }
+
+        internal bool Includes(double number)
+        {
+            return lower <= number && number <= heigher;
+        }
+
+        internal bool Excludes(double number)
+        {
+            return !Includes(number);
+        }
     }
 }
