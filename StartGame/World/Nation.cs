@@ -130,6 +130,10 @@ namespace StartGame.World
         }
 
         double actionsPassed = 0;
+        /// <summary>
+        /// Run every hour
+        /// </summary>
+        /// <param name="actions"></param>
         internal void WorldAction(double actions)
         {
             actionsPassed += actions;

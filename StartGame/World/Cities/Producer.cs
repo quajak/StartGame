@@ -37,7 +37,7 @@ namespace StartGame.World.Cities
             {
                 price = (int)(price * (double)(itemsWanted[name] - itemsProduced[name]) / itemsProduced[name]);
             }
-            Trace.TraceInformation($"{this.name}: Produced {name} x{amount} at {price} by {workers}");
+            //Trace.TraceInformation($"{this.name}: Produced {name} x{amount} at {price} by {workers}");
             AddItem(new Resource(name, amount, price));
         }
 

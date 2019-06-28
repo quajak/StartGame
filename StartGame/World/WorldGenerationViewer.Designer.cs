@@ -78,6 +78,8 @@
             this.pointInformation = new System.Windows.Forms.Label();
             this.runSingleStep = new System.Windows.Forms.Button();
             this.atmosphereRatio = new System.Windows.Forms.ComboBox();
+            this.radiationMap = new System.Windows.Forms.PictureBox();
+            this.label17 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.heightMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.humidityMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.rainfallMapBox)).BeginInit();
@@ -99,6 +101,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dPressureMap)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dTemperatureMap)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.lonWindMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.radiationMap)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -532,11 +535,30 @@
             this.atmosphereRatio.Size = new System.Drawing.Size(121, 21);
             this.atmosphereRatio.TabIndex = 838;
             // 
+            // radiationMap
+            // 
+            this.radiationMap.Location = new System.Drawing.Point(1670, 342);
+            this.radiationMap.Name = "radiationMap";
+            this.radiationMap.Size = new System.Drawing.Size(200, 200);
+            this.radiationMap.TabIndex = 840;
+            this.radiationMap.TabStop = false;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(1670, 325);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(76, 13);
+            this.label17.TabIndex = 839;
+            this.label17.Text = "Radiation Map";
+            // 
             // WorldGenerationViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1668, 989);
+            this.ClientSize = new System.Drawing.Size(1915, 1181);
+            this.Controls.Add(this.radiationMap);
+            this.Controls.Add(this.label17);
             this.Controls.Add(this.atmosphereRatio);
             this.Controls.Add(this.runSingleStep);
             this.Controls.Add(this.pointInformation);
@@ -608,6 +630,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dPressureMap)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dTemperatureMap)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.lonWindMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.radiationMap)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -662,5 +685,7 @@
         private System.Windows.Forms.Label pointInformation;
         private System.Windows.Forms.Button runSingleStep;
         private System.Windows.Forms.ComboBox atmosphereRatio;
+        private System.Windows.Forms.PictureBox radiationMap;
+        private System.Windows.Forms.Label label17;
     }
 }

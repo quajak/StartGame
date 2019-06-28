@@ -21,6 +21,12 @@ namespace StartGame.World
             atmosphereRatio.SelectedIndexChanged += AtmosphereRatio_SelectedIndexChanged;
             InitialiseData();
             worldMapBox.MouseWheel += WorldMapBox_MouseWheel;
+            World.Instance.TimeChange += (o, e) => {
+                if (World.Instance.time.DayOfYear % 7 == 0)
+                {
+                    AddDataPoints();
+                }
+            };
             Render();
         }
 
@@ -74,6 +80,7 @@ namespace StartGame.World
             lonWindMap.Image = worldRenderer.DrawLonWindMap(size);
             dPressureMap.Image = worldRenderer.DrawDPMap(size);
             dTemperatureMap.Image = worldRenderer.DrawDTMap(size);
+            radiationMap.Image = worldRenderer.DrawRadiationMap(size);
         }
 
         private void TrackBar1_Scroll(object sender, EventArgs e)
@@ -133,10 +140,7 @@ namespace StartGame.World
         }
         private void RunTenYears_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 10; i++)
-            {
-                ProgressTime(new TimeSpan(365, 0, 0, 0, 0));
-            }
+            ProgressTime(new TimeSpan(10 * 365, 0, 0, 0));
             Render();
         }
 
@@ -149,14 +153,7 @@ namespace StartGame.World
 
         void ProgressTime(TimeSpan time)
         {
-            for (int i = 0; i < time.TotalHours; i++)
-            {
-                World.Instance.ProgressTime(new TimeSpan(0, 1, 0, 0));
-                if(World.Instance.time.DayOfYear % 7 == 0)
-                {
-                    AddDataPoints();
-                }
-            }    
+            World.Instance.ProgressTime(time);  
         }
 
         void InitialiseData()

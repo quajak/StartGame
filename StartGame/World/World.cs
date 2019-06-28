@@ -533,25 +533,89 @@ namespace StartGame.World
             return values;
         }
 
-        public void ProgressTime(TimeSpan timePassed, bool debug = false)
+        public EventHandler TimeChange;
+
+        public void ProgressTime(TimeSpan timeToPass, bool debug = false)
         {
-            TimeSpan counter = new TimeSpan(0);
-            int timeHours = (int)timePassed.TotalHours;
-            for (int i = 0; i < timeHours / atmosphereTimeStep; i++)
+            //We progress time in distinct blocks, to have a somewhat accurate final picture and run relativly quickly
+
+            //In years
+            DateTime total = DateTime.Now;
+            DateTime start = DateTime.Now;
+            if(timeToPass.TotalDays > 31)
+            {
+                int daysToRun = (int)timeToPass.TotalDays - 31;
+                timeToPass -= new TimeSpan(daysToRun, 0, 0, 0, 0);
+                InitialiseAtmosphere(8);
+                RunDays(debug, daysToRun);
+                Trace.TraceInformation($"Simulates {daysToRun} days at ratio = 8 in {(DateTime.Now - start).TotalSeconds} seconds");
+            }
+
+            if (timeToPass.TotalDays > 14)
+            {
+                start = DateTime.Now;
+                int daysToRun = (int)timeToPass.TotalDays - 14;
+                timeToPass -= new TimeSpan(daysToRun, 0, 0, 0, 0);
+                InitialiseAtmosphere(4);
+                RunDays(debug, daysToRun);
+                Trace.TraceInformation($"Simulates {daysToRun} days at ratio = 4 in {(DateTime.Now - start).TotalSeconds} seconds");
+            }
+
+            if (timeToPass.TotalDays > 3)
+            {
+                start = DateTime.Now;
+                int daysToRun = (int)timeToPass.TotalDays - 3;
+                timeToPass -= new TimeSpan(daysToRun, 0, 0, 0, 0);
+                InitialiseAtmosphere(2);
+                RunDays(debug, daysToRun);
+                Trace.TraceInformation($"Simulates {daysToRun} days at ratio = 2 in {(DateTime.Now - start).TotalSeconds} seconds");
+            }
+
+            start = DateTime.Now;
+            int daysLeft = (int)timeToPass.TotalDays;
+            timeToPass -= new TimeSpan(daysLeft, 0, 0, 0, 0);
+            InitialiseAtmosphere(1);
+            RunDays(debug, daysLeft);
+            for (int hour = 0; hour < (int)timeToPass.TotalHours; hour++)
+            {
+                RunHour(debug);
+            }
+            for (int timeStep = 0; timeStep < timeToPass.TotalHours / atmosphereTimeStep; timeStep++)
             {
                 CalculateAtmosphereTimeStep(debug);
-                //CalculateAtmosphereTimeStep(debug);
-                counter -= new TimeSpan(2, 0, 0);
-                nation.WorldAction(1);
-                actors.ForEach(a => a.WorldAction(1));
-                foreach (var actor in ToChange)
+            }
+            Trace.TraceInformation($"Simulates {daysLeft} days at ratio = 1 in {(DateTime.Now - start).TotalSeconds} seconds. " +
+                $"Total calculation took {(DateTime.Now - total).TotalSeconds} seconds");
+        }
+
+        private void RunDays(bool debug, int daysToRun)
+        {
+            for (int day = 0; day < daysToRun; day++)
+            {
+                for (int i = 0; i < 24; i++)
                 {
-                    if (actors.Contains(actor))
-                        actors.Remove(actor);
-                    else
-                        actors.Add(actor);
+                    RunHour(debug);
                 }
             }
+        }
+
+        private void RunHour(bool debug)
+        {
+            for (int i = 0; i < 1 / atmosphereTimeStep; i++)
+            {
+                CalculateAtmosphereTimeStep(debug);
+            }
+            nation.WorldAction(1);
+            actors.ForEach(a => a.WorldAction(1));
+            foreach (var actor in ToChange)
+            {
+                if (actors.Contains(actor))
+                    actors.Remove(actor);
+                else
+                    actors.Add(actor);
+            }
+            time += new TimeSpan(1, 0, 0);
+            TimeChange?.Invoke(null, null);
         }
 
         List<WorldPlayer> toChange = new List<WorldPlayer>();

@@ -17,6 +17,16 @@ namespace StartGame
 {
     public static class E
     {
+        public static bool AlmostEqual(this double a, double b, double diff = 0.1)
+        {
+            return Math.Abs(a - b) < diff;
+        }
+
+        public static bool AlmostEqual(this float a, float b, float diff = 0.1f)
+        {
+            return Math.Abs(a - b) < diff;
+        }
+
         public static double GetAverage<T>(this T[,] array, int sX, int eX, int sY, int eY, Func<T,double> func)
         {
             double value = 0;
@@ -36,6 +46,21 @@ namespace StartGame
         public static double GetAverage<T>(this T[] array, int sX, int eX, int sY, int eY, Func<T, double> func, Func<int,int,int> getIndex)
         {
             double value = default;
+            for (int x = sX; x < eX; x++)
+            {
+                for (int y = sY; y < eY; y++)
+                {
+                    int index = getIndex.Invoke(x, y);
+                    value += func.Invoke(array[index]);
+                }
+            }
+            value /= (eX - sX) * (eY - sY);
+            return value;
+        }
+
+        public static float GetAverage<T>(this T[] array, int sX, int eX, int sY, int eY, Func<T, float> func, Func<int, int, int> getIndex)
+        {
+            float value = default;
             for (int x = sX; x < eX; x++)
             {
                 for (int y = sY; y < eY; y++)
@@ -220,6 +245,11 @@ namespace StartGame
         }
 
         public static double Cut(this double v, double min, double max)
+        {
+            return v < min ? min : (v > max ? max : v);
+        }
+
+        public static float Cut(this float v, float min, float max)
         {
             return v < min ? min : (v > max ? max : v);
         }

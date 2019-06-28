@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 
+using static StartGame.World.World;
+
 namespace StartGame.Rendering
 {
     public class WorldRenderer
@@ -24,7 +26,7 @@ namespace StartGame.Rendering
 
         public Bitmap Render(int renderWidth, int renderHeight, int size = 20)
         {
-            E.TraceFunction($"{renderWidth}, {renderHeight}, {size}");
+            //E.TraceFunction($"{renderWidth}, {renderHeight}, {size}");
             currentMap?.Dispose();
             //Only draw the needed area
             currentMap = DrawMap((Position.X / size).Min(0), (Position.Y / size).Min(0), renderWidth / size + 1, renderHeight / size + 1, size);
@@ -37,16 +39,16 @@ namespace StartGame.Rendering
         }
         private Bitmap DrawMap(int X, int Y, int Width, int Height, int size = 20)
         {
-            Trace.TraceInformation($"WorldRenderer::DrawMap({X}, {Y}, {Width}, {Height}, {size})");
+            //Trace.TraceInformation($"WorldRenderer::DrawMap({X}, {Y}, {Width}, {Height}, {size})");
             DateTime time = DateTime.Now;
-            Bitmap worldImage = DrawBackground(X, Y, Math.Min(World.World.Instance.costMap.GetUpperBound(0), X + Width), Math.Min(World.World.Instance.costMap.GetUpperBound(0), Y + Height), size);
+            Bitmap worldImage = DrawBackground(X, Y, Math.Min(Instance.costMap.GetUpperBound(0), X + Width), Math.Min(Instance.costMap.GetUpperBound(0), Y + Height), size);
             Trace.TraceInformation($"Rendering background in {(DateTime.Now - time).TotalMilliseconds}!");
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 DateTime point = DateTime.Now;
                 //Draw features
                 int features = 0;
-                foreach (var feature in World.World.Instance.features.OrderBy(f => f.level))
+                foreach (var feature in Instance.features.OrderBy(f => f.level))
                 {
                     if (feature.MinimumSize <= size && feature.position.X.Between(X, X + Width) && feature.position.Y.Between(Y, Y + Height))
                     {
@@ -64,11 +66,11 @@ namespace StartGame.Rendering
                 Trace.TraceInformation($"Rendering {features} features in {(DateTime.Now - point).TotalMilliseconds}!");
                 point = DateTime.Now;
                 //Draw actors
-                foreach (var actor in World.World.Instance.actors)
+                foreach (var actor in Instance.actors)
                 {
                     g.DrawImage(actor.troop.Image, (actor.WorldPosition.X - X) * size, (actor.WorldPosition.Y - Y) * size, size, size);
                 }
-                Trace.TraceInformation($"Rendering {World.World.Instance.actors.Count} actors in {(DateTime.Now - point).TotalMilliseconds}!");
+                Trace.TraceInformation($"Rendering {Instance.actors.Count} actors in {(DateTime.Now - point).TotalMilliseconds}!");
 
                 //Draw overlay objects
                 foreach (var obj in overlayObjects)
@@ -91,17 +93,16 @@ namespace StartGame.Rendering
                         g.DrawLine(new Pen(line.color), line.start.Div(20).Mult(size).Sub(X * size, Y * size).Add(10, 10), line.end.Div(20).Mult(size).Sub(X * size, Y * size).Add(10, 10));
                     }
                 }
-
+                //g.FillRectangle(Brushes.Blue, 0, 0, WORLD_SIZE * size, WORLD_SIZE * size);
                 //Update Overlay
                 overlayObjects = overlayObjects.Where(o => !o.once).ToList();
-
                 //Draw weather and daytime
-                int ratio = World.World.RATIO;
-                for (int x = X / ratio; x < Math.Min(X / ratio + Width/ ratio, World.World.WORLD_SIZE/ ratio); x++)
+                int ratio = RATIO;
+                for (int x = X / ratio; x < Math.Min(X / ratio + Width/ ratio, WORLD_SIZE / ratio); x++)
                 {
-                    for (int y = Y / ratio; y < Math.Min(Y / ratio + Height/ ratio, World.World.WORLD_SIZE/ ratio); y++)
+                    for (int y = Y / ratio; y < Math.Min(Y / ratio + Height/ ratio, WORLD_SIZE / ratio); y++)
                     {
-                        WeatherPoint weatherPoint = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.MaxZ * World.World.WORLD_SIZE / ratio];
+                        WeatherPoint weatherPoint = Instance.atmosphere[x * MaxZ + y * MaxZ * WORLD_SIZE / ratio];
                         if (weatherPoint.precipitation == 0)
                             g.FillRectangle(new SolidBrush(Color.FromArgb((int)(weatherPoint.CloudCover * 2), 255, 255, 255)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
                         else
@@ -117,20 +118,20 @@ namespace StartGame.Rendering
 
         internal Image DrawLatWindMap(int size)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x < World.World.WORLD_SIZE / World.World.RATIO; x++)
+                for (int x = 0; x < WORLD_SIZE / RATIO; x++)
                 {
-                    for (int y = 0; y < World.World.WORLD_SIZE / World.World.RATIO; y++)
+                    for (int y = 0; y < WORLD_SIZE / RATIO; y++)
                     {
 
-                        WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE / World.World.RATIO * World.World.MaxZ];
+                        WeatherPoint point = Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ];
                         double v = point.u;
                         if (v > 0)
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size * World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size * RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                         }
                         else if (v == 0)
                         {
@@ -139,7 +140,7 @@ namespace StartGame.Rendering
                         else
                         {
                             v = Math.Abs(v);
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                         }
                     }
                 }
@@ -149,20 +150,20 @@ namespace StartGame.Rendering
 
         internal Image DrawLonWindMap(int size)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x < World.World.WORLD_SIZE / World.World.RATIO; x++)
+                for (int x = 0; x < WORLD_SIZE / RATIO; x++)
                 {
-                    for (int y = 0; y < World.World.WORLD_SIZE / World.World.RATIO; y++)
+                    for (int y = 0; y < WORLD_SIZE / RATIO; y++)
                     {
 
-                        WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE / World.World.RATIO* World.World.MaxZ];
+                        WeatherPoint point = Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ];
                         double v = point.v * 2;
                         if (v > 0)
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                         }
                         else if (v == 0)
                         {
@@ -171,7 +172,7 @@ namespace StartGame.Rendering
                         else
                         {
                             v = Math.Abs(v);
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                         }
                     }
                 }
@@ -181,20 +182,20 @@ namespace StartGame.Rendering
 
         internal Image DrawDTMap(int size)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x < World.World.WORLD_SIZE / World.World.RATIO; x++)
+                for (int x = 0; x < WORLD_SIZE / RATIO; x++)
                 {
-                    for (int y = 0; y < World.World.WORLD_SIZE / World.World.RATIO; y++)
+                    for (int y = 0; y < WORLD_SIZE / RATIO; y++)
                     {
 
-                        WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE / World.World.RATIO  * World.World.MaxZ];
+                        WeatherPoint point = Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ];
                         double v = 40 * point.dT;
                         if (v > 0)
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 255, 0, 0)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 255, 0, 0)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                         }
                         else if (v == 0)
                         {
@@ -203,7 +204,39 @@ namespace StartGame.Rendering
                         else
                         {
                             v = Math.Abs(v);
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                        }
+                    }
+                }
+            }
+            return worldImage;
+        }
+
+        internal Image DrawRadiationMap(int size)
+        {
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x < WORLD_SIZE / RATIO; x++)
+                {
+                    for (int y = 0; y < WORLD_SIZE / RATIO; y++)
+                    {
+
+                        WeatherPoint point = Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ];
+                        double v = 5 * point.EnergyBalance * atmosphereTimeStep / (point.groundHeatCapacity);
+                        if (v > 0)
+                        {
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 255, 0, 0)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
+                        }
+                        else if (v == 0)
+                        {
+
+                        }
+                        else
+                        {
+                            v = Math.Abs(v);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                         }
                     }
                 }
@@ -213,20 +246,20 @@ namespace StartGame.Rendering
 
         internal Image DrawDPMap(int size)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x < World.World.WORLD_SIZE / World.World.RATIO; x++)
+                for (int x = 0; x < WORLD_SIZE / RATIO; x++)
                 {
-                    for (int y = 0; y < World.World.WORLD_SIZE / World.World.RATIO; y++)
+                    for (int y = 0; y < WORLD_SIZE / RATIO; y++)
                     {
 
-                        WeatherPoint point = World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE / World.World.RATIO * World.World.MaxZ];
+                        WeatherPoint point = Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ];
                         double v = 30 * point.dP;
                         if (v > 0)
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                         }
                         else if (v == 0)
                         {
@@ -235,7 +268,7 @@ namespace StartGame.Rendering
                         else
                         {
                             v = Math.Abs(v);
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                         }
                     }
                 }
@@ -245,16 +278,16 @@ namespace StartGame.Rendering
 
         internal Image DrawPressureMap(int size)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x < World.World.WORLD_SIZE / World.World.RATIO; x++)
+                for (int x = 0; x < WORLD_SIZE / RATIO; x++)
                 {
-                    for (int y = 0; y < World.World.WORLD_SIZE / World.World.RATIO; y++)
+                    for (int y = 0; y < WORLD_SIZE / RATIO; y++)
                     {
-                        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(Math.Min(2 * (World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE / World.World.RATIO * World.World.MaxZ].pressure - 960).Cut(0, 255), 255)), 255, 0, 255)),
-                            x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(Math.Min(2 * (Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ].pressure - 960).Cut(0, 255), 255)), 255, 0, 255)),
+                            x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                     }
                 }
             }
@@ -263,15 +296,15 @@ namespace StartGame.Rendering
 
         public Bitmap DrawHeightMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
                 {
-                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
                     {
-                        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * World.World.Instance.heightMap[x, y]), 0, 0, 0)), x * size, y * size, size, size);
+                        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * Instance.heightMap[x, y]), 0, 0, 0)), x * size, y * size, size, size);
                     }
                 }
             }
@@ -280,17 +313,17 @@ namespace StartGame.Rendering
 
         public Bitmap DrawRawHeightMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
                 {
-                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
                     {
                         try
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * World.World.Instance.rawheightMap[x, y]), 0, 0, 0)), x * size, y * size, size, size);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * Instance.rawheightMap[x, y]), 0, 0, 0)), x * size, y * size, size, size);
 
                         }
                         catch (Exception)
@@ -299,23 +332,23 @@ namespace StartGame.Rendering
                         }
                     }
                 }
-            End:
-                Trace.TraceInformation("Finished rendering raw height!");
             }
-            return worldImage;
+            End:
+                //Trace.TraceInformation("Finished rendering raw height!");
+                return worldImage;
         }
 
         public Bitmap DrawTemperatureMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
                 {
-                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
                     {
-                        g.FillRectangle(new SolidBrush(Color.FromArgb(255, (int)(255 * (1 + World.World.Instance.temperatureMap[x, y]) / 2), 0, 255)), x * size, y * size, size, size);
+                        g.FillRectangle(new SolidBrush(Color.FromArgb(255, (int)(255 * (1 + Instance.temperatureMap[x, y]) / 2), 0, 255)), x * size, y * size, size, size);
                     }
                 }
             }
@@ -324,17 +357,17 @@ namespace StartGame.Rendering
 
         public Bitmap DrawAtmosphereTemperatureMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x < World.World.WORLD_SIZE / World.World.RATIO; x++)
+                for (int x = 0; x < WORLD_SIZE / RATIO; x++)
                 {
-                    for (int y = 0; y < World.World.WORLD_SIZE / World.World.RATIO; y++)
+                    for (int y = 0; y < WORLD_SIZE / RATIO; y++)
                     {
                         g.FillRectangle(new SolidBrush(
-                            Color.FromArgb((int)((World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE/ World.World.RATIO * World.World.MaxZ].temperature + 40) / 100d * 255).Cut(0, 255), 255, 0, 0)),
-                            x * size * World.World.RATIO, y * size * World.World.RATIO, size * World.World.RATIO, size * World.World.RATIO);
+                            Color.FromArgb((int)((Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ].temperature + 40) / 100d * 255).Cut(0, 255), 255, 0, 0)),
+                            x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                     }
                 }
             }
@@ -344,17 +377,17 @@ namespace StartGame.Rendering
 
         public Bitmap DrawRainfallMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x < World.World.WORLD_SIZE / World.World.RATIO; x++)
+                for (int x = 0; x < WORLD_SIZE / RATIO; x++)
                 {
-                    for (int y = 0; y < World.World.WORLD_SIZE / World.World.RATIO; y++)
+                    for (int y = 0; y < WORLD_SIZE / RATIO; y++)
                     {
                         g.FillRectangle(
-                            new SolidBrush(Color.FromArgb((int)(6 * (World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE / World.World.RATIO * World.World.MaxZ].precipitation)).Cut(0, 255),
-                            0, 0, 255)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            new SolidBrush(Color.FromArgb((int)(6 * (Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ].precipitation)).Cut(0, 255),
+                            0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                     }
                 }
             }
@@ -363,17 +396,17 @@ namespace StartGame.Rendering
 
         public Bitmap DrawHumidityMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x < World.World.WORLD_SIZE / World.World.RATIO; x++)
+                for (int x = 0; x < WORLD_SIZE / RATIO; x++)
                 {
-                    for (int y = 0; y < World.World.WORLD_SIZE / World.World.RATIO; y++)
+                    for (int y = 0; y < WORLD_SIZE / RATIO; y++)
                     {
                         g.FillRectangle(
-                            new SolidBrush(Color.FromArgb((int)(2 * (World.World.Instance.atmosphere[x * World.World.MaxZ + y * World.World.WORLD_SIZE / World.World.RATIO * World.World.MaxZ].humidity).Cut(0, 100)),
-                            0, 0, 255)), x * size* World.World.RATIO, y * size* World.World.RATIO, size* World.World.RATIO, size* World.World.RATIO);
+                            new SolidBrush(Color.FromArgb((int)(2 * (Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ].humidity).Cut(0, 100)),
+                            0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
                     }
                 }
             }
@@ -382,15 +415,15 @@ namespace StartGame.Rendering
 
         public Bitmap DrawMineralMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
                 {
-                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
                     {
-                        g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255 - (int)(255 * World.World.Instance.mineralMap[x, y]), 255)), x * size, y * size, size, size);
+                        g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255 - (int)(255 * Instance.mineralMap[x, y]), 255)), x * size, y * size, size, size);
                     }
                 }
             }
@@ -399,15 +432,15 @@ namespace StartGame.Rendering
 
         public Bitmap DrawAgriculturalMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
                 {
-                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
                     {
-                        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * World.World.Instance.agriculturalMap[x, y]), 255, 160, 0)), x * size, y * size, size, size);
+                        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * Instance.agriculturalMap[x, y]), 255, 160, 0)), x * size, y * size, size, size);
                     }
                 }
             }
@@ -416,15 +449,15 @@ namespace StartGame.Rendering
 
         public Bitmap DrawValueMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
                 {
-                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
                     {
-                        g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255 - (int)(255 * World.World.Instance.valueMap[x, y]), 0)), x * size, y * size, size, size);
+                        g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255 - (int)(255 * Instance.valueMap[x, y]), 0)), x * size, y * size, size, size);
                     }
                 }
             }
@@ -436,17 +469,17 @@ namespace StartGame.Rendering
             Brush[] brushes = new Brush[Island.ID + 1];
             for (int i = 0; i < brushes.Length; i++)
             {
-                brushes[i] = new SolidBrush(Color.FromArgb(World.World.random.Next(255), World.World.random.Next(255), World.World.random.Next(255)));
+                brushes[i] = new SolidBrush(Color.FromArgb(random.Next(255), random.Next(255), random.Next(255)));
             }
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
                 {
-                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
                     {
-                        Island island = World.World.Instance.worldMap[x, y].island;
+                        Island island = Instance.worldMap[x, y].island;
                         if (island != null)
                         {
                             g.FillRectangle(brushes[island.id], x * size, y * size, size, size);
@@ -459,12 +492,25 @@ namespace StartGame.Rendering
 
         public Bitmap DrawBackground()
         {
-            return DrawBackground(0, 0, World.World.Instance.worldMap.GetUpperBound(0), World.World.Instance.worldMap.GetUpperBound(1));
+            return DrawBackground(0, 0, Instance.worldMap.GetUpperBound(0), Instance.worldMap.GetUpperBound(1));
         }
 
+        int lastX;
+        int lastY;
+        int lastEX;
+        int lastEY;
+        Bitmap lastBackground;
         public Bitmap DrawBackground(int X, int Y, int EX, int EY, int size = 20)
         {
-            E.TraceFunction($"{X}, {Y}, {EX}, {EY}, {size}");
+            //E.TraceFunction($"{X}, {Y}, {EX}, {EY}, {size}");
+            if (lastBackground != null && X == lastX && Y == lastY && lastEX == EX && lastEY == EY)
+                return new Bitmap(lastBackground);
+
+            lastBackground?.Dispose();
+            lastX = X;
+            lastY = Y;
+            lastEX = EX;
+            lastEY = EY;
             SolidBrush blue = new SolidBrush(Color.Blue);
             SolidBrush green = new SolidBrush(Color.Green);
             SolidBrush rainforest = new SolidBrush(Color.FromArgb(255, 3, 72, 38));
@@ -481,7 +527,7 @@ namespace StartGame.Rendering
                 {
                     for (int y = Y; y <= EY; y++)
                     {
-                        switch (World.World.Instance.worldMap[x, y].type)
+                        switch (Instance.worldMap[x, y].type)
                         {
                             case WorldTileType.Ocean:
                                 g.FillRectangle(blue, (x - X) * size, (y - Y) * size, size, size);
@@ -526,7 +572,7 @@ namespace StartGame.Rendering
                         //apply shader
                         try
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * World.World.Instance.rawheightMap[x, y] / 2), 0, 0, 0)), (x - X) * size, (y - Y) * size, size, size);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * Instance.rawheightMap[x, y] / 2), 0, 0, 0)), (x - X) * size, (y - Y) * size, size, size);
                         }
                         catch (Exception e)
                         {
@@ -536,51 +582,52 @@ namespace StartGame.Rendering
                     }
                 }
             End:
-                return worldImage;
+                lastBackground = worldImage;
+                return new Bitmap(lastBackground);
             }
         }
 
         public Bitmap DrawNationMap(int size = 20)
         {
-            Bitmap worldImage = new Bitmap(World.World.WORLD_SIZE * size, World.World.WORLD_SIZE * size);
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 //Draw background
-                IEnumerable<Island> settledIslands = World.World.Instance.nation.islands.Where(n => n.Settled).Select(n => n.island);
-                for (int x = 0; x <= World.World.Instance.worldMap.GetUpperBound(0); x++)
+                IEnumerable<Island> settledIslands = Instance.nation.islands.Where(n => n.Settled).Select(n => n.island);
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
                 {
-                    for (int y = 0; y <= World.World.Instance.worldMap.GetUpperBound(1); y++)
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
                     {
-                        if (settledIslands.Contains(World.World.Instance.worldMap[x, y].island))
+                        if (settledIslands.Contains(Instance.worldMap[x, y].island))
                             g.FillRectangle(new SolidBrush(Color.Gray), x * size, y * size, size, size);
-                        else if (World.World.Instance.worldMap[x, y].type == WorldTileType.Ocean)
+                        else if (Instance.worldMap[x, y].type == WorldTileType.Ocean)
                             g.FillRectangle(new SolidBrush(Color.LightBlue), x * size, y * size, size, size);
                     }
                 }
                 //Draw cities
-                foreach (var city in World.World.Instance.nation.cities)
+                foreach (var city in Instance.nation.cities)
                 {
                     Color c = Color.Green;
-                    if (city == World.World.Instance.nation.Captial)
+                    if (city == Instance.nation.Captial)
                         c = Color.Red;
                     else if (city is LargeCity)
                         c = Color.Yellow;
                     else if (city is MediumCity)
                         c = Color.Beige;
-                    else if (World.World.Instance.worldMap.Get(city.position).sorroundingTiles.rawMaptiles.Any(m => !World.World.IsLand(m.type)))
+                    else if (Instance.worldMap.Get(city.position).sorroundingTiles.rawMaptiles.Any(m => !IsLand(m.type)))
                         c = Color.Blue;
                     g.FillRectangle(new SolidBrush(c), city.position.X - size * 2, city.position.Y - size * 2, size * 4, size * 4);
                 }
 
                 //Draw farms
-                foreach (var farm in World.World.Instance.nation.farms)
+                foreach (var farm in Instance.nation.farms)
                 {
                     Color c = Color.LightGreen;
                     g.FillRectangle(new SolidBrush(c), farm.position.X - size, farm.position.Y - size, size * 2, size * 2);
                 }
 
                 //Draw mines
-                foreach (var mine in World.World.Instance.nation.mines)
+                foreach (var mine in Instance.nation.mines)
                 {
                     Color c = Color.LightSalmon;
                     g.FillRectangle(new SolidBrush(c), mine.position.X - size, mine.position.Y - size, size * 2, size * 2);
