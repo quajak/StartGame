@@ -102,11 +102,26 @@ namespace StartGame.Rendering
                 {
                     for (int y = Y / ratio; y < Math.Min(Y / ratio + Height/ ratio, WORLD_SIZE / ratio); y++)
                     {
-                        WeatherPoint weatherPoint = Instance.atmosphere[x * MaxZ + y * MaxZ * WORLD_SIZE / ratio];
-                        if (weatherPoint.precipitation == 0)
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(weatherPoint.CloudCover * 2), 255, 255, 255)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                        WeatherPoint weatherPoint = GetWeatherPoint(ratio, x, y);
+                        float cloudCover = weatherPoint.CloudCover * 2;
+                        if (x > 0 && y > 0)
+                        {
+                            cloudCover += GetWeatherPoint(ratio, x - 1, y).CloudCover + GetWeatherPoint(ratio, x, y - 1).CloudCover;
+                            cloudCover /= 4;
+                        }
+                        if(x < WORLD_SIZE / ratio - 1 && y < WORLD_SIZE / ratio - 1)
+                        {
+                            cloudCover += GetWeatherPoint(ratio, x + 1, y).CloudCover + GetWeatherPoint(ratio, x, y + 1).CloudCover;
+                            cloudCover /= 4;
+                        }
+                        if (cloudCover * 6 < 190)
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(cloudCover * 6).Cut(0, 255), 255, 255, 255)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
                         else
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(weatherPoint.precipitation * 4).Cut(0, 200), 0, 0, 255)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                        {
+                            const int V = 180;
+                            g.FillRectangle(new SolidBrush(Color.FromArgb(200, (int)(V - cloudCover * 2).Cut(0, 255), (int)(V - cloudCover * 2).Cut(0, 255), (int)(V - cloudCover * 2).Cut(0, 255))), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                        }
+
                         g.FillRectangle(new SolidBrush(Color.FromArgb(255 - (int)(weatherPoint.BaseSunlight / 100 * 255), 0, 0, 0)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
                     }
                 }
@@ -114,6 +129,11 @@ namespace StartGame.Rendering
             }
             Trace.TraceInformation($"Finished in {(DateTime.Now - time).TotalMilliseconds}");
             return worldImage;
+        }
+
+        private static WeatherPoint GetWeatherPoint(int ratio, int x, int y)
+        {
+            return Instance.atmosphere[x * MaxZ + y * MaxZ * WORLD_SIZE / ratio];
         }
 
         internal Image DrawLatWindMap(int size)

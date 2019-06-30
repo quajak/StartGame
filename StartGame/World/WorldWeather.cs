@@ -705,10 +705,12 @@ namespace StartGame.World
                             dV = Math.Sign(dV) * Math.Max(5 * Math.Abs(dV) - Math.Abs(point.v), 0);
 
                         point.v += dV;
+                        
                         // Pressure
                         float pressure = point.pressure;
                         point.pressure = 1000 + point.temperature * 1.8f + point.dT * 10;// + point.humidity / 10;
                         point.dP = pressure - point.pressure;
+
                         // Vertical wind - as long as MaxZ is 1 this is not important
                         // float dW = point.dP * (-dU / DX - dV / DY);
                         // point.w += dW;
@@ -749,8 +751,8 @@ namespace StartGame.World
                         point.dT += dTfromdH;
 
                         //Movement due to wind
-                        int xMovement = (int)point.u / 20;
-                        int yMovement = (int)point.v / 20;
+                        int xMovement = (int)point.u / 10;
+                        int yMovement = (int)point.v / 10;
                         int gX = x + xMovement;
                         while (0 > gX)
                         {
@@ -770,6 +772,7 @@ namespace StartGame.World
                             gY -= WORLD_SIZE / RATIO - 1;
                         }
                         WeatherPoint moveTo = atmosphere[z + gX * MaxZ + gY * MaxZ * WORLD_SIZE / RATIO];
+
                         //Move humidity
                         float proportion = Math.Min(2, Math.Abs(atmosphereTimeStep * (Math.Abs(point.u) + Math.Abs(point.v)) / (DX * RATIO))) / 2f;
                         float changed = (float)FastMath.Round((point.humidity - point.movedHumidity).Cut(0, 100) * proportion, 3);
@@ -794,7 +797,7 @@ namespace StartGame.World
                             if (delta > 5)
                             {
                                 point.precipitation += delta;
-                                point.humidity -= delta;
+                                point.humidity -= delta / 2;
                                 if (point.humidity < 0)
                                     throw new Exception();
                                 dTfromdH = -delta / 10;

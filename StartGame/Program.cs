@@ -17,11 +17,11 @@ namespace StartGame
         [STAThread]
         private static void Main()
         {
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            ////Application.Run(new MainGameMenu());
-            //Application.Run(new World.WorldGenerationViewer());
-            MakeVideo();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            //Application.Run(new MainGameMenu());
+            Application.Run(new World.WorldGenerationViewer());
+            //MakeVideo();
             //FindOptimalThreads();
         }
 
@@ -32,14 +32,14 @@ namespace StartGame
         static void MakeVideo()
 #pragma warning restore IDE0051 // Remove unused private members
         {
-            int frames = 400;
+            int frames = 200;
             WorldRenderer worldRenderer = new WorldRenderer();
             using (VideoFileWriter vFWriter = new VideoFileWriter())
             {
                 const int RENDERSIZE = World.World.WORLD_SIZE * 4;
                 int framRate = 20;
                 // create new video file
-                vFWriter.Open("output.mp4", RENDERSIZE, RENDERSIZE, framRate, VideoCodec.MPEG4, RENDERSIZE * RENDERSIZE * 256);
+                vFWriter.Open("output.mp4", RENDERSIZE, RENDERSIZE, framRate, VideoCodec.MPEG4, 163840000);
 
                 for (int i = 0; i < frames; i++)
                 {
