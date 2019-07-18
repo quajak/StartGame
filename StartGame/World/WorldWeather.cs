@@ -1,5 +1,6 @@
 ﻿using StartGame.Functions;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 //This file is used to do the weather calculations
@@ -27,14 +28,11 @@ namespace StartGame.World
             {
                 float offset = longitude / 180 * 12;
                 double baseSunlight = Math.Sin((hour + offset) / 24 * 2 * Math.PI);
-                return (float)(baseSunlight / 2.5f + 0.5f).Cut(0, 1) * 100;
+                return (float)(baseSunlight / 2f + 0.5f).Cut(0, 1) * 100;
             }
         }
 
-        /// <summary>
-        /// 0 -> 100
-        /// </summary>
-        internal readonly float baseMinimumHumditiy;
+        internal float baseMinimumHumditiy;
 
         // At -30°C no water in air, at 10°C 100% and at 40°C 200%?
         public float MinimumHumditiy => baseMinimumHumditiy * (temperature.Cut(-30, 200) + 30) / 40;
@@ -64,6 +62,7 @@ namespace StartGame.World
 
         public float windTemperatureChange;
         public float temperature;
+        private readonly float latitude;
         public float dT;
 
         //public float geopotential;
@@ -97,7 +96,8 @@ namespace StartGame.World
                 if (!temperature.AlmostEqual(lastTemp, 0.2f))
                 {
                     //Cloud cover can not decrease outgoing
-                    outgoing = (float)(5.670367e-10f * Math.Pow(250 + temperature, 4) * World.DX * World.DY);
+                    insolation = CalculateInsolation();
+                    outgoing = (float)(3e-9f * Math.Pow(150 + temperature, 4) * World.DX * World.DY);
                     lastTemp = temperature;
                 }
                 //Cloud cover can at maximum decrease insolation by 25%
@@ -113,14 +113,14 @@ namespace StartGame.World
         /// </summary>
         public float mountain;
 
-        internal readonly float albedo;
+        internal float albedo;
 
         public int Height { get; }
         public int X { get; }
         public int Y { get; }
 
-        private readonly float insolation;
-        internal readonly float baseEvaporationRate;
+        private float insolation;
+        internal float baseEvaporationRate;
         public float EvaporationRate => baseEvaporationRate * Math.Max(temperature - 10, 0) / 10;
 
         public float precipitation;
@@ -128,10 +128,15 @@ namespace StartGame.World
         {
             get
             {
-                float resistance = mountain; // 1 - (0.5f * ((float)Math.Pow(2, mountain) - 1) + 0.25f * (1 - mountain) - 0.2f);
+                float resistance = ((mountain - 0.3f) * 4).Cut(0,1); // 1 - (0.5f * ((float)Math.Pow(2, mountain) - 1) + 0.25f * (1 - mountain) - 0.2f);
                 return resistance;
             }
         }
+
+        /// <summary>
+        /// Determines if a tile is currently raining
+        /// </summary>
+        public bool Raining = false;
 
         /// <summary>
         ///
@@ -149,20 +154,14 @@ namespace StartGame.World
             this.w = w;
             this.temperature = temperature;
             Height = height;
+            this.latitude = latitude;
             X = x;
             Y = y;
             //geopotential = (float)((decimal)6.673e-11 * (decimal)5.975e24 * 1 / (decimal)6.378e6 - 1 / (decimal)(6.37e6 + height * 1000));
             //if (geopotential < 0)
             //    throw new Exception();
-            if (height == 0)
-            {
-                insolation = (-1f * Math.Abs(latitude) + 400) * 8 * (1 - albedo);
-            }
-            else
-            {
-                insolation = 0;
-            }
-            f = CalculateCoriolisStrength(latitude);
+            insolation = CalculateInsolation();
+            f = CalculateCoriolisStrength();
             pressure = 1000 + temperature * 1.8f;
             if (pressure < 900)
                 throw new Exception();
@@ -187,6 +186,7 @@ namespace StartGame.World
             this.w = w;
             this.temperature = temperature;
             Height = height;
+            this.latitude = latitude;
             X = x;
             Y = y;
             //geopotential = (float)((decimal)6.673e-11 * (decimal)5.975e24 * 1 / (decimal)6.378e6 - 1 / (decimal)(6.37e6 + height * 1000));
@@ -200,7 +200,7 @@ namespace StartGame.World
             {
                 insolation = 0;
             }
-            f = CalculateCoriolisStrength(latitude);
+            f = CalculateCoriolisStrength();
             this.pressure = pressure;
             this.humidity = humidity;
             this.hour = hour;
@@ -214,9 +214,14 @@ namespace StartGame.World
             this.groundHeatCapacity = groundHeatCapacity;
         }
 
-        private static float CalculateCoriolisStrength(float latitude)
+        private float CalculateCoriolisStrength()
         {
-            return (float)FastMath.Round(400 * World.atmosphereTimeStep * Math.Cos(latitude / 360 * Math.PI), 3);
+            return (float)FastMath.Round(600 * World.atmosphereTimeStep * Math.Cos(latitude / 360 * Math.PI), 3);
+        }
+
+        float CalculateInsolation()
+        {
+            return Height == 0 ? (-1f * Math.Abs(latitude) + 400) * 8 * (1 - albedo) : 0;
         }
 
         public WeatherPoint()
@@ -239,7 +244,7 @@ namespace StartGame.World
         /// <summary>
         /// In hours
         /// </summary>
-        public const float atmosphereTimeStep = 0.2f;
+        public const float atmosphereTimeStep = 0.3f;
 
         //Weather variables
         public static int DX = 20; // Every box is 20 km wide
@@ -248,7 +253,8 @@ namespace StartGame.World
         public static int DZ = 1; //Every box is 1 km up
         public static int RATIO = 1;
         public const int MaxZ = 1;
-        private const int WindStrength = 25; // Determines how strong winds are due to differences in pressuree
+        private const int WindStrength = 40; // Determines how strong winds are due to differences in pressuree
+        const int MaxWindStrength = 60;
         public static int THREADS = 5; //Adding more threads does not improve performance. Lower number of threads is better because there will be less overhead at higher ratios
 
         /// <summary>
@@ -256,12 +262,20 @@ namespace StartGame.World
         /// </summary>
         public WeatherPoint[] atmosphere = new WeatherPoint[WORLD_SIZE / RATIO * WORLD_SIZE / RATIO * MaxZ / DZ];
 
+        public Dictionary<WorldTileType, int> lost;
+        public Dictionary<WorldTileType, int> gained;
+
+        double totalHumidity = 0;
+
         /// <summary>
         ///
         /// </summary>
         /// <param name="ratio"></param>
         public void InitialiseAtmosphere(int ratio = 1)
         {
+            lost = new Dictionary<WorldTileType, int>();
+            gained = new Dictionary<WorldTileType, int>();
+            ResetBiomeChangeData();
             DateTime time = DateTime.Now;
             WeatherPoint[] oldAtmosphere = atmosphere;
             if (oldAtmosphere[0] is null)
@@ -373,14 +387,25 @@ namespace StartGame.World
             Trace.TraceInformation($"Generated atmosphere in {(DateTime.Now - time).TotalMilliseconds} miliseconds");
         }
 
+        private void ResetBiomeChangeData()
+        {
+            lost = new Dictionary<WorldTileType, int>();
+            gained = new Dictionary<WorldTileType, int>();
+            foreach (object item in Enum.GetValues(typeof(WorldTileType)))
+            {
+                lost.Add((WorldTileType)item, 0);
+                gained.Add((WorldTileType)item, 0);
+            }
+        }
+
         internal WeatherPoint GetAtmosphereValue(int x, int y, int z)
         {
-            return atmosphere[z + x / RATIO * MaxZ * y / RATIO * WORLD_SIZE * MaxZ];
+            return atmosphere[z + x / RATIO * MaxZ + y / RATIO * WORLD_SIZE * MaxZ];
         }
 
         #region Biome Values
 
-        private float GetGroundHeatCapacity(WorldTileType type)
+        public static float GetGroundHeatCapacity(WorldTileType type)
         {
             switch (type)
             {
@@ -419,12 +444,12 @@ namespace StartGame.World
             }
         }
 
-        private int GetMinimumHumdity(WorldTileType type)
+        public static int GetMinimumHumdity(WorldTileType type)
         {
             switch (type)
             {
                 case WorldTileType.Ocean:
-                    return 120;
+                    return 300;
 
                 case WorldTileType.River:
                     return 120;
@@ -458,7 +483,7 @@ namespace StartGame.World
             }
         }
 
-        private float GetEvaporationRate(WorldTileType type)
+        public static float GetEvaporationRate(WorldTileType type)
         {
             switch (type)
             {
@@ -497,7 +522,7 @@ namespace StartGame.World
             }
         }
 
-        private float GetAlebdo(WorldTileType type)
+        public static float GetAlebdo(WorldTileType type)
         {
             switch (type)
             {
@@ -617,6 +642,7 @@ namespace StartGame.World
             DateTime time = DateTime.Now;
             //CalculateWeather(0, WORLD_SIZE);
             Forker forker = new Forker();
+            totalHumidity = 0;
             //TODO: Move the boundaries between threads, so that artifacts are cleaned up
             for (int i = 0; i < THREADS; i++)
             {
@@ -625,6 +651,7 @@ namespace StartGame.World
                 forker.Fork(() => CalculateWeather(startY, endY));
             }
             forker.Join();
+            //Trace.TraceInformation("Total humidity: " + totalHumidity);
             if (debug)
                 Trace.TraceInformation($"Atmosphere calculation in {(DateTime.Now - time).TotalMilliseconds}");
         }
@@ -669,12 +696,13 @@ namespace StartGame.World
                         point.u -= moveU;
                         //float friction = point.u * 0.05 * atmosphereTimeStep * point.mountain;
                         //Go from high pressure to low pressure
-                        float pressureDiff = -point.Resistance * WindStrength * (right.pressure - left.pressure) / (DX * RATIO);
+                        float pressureDiff = -(1 - point.Resistance) * WindStrength * 10 * (right.pressure - left.pressure) / (DX * RATIO);
                         float coriolis = atmosphereTimeStep * point.f;
                         float dU = coriolis + pressureDiff;// - friction;
                         if (Math.Sign(dU) == Math.Sign(point.u))
                             dU = Math.Sign(dU) * Math.Max(2 * Math.Abs(dU) - Math.Abs(point.u), 0);
                         point.u += dU;
+                        point.u = point.u.Cut(-MaxWindStrength, MaxWindStrength);
 
                         // Vertical wind
                         WeatherPoint bottom;
@@ -700,12 +728,13 @@ namespace StartGame.World
                         bottom.v += moveV / 4;
                         point.v -= moveV;
                         //float friction = point.v * 0.05f * atmosphereTimeStep * point.mountain;
-                        float dV = -point.Resistance * WindStrength * (top.pressure - bottom.pressure) / (DY * RATIO); // - friction;
+                        float dV = -(1 - point.Resistance) * WindStrength * (top.pressure - bottom.pressure) / (DY * RATIO); // - friction;
                         if (Math.Sign(dV) == Math.Sign(point.v))
                             dV = Math.Sign(dV) * Math.Max(5 * Math.Abs(dV) - Math.Abs(point.v), 0);
 
                         point.v += dV;
-                        
+                        point.v = point.v.Cut(-MaxWindStrength, MaxWindStrength);
+
                         // Pressure
                         float pressure = point.pressure;
                         point.pressure = 1000 + point.temperature * 1.8f + point.dT * 10;// + point.humidity / 10;
@@ -717,7 +746,7 @@ namespace StartGame.World
 
                         // Temperature
                         //TODO: Calculate the effect of the wind
-                        float radiation = point.EnergyBalance * atmosphereTimeStep / (20f * point.groundHeatCapacity);
+                        float radiation = point.EnergyBalance * atmosphereTimeStep / (40f * point.groundHeatCapacity);
                         float latitudinalTemp = 20 * atmosphereTimeStep * ((left.temperature + right.temperature) / 2 - point.temperature) / (DX * (RATIO / 2).Cut(1, 10));
                         float longitudinalTemp = 20 * atmosphereTimeStep * ((top.temperature + bottom.temperature) / 2 - point.temperature) / (DY * (RATIO / 2).Cut(1, 10));
                         WeatherPoint below;
@@ -741,8 +770,7 @@ namespace StartGame.World
 
                         // Calculate humidity
                         // First add new
-                        float dH = point.EvaporationRate * atmosphereTimeStep * (1 - point.CloudCover / 100);
-                        dH = (float)random.NextDouble() * dH;
+                        float dH = point.EvaporationRate * atmosphereTimeStep * (1 - point.CloudCover / 100) / 4;
                         point.humidity += dH;
                         //point.humidity = point.humidity.Cut(0, 100); //Maybe not necessary anymore
                         //Change in humidity also affects temperature
@@ -775,11 +803,13 @@ namespace StartGame.World
 
                         //Move humidity
                         float proportion = Math.Min(2, Math.Abs(atmosphereTimeStep * (Math.Abs(point.u) + Math.Abs(point.v)) / (DX * RATIO))) / 2f;
-                        float changed = (float)FastMath.Round((point.humidity - point.movedHumidity).Cut(0, 100) * proportion, 3);
+                        float changed = (float)FastMath.Round((point.humidity - point.movedHumidity - 1).Cut(0, 100) * proportion, 3);
                         point.movedHumidity = 0;
                         if (moveTo.humidity < point.humidity * 2)
                         {
                             point.humidity -= changed;
+                            if (point.humidity < 0)
+                                throw new Exception();
                             moveTo.humidity += changed;
                             moveTo.movedHumidity += changed;
                         }
@@ -792,20 +822,40 @@ namespace StartGame.World
                         point.precipitation = 0;
                         if (point.humidity > point.MinimumHumditiy)
                         {
-                            float v = (float)random.NextDouble();
-                            float delta = (float)Math.Floor(v * (point.humidity - (point.MinimumHumditiy - 20).Cut(0, 200)));
+                            if(random.Next(3) == 0)
+                                point.Raining = true;
+                        }
+                        if (point.Raining)
+                        {
+                            float delta = random.Next(Math.Min(20, (int)point.humidity));
                             if (delta > 5)
                             {
                                 point.precipitation += delta;
                                 point.humidity -= delta / 2;
                                 if (point.humidity < 0)
                                     throw new Exception();
+
+                                for (int X = x * RATIO; X < ((x + 1) * RATIO).Cut(0, WORLD_SIZE - 1); X++)
+                                {
+                                    for (int Y = y * RATIO; Y < ((y + 1) * RATIO).Cut(0, WORLD_SIZE - 1); Y++)
+                                    {
+                                        if (IsLand(worldMap[X, Y].type))
+                                            worldMap[X, Y].rock.WaterAmount += delta * 0.3;
+                                    }
+                                }
+
                                 dTfromdH = -delta / 10;
                                 point.temperature += dTfromdH;
                                 point.dT += dTfromdH;
                             }
+                            if (point.humidity < 10)
+                                point.Raining = false;
                         }
-                        point.humidity = (float)FastMath.Round(point.humidity, 3);
+
+                        var tile = worldMap[x, y];
+                        tile.averageTemp = (tile.averageTemp * tile.measurements + point.temperature) / (tile.measurements + 1);
+                        tile.measurements++;
+                        totalHumidity += point.humidity;
 #if DEBUG
                         if (point.humidity < 0)
                             throw new Exception();

@@ -15,6 +15,7 @@ namespace StartGame.World
     {
         public const int WORLD_SIZE = 200;
         public const int WORLD_DIFFICULTY = 5;
+        public static double EROSION_RATE = 0; // This value is changed before usage at runtime
         private static World world;
         public DateTime time = new DateTime(1000, 1, 1, 0, 0, 0, 0);
         public Campaign campaign; //Get a better system to generate mission
@@ -54,6 +55,8 @@ namespace StartGame.World
         public List<WorldPlayer> ToChange { get => toChange; set => toChange = value; }
 
         public Nation nation;
+
+        public bool Changed = false;
 
         private World(double a = 0.30, double b = 0.14, double c = 0.31, double Seed = 0, int octaves = 4, double persistance = 0.26)
         {
@@ -192,8 +195,60 @@ namespace StartGame.World
                 }
             }
 
+            // Do initial erosion to create rivers
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            EROSION_RATE = 100;
+            for (int iteration = 0; iteration < 100; iteration++)
+            {
+                if(iteration % 30 == 0)
+                {
+                    // Every x iterations add new water to spawn new rivers
+                    for (int i = 0; i < 10; i++)
+                    {
+                        int x;
+                        int y;
+                        do
+                        {
+                            x = random.Next(WORLD_SIZE);
+                            y = random.Next(WORLD_SIZE);
+                        } while (!IsLand(worldMap[x,y].type));
+                        worldMap[x, y].rock.WaterAmount += 1000;
+                    }
+                }
+                for (int x = 0; x < WORLD_SIZE; x++)
+                {
+                    for (int y = 0; y < WORLD_SIZE; y++)
+                    {
+                        worldMap[x, y].DoUpdate();
+                    }
+                }
+            }
+            for (int x = 0; x < WORLD_SIZE; x++)
+            {
+                for (int y = 0; y < WORLD_SIZE; y++)
+                {
+                    worldMap[x, y].landWater = 0;
+                    worldMap[x, y].rock.WaterAmount = 0;
+                }
+            }
+            stopwatch.Stop();
+            Trace.TraceInformation($"World Generation: Finished erosion in {stopwatch.ElapsedMilliseconds} milliseconds");
+
+            // Shift to world time
+            EROSION_RATE = 1;
+
+            //Generate nation
+            nation = new Nation();
+
             //Initialise atmosphere
             InitialiseAtmosphere();
+
+            // Simulate one week for atmosphere and biomes to settle
+            //for (int i = 0; i < 7; i++)
+            //{
+            //    ProgressTime(new TimeSpan(1, 0, 0, 0, 0));
+            //}
 
             //Calculate connections
             for (int x = 0; x < WORLD_SIZE; x++)
@@ -237,9 +292,6 @@ namespace StartGame.World
                     features.Add(new WorldFeature(++WorldFeature.ID, p, natureFeatures[type].GetRandom()));
                 }
             }
-
-            //Generate nation
-            nation = new Nation();
 
             //Generate cities
             //City number
@@ -535,13 +587,26 @@ namespace StartGame.World
 
         public EventHandler TimeChange;
 
-        public void ProgressTime(TimeSpan timeToPass, bool debug = false)
+        public void ProgressTime(TimeSpan timeToPass, bool debug = false, bool allowScale = true)
         {
             //We progress time in distinct blocks, to have a somewhat accurate final picture and run relativly quickly
 
             //In years
             DateTime total = DateTime.Now;
             DateTime start = DateTime.Now;
+            if (!allowScale)
+            {
+                for (int i = 0; i < (int)timeToPass.TotalHours; i++)
+                {
+                    RunHour(debug);
+                }
+                for (int i = 0; i < timeToPass.TotalHours % 1 / atmosphereTimeStep; i++)
+                {
+                    CalculateAtmosphereTimeStep(debug);
+                }
+                Trace.TraceInformation($"Simulated {timeToPass.TotalHours} hours at ratio = {RATIO} in {(DateTime.Now - start).TotalSeconds} seconds");
+                return;
+            }
             if(timeToPass.TotalDays > 31)
             {
                 int daysToRun = (int)timeToPass.TotalDays - 31;
@@ -605,6 +670,14 @@ namespace StartGame.World
             {
                 CalculateAtmosphereTimeStep(debug);
             }
+            //Update water
+            for (int y = 0; y < WORLD_SIZE; y++)
+            {
+                for (int x = 0; x < WORLD_SIZE; x++)
+                {
+                    worldMap[x, y].DoUpdate();
+                }
+            }
             nation.WorldAction(1);
             actors.ForEach(a => a.WorldAction(1));
             foreach (var actor in ToChange)
@@ -615,6 +688,24 @@ namespace StartGame.World
                     actors.Add(actor);
             }
             time += new TimeSpan(1, 0, 0);
+            if(time.DayOfYear % 7 == 0 && time.Hour == 0)
+            {
+                for (int x = 0; x < WORLD_SIZE; x++)
+                {
+                    for (int y = 0; y < WORLD_SIZE; y++)
+                    {
+                        worldMap[x, y].DetermineBiome();
+                    }
+                }
+                Changed = true;
+                Trace.TraceInformation($"Changing biomes for {lost.Aggregate(0, (v,d) => v + d.Value)} tiles");
+                foreach (object item in Enum.GetValues(typeof(WorldTileType)))
+                {
+                    Trace.TraceInformation($"{item}: -{lost[(WorldTileType)item]} +{gained[(WorldTileType)item]}");
+                }
+
+                ResetBiomeChangeData();
+            }
             TimeChange?.Invoke(null, null);
         }
 

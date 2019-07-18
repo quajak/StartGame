@@ -32,24 +32,31 @@ namespace StartGame
         static void MakeVideo()
 #pragma warning restore IDE0051 // Remove unused private members
         {
-            int frames = 200;
+            int frames = 6000;
             WorldRenderer worldRenderer = new WorldRenderer();
             using (VideoFileWriter vFWriter = new VideoFileWriter())
             {
                 const int RENDERSIZE = World.World.WORLD_SIZE * 4;
-                int framRate = 20;
+                int framRate = 15;
                 // create new video file
                 vFWriter.Open("output.mp4", RENDERSIZE, RENDERSIZE, framRate, VideoCodec.MPEG4, 163840000);
-
-                for (int i = 0; i < frames; i++)
+                try
                 {
-                    Bitmap imageFrame = worldRenderer.Render(RENDERSIZE, RENDERSIZE, 4);
-                    Thread thread = new Thread(() => { vFWriter.WriteVideoFrame(imageFrame); imageFrame.Dispose(); });
-                    thread.Start();
-                    World.World.Instance.ProgressTime();
-                    thread.Join();
+                    for (int i = 0; i < frames; i++)
+                    {
+                        Bitmap imageFrame = worldRenderer.Render(RENDERSIZE, RENDERSIZE, 4, false);
+                        Thread thread = new Thread(() => { vFWriter.WriteVideoFrame(imageFrame); imageFrame.Dispose(); });
+                        thread.Start();
+                        World.World.Instance.ProgressTime();
+                        thread.Join();
+                    }
+
                 }
-                vFWriter.Close();
+                catch (Exception e)
+                {
+                    Trace.TraceError(e.ToString());
+                    vFWriter.Close();
+                }
             }
         }
         /// <summary>

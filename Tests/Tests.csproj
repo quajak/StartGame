@@ -80,6 +80,7 @@
     <Compile Include="HumanPlayerTest.cs" />
     <Compile Include="RunningWorld.cs" />
     <Compile Include="AtmosphereTests.cs" />
+    <Compile Include="FastMathTest.cs" />
     <Compile Include="WorldGenerationTest.cs" />
     <Compile Include="WordMapTest.cs" />
   </ItemGroup>

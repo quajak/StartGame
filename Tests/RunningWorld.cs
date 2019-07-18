@@ -8,6 +8,14 @@ namespace Tests
     public class RunningWorld
     {
         [TestMethod]
+        public void RunWorldShort()
+        {
+
+            World.Instance.ProgressTime(new TimeSpan(2, 0, 0, 0));
+            Assert.IsNotNull(World.Instance); //Random check, only real check right now is if any exception is thrown
+        }
+
+        [TestMethod]
         public void RunWorld()
         {
             

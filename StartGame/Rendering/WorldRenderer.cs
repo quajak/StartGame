@@ -24,12 +24,12 @@ namespace StartGame.Rendering
         {
         }
 
-        public Bitmap Render(int renderWidth, int renderHeight, int size = 20)
+        public Bitmap Render(int renderWidth, int renderHeight, int size = 20, bool showTime = true)
         {
             //E.TraceFunction($"{renderWidth}, {renderHeight}, {size}");
             currentMap?.Dispose();
             //Only draw the needed area
-            currentMap = DrawMap((Position.X / size).Min(0), (Position.Y / size).Min(0), renderWidth / size + 1, renderHeight / size + 1, size);
+            currentMap = DrawMap((Position.X / size).Min(0), (Position.Y / size).Min(0), renderWidth / size + 1, renderHeight / size + 1, size, showTime);
             Bitmap toReturn = new Bitmap(renderWidth, renderHeight);
             using (Graphics g = Graphics.FromImage(toReturn))
             {
@@ -37,7 +37,7 @@ namespace StartGame.Rendering
             }
             return toReturn;
         }
-        private Bitmap DrawMap(int X, int Y, int Width, int Height, int size = 20)
+        private Bitmap DrawMap(int X, int Y, int Width, int Height, int size = 20, bool showTime = true)
         {
             //Trace.TraceInformation($"WorldRenderer::DrawMap({X}, {Y}, {Width}, {Height}, {size})");
             DateTime time = DateTime.Now;
@@ -46,6 +46,32 @@ namespace StartGame.Rendering
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 DateTime point = DateTime.Now;
+                // Hiding water until better way to represent it has been found
+                // Draw water ways
+                //for (int y = Y; y < WORLD_SIZE; y++)
+                //{
+                //    for (int x = X; x < WORLD_SIZE; x++)
+                //    {
+                //        WorldRockMaterial rock = Instance.worldMap[x, y].rock;
+                //        if (rock.WaterAmount > 60)
+                //        {
+                //            double riverSize = (rock.WaterAmount - 120) / 120 + 0.1;
+                //            riverSize = riverSize.Cut(0, 0.8);
+                //            double offset = 0.5 - riverSize / 2;
+                //            if ((rock.xDirection ?? 0 ) != 0)
+                //            {
+                //                g.FillRectangle(Brushes.Blue, (int)((x - X + 0.5) * size), (int)((y - Y + offset) * size), size * (rock.xDirection ?? 0), (int)(riverSize * size));
+                //            }
+                //            else
+                //            {
+                //                g.FillRectangle(Brushes.Blue, (int)((x - X + offset) * size), (int)((y - Y + 0.5) * size), (int)(riverSize * size), (rock.yDirection ?? 0) * size);
+                //            }
+                //        }
+                //    }
+                //}
+                //Trace.TraceInformation($"Rendering water in {(DateTime.Now - point).TotalMilliseconds}!");
+                //point = DateTime.Now;
+
                 //Draw features
                 int features = 0;
                 foreach (var feature in Instance.features.OrderBy(f => f.level))
@@ -97,10 +123,11 @@ namespace StartGame.Rendering
                 //Update Overlay
                 overlayObjects = overlayObjects.Where(o => !o.once).ToList();
                 //Draw weather and daytime
+                point = DateTime.Now;
                 int ratio = RATIO;
-                for (int x = X / ratio; x < Math.Min(X / ratio + Width/ ratio, WORLD_SIZE / ratio); x++)
+                for (int x = X / ratio; x < Math.Min(X / ratio + Width / ratio, WORLD_SIZE / ratio); x++)
                 {
-                    for (int y = Y / ratio; y < Math.Min(Y / ratio + Height/ ratio, WORLD_SIZE / ratio); y++)
+                    for (int y = Y / ratio; y < Math.Min(Y / ratio + Height / ratio, WORLD_SIZE / ratio); y++)
                     {
                         WeatherPoint weatherPoint = GetWeatherPoint(ratio, x, y);
                         float cloudCover = weatherPoint.CloudCover * 2;
@@ -109,22 +136,23 @@ namespace StartGame.Rendering
                             cloudCover += GetWeatherPoint(ratio, x - 1, y).CloudCover + GetWeatherPoint(ratio, x, y - 1).CloudCover;
                             cloudCover /= 4;
                         }
-                        if(x < WORLD_SIZE / ratio - 1 && y < WORLD_SIZE / ratio - 1)
+                        if (x < WORLD_SIZE / ratio - 1 && y < WORLD_SIZE / ratio - 1)
                         {
                             cloudCover += GetWeatherPoint(ratio, x + 1, y).CloudCover + GetWeatherPoint(ratio, x, y + 1).CloudCover;
                             cloudCover /= 4;
                         }
                         if (cloudCover * 6 < 190)
                             g.FillRectangle(new SolidBrush(Color.FromArgb((int)(cloudCover * 6).Cut(0, 255), 255, 255, 255)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
-                        else
+                        else if(cloudCover > 10)
                         {
                             const int V = 180;
                             g.FillRectangle(new SolidBrush(Color.FromArgb(200, (int)(V - cloudCover * 2).Cut(0, 255), (int)(V - cloudCover * 2).Cut(0, 255), (int)(V - cloudCover * 2).Cut(0, 255))), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
                         }
-
-                        g.FillRectangle(new SolidBrush(Color.FromArgb(255 - (int)(weatherPoint.BaseSunlight / 100 * 255), 0, 0, 0)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                        if(showTime)
+                            g.FillRectangle(new SolidBrush(Color.FromArgb(255 - (int)(weatherPoint.BaseSunlight / 100 * 255), 0, 0, 0)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
                     }
                 }
+                Trace.TraceInformation($"Rendering weather in {(DateTime.Now - point).TotalMilliseconds}!");
 
             }
             Trace.TraceInformation($"Finished in {(DateTime.Now - time).TotalMilliseconds}");
@@ -151,7 +179,7 @@ namespace StartGame.Rendering
                         double v = point.u;
                         if (v > 0)
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size * RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                         }
                         else if (v == 0)
                         {
@@ -160,7 +188,7 @@ namespace StartGame.Rendering
                         else
                         {
                             v = Math.Abs(v);
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                         }
                     }
                 }
@@ -183,7 +211,7 @@ namespace StartGame.Rendering
                         double v = point.v * 2;
                         if (v > 0)
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                         }
                         else if (v == 0)
                         {
@@ -192,7 +220,7 @@ namespace StartGame.Rendering
                         else
                         {
                             v = Math.Abs(v);
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                         }
                     }
                 }
@@ -215,7 +243,7 @@ namespace StartGame.Rendering
                         double v = 40 * point.dT;
                         if (v > 0)
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 255, 0, 0)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 255, 0, 0)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                         }
                         else if (v == 0)
                         {
@@ -224,7 +252,7 @@ namespace StartGame.Rendering
                         else
                         {
                             v = Math.Abs(v);
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                         }
                     }
                 }
@@ -279,7 +307,7 @@ namespace StartGame.Rendering
                         double v = 30 * point.dP;
                         if (v > 0)
                         {
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 0, 255)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                         }
                         else if (v == 0)
                         {
@@ -288,7 +316,7 @@ namespace StartGame.Rendering
                         else
                         {
                             v = Math.Abs(v);
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)v.Cut(0, 255), 0, 255, 0)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                         }
                     }
                 }
@@ -307,7 +335,7 @@ namespace StartGame.Rendering
                     for (int y = 0; y < WORLD_SIZE / RATIO; y++)
                     {
                         g.FillRectangle(new SolidBrush(Color.FromArgb((int)(Math.Min(2 * (Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ].pressure - 960).Cut(0, 255), 255)), 255, 0, 255)),
-                            x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                     }
                 }
             }
@@ -325,6 +353,42 @@ namespace StartGame.Rendering
                     for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
                     {
                         g.FillRectangle(new SolidBrush(Color.FromArgb((int)(255 * Instance.heightMap[x, y]), 0, 0, 0)), x * size, y * size, size, size);
+                    }
+                }
+            }
+            return worldImage;
+        }
+
+        public Bitmap DrawWaterMap(int size = 20)
+        {
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
+                    {
+                        WorldRockMaterial rock = Instance.worldMap[x, y].rock;
+                        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(rock.WaterAmount).Cut(0, 255)
+                            , 0, (int)((-1 * rock.waterSpeed).Cut(0, 255)), (int)(rock.waterSpeed.Cut(0, 255)))), x * size, y * size, size, size);
+                    }
+                }
+            }
+            return worldImage;
+        }
+
+        public Bitmap DrawWaterkeptMap(int size = 20)
+        {
+            Bitmap worldImage = new Bitmap(WORLD_SIZE * size, WORLD_SIZE * size);
+            using (Graphics g = Graphics.FromImage(worldImage))
+            {
+                //Draw background
+                for (int x = 0; x <= Instance.worldMap.GetUpperBound(0); x++)
+                {
+                    for (int y = 0; y <= Instance.worldMap.GetUpperBound(1); y++)
+                    {
+                        g.FillRectangle(new SolidBrush(Color.FromArgb((int)(5 * Instance.worldMap[x, y].landWater).Cut(0, 255), 0, 0, 255)), x * size, y * size, size, size);
                     }
                 }
             }
@@ -353,9 +417,9 @@ namespace StartGame.Rendering
                     }
                 }
             }
-            End:
-                //Trace.TraceInformation("Finished rendering raw height!");
-                return worldImage;
+        End:
+            //Trace.TraceInformation("Finished rendering raw height!");
+            return worldImage;
         }
 
         public Bitmap DrawTemperatureMap(int size = 20)
@@ -407,7 +471,7 @@ namespace StartGame.Rendering
                     {
                         g.FillRectangle(
                             new SolidBrush(Color.FromArgb((int)(6 * (Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ].precipitation)).Cut(0, 255),
-                            0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            0, 0, 255)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                     }
                 }
             }
@@ -426,7 +490,7 @@ namespace StartGame.Rendering
                     {
                         g.FillRectangle(
                             new SolidBrush(Color.FromArgb((int)(2 * (Instance.atmosphere[x * MaxZ + y * WORLD_SIZE / RATIO * MaxZ].humidity).Cut(0, 100)),
-                            0, 0, 255)), x * size* RATIO, y * size* RATIO, size* RATIO, size* RATIO);
+                            0, 0, 255)), x * size * RATIO, y * size * RATIO, size * RATIO, size * RATIO);
                     }
                 }
             }
@@ -523,9 +587,10 @@ namespace StartGame.Rendering
         public Bitmap DrawBackground(int X, int Y, int EX, int EY, int size = 20)
         {
             //E.TraceFunction($"{X}, {Y}, {EX}, {EY}, {size}");
-            if (lastBackground != null && X == lastX && Y == lastY && lastEX == EX && lastEY == EY)
+            if (!Instance.Changed && !Redraw && lastBackground != null && X == lastX && Y == lastY && lastEX == EX && lastEY == EY)
                 return new Bitmap(lastBackground);
-
+            Instance.Changed = false;
+            Redraw = false;
             lastBackground?.Dispose();
             lastX = X;
             lastY = Y;
@@ -536,7 +601,7 @@ namespace StartGame.Rendering
             SolidBrush rainforest = new SolidBrush(Color.FromArgb(255, 3, 72, 38));
             SolidBrush desert = new SolidBrush(Color.FromArgb(255, 204, 225, 64));
             SolidBrush tundra = new SolidBrush(Color.FromArgb(255, 9, 225, 223));
-            SolidBrush temperateForest = new SolidBrush(Color.FromArgb(255, 94, 183, 80));
+            SolidBrush temperateGrassland = new SolidBrush(Color.FromArgb(255, 94, 183, 80));
             SolidBrush savanna = new SolidBrush(Color.FromArgb(255, 237, 189, 78));
             SolidBrush alpine = new SolidBrush(Color.FromArgb(255, 73, 73, 73));
             SolidBrush seaIce = new SolidBrush(Color.FromArgb(255, 0, 145, 193));
@@ -556,7 +621,7 @@ namespace StartGame.Rendering
                             case WorldTileType.River:
                                 throw new NotImplementedException();
                             case WorldTileType.TemperateGrassland:
-                                g.FillRectangle(green, (x - X) * size, (y - Y) * size, size, size);
+                                g.FillRectangle(temperateGrassland, (x - X) * size, (y - Y) * size, size, size);
                                 break;
 
                             case WorldTileType.Rainforest:
@@ -572,7 +637,7 @@ namespace StartGame.Rendering
                                 break;
 
                             case WorldTileType.TemperateForest:
-                                g.FillRectangle(temperateForest, (x - X) * size, (y - Y) * size, size, size);
+                                g.FillRectangle(green, (x - X) * size, (y - Y) * size, size, size);
                                 break;
 
                             case WorldTileType.Savanna:

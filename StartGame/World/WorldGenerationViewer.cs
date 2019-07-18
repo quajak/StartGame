@@ -22,7 +22,7 @@ namespace StartGame.World
             InitialiseData();
             worldMapBox.MouseWheel += WorldMapBox_MouseWheel;
             World.Instance.TimeChange += (o, e) => {
-                if (World.Instance.time.DayOfYear % 7 == 0)
+                if (World.Instance.time.DayOfYear % 7 == 0 && World.Instance.time.Hour == 0)
                 {
                     AddDataPoints();
                 }
@@ -40,17 +40,19 @@ namespace StartGame.World
         int zoom = -16;
         private void WorldMapBox_MouseWheel(object sender, MouseEventArgs e)
         {
+            if (e.Delta == 0)
+                return;
             //pre zoom snap to grid and center on mouse
             int cornerX = worldRenderer.Position.X / (20 + zoom);
             int mouseX = (e.X - worldMapBox.Width / 2) / (20 + zoom);
-            int posX = cornerX + mouseX;
+            int posX = (cornerX + mouseX).Cut(0, worldMapBox.Width);
             int cornerY = worldRenderer.Position.Y / (20 + zoom);
             int mouseY = (e.Y - worldMapBox.Height / 2) / (20 + zoom);
-            int posY = cornerY + mouseY;
+            int posY = (cornerY + mouseY).Cut(0, worldMapBox.Height);
 
             //Zoom in or out
             zoom += 2 * e.Delta / Math.Abs(e.Delta);
-            zoom = zoom < -18 ? -18 : zoom;
+            zoom = zoom < -16 ? -16 : zoom;
             zoom = zoom > 30 ? 30 : zoom;
 
             worldRenderer.Position = new Point(posX * (20 + zoom), posY * (20 + zoom));
@@ -65,7 +67,7 @@ namespace StartGame.World
         private void Render()
         {
             int size = 1;
-            worldMapBox.Image = worldRenderer.Render(800, 800, 20 + zoom);
+            worldMapBox.Image = worldRenderer.Render(800, 800, 20 + zoom, showTime.Checked);
             rainfallMapBox.Image = worldRenderer.DrawRainfallMap(size);
             humidityMapBox.Image = worldRenderer.DrawHumidityMap(size);
             heightMapBox.Image = worldRenderer.DrawHeightMap(size);
@@ -81,6 +83,8 @@ namespace StartGame.World
             dPressureMap.Image = worldRenderer.DrawDPMap(size);
             dTemperatureMap.Image = worldRenderer.DrawDTMap(size);
             radiationMap.Image = worldRenderer.DrawRadiationMap(size);
+            waterMap.Image = worldRenderer.DrawWaterMap(size);
+            waterkeptMap.Image = worldRenderer.DrawWaterkeptMap(size);
         }
 
         private void TrackBar1_Scroll(object sender, EventArgs e)
@@ -146,14 +150,14 @@ namespace StartGame.World
 
         private void RunDay_Click(object sender, EventArgs e)
         {
-            ProgressTime(new TimeSpan(1, 0, 0, 0, 0));
+            ProgressTime(new TimeSpan(1, 0, 0, 0, 0), false);
             Render();
         }
 
 
-        void ProgressTime(TimeSpan time)
+        void ProgressTime(TimeSpan time, bool allowScale = false)
         {
-            World.Instance.ProgressTime(time);  
+            World.Instance.ProgressTime(time, false, allowScale);  
         }
 
         void InitialiseData()
@@ -193,7 +197,9 @@ namespace StartGame.World
             int x = (worldRenderer.Position.X + e.X)/(20 + zoom);
             int y = (worldRenderer.Position.Y + e.Y)/(20 + zoom);
             WeatherPoint wP = World.Instance.atmosphere[x * World.MaxZ / World.RATIO + y / World.RATIO * World.MaxZ * World.WORLD_SIZE / World.RATIO];
-            pointInformation.Text = $"Co-ords: {x} {y} Temp: {wP.temperature} Pressure: {wP.pressure} Humidity: {wP.humidity} Lon Wind {wP.v} Lat Wind {wP.u}";
+            WorldTile point = World.Instance.worldMap[x, y];
+            pointInformation.Text = $"Co-ords: {x} {y} Temp: {wP.temperature} Pressure: {wP.pressure} Humidity: {wP.humidity} Lon Wind {wP.v} Lat Wind {wP.u} " +
+                $"Height {point.height} Water: {point.rock.WaterAmount} Average Temp: {point.averageTemp} Landwater {point.landWater}";
             if (e.Button == MouseButtons.Left)
                 mouseDownPosition = e.Location;
         }
@@ -204,13 +210,13 @@ namespace StartGame.World
 
         private void Run2Hour_Click(object sender, EventArgs e)
         {
-            ProgressTime(new TimeSpan(2, 0, 0));
+            ProgressTime(new TimeSpan(2, 0, 0), false);
             Render();
         }
 
         private void RunSingleStep_Click(object sender, EventArgs e)
         {
-            ProgressTime(new TimeSpan((int)World.atmosphereTimeStep, (int)(World.atmosphereTimeStep * 60) - (60 * (int)World.atmosphereTimeStep) , 0));
+            ProgressTime(new TimeSpan((int)World.atmosphereTimeStep, (int)(World.atmosphereTimeStep * 60) - (60 * (int)World.atmosphereTimeStep) , 0), false);
             Render();
         }
     }

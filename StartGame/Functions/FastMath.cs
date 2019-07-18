@@ -27,5 +27,11 @@ namespace StartGame.Functions
             double adjustment = RoundLookup[decimalPlaces];
             return Math.Floor(value * adjustment + 0.5) / adjustment;
         }
+
+        public static double Floor(double value, int decimalPlaces)
+        {
+            double adjustment = RoundLookup[decimalPlaces];
+            return Math.Floor(value * adjustment) / adjustment;
+        }
     }
 }

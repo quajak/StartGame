@@ -8,6 +8,7 @@ namespace Tests
     [TestClass]
     public class ExtensionTest
     {
+
         [TestMethod]
         public void TestCopy()
         {

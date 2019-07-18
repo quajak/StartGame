@@ -80,6 +80,11 @@
             this.atmosphereRatio = new System.Windows.Forms.ComboBox();
             this.radiationMap = new System.Windows.Forms.PictureBox();
             this.label17 = new System.Windows.Forms.Label();
+            this.waterMap = new System.Windows.Forms.PictureBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.waterkeptMap = new System.Windows.Forms.PictureBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.showTime = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.heightMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.humidityMapBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.rainfallMapBox)).BeginInit();
@@ -102,6 +107,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dTemperatureMap)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.lonWindMap)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.radiationMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.waterMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.waterkeptMap)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -552,11 +559,60 @@
             this.label17.TabIndex = 839;
             this.label17.Text = "Radiation Map";
             // 
+            // waterMap
+            // 
+            this.waterMap.Location = new System.Drawing.Point(1673, 565);
+            this.waterMap.Name = "waterMap";
+            this.waterMap.Size = new System.Drawing.Size(200, 200);
+            this.waterMap.TabIndex = 842;
+            this.waterMap.TabStop = false;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(1673, 548);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(60, 13);
+            this.label18.TabIndex = 841;
+            this.label18.Text = "Water Map";
+            // 
+            // waterkeptMap
+            // 
+            this.waterkeptMap.Location = new System.Drawing.Point(1673, 785);
+            this.waterkeptMap.Name = "waterkeptMap";
+            this.waterkeptMap.Size = new System.Drawing.Size(200, 200);
+            this.waterkeptMap.TabIndex = 844;
+            this.waterkeptMap.TabStop = false;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(1673, 768);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(81, 13);
+            this.label19.TabIndex = 843;
+            this.label19.Text = "Waterkept Map";
+            // 
+            // showTime
+            // 
+            this.showTime.AutoSize = true;
+            this.showTime.Location = new System.Drawing.Point(185, 227);
+            this.showTime.Name = "showTime";
+            this.showTime.Size = new System.Drawing.Size(79, 17);
+            this.showTime.TabIndex = 845;
+            this.showTime.Text = "Show Time";
+            this.showTime.UseVisualStyleBackColor = true;
+            // 
             // WorldGenerationViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1915, 1181);
+            this.ClientSize = new System.Drawing.Size(1915, 1061);
+            this.Controls.Add(this.showTime);
+            this.Controls.Add(this.waterkeptMap);
+            this.Controls.Add(this.label19);
+            this.Controls.Add(this.waterMap);
+            this.Controls.Add(this.label18);
             this.Controls.Add(this.radiationMap);
             this.Controls.Add(this.label17);
             this.Controls.Add(this.atmosphereRatio);
@@ -631,6 +687,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dTemperatureMap)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.lonWindMap)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.radiationMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.waterMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.waterkeptMap)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -687,5 +745,10 @@
         private System.Windows.Forms.ComboBox atmosphereRatio;
         private System.Windows.Forms.PictureBox radiationMap;
         private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.PictureBox waterMap;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.PictureBox waterkeptMap;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.CheckBox showTime;
     }
 }
