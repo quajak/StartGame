@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StartGame.Items;
+using StartGame.PlayerData;
 
 namespace StartGame.World.Cities
 {
@@ -64,6 +65,7 @@ namespace StartGame.World.Cities
             Trace.TraceInformation($"Store::OnAction {action.name}");
             if(action.name == "Deselect")
             {
+                cityV.actionOptionLabel.Visible = false;
                 cityView.actionOptionList.Visible = false;
                 cityView.actionOptionList.SelectedIndexChanged -= ActionOptionList_SelectedIndexChanged;
             }
@@ -71,6 +73,7 @@ namespace StartGame.World.Cities
             {
                 cityView.actionOptionList.Visible = true;
                 cityV.actionOptionList.Items.Clear();
+                cityV.actionOptionLabel.Visible = false;
                 foreach (var c in city.portConnections)
                 {
                     cityV.actionOptionList.Items.Add(c);
@@ -79,6 +82,8 @@ namespace StartGame.World.Cities
             }
         }
 
+        TimeSpan time;
+        int cost;
         private void ActionOptionList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cityV.actionOptionList.SelectedIndex == -1) {
@@ -87,8 +92,13 @@ namespace StartGame.World.Cities
             City selected = cityV.actionOptionList.SelectedItem as City;
             cityV.actionOptionList.Text = selected.position.ToString();
             cityV.button1.Text = "Travel";
+            time = new TimeSpan(AIUtility.Distance(city.position, selected.position) / 20, 0, 0);
+            cost = (int)time.TotalHours * 10;
+            cityV.actionOptionLabel.Visible = true;
+            cityV.actionOptionLabel.Text = $"Travel in {time.Days} days and {time.Hours} hours. It costs {cost} coins.";
             cityV.button1.Click += Button1_Click;
             cityV.button1.Visible = true;
+            cityV.button1.Enabled = cityV.player.Money.Value >= cost;
 
         }
 
@@ -97,6 +107,8 @@ namespace StartGame.World.Cities
             if (cityV.actionOptionList.SelectedIndex == -1) return;
             City selected = cityV.actionOptionList.SelectedItem as City;
             cityV.player.WorldPosition = selected.position;
+            cityV.player.Money.RawValue -= cost;
+            World.Instance.ProgressTime(time);
             cityV.worldView.FocusOnPlayer();
             cityV.worldView.Render();
             cityV.Close();

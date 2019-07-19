@@ -19,8 +19,8 @@ namespace StartGame
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new MainGameMenu());
-            Application.Run(new World.WorldGenerationViewer());
+            Application.Run(new MainGameMenu());
+            //Application.Run(new World.WorldGenerationViewer());
             //MakeVideo();
             //FindOptimalThreads();
         }

@@ -24,12 +24,12 @@ namespace StartGame.Rendering
         {
         }
 
-        public Bitmap Render(int renderWidth, int renderHeight, int size = 20, bool showTime = true)
+        public Bitmap Render(int renderWidth, int renderHeight, int size = 20, bool showTime = true, bool inGame = false)
         {
             //E.TraceFunction($"{renderWidth}, {renderHeight}, {size}");
             currentMap?.Dispose();
             //Only draw the needed area
-            currentMap = DrawMap((Position.X / size).Min(0), (Position.Y / size).Min(0), renderWidth / size + 1, renderHeight / size + 1, size, showTime);
+            currentMap = DrawMap((Position.X / size).Min(0), (Position.Y / size).Min(0), renderWidth / size + 1, renderHeight / size + 1, size, showTime, inGame);
             Bitmap toReturn = new Bitmap(renderWidth, renderHeight);
             using (Graphics g = Graphics.FromImage(toReturn))
             {
@@ -37,7 +37,7 @@ namespace StartGame.Rendering
             }
             return toReturn;
         }
-        private Bitmap DrawMap(int X, int Y, int Width, int Height, int size = 20, bool showTime = true)
+        private Bitmap DrawMap(int X, int Y, int Width, int Height, int size = 20, bool showTime = true, bool inGame = false)
         {
             //Trace.TraceInformation($"WorldRenderer::DrawMap({X}, {Y}, {Width}, {Height}, {size})");
             DateTime time = DateTime.Now;
@@ -141,15 +141,31 @@ namespace StartGame.Rendering
                             cloudCover += GetWeatherPoint(ratio, x + 1, y).CloudCover + GetWeatherPoint(ratio, x, y + 1).CloudCover;
                             cloudCover /= 4;
                         }
-                        if (cloudCover * 6 < 190)
-                            g.FillRectangle(new SolidBrush(Color.FromArgb((int)(cloudCover * 6).Cut(0, 255), 255, 255, 255)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
-                        else if(cloudCover > 10)
+                        if (inGame)
                         {
-                            const int V = 180;
-                            g.FillRectangle(new SolidBrush(Color.FromArgb(200, (int)(V - cloudCover * 2).Cut(0, 255), (int)(V - cloudCover * 2).Cut(0, 255), (int)(V - cloudCover * 2).Cut(0, 255))), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                            if (cloudCover * 6 < 190)
+                                g.FillRectangle(new SolidBrush(Color.FromArgb((int)(cloudCover * 6).Cut(0, 255), 255, 255, 255)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                            else if(cloudCover > 10)
+                            {
+                                const int V = 180;
+                                g.FillRectangle(new SolidBrush(Color.FromArgb(200, (int)(V - cloudCover * 2).Cut(0, 255), (int)(V - cloudCover * 2).Cut(0, 255), (int)(V - cloudCover * 2).Cut(0, 255))), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                            }
+                            if(showTime)
+                                g.FillRectangle(new SolidBrush(Color.FromArgb(255 - (int)(weatherPoint.BaseSunlight / 100 * 255), 0, 0, 0)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
                         }
-                        if(showTime)
-                            g.FillRectangle(new SolidBrush(Color.FromArgb(255 - (int)(weatherPoint.BaseSunlight / 100 * 255), 0, 0, 0)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                        else
+                        {
+                            if (cloudCover * 6 < 190)
+                                g.FillRectangle(new SolidBrush(Color.FromArgb((int)(cloudCover * 3).Cut(0, 255), 255, 255, 255)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                            else if (cloudCover > 10)
+                            {
+                                const int V = 180;
+                                g.FillRectangle(new SolidBrush(Color.FromArgb(100, (int)(V - cloudCover).Cut(0, 255), (int)(V - cloudCover).Cut(0, 255), (int)(V - cloudCover).Cut(0, 255))), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+                            }
+                            if (showTime)
+                                g.FillRectangle(new SolidBrush(Color.FromArgb(128 - (int)(weatherPoint.BaseSunlight / 100 * 128), 0, 0, 0)), (x - X) * size * ratio, (y - Y) * size * ratio, size * ratio, size * ratio);
+
+                        }
                     }
                 }
                 Trace.TraceInformation($"Rendering weather in {(DateTime.Now - point).TotalMilliseconds}!");

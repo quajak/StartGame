@@ -245,10 +245,10 @@ namespace StartGame.World
             InitialiseAtmosphere();
 
             // Simulate one week for atmosphere and biomes to settle
-            //for (int i = 0; i < 7; i++)
-            //{
-            //    ProgressTime(new TimeSpan(1, 0, 0, 0, 0));
-            //}
+            for (int i = 0; i < 7; i++)
+            {
+                ProgressTime(new TimeSpan(1, 0, 0, 0, 0));
+            }
 
             //Calculate connections
             for (int x = 0; x < WORLD_SIZE; x++)
@@ -647,7 +647,12 @@ namespace StartGame.World
             }
             for (int timeStep = 0; timeStep < timeToPass.TotalHours / atmosphereTimeStep; timeStep++)
             {
+                time += new TimeSpan(0, 0, (int)(atmosphereTimeStep * 60), 0, 0);
                 CalculateAtmosphereTimeStep(debug);
+                if(time.Minute == 0)
+                {
+                    HourlyUpdate();
+                }
             }
             Trace.TraceInformation($"Simulates {daysLeft} days at ratio = 1 in {(DateTime.Now - start).TotalSeconds} seconds. " +
                 $"Total calculation took {(DateTime.Now - total).TotalSeconds} seconds");
@@ -670,6 +675,12 @@ namespace StartGame.World
             {
                 CalculateAtmosphereTimeStep(debug);
             }
+            time += new TimeSpan(1, 0, 0);
+            HourlyUpdate();
+        }
+
+        private void HourlyUpdate()
+        {
             //Update water
             for (int y = 0; y < WORLD_SIZE; y++)
             {
@@ -687,8 +698,7 @@ namespace StartGame.World
                 else
                     actors.Add(actor);
             }
-            time += new TimeSpan(1, 0, 0);
-            if(time.DayOfYear % 7 == 0 && time.Hour == 0)
+            if (time.DayOfYear % 7 == 0 && time.Hour == 0)
             {
                 for (int x = 0; x < WORLD_SIZE; x++)
                 {
@@ -698,7 +708,7 @@ namespace StartGame.World
                     }
                 }
                 Changed = true;
-                Trace.TraceInformation($"Changing biomes for {lost.Aggregate(0, (v,d) => v + d.Value)} tiles");
+                Trace.TraceInformation($"Changing biomes for {lost.Aggregate(0, (v, d) => v + d.Value)} tiles");
                 foreach (object item in Enum.GetValues(typeof(WorldTileType)))
                 {
                     Trace.TraceInformation($"{item}: -{lost[(WorldTileType)item]} +{gained[(WorldTileType)item]}");

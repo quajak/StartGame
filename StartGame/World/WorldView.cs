@@ -84,7 +84,7 @@ namespace StartGame.World
 
         private void Controller_Tick(object sender, EventArgs e)
         {
-            World.Instance.ProgressTime(new TimeSpan(0, 2, 0, 0));
+            World.Instance.ProgressTime(new TimeSpan(0, 0, 30, 0));
             worldRenderer.Redraw = true; //Is there a way we can avoid this?
             Render();
             startMission.Visible = player.availableActions.Exists(a => a is StartMission);
