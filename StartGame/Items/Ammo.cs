@@ -48,7 +48,7 @@ namespace StartGame.Items
 
         public void Select(RangedWeapon weapon)
         {
-            Selected[weapon] = true; ;
+            Selected[weapon] = true;
             connected.Add(weapon);
             weapon.attackDamage.buffs.Add(damage);
         }

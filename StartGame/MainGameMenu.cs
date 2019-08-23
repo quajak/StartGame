@@ -43,14 +43,16 @@ namespace StartGame
 
         private void StartGame_Click(object sender, EventArgs e)
         {
-            MapBiome biome = new GrasslandMapBiome();
+            MapBiome biome = new DesertMapBiome();
             //Long term: allow map selection
             if (map == null)
             {
                 if (MessageBox.Show("You have no map selected! \n Starting now will mean using a random map!", "Alert", MessageBoxButtons.OKCancel) == DialogResult.OK)
                 {
                     //Start game with random map
-                    map = new Map();
+                    map = new Map {
+                        mapBiome = biome
+                    };
                     Thread mapThread;
                     do
                     {
@@ -94,7 +96,7 @@ namespace StartGame
             Hide();
             //Long term: Make form to allow use to choose mission and difficulty
 
-            Mission.Mission mission = new SpiderNestMission();
+            Mission.Mission mission = new BearMission();
 
             List<Tree> trees = Tree.GenerateTrees();
 

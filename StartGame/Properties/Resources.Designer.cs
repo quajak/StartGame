@@ -61,6 +61,16 @@ namespace StartGame.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Archer {
+            get {
+                object obj = ResourceManager.GetObject("Archer", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Alex.
         /// </summary>
         public static string BasePlayerName {
@@ -105,6 +115,26 @@ namespace StartGame.Properties {
         public static System.Drawing.Bitmap CapitalCity {
             get {
                 object obj = ResourceManager.GetObject("CapitalCity", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Caravan {
+            get {
+                object obj = ResourceManager.GetObject("Caravan", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap CaravanWagon {
+            get {
+                object obj = ResourceManager.GetObject("CaravanWagon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

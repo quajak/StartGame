@@ -479,14 +479,7 @@ namespace StartGame.World.Cities
                     {
                         toBuy -= amount;
                         money -= bestFarm.Buy(bestFarm.Items()[0].name, bestFarm.Items()[0].amount);
-                        if (Items.TryGet(i => i.item.name == resource.name, out InventoryItem inventoryItem))
-                        {
-                            inventoryItem.Amount += amount;
-                        }
-                        else
-                        {
-                            Items.Add(new InventoryItem(resource, amount, city.DetermineLocalFoodPrice(resource)));
-                        }
+                        AddItem(resource, amount);
                     }
                     else
                         break; ;
@@ -495,6 +488,48 @@ namespace StartGame.World.Cities
             //Trace.TraceInformation($"{city.name} has {Items.Sum(i => i.Amount)} after buying");
 
         }
+
+        public int Sell(SellableItem item)
+        {
+            int price = GetBuyPrice(item);
+            item.cost = price;
+            AddItem(item, item.amount);
+            money -= item.amount * price;
+            return item.amount * price;
+        }
+
+        internal int Sell(InventoryItem item)
+        {
+            if(item.item is Food f)
+            {
+                return Sell(new Food(item.item.name, item.Amount, item.Cost, f.healAmount));
+            }
+            return Sell(new Resource(item.item.name, item.Amount, item.Cost));
+        }
+        private void AddItem(SellableItem item, int amount)
+        {
+            if (Items.TryGet(i => i.item.name == item.name && i.Cost == item.cost, out InventoryItem inventoryItem))
+            {
+                inventoryItem.Amount += amount;
+            }
+            else
+            {
+                Items.Add(new InventoryItem(item, amount, item.cost));
+            }
+        }
+
+        private void AddItem(Resource resource, int amount)
+        {
+            if (Items.TryGet(i => i.item.name == resource.name, out InventoryItem inventoryItem))
+            {
+                inventoryItem.Amount += amount;
+            }
+            else
+            {
+                Items.Add(new InventoryItem(resource, amount, city.DetermineLocalFoodPrice(resource)));
+            }
+        }
+
     }
 
     public class JewleryStore : Store
@@ -592,7 +627,7 @@ namespace StartGame.World.Cities
         public static MagicStore GenerateStore(int value, City city)
         {
             List<InventoryItem> sold = new List<InventoryItem>();
-            for (int i = 0; i < value / 10; i++)
+            for (int i = 0; i < value / 20; i++)
             {
                 Spell spell = World.Instance.Spells.GetRandom();
                 sold.Add(new InventoryItem(spell, 1, (int)(spell.buyCost * (World.random.NextDouble() + 1))));

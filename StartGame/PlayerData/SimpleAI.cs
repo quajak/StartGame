@@ -4,7 +4,7 @@ namespace StartGame.PlayerData
 {
     internal class BanditAI : Player
     {
-        public BanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies) : base(Type, Name, Map, Enemies, 3, 0, 2, 0, 1, 3, 5)
+        public BanditAI(PlayerType Type, string Name, Map Map, Player[] Enemies, int strength = 2) : base(Type, Name, Map, Enemies, 3, 0, strength, 0, 1, 3, 5)
         {
         }
 

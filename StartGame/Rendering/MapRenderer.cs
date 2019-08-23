@@ -123,7 +123,7 @@ namespace StartGame.Rendering
         public void SetPosition(Point position, PositionSetType setType)
         {
             StackTrace stackTrace = new StackTrace();
-            Trace.TraceInformation($"RenderObject::SetPosition {Name} From: {this.position} To: {position} Type: {setType} Stack: {stackTrace.GetFrame(3).GetMethod().Name}");
+            //Trace.TraceInformation($"RenderObject::SetPosition {Name} From: {this.position} To: {position} Type: {setType} Stack: {stackTrace.GetFrame(3).GetMethod().Name}");
             switch (setType)
             {
                 case PositionSetType.absolute:
@@ -266,11 +266,11 @@ namespace StartGame.GameMap
                     Point[] points = new Point[renderObjects.Count]; //DEBUG
                     for (int i = 0; i < renderObjects.Count; i++)
                     {
-                        Trace.TraceInformation($"Rendering {renderObjects[i].Name} in {renderObjects[i].time} from {points[i] = renderObjects[i].position}");
+                        //Trace.TraceInformation($"Rendering {renderObjects[i].Name} in {renderObjects[i].time} from {points[i] = renderObjects[i].position}");
                         times[i] = renderObjects[i].time;
                         points[i] = renderObjects[i].position;
                     }
-                    Trace.TraceInformation($"Rendering {renderObjects.Count} objects at {_time} in {time} steps.");
+                    //Trace.TraceInformation($"Rendering {renderObjects.Count} objects at {_time} in {time} steps.");
                     for (int i = 0; i < time + 1; i++)
                     {
                         //Move all entites
@@ -453,7 +453,7 @@ namespace StartGame.GameMap
                                     waterTile += 2;
                                     break;
 
-                                case MapTileTypeEnum.path:
+                                case MapTileTypeEnum.road:
                                     break;
 
                                 case MapTileTypeEnum.wall:

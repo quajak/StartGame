@@ -354,7 +354,7 @@ namespace StartGame
                 nextAction.Enabled = true;
             }
             nextAction.Focus();
-            fleeButton.Enabled = canPlayerEscape && (humanPlayer.troop.Position.X == 0 || humanPlayer.troop.Position.X == map.map.GetUpperBound(0) ||
+            fleeButton.Enabled = humanPlayer != null && canPlayerEscape && (humanPlayer.troop.Position.X == 0 || humanPlayer.troop.Position.X == map.map.GetUpperBound(0) ||
                 humanPlayer.troop.Position.Y == 0 || humanPlayer.troop.Position.Y == map.map.GetUpperBound(1));
         }
 
@@ -1073,7 +1073,7 @@ namespace StartGame
                         if (layer.sharpDefense >= damage)
                         {
                             //Weapon does not penetrate
-                            damage = layer.sharpDefense < damage * 2 ? damage / 10 : 0;
+                            damage = layer.sharpDefense < damage * 3 ? damage / 5 : 0;
                             durLost = damage * 2 + 1;
                             text += $"The weapon does not penetrate {layer.name}. {damage} continues as blunt damage. {layer.name} looses {durLost} durability.";
                             layer.durability -= durLost;

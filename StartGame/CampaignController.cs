@@ -67,7 +67,7 @@ namespace StartGame
                 }
                 if (campaign.activeGame.giveReward)
                 {
-                    MissionResult worldView = GenerateRewardAndHeal(player, campaign.activeGame, campaign.mission, campaign.healthRegen, (double)(campaign.Round - 1)/ campaign.numberOfGames, "Next Mission");
+                    MissionResult worldView = GenerateRewardAndHeal(player, campaign.activeGame, campaign.mission, campaign.healthRegen, (double)(campaign.Round - 1) / campaign.numberOfGames, "Next Mission");
                     worldView.ShowDialog();
                 }
             } while (campaign.Next());
@@ -88,24 +88,27 @@ namespace StartGame
             player.troop.health.RawValue += healthRegen;
             player.troop.health.RawValue = player.troop.health.Value > player.troop.health.MaxValue().Value ? player.troop.health.MaxValue().Value : player.troop.health.Value;
 
-            //Generate loot from dead players
-            List<Armour> lootableArmour = new List<Armour>();
-            foreach (var deadPlayer in mainWindow.killedPlayers)
-            {
-                lootableArmour.AddRange(deadPlayer.troop.armours);
-            }
-
-            lootableArmour = lootableArmour.OrderBy(a => World.World.random.Next()).ToList(); // I know it is not the most effiecent but that does not matter here
-
-            int chosen = 0;
             List<Armour> loot = new List<Armour>();
-            foreach (var lootpiece in lootableArmour)
+            if (mission.lootDead)
             {
-                if (World.World.random.NextDouble() < 1d / (chosen + 1d))
+                //Generate loot from dead players
+                List<Armour> lootableArmour = new List<Armour>();
+                foreach (var deadPlayer in mainWindow.killedPlayers)
                 {
-                    lootpiece.active = false;
-                    loot.Add(lootpiece);
-                    chosen++;
+                    lootableArmour.AddRange(deadPlayer.troop.armours);
+                }
+
+                lootableArmour = lootableArmour.OrderBy(a => World.World.random.Next()).ToList(); // I know it is not the most effiecent but that does not matter here
+
+                int chosen = 0;
+                foreach (var lootpiece in lootableArmour)
+                {
+                    if (World.World.random.NextDouble() < 1d / (chosen + 1d))
+                    {
+                        lootpiece.active = false;
+                        loot.Add(lootpiece);
+                        chosen++;
+                    }
                 }
             }
             //Show world map

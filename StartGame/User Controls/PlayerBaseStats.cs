@@ -22,7 +22,7 @@ namespace StartGame.User_Controls
             this.player = player;
             Render();
         }
-
+        
         private void PlayerBaseStats_Load(object sender, EventArgs e)
         {
         }

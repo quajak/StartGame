@@ -49,7 +49,7 @@ namespace StartGame.Items.Crops
 
         public Crop Duplicate(Crop crop, int amount)
         {
-            System.Type type = crop.GetType();
+            Type type = crop.GetType();
             if (type == typeof(Apple))
             {
                 return new Apple(amount);

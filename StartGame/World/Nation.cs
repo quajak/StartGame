@@ -12,6 +12,18 @@ using System.Threading.Tasks;
 
 namespace StartGame.World
 {
+
+    class RoadNetwork
+    {
+        public List<City> cities = new List<City>();
+        public List<Point> roads = new List<Point>();
+
+        public void MergeNetwork(RoadNetwork network)
+        {
+            cities.AddRange(network.cities.Except(cities));
+            roads.AddRange(network.roads.Except(roads));
+        }
+    }
     public class Nation
     {
         public static List<SellableItem> prices = new List<SellableItem> {
@@ -97,11 +109,61 @@ namespace StartGame.World
         /// </summary>
         public void GenerateRoads()
         {
+
+            //TODO: Check if roads connect to other cities
             int roads = 0;
             foreach (var island in islands.Where(i => i.Settled))
             {
                 Trace.TraceInformation($"Generating roads for island {island.island.Name} \t Cities: {island.cities.Count}");
+                List<RoadNetwork> roadNetworks = new List<RoadNetwork>();
                 List<City> order = island.cities.OrderByDescending(c => c.priority).ToList();
+
+                void AddRoad(Road road, City city1, City city2)
+                {
+                    RoadNetwork roadNetwork = roadNetworks.Find(n => n.roads.Contains(road.position));
+                    if (roadNetwork is null)
+                    {
+                        RoadNetwork item = new RoadNetwork();
+                        item.roads.Add(road.position);
+                        item.cities.Add(city1);
+                        item.cities.Add(city2);
+                        roadNetworks.Add(item);
+                        roadNetwork = item;
+                    }
+                    else
+                    {
+                        if (!roadNetwork.cities.Contains(city1))
+                            roadNetwork.cities.Add(city1);
+                        if (!roadNetwork.cities.Contains(city2))
+                            roadNetwork.cities.Add(city2);
+                        if (!roadNetwork.roads.Contains(road.position))
+                            roadNetwork.roads.Add(road.position);
+                    }
+                    RoadNetwork oRoadNetwork = roadNetworks.Find(n => n.roads.Contains(road.position.Add(-1, 0)));
+                    if (oRoadNetwork != null)
+                    {
+                        roadNetwork.MergeNetwork(oRoadNetwork);
+                        roadNetworks.Remove(oRoadNetwork);
+                    }
+                    oRoadNetwork = roadNetworks.Find(n => n.roads.Contains(road.position.Add(1, 0)));
+                    if (oRoadNetwork != null)
+                    {
+                        roadNetwork.MergeNetwork(oRoadNetwork);
+                        roadNetworks.Remove(oRoadNetwork);
+                    }
+                    oRoadNetwork = roadNetworks.Find(n => n.roads.Contains(road.position.Add(0, -1)));
+                    if (oRoadNetwork != null)
+                    {
+                        roadNetwork.MergeNetwork(oRoadNetwork);
+                        roadNetworks.Remove(oRoadNetwork);
+                    }
+                    oRoadNetwork = roadNetworks.Find(n => n.roads.Contains(road.position.Add(0, 1)));
+                    if (oRoadNetwork != null)
+                    {
+                        roadNetwork.MergeNetwork(oRoadNetwork);
+                        roadNetworks.Remove(oRoadNetwork);
+                    }
+                }
                 foreach (var city in island.cities.OrderBy(c => AIUtility.Distance(order[0].position, c.position)))
                 {
                     List<City> allowedCities = order.Where(c => c != city && AIUtility.Distance(c.position, city.position) < Math.Max(c.Wealth, 15)).ToList();
@@ -111,8 +173,6 @@ namespace StartGame.World
                         if (city.roadConnections.Contains(toCity) || toCity.roadConnections.Contains(city))
                             continue;
                         Trace.TraceInformation($"Generated road between {city.position} and {toCity.position}");
-                        city.roadConnections.Add(toCity);
-                        toCity.roadConnections.Add(city);
                         roads++;
                         toCity.costMap = AStar.GenerateCostMap(World.Instance.costMap, ref toCity.position, AIUtility.Distance(toCity.position, city.position) * 10);
                         Point[] route = AStar.FindPath(toCity.position, city.position, toCity.costMap);
@@ -120,12 +180,25 @@ namespace StartGame.World
                         {
                             if (!World.Instance.features.Exists(f => f is Road && f.position == point))
                             {
-                                World.Instance.features.Add(new Road(point));
+                                Road road = new Road(point);
+                                World.Instance.features.Add(road);
+                                AddRoad(road, city, toCity);
                             }
                         }
                     }
                 }
+                //Finalise all connections
+                foreach (var network in roadNetworks)
+                {
+                    foreach (var _city in network.cities)
+                    {
+                        _city.roadConnections = new List<City>(network.cities);
+                        _city.roadConnections.Remove(_city);
+                    }
+                }
+
             }
+
             Trace.TraceInformation($"Generated {roads} roads!");
         }
 
@@ -180,6 +253,14 @@ namespace StartGame.World
                     }
                 }
                 toChange.Clear();
+            }
+        }
+
+        internal void GenerateSociety()
+        {
+            foreach (var city in cities)
+            {
+                city.Initialise();
             }
         }
     }

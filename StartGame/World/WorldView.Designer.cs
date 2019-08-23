@@ -37,6 +37,8 @@
             this.coords = new System.Windows.Forms.Label();
             this.enterCity = new System.Windows.Forms.Button();
             this.generateNewWorld = new System.Windows.Forms.Button();
+            this.scout = new System.Windows.Forms.Button();
+            this.skipDay = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.worldMapView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -105,7 +107,7 @@
             // coords
             // 
             this.coords.AutoSize = true;
-            this.coords.Location = new System.Drawing.Point(94, 606);
+            this.coords.Location = new System.Drawing.Point(167, 606);
             this.coords.Name = "coords";
             this.coords.Size = new System.Drawing.Size(35, 13);
             this.coords.TabIndex = 7;
@@ -132,11 +134,34 @@
             this.generateNewWorld.UseVisualStyleBackColor = true;
             this.generateNewWorld.Click += new System.EventHandler(this.GenerateNewWorld_Click);
             // 
+            // scout
+            // 
+            this.scout.Location = new System.Drawing.Point(739, 369);
+            this.scout.Name = "scout";
+            this.scout.Size = new System.Drawing.Size(75, 50);
+            this.scout.TabIndex = 9;
+            this.scout.Text = "Scout";
+            this.scout.UseVisualStyleBackColor = true;
+            this.scout.Visible = false;
+            this.scout.Click += new System.EventHandler(this.Scout_Click);
+            // 
+            // skipDay
+            // 
+            this.skipDay.Location = new System.Drawing.Point(175, 570);
+            this.skipDay.Name = "skipDay";
+            this.skipDay.Size = new System.Drawing.Size(75, 23);
+            this.skipDay.TabIndex = 10;
+            this.skipDay.Text = "Wait 1 Day";
+            this.skipDay.UseVisualStyleBackColor = true;
+            this.skipDay.Click += new System.EventHandler(this.SkipDay_Click);
+            // 
             // WorldView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1055, 628);
+            this.Controls.Add(this.skipDay);
+            this.Controls.Add(this.scout);
             this.Controls.Add(this.enterCity);
             this.Controls.Add(this.coords);
             this.Controls.Add(this.generateNewWorld);
@@ -167,5 +192,7 @@
         private System.Windows.Forms.Label coords;
         private System.Windows.Forms.Button enterCity;
         private System.Windows.Forms.Button generateNewWorld;
+        private System.Windows.Forms.Button scout;
+        private System.Windows.Forms.Button skipDay;
     }
 }

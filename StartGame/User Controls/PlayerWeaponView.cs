@@ -75,8 +75,16 @@ namespace StartGame.User_Controls
                 if(weapon is RangedWeapon w)
                 {
                     ammoList.Visible = true;
-                    ammoList.Items.Clear();
-                    ammoList.Items.AddRange(w.Ammo.ToArray());
+                    List<Ammo> diffAmmo = ammoList.Items.Cast<Ammo>().Except(w.Ammo).ToList();
+                    foreach (var d in diffAmmo)
+                    {
+                        ammoList.Items.Remove(d);
+                    }
+                    diffAmmo = w.Ammo.Except(ammoList.Items.Cast<Ammo>()).ToList();
+                    foreach (var d in diffAmmo)
+                    {
+                        ammoList.Items.Add(d);
+                    }
                     int index = w.Ammo.IndexOf(w.Ammo.Find(a => a.Selected.ContainsKey(w) && a.Selected[w]));
                     if(ammoList.SelectedIndex != index)
                         ammoList.SelectedIndex = index;

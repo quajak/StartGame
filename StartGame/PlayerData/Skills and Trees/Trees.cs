@@ -30,7 +30,10 @@ namespace StartGame
                 new SpiderKiller(),
                 new Fighter(),
                 new Mage(),
-                new Acrobat()
+                new Acrobat(),
+                new Pincushion(),
+                new Woodcutter(),
+                new Scouting()
             };
         }
     }

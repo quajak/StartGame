@@ -67,7 +67,6 @@ namespace StartGame
                 thread.Start();
                 finished = thread.Join(Map.creationTime);
             } while (times < 10 && (!map.created || !finished));
-
             UpdateMap();
             mapType.Text = map.Stats();
         }

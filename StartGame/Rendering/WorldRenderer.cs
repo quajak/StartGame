@@ -42,7 +42,7 @@ namespace StartGame.Rendering
             //Trace.TraceInformation($"WorldRenderer::DrawMap({X}, {Y}, {Width}, {Height}, {size})");
             DateTime time = DateTime.Now;
             Bitmap worldImage = DrawBackground(X, Y, Math.Min(Instance.costMap.GetUpperBound(0), X + Width), Math.Min(Instance.costMap.GetUpperBound(0), Y + Height), size);
-            Trace.TraceInformation($"Rendering background in {(DateTime.Now - time).TotalMilliseconds}!");
+            //Trace.TraceInformation($"Rendering background in {(DateTime.Now - time).TotalMilliseconds}!");
             using (Graphics g = Graphics.FromImage(worldImage))
             {
                 DateTime point = DateTime.Now;
@@ -89,14 +89,14 @@ namespace StartGame.Rendering
                         }
                     }
                 }
-                Trace.TraceInformation($"Rendering {features} features in {(DateTime.Now - point).TotalMilliseconds}!");
+                //Trace.TraceInformation($"Rendering {features} features in {(DateTime.Now - point).TotalMilliseconds}!");
                 point = DateTime.Now;
                 //Draw actors
                 foreach (var actor in Instance.actors)
                 {
                     g.DrawImage(actor.troop.Image, (actor.WorldPosition.X - X) * size, (actor.WorldPosition.Y - Y) * size, size, size);
                 }
-                Trace.TraceInformation($"Rendering {Instance.actors.Count} actors in {(DateTime.Now - point).TotalMilliseconds}!");
+                //Trace.TraceInformation($"Rendering {Instance.actors.Count} actors in {(DateTime.Now - point).TotalMilliseconds}!");
 
                 //Draw overlay objects
                 foreach (var obj in overlayObjects)
@@ -168,10 +168,10 @@ namespace StartGame.Rendering
                         }
                     }
                 }
-                Trace.TraceInformation($"Rendering weather in {(DateTime.Now - point).TotalMilliseconds}!");
+                //Trace.TraceInformation($"Rendering weather in {(DateTime.Now - point).TotalMilliseconds}!");
 
             }
-            Trace.TraceInformation($"Finished in {(DateTime.Now - time).TotalMilliseconds}");
+            //Trace.TraceInformation($"Finished in {(DateTime.Now - time).TotalMilliseconds}");
             return worldImage;
         }
 

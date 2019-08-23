@@ -94,15 +94,15 @@
             // actionOptionList
             // 
             this.actionOptionList.FormattingEnabled = true;
-            this.actionOptionList.Location = new System.Drawing.Point(267, 74);
+            this.actionOptionList.Location = new System.Drawing.Point(267, 35);
             this.actionOptionList.Name = "actionOptionList";
-            this.actionOptionList.Size = new System.Drawing.Size(120, 121);
+            this.actionOptionList.Size = new System.Drawing.Size(186, 121);
             this.actionOptionList.TabIndex = 5;
             this.actionOptionList.Visible = false;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(267, 292);
+            this.button1.Location = new System.Drawing.Point(265, 306);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(56, 32);
             this.button1.TabIndex = 6;
@@ -112,7 +112,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(331, 292);
+            this.button2.Location = new System.Drawing.Point(329, 306);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(56, 32);
             this.button2.TabIndex = 7;
@@ -123,13 +123,14 @@
             // actionOptionLabel
             // 
             this.actionOptionLabel.AutoSize = true;
-            this.actionOptionLabel.Location = new System.Drawing.Point(267, 202);
-            this.actionOptionLabel.MaximumSize = new System.Drawing.Size(120, 200);
+            this.actionOptionLabel.Location = new System.Drawing.Point(264, 165);
+            this.actionOptionLabel.MaximumSize = new System.Drawing.Size(186, 200);
             this.actionOptionLabel.Name = "actionOptionLabel";
             this.actionOptionLabel.Size = new System.Drawing.Size(93, 13);
             this.actionOptionLabel.TabIndex = 8;
             this.actionOptionLabel.Text = "actionOptionLabel";
             this.actionOptionLabel.Visible = false;
+            this.actionOptionLabel.Click += new System.EventHandler(this.ActionOptionLabel_Click);
             // 
             // playerView
             // 

@@ -73,5 +73,10 @@ namespace StartGame.World.Cities
         {
 
         }
+
+        private void ActionOptionLabel_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

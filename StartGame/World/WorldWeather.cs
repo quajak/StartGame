@@ -265,7 +265,7 @@ namespace StartGame.World
         public Dictionary<WorldTileType, int> lost;
         public Dictionary<WorldTileType, int> gained;
 
-        double totalHumidity = 0;
+        //double totalHumidity = 0;
 
         /// <summary>
         ///
@@ -400,7 +400,7 @@ namespace StartGame.World
 
         internal WeatherPoint GetAtmosphereValue(int x, int y, int z)
         {
-            return atmosphere[z + x / RATIO * MaxZ + y / RATIO * WORLD_SIZE * MaxZ];
+            return atmosphere[z + x / RATIO * MaxZ + y / RATIO * WORLD_SIZE / RATIO * MaxZ];
         }
 
         #region Biome Values
@@ -642,7 +642,7 @@ namespace StartGame.World
             DateTime time = DateTime.Now;
             //CalculateWeather(0, WORLD_SIZE);
             Forker forker = new Forker();
-            totalHumidity = 0;
+            //totalHumidity = 0;
             //TODO: Move the boundaries between threads, so that artifacts are cleaned up
             for (int i = 0; i < THREADS; i++)
             {
@@ -855,7 +855,7 @@ namespace StartGame.World
                         var tile = worldMap[x, y];
                         tile.averageTemp = (tile.averageTemp * tile.measurements + point.temperature) / (tile.measurements + 1);
                         tile.measurements++;
-                        totalHumidity += point.humidity;
+                        //totalHumidity += point.humidity;
 #if DEBUG
                         if (point.humidity < 0)
                             throw new Exception();

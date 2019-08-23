@@ -139,7 +139,7 @@ namespace StartGame.AI
                     }
                 }
             }
-            Trace.TraceInformation($"AStar::GenerateCostMap completed in {(DateTime.Now - t).TotalMilliseconds}");
+            //Trace.TraceInformation($"AStar::GenerateCostMap completed in {(DateTime.Now - t).TotalMilliseconds}");
             return fields;
         }
     }

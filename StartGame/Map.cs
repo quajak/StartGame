@@ -36,6 +36,10 @@ namespace StartGame.GameMap
         public bool created = false;
 
         public const int creationTime = 500;
+        /// <summary>
+        /// This only acts as a reference
+        /// </summary>
+        public MapBiome mapBiome; 
 
         public Map(int Width = 31, int Height = 31)
         {
@@ -93,7 +97,7 @@ namespace StartGame.GameMap
 
                     //Modify perlin value for more extremes
                     mHeight += HeightBias;
-                    mHeight = mHeight.Cut(0,1);
+                    mHeight = mHeight.Cut(0, 1);
 
                     MapTileTypeEnum mapTileEnum = biome.DetermineType(mHeight);
 
@@ -132,7 +136,8 @@ namespace StartGame.GameMap
             Continent maxContinent = new Continent();
             foreach (Continent continent in continents)
             {
-                if (continent.Type == MapTileTypeEnum.land && maxSize < continent.tiles.Count)
+                if ((continent.Type == MapTileTypeEnum.land || continent.Type == MapTileTypeEnum.snow || continent.Type == MapTileTypeEnum.snowyLand) 
+                    && maxSize < continent.tiles.Count)
                 {
                     maxSize = continent.tiles.Count;
                     maxContinent = continent;
@@ -329,7 +334,8 @@ namespace StartGame.GameMap
                 //Set starting position
                 MapTile position = goals[0];
                 pathLength++;
-                map[position.position.X, position.position.Y].type.type = MapTileTypeEnum.path;
+                map[position.position.X, position.position.Y].type.type = MapTileTypeEnum.road;
+                map[position.position.X, position.position.Y].color = Color.SandyBrown;
                 //Repeat until you have found the goal
                 while (true)
                 {
@@ -356,10 +362,12 @@ namespace StartGame.GameMap
                         }
                     }
                     //Set lowest neighbour type to path if not path
-                    if (map[lowest.position.X, lowest.position.Y].type.type != MapTileTypeEnum.path)
+                    if (map[lowest.position.X, lowest.position.Y].type.type != MapTileTypeEnum.road)
                     {
                         pathLength++;
-                        map[lowest.position.X, lowest.position.Y].type.type = MapTileTypeEnum.path;
+                        map[lowest.position.X, lowest.position.Y].type.type = MapTileTypeEnum.road;
+                        map[lowest.position.X, lowest.position.Y].color = Color.SandyBrown;
+
                         //Change cost of field
                         map[lowest.position.X, lowest.position.Y].Cost = 0.5;
                         map[lowest.position.X, lowest.position.Y].MovementCost = 0.5;
@@ -421,7 +429,7 @@ namespace StartGame.GameMap
                     sides.right = true;
                     y = Y;
                     x = X;
-                    if (map[x, y].type.type != MapTileTypeEnum.path) continue;
+                    if (map[x, y].type.type != MapTileTypeEnum.road) continue;
                     while (true)
                     {
                         if (y != 0)
@@ -429,7 +437,7 @@ namespace StartGame.GameMap
                             //Iterate top, if all true then enlarge
                             for (int xDiff = 0; xDiff < width; xDiff++)
                             {
-                                if (map[x + xDiff, y - 1].type.type != MapTileTypeEnum.path || width == map.GetUpperBound(0)) //This should be false if there is path next
+                                if (map[x + xDiff, y - 1].type.type != MapTileTypeEnum.road || width == map.GetUpperBound(0)) //This should be false if there is path next
                                 {
                                     sides.top = false;
                                     break;
@@ -447,7 +455,7 @@ namespace StartGame.GameMap
                             //Iterate bottom, if all true then enlarge
                             for (int xDiff = 0; xDiff < width; xDiff++)
                             {
-                                if (map[x + xDiff, y + height].type.type != MapTileTypeEnum.path || width == map.GetUpperBound(0))
+                                if (map[x + xDiff, y + height].type.type != MapTileTypeEnum.road || width == map.GetUpperBound(0))
                                 {
                                     sides.bottom = false;
                                     break;
@@ -464,7 +472,7 @@ namespace StartGame.GameMap
                             //Iterate left, if all true then enlarge
                             for (int yDiff = 0; yDiff < height; yDiff++)
                             {
-                                if (map[x - 1, y + yDiff].type.type != MapTileTypeEnum.path || height == map.GetUpperBound(1))
+                                if (map[x - 1, y + yDiff].type.type != MapTileTypeEnum.road || height == map.GetUpperBound(1))
                                 {
                                     sides.left = false;
                                     break;
@@ -482,7 +490,7 @@ namespace StartGame.GameMap
                             //Iterate right, if all true then enlarge
                             for (int yDiff = 0; yDiff < height; yDiff++)
                             {
-                                if (map[x + width, y + yDiff].type.type != MapTileTypeEnum.path || height == map.GetUpperBound(1))
+                                if (map[x + width, y + yDiff].type.type != MapTileTypeEnum.road || height == map.GetUpperBound(1))
                                 {
                                     sides.right = false;
                                     break;
@@ -506,7 +514,7 @@ namespace StartGame.GameMap
                             //Iterate top
                             for (int xDiff = 0; xDiff < width; xDiff++)
                             {
-                                if (map[x + xDiff, y - 1].type.type == MapTileTypeEnum.path)
+                                if (map[x + xDiff, y - 1].type.type == MapTileTypeEnum.road)
                                 {
                                     paths.top.Add(xDiff);
                                 }
@@ -517,7 +525,7 @@ namespace StartGame.GameMap
                             //Iterate bottom
                             for (int xDiff = 0; xDiff < width; xDiff++)
                             {
-                                if (map[x + xDiff, y + height].type.type == MapTileTypeEnum.path)
+                                if (map[x + xDiff, y + height].type.type == MapTileTypeEnum.road)
                                 {
                                     paths.bottom.Add(xDiff);
                                 }
@@ -528,7 +536,7 @@ namespace StartGame.GameMap
                             //Iterate left
                             for (int yDiff = 0; yDiff < height; yDiff++)
                             {
-                                if (map[x - 1, y + yDiff].type.type == MapTileTypeEnum.path)
+                                if (map[x - 1, y + yDiff].type.type == MapTileTypeEnum.road)
                                 {
                                     paths.left.Add(yDiff);
                                 }
@@ -539,7 +547,7 @@ namespace StartGame.GameMap
                             //Iterate right
                             for (int yDiff = 0; yDiff < height; yDiff++)
                             {
-                                if (map[x + width, y + yDiff].type.type == MapTileTypeEnum.path)
+                                if (map[x + width, y + yDiff].type.type == MapTileTypeEnum.road)
                                 {
                                     paths.right.Add(yDiff);
                                 }
@@ -574,12 +582,12 @@ namespace StartGame.GameMap
                         //Draw the top to bottom
                         for (int yDiff = 0; yDiff < max.bottom + 1 - max.top; yDiff++)
                         {
-                            map[x + topPos, y + yDiff + max.top].type.type = MapTileTypeEnum.path;
+                            map[x + topPos, y + yDiff + max.top].type.type = MapTileTypeEnum.road;
                         }
                         //Draw the left to right
                         for (int xDiff = 0; xDiff < max.right + 1 - max.left; xDiff++)
                         {
-                            map[x + max.left + xDiff, y + max.bottom].type.type = MapTileTypeEnum.path;
+                            map[x + max.left + xDiff, y + max.bottom].type.type = MapTileTypeEnum.road;
                         }
                     }
                     else
@@ -625,7 +633,7 @@ namespace StartGame.GameMap
             foreach (MapTile neighbour in pos.neighbours.rawMaptiles)
             {
                 //Don't go through water or hills
-                if (neighbour.type.type != MapTileTypeEnum.path && neighbour.type.type != MapTileTypeEnum.land) continue;
+                if (neighbour.type.type == MapTileTypeEnum.deepWater || neighbour.type.type == MapTileTypeEnum.shallowWater || neighbour.type.type == MapTileTypeEnum.wall) continue;
                 //If already has value
                 int index = Array.IndexOf(map[neighbour.position.X, neighbour.position.Y].GoalIDs, id);
                 if (index == -1)
@@ -663,38 +671,40 @@ namespace StartGame.GameMap
             switch (spawnType)
             {
                 case SpawnType.road:
-
-                    if (goals.Count <= 1)
                     {
-                        for (int i = 0; i < playerNumber; i++)
-                        {
-                            int x;
-                            int y;
-                            int n = World.World.random.Next(4);
-                            if (n == 0)
-                            {
-                                x = 0;
-                                y = World.World.random.Next(map.GetUpperBound(1));
-                            }
-                            else if (n == 1)
-                            {
-                                x = World.World.random.Next(map.GetUpperBound(0));
-                                y = 0;
-                            }
-                            else if (n == 2)
-                            {
-                                x = map.GetUpperBound(0);
-                                y = World.World.random.Next(map.GetUpperBound(1));
-                            }
-                            else
-                            {
-                                x = World.World.random.Next(map.GetUpperBound(0));
-                                y = map.GetUpperBound(1);
-                            }
 
-                            toReturn.Add(new Point(x, y));
+                        if (goals.Count <= 1)
+                        {
+                            for (int i = 0; i < playerNumber; i++)
+                            {
+                                int x;
+                                int y;
+                                int n = World.World.random.Next(4);
+                                if (n == 0)
+                                {
+                                    x = 0;
+                                    y = World.World.random.Next(map.GetUpperBound(1));
+                                }
+                                else if (n == 1)
+                                {
+                                    x = World.World.random.Next(map.GetUpperBound(0));
+                                    y = 0;
+                                }
+                                else if (n == 2)
+                                {
+                                    x = map.GetUpperBound(0);
+                                    y = World.World.random.Next(map.GetUpperBound(1));
+                                }
+                                else
+                                {
+                                    x = World.World.random.Next(map.GetUpperBound(0));
+                                    y = map.GetUpperBound(1);
+                                }
+
+                                toReturn.Add(new Point(x, y));
+                            }
+                            break;
                         }
-                        break;
                     }
                     //Determin which road spawn point to start
                     List<MapTile> _goals = new List<MapTile>(goals);
@@ -705,7 +715,7 @@ namespace StartGame.GameMap
                         toReturn.Add(pathPoint.position);
                         playerNumber--;
                         if (playerNumber == 0) break;
-                        foreach (MapTile possible in pathPoint.neighbours.rawMaptiles.Where(m => m.type.type == MapTileTypeEnum.path))
+                        foreach (MapTile possible in pathPoint.neighbours.rawMaptiles.Where(m => m.type.type == MapTileTypeEnum.road))
                         {
                             toReturn.Add(possible.position);
                             playerNumber--;
@@ -743,7 +753,85 @@ namespace StartGame.GameMap
                                   select field;
                     toReturn = ordered.Take(playerNumber).ToList().ConvertAll(f => f.position);
                     break;
-
+                case SpawnType.centralRoad:
+                    {
+                        int x, y, count = 50;
+                        for (int i = 0; i < playerNumber; i++)
+                        {
+                            do
+                            {
+                                x = World.World.random.Next((int)(0.2 * map.GetUpperBound(0)), (int)(0.8 * map.GetUpperBound(0)));
+                                y = World.World.random.Next((int)(0.2 * map.GetUpperBound(1)), (int)(0.8 * map.GetUpperBound(1)));
+                                count--;
+                                if(count == 0)
+                                {
+                                    count = 100;
+                                    do
+                                    {
+                                        x = World.World.random.Next(0, map.GetUpperBound(0));
+                                        y = World.World.random.Next(0, map.GetUpperBound(1));
+                                        count--;
+                                    } while (map[x, y].type.type != MapTileTypeEnum.road && count > 0 && toReturn.Contains(new Point(x,y)));
+                                    break;
+                                }
+                            } while (map[x, y].type.type != MapTileTypeEnum.road && toReturn.Contains(new Point(x,y)));
+                            toReturn.Add(new Point(x, y));
+                        }
+                        break;
+                    }
+                case SpawnType.randomRoughCircle:
+                    {
+                        int x, y;
+                        x = World.World.random.Next((int)(0.2 * map.GetUpperBound(0)), (int)(0.8 * map.GetUpperBound(0)));
+                        y = World.World.random.Next((int)(0.2 * map.GetUpperBound(1)), (int)(0.8 * map.GetUpperBound(1)));
+                        for (int i = 0; i < playerNumber; i++)
+                        {
+                            int _x = 0, _y = 0, tempX, tempY, minDistance = 100;
+                            for (int t = 0; t < 10; t++)
+                            {
+                                tempX = World.World.random.Next((int)(0.2 * map.GetUpperBound(0)), (int)(0.8 * map.GetUpperBound(0)));
+                                tempY = World.World.random.Next((int)(0.2 * map.GetUpperBound(1)), (int)(0.8 * map.GetUpperBound(1)));
+                                int distance = Math.Abs(tempX - x) + Math.Abs(tempY - y);
+                                if(distance < minDistance && !toReturn.Contains(new Point(tempX,tempY)))
+                                {
+                                    _x = tempX;
+                                    _y = tempY;
+                                    minDistance = distance;
+                                }
+                            }
+                            toReturn.Add(new Point(_x, _y));
+                        }
+                        break;
+                    }
+                case SpawnType.randomRoughRoadCircle:
+                    {
+                        int x, y, count = 100;
+                        do
+                        {
+                            x = World.World.random.Next((int)(0.2 * map.GetUpperBound(0)), (int)(0.8 * map.GetUpperBound(0)));
+                            y = World.World.random.Next((int)(0.2 * map.GetUpperBound(1)), (int)(0.8 * map.GetUpperBound(1)));
+                            count--;
+                        } while (map[x,y].type.type != MapTileTypeEnum.road && count > 0);
+                        toReturn.Add(new Point(x, y));
+                        for (int i = 0; i < playerNumber; i++)
+                        {
+                            int _x = 0, _y = 0, tempX, tempY, minDistance = 100;
+                            for (int t = 0; t < 10; t++)
+                            {
+                                tempX = World.World.random.Next((int)(0.2 * map.GetUpperBound(0)), (int)(0.8 * map.GetUpperBound(0)));
+                                tempY = World.World.random.Next((int)(0.2 * map.GetUpperBound(1)), (int)(0.8 * map.GetUpperBound(1)));
+                                int distance = Math.Abs(tempX - x) + Math.Abs(tempY - y);
+                                if (distance < minDistance && !toReturn.Contains(new Point(tempX,tempY)))
+                                {
+                                    _x = tempX;
+                                    _y = tempY;
+                                    minDistance = distance;
+                                }
+                            }
+                            toReturn.Add(new Point(_x, _y));
+                        }
+                        break;
+                    }
                 default:
                     break;
             }
@@ -784,5 +872,5 @@ namespace StartGame.GameMap
     }
 
     public enum SpawnType
-    { road, random, randomLand, heighestField };
+    { road, random, randomLand, heighestField, centralRoad, randomRoughCircle, randomRoughRoadCircle };
 }

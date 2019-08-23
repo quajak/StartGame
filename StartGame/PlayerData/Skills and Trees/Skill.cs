@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StartGame.Items;
+using System;
 using static StartGame.MainGameWindow;
 
 namespace StartGame
@@ -14,6 +15,11 @@ namespace StartGame
         private readonly double growthFactor;
         internal bool activateOnLevelUp = false;
 
+        internal virtual void OnLevelUp()
+        {
+
+        }
+
         public int Xp
         {
             get => xp;
@@ -27,9 +33,10 @@ namespace StartGame
                     xp -= maxXP;
                     level++;
                     maxXP = (int)Math.Max(maxXP + minGrowth, maxXP * growthFactor);
+                    OnLevelUp();
                 }
                 if (!(main is null)) main.UpdatePlayerView();
-                if (levelup) main.SkillLevelUp(this);
+                if (levelup) main?.SkillLevelUp(this);
                 if (levelup && activateOnLevelUp) Activate();
             }
         }
@@ -41,6 +48,120 @@ namespace StartGame
             Xp = 0;
             level = 0;
             this.minGrowth = minGrowth;
+        }
+    }
+
+    class Woodcutter : Skill
+    {
+        private const string buffName = "Woodcutter Buff";
+        PlayerData.Buff buff;
+        public Woodcutter() : base("Woodcutter", "More proficiency with the axe.", "Working as a woodcuttter", 1, 3)
+        {
+
+        }
+
+        public override void Initialise(MainGameWindow mainGame)
+        {
+        }
+
+        public override void Activate()
+        {
+            level = level == 0 ? 1 : level;
+            PlayerData.HumanPlayer player = World.World.Instance.GetHumanPlayer();
+            if (!player.strength.buffs.Exists(b => b.Name == buffName))
+            {
+                //Add effect
+                buff = new PlayerData.Buff(PlayerData.BuffType.Constant, level, buffName);
+                player.strength.buffs.Add(buff);
+            }
+        }
+
+        internal override void OnLevelUp()
+        {
+            buff.value++;
+        }
+    }
+
+    class Scouting : Skill
+    {
+        public Scouting() : base("Scouting", "Scout better. Decreased chance of being attacked while part of caravan.", "scouting.", 1, 3)
+        {
+
+        }
+
+        public override void Initialise(MainGameWindow mainGame)
+        {
+        }
+
+        public override void Activate()
+        {
+            level = level == 0 ? 1 : level;
+        }
+
+        internal override void OnLevelUp()
+        {
+        }
+    }
+
+    internal class Pincushion : Skill
+    {
+        private int succesiveShots = 0;
+        private readonly int goal = 3;
+        private bool active = false;
+        PlayerData.Buff buff;
+
+        public Pincushion() : base("Pincushion", "Less damage from ranged attacks.", "Get shot 3 times in a turn.", 2, 2)
+        {
+        }
+
+        public override void Initialise(MainGameWindow mainGame)
+        {
+            main = mainGame;
+            main.Turn += TurnUpdate;
+            main.Combat += CombatUpdate;
+        }
+
+        public void CombatUpdate(object sender, CombatData data)
+        {
+            if (main.humanPlayer.Name == data.attacked.Name && data.attacker.troop.activeWeapon is RangedWeapon w)
+            {
+                if (active)
+                {
+                    Xp += 1;
+                    main.ShowPlayerStats();
+                }
+                else
+                {
+                    succesiveShots++;
+                    if (succesiveShots == goal)
+                    {
+                        //pop up
+                        main.TreeGained(this);
+
+                        main.humanPlayer.trees.Add(this);
+                        Activate();
+                    }
+                }
+            }
+        }
+
+        public override void Activate()
+        {
+            level = level == 0 ? 1 : level;
+            //Add effect
+            buff = new PlayerData.Buff(PlayerData.BuffType.Constant, level, "Pincushion Buff");
+            main.humanPlayer.troop.defense.buffs.Add(buff);
+            main.UpdatePlayerView();
+        }
+
+        public void TurnUpdate(object sender, TurnData data)
+        {
+            succesiveShots = 0;
+        }
+
+        internal override void OnLevelUp()
+        {
+            buff.value += 1;
         }
     }
 

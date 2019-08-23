@@ -101,7 +101,7 @@ namespace StartGame
                     MovementCost = 2;
                     break;
 
-                case MapTileTypeEnum.path:
+                case MapTileTypeEnum.road:
                     shader = Color.FromArgb((int)(Height * 255), 0, 0, 0);
                     MovementCost = 0.5;
                     break;
@@ -280,7 +280,7 @@ namespace StartGame
         deepWater,
 
         [Description("Path")]
-        path,
+        road,
 
         [Description("Wall")]
         wall,
@@ -342,7 +342,7 @@ namespace StartGame
                     case MapTileTypeEnum.deepWater:
                         return Color.MediumBlue;
 
-                    case MapTileTypeEnum.path:
+                    case MapTileTypeEnum.road:
                         return Color.SandyBrown;
 
                     case MapTileTypeEnum.wall:
@@ -393,7 +393,7 @@ namespace StartGame
                     case MapTileTypeEnum.deepWater:
                         return FieldType.water;
 
-                    case MapTileTypeEnum.path:
+                    case MapTileTypeEnum.road:
                         return FieldType.land;
 
                     case MapTileTypeEnum.wall:

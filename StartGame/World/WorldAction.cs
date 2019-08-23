@@ -1,5 +1,7 @@
-﻿using StartGame.PlayerData;
+﻿using StartGame.Mission;
+using StartGame.PlayerData;
 using StartGame.World.Cities;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -24,6 +26,7 @@ namespace StartGame.World
     {
         public readonly Mission.Mission mission;
         public readonly int difficulty;
+        
         public bool Forced => mission.forced;
 
         public StartMission(Mission.Mission mission, int difficulty, Point position) : base(position, 0)
@@ -35,6 +38,35 @@ namespace StartGame.World
         public override bool Available(WorldPlayer player)
         {
             return position == player.WorldPosition;
+        }
+
+        public virtual void MissionEnded(bool won)
+        {
+
+        }
+    }
+
+    public class CaravanMission : StartMission
+    {
+        private readonly Caravan caravan;
+
+        public CaravanMission(Caravan caravan, int difficulty, Point position) : base(new CaravanAttack(), difficulty, position)
+        {
+            this.caravan = caravan;
+        }
+
+        public override void MissionEnded(bool won)
+        {
+            if (won)
+            {
+                // Player has captured the caravan
+                World.Instance.ToChange.Add(caravan);
+            }
+        }
+
+        internal int GetEnemyNumber()
+        {
+            return mission.GetEnemyNumber(difficulty);
         }
     }
 

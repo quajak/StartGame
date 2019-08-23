@@ -31,10 +31,24 @@ namespace StartGame.PlayerData
             {
                 Point playerPos = enemies[0].troop.Position;
 
+                //If the weapon is ranged and empty first load the weapon
+                if(troop.activeWeapon.Attacks() == 0 && troop.activeWeapon is RangedWeapon w)
+                {
+                    Ammo selectedAmmo = w.GetSelectedAmmo();
+                    foreach (var ammo in w.Ammo)
+                    {
+                        if (selectedAmmo is null || selectedAmmo.damage.Value < ammo.damage.Value)
+                        {
+                            ammo.Select(w);
+                            selectedAmmo = ammo;
+                        }
+                    }
+                }
+
                 //Check if it can attack player
                 int playerDistance = AIUtility.Distance(playerPos, troop.Position);
-                if (playerDistance <= troop.activeWeapon.range &&
-                    troop.activeWeapon.Attacks() > 0)
+                int attacks = troop.activeWeapon.Attacks();
+                if (playerDistance <= troop.activeWeapon.range && attacks > 0)
                 {
                     //Attack
                     var (damage, killed, hit) = main.Attack(ai, enemies[0]);

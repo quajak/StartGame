@@ -52,7 +52,7 @@ namespace StartGame.World
         public List<Island> islands = new List<Island>();
         public List<Island> Oceans => islands.Where(i => !i.land).ToList();
 
-        public List<WorldPlayer> ToChange { get => toChange; set => toChange = value; }
+        public List<WorldPlayer> ToChange { get; set; } = new List<WorldPlayer>();
 
         public Nation nation;
 
@@ -245,10 +245,10 @@ namespace StartGame.World
             InitialiseAtmosphere();
 
             // Simulate one week for atmosphere and biomes to settle
-            for (int i = 0; i < 7; i++)
-            {
-                ProgressTime(new TimeSpan(1, 0, 0, 0, 0));
-            }
+            //for (int i = 0; i < 7; i++)
+            //{
+            //    ProgressTime(new TimeSpan(1, 0, 0, 0, 0));
+            //}
 
             //Calculate connections
             for (int x = 0; x < WORLD_SIZE; x++)
@@ -440,6 +440,8 @@ namespace StartGame.World
             nation.DeterminePortConnections();
             //Generate roads
             nation.GenerateRoads();
+
+            nation.GenerateSociety();
 
             //Add labels to each city
             nation.cities.ForEach(ci => features.Add(new WorldMapText(ci.name, ci.position)));
@@ -654,8 +656,8 @@ namespace StartGame.World
                     HourlyUpdate();
                 }
             }
-            Trace.TraceInformation($"Simulates {daysLeft} days at ratio = 1 in {(DateTime.Now - start).TotalSeconds} seconds. " +
-                $"Total calculation took {(DateTime.Now - total).TotalSeconds} seconds");
+            //Trace.TraceInformation($"Simulates {daysLeft} days at ratio = 1 in {(DateTime.Now - start).TotalSeconds} seconds. " +
+            //    $"Total calculation took {(DateTime.Now - total).TotalSeconds} seconds");
         }
 
         private void RunDays(bool debug, int daysToRun)
@@ -690,7 +692,9 @@ namespace StartGame.World
                 }
             }
             nation.WorldAction(1);
-            actors.ForEach(a => a.WorldAction(1));
+            HumanPlayer humanPlayer = GetHumanPlayer();
+            actors.Except(new[] { humanPlayer }).ToList().ForEach(a => a.WorldAction(1));
+            humanPlayer.WorldAction(1); // player is updated last as he has to check if missions are available
             foreach (var actor in ToChange)
             {
                 if (actors.Contains(actor))
@@ -698,6 +702,8 @@ namespace StartGame.World
                 else
                     actors.Add(actor);
             }
+            ToChange = new List<WorldPlayer>();
+
             if (time.DayOfYear % 7 == 0 && time.Hour == 0)
             {
                 for (int x = 0; x < WORLD_SIZE; x++)
@@ -718,8 +724,6 @@ namespace StartGame.World
             }
             TimeChange?.Invoke(null, null);
         }
-
-        List<WorldPlayer> toChange = new List<WorldPlayer>();
 
         public void RemovePlayer(WorldPlayer player)
         {
@@ -746,7 +750,7 @@ namespace StartGame.World
         }
         public void Move(WorldPlayer actor, Point position)
         {
-            Trace.TraceInformation($"{actor.Name} moved to {position} at {time.ToString("MM/dd/yyyy H:mm")}");
+            //Trace.TraceInformation($"{actor.Name} moved to {position} at {time.ToString("MM/dd/yyyy H:mm")}");
             actor.WorldPosition = position;
             //How does the renderer know that something has happened?
         }
@@ -805,6 +809,11 @@ namespace StartGame.World
         public static bool IsLand(WorldTileType type)
         {
             return !(type == WorldTileType.Ocean || type == WorldTileType.River || type == WorldTileType.SeaIce);
+        }
+
+        public HumanPlayer GetHumanPlayer()
+        {
+            return actors.Find(a => a is HumanPlayer) as HumanPlayer;
         }
 
         //TODO: Maybe I should change the temperature range to include negatives

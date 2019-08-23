@@ -68,7 +68,7 @@ namespace StartGame.Items
             ammo1.OnUse(player, main);
         }
 
-        private Ammo GetSelectedAmmo()
+        public Ammo GetSelectedAmmo()
         {
             return ammo.Find(a =>a.Selected.ContainsKey(this) && a.Selected[this]);
         }
@@ -99,7 +99,17 @@ namespace StartGame.Items
         readonly int maxAttacks;
         public bool discardeable;
         public int attackCost;
-
+        /// <summary>
+        /// If the weapon is ranged, use RangedWeapon
+        /// </summary>
+        /// <param name="AttackDamage"></param>
+        /// <param name="Type"></param>
+        /// <param name="damageType"></param>
+        /// <param name="Range"></param>
+        /// <param name="Name"></param>
+        /// <param name="Attacks"></param>
+        /// <param name="Discardeable"></param>
+        /// <param name="AttackCost"></param>
         public Weapon(int AttackDamage, BaseAttackType Type, BaseDamageType damageType, int Range, string Name, int Attacks, bool Discardeable, int AttackCost = 1) : base(Name)
         {
             attackCost = AttackCost;

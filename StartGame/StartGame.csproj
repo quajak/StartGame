@@ -162,10 +162,12 @@
     <Compile Include="MapBiome.cs" />
     <Compile Include="Functions\Range.cs" />
     <Compile Include="Mission\AnimalFightMissions.cs" />
+    <Compile Include="Mission\CaravanMissions.cs" />
     <Compile Include="Mission\MissionWorldPlayer.cs" />
     <Compile Include="PlayerData\AI.cs" />
     <Compile Include="PlayerData\AIUtility.cs" />
     <Compile Include="PlayerData\Attribute.cs" />
+    <Compile Include="PlayerData\PlayerDataResource.cs" />
     <Compile Include="PlayerData\SimpleAI.cs" />
     <Compile Include="PlayerData\Body.cs" />
     <Compile Include="Campaign.cs" />
@@ -294,6 +296,7 @@
     <Compile Include="WeaponView.Designer.cs">
       <DependentUpon>WeaponView.cs</DependentUpon>
     </Compile>
+    <Compile Include="World\Cities\CaravanMarket.cs" />
     <Compile Include="World\Cities\City.cs" />
     <Compile Include="World\Cities\CityBuilding.cs" />
     <Compile Include="World\Cities\CityView.cs">
@@ -515,6 +518,12 @@
     <None Include="Resources\Forest1.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Archer.png" />
+    <Content Include="Resources\MaleNames.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\Caravan.png" />
+    <None Include="Resources\CaravanWagon.png" />
     <Content Include="Resources\CityNames.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

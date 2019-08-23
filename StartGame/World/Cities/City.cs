@@ -13,7 +13,7 @@ namespace StartGame.World.Cities
     {
         private bool isPort = false;
         static List<string> Names = new List<string> { "Edagas"}; //Hack as one name has to be loaded
-
+        readonly Nation nation = World.Instance.nation;
         public bool IsPort
         {
             get => isPort; set
@@ -79,6 +79,7 @@ namespace StartGame.World.Cities
             //Add base buildings
             buildings.Add(new MayorHouse(this));
             buildings.Add(FoodMarket.GenerateStore(value * 10, this));
+            buildings.Add(CaravanMarket.GenerateStore(this, nation));
             //Add producers
             buildings.Add(new Logger(this));
             //Generate shops
@@ -112,6 +113,16 @@ namespace StartGame.World.Cities
                 }
             }
         }
+        /// <summary>
+        /// Method called when the nation has been initialised
+        /// </summary>
+        internal void Initialise()
+        {
+            foreach (var building in buildings)
+            {
+                building.Initialse();
+            }
+        }
 
         double day = 0;
         internal override void WorldAction()
@@ -143,17 +154,44 @@ namespace StartGame.World.Cities
             return name;
         }
 
+        public int DetermineLocalFoodPrice(string s)
+        {
+            return DetermineLocalFoodPrice(nation.GetPrice(s));
+        }
+
         public int DetermineLocalFoodPrice(SellableItem item)
         {
             return (int)(item.cost / 2 + ((100 - agriculturalProduction) / 100d) * item.cost).Cut(1, 10000);
         }
 
-    }
+        public int DetermineLocalFoodPrice(int cost)
+        {
+            return (int)(cost / 2 + ((100 - agriculturalProduction) / 100d) * cost).Cut(1, 10000);
+        }
+
+        public List<T> GetBuildings<T>() where T : CityBuilding
+        {
+            return buildings.Where(b => b is T).Select(b => b as T).ToList();
+        }
+        public T GetBuilding<T>() where T : CityBuilding
+        {
+            return buildings.Where(b => b is T).Select(b => b as T).First();
+        }
+
+        internal abstract string GetSizeDescriptor();
+
+        public string Description => $"{name} is a {GetSizeDescriptor().ToLower()} city in the {World.Instance.worldMap.Get(position).type}.";
+            }
 
     public class SmallCity : City
     {
         public SmallCity(Point position, int value, int agriculture, int mineral) : base(position, Resources.SmallCity, 1, 1, value, agriculture, mineral)
         {
+        }
+
+        internal override string GetSizeDescriptor()
+        {
+            return "Small";
         }
     }
 
@@ -162,6 +200,10 @@ namespace StartGame.World.Cities
         public MediumCity(Point position, int value, int agriculture, int mineral) : base(position, Resources.MediumCity, 1, 3, value, agriculture, mineral)
         {
         }
+        internal override string GetSizeDescriptor()
+        {
+            return "Medium";
+        }
     }
 
     public class LargeCity : City
@@ -169,12 +211,20 @@ namespace StartGame.World.Cities
         public LargeCity(Point position, int value, int agriculture, int mineral) : base(position, Resources.BigCity, 1, 6, value, agriculture, mineral)
         {
         }
+        internal override string GetSizeDescriptor()
+        {
+            return "Large";
+        }
     }
 
     public class CapitalCity : City
     {
         public CapitalCity(Point position, int value, int agriculture, int mineral) : base(position, Resources.CapitalCity, 1, 10, value, agriculture, mineral)
         {
+        }
+        internal override string GetSizeDescriptor()
+        {
+            return "Capital";
         }
     }
 }

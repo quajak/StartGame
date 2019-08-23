@@ -3,6 +3,7 @@ using StartGame.Entities;
 using StartGame.Items;
 using StartGame.PlayerData;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -17,6 +18,14 @@ namespace StartGame
 {
     public static class E
     {
+        public static IEnumerable<T> ToEnumerable<T>(this IEnumerator e)
+        {
+            while (e.MoveNext())
+            {
+                yield return (T)e.Current;
+            }
+        }
+
         public static bool AlmostEqual(this double a, double b, double diff = 0.1)
         {
             return Math.Abs(a - b) < diff;
@@ -71,6 +80,11 @@ namespace StartGame
             }
             value /= (eX - sX) * (eY - sY);
             return value;
+        }
+
+        public static string WriteSignigicantFigures(this int number, int figures)
+        {
+            return Convert.ToDouble(String.Format($"{{0:G{figures}}}", number)).ToString("R0");
         }
 
         public static bool TryGet<T>(this List<T> values, Predicate<T> check, out T value)

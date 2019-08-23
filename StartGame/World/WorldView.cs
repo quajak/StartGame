@@ -18,8 +18,11 @@ namespace StartGame.World
     public partial class WorldView : Form
     {
         private bool running = false;
-        private WorldRenderer worldRenderer;
-        private Timer controller = new Timer();
+        public WorldRenderer worldRenderer;
+        public Timer controller = new Timer();
+        public readonly HumanPlayer player;
+
+
 
         //Todo: Use better zoom system
         private int zoom = 0; //Should be between -15 and 30
@@ -30,7 +33,7 @@ namespace StartGame.World
             {
                 player = new HumanPlayer(PlayerType.localHuman, "Player", null, new Player[0], null, 0);
                 player.Money.RawValue = 1000;
-                Troop playerTroop = new Troop("Player", new Weapon(5, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0
+                Troop playerTroop = new Troop("Player", new Weapon(3, BaseAttackType.melee, BaseDamageType.blunt, 1, "Punch", 2, false), Resources.playerTroop, 0
                         , null, player) {
                     armours = new List<Armour>
                     {
@@ -59,6 +62,7 @@ namespace StartGame.World
                 Trace.TraceWarning("Unable to determine good spawnpoint for player!");
                 point = World.Instance.nation.cities.GetRandom().position;
             }
+            int count = 100;
             Point spawn = point.Copy();
             do
             {
@@ -67,7 +71,8 @@ namespace StartGame.World
                 spawn.Y += World.random.Next(10) - 5;
                 spawn.X = spawn.X.Cut(5, World.WORLD_SIZE - 5);
                 spawn.Y = spawn.Y.Cut(5, World.WORLD_SIZE - 5);
-            } while (!World.IsLand(World.Instance.worldMap.Get(spawn).type));
+                count--;
+            } while (!World.IsLand(World.Instance.worldMap.Get(spawn).type) && count > 0);
             player.WorldPosition = spawn;
 
             player.worldRenderer = worldRenderer;
@@ -78,17 +83,53 @@ namespace StartGame.World
             Render();
             worldMapView.MouseWheel += WorldMapView_MouseWheel;
             controller.Interval = 500;
-            controller.Tick += Controller_Tick;
+            controller.Tick += WorldProgressTime;
             FocusOnPlayer();
+            player.playerView = playerView;
         }
 
-        private void Controller_Tick(object sender, EventArgs e)
+        private void WorldProgressTime(object sender, EventArgs e)
         {
             World.Instance.ProgressTime(new TimeSpan(0, 0, 30, 0));
             worldRenderer.Redraw = true; //Is there a way we can avoid this?
             Render();
-            startMission.Visible = player.availableActions.Exists(a => a is StartMission);
-            enterCity.Visible = player.availableActions.Exists(a => a is InteractCity);
+            if (!player.spectatorMode)
+            {
+                startMission.Visible = player.availableActions.Exists(a => a is StartMission);
+                enterCity.Visible = player.availableActions.Exists(a => a is InteractCity);
+                scout.Visible = World.Instance.actors.Exists(p => AIUtility.Distance(p.WorldPosition, player.WorldPosition) == 1);
+                World.Instance.actors.FindAll(a => a is PureWorldPlayer && a.WorldPosition == player.WorldPosition).ForEach(a => (a as PureWorldPlayer).OnPlayerEntry());
+            }
+            else
+            {
+                if(player.caravan != null)
+                {
+                    startMission.Visible = false;
+                    enterCity.Visible = false;
+                    if(player.WorldPosition == player.caravan.end.position)
+                    {
+                        //The caravan has ended
+                        player.troop.Image = Resources.playerTroop;
+                        player.caravan.End();
+                        player.spectatorMode = false;
+                        int payed = player.caravan.GetGuardPayment();
+                        MessageBox.Show($"The caravan has finally reached its goal. You have been payed {payed} coins.");
+                        player.Money.RawValue += payed;
+                        player.caravan = null;
+                    }
+                    Scouting s = player.GetTree("Scouting") as Scouting;
+                    if(World.random.Next(30 + (s?.level ?? 0) * 2) == 1)
+                    {
+                        controller.Stop();
+                        MessageBox.Show($"The caravan is being attacked!");
+                        player.troop.Image = Resources.playerTroop;
+                        Mission.Mission mission = new CaravanDefense();
+                        int difficulty = player.caravan.items.Select(i => i.Amount * i.Cost).Sum() / 200;
+                        RunMission(difficulty, mission);
+                        player.troop.Image = Resources.Caravan;
+                    }
+                }
+            }
         }
 
         private void WorldMapView_MouseWheel(object sender, MouseEventArgs e)
@@ -135,7 +176,6 @@ namespace StartGame.World
         }
 
         private Point mouseDownPosition;
-        public readonly HumanPlayer player;
 
         private void WorldMapView_MouseDown(object sender, MouseEventArgs e)
         {
@@ -195,7 +235,18 @@ namespace StartGame.World
             //TODO: If entity at position show info
 
             //Find route from player
+            if (player.spectatorMode) return;
             Point[] route = AStar.FindOptimalRoute(World.Instance.MovementCost(), player.WorldPosition, selected);
+            ShowPlayerRoute(route);
+            player.toMove = route.Skip(1).ToList();
+
+            worldRenderer.Redraw = true;
+
+            Render();
+        }
+
+        public void ShowPlayerRoute(Point[] route)
+        {
             if (route.Length > 1)
             {
                 Point previous = route[1];
@@ -209,11 +260,6 @@ namespace StartGame.World
                     previous = point;
                 }
             }
-            player.toMove = route.Skip(1).ToList();
-
-            worldRenderer.Redraw = true;
-
-            Render();
         }
 
         private void GameRunningControl_Click(object sender, EventArgs e)
@@ -236,7 +282,15 @@ namespace StartGame.World
         private void StartMission_Click(object sender, EventArgs e)
         {
             StartMission startMission1 = (player.availableActions.Find(a => a is StartMission) as StartMission);
+            int difficulty = startMission1.difficulty;
             Mission.Mission selected = startMission1.mission;
+            player.availableActions.Remove(startMission1);
+            player.possibleActions.Remove(startMission1);
+            RunMission(difficulty, selected, startMission1);
+        }
+
+        private void RunMission(int difficulty, Mission.Mission selected, StartMission action = null)
+        {
             World.Instance.campaign.mission = selected;
             MapBiome biome = new GrasslandMapBiome();
             if (mapBiomes.ContainsKey(World.Instance.worldMap[player.WorldPosition.X, player.WorldPosition.Y].type))
@@ -246,11 +300,13 @@ namespace StartGame.World
             Map map = World.Instance.campaign.GenerateMap(biome);
             player.map = map;
             player.troop.Map = map;
-            MainGameWindow mainGame = new MainGameWindow(map, player, selected, World.Instance.trees, World.WORLD_DIFFICULTY, startMission1.difficulty);
+            MainGameWindow mainGame = new MainGameWindow(map, player, selected, World.Instance.trees, difficulty, World.WORLD_DIFFICULTY);
             biome.ManipulateMission(mainGame, selected);
             mainGame.RenderMap(true, true, true);
             controller.Stop();
             mainGame.ShowDialog();
+            if (action != null)
+                action.MissionEnded(mainGame.giveReward);
             if (mainGame.dead)
             {
                 //as player is dead campaign is over
@@ -260,14 +316,12 @@ namespace StartGame.World
             if (mainGame.giveReward)
             {
                 //Now give reward
-                MissionResult r = CampaignController.GenerateRewardAndHeal(player, mainGame, selected, player.vitality.Value, (player.level / 25d).Cut(0,1), "Close");
+                MissionResult r = CampaignController.GenerateRewardAndHeal(player, mainGame, selected, player.vitality.Value, (player.level / 25d).Cut(0, 1), "Close");
                 r.ShowDialog();
             }
             if (running)
                 controller.Start();
             World.Instance.missionsCompleted++;
-            player.availableActions.Remove(startMission1);
-            player.possibleActions.Remove(startMission1);
             World.Instance.actors.RemoveAll(p => (p is MissionWorldPlayer wp) && wp.WorldPosition == player.WorldPosition);
             World.Instance.GenerateNewMission();
             Render();
@@ -296,6 +350,41 @@ namespace StartGame.World
             controller.Enabled = false;
             controller.Dispose();
             controller = null;
+        }
+        
+        private void Scout_Click(object sender, EventArgs e)
+        {
+            bool running = controller.Enabled;
+            controller.Stop();
+            string report = "When scouting the sorrounding area, you see the following:";
+            List<WorldPlayer> objects = World.Instance.actors.Where(a => AIUtility.Distance(a.WorldPosition, player.WorldPosition) == 1).ToList();
+            foreach (var obj in objects)
+            {
+                report += obj.Report() + "\n";
+            }
+            Scouting s = player.GetTree("Scouting") as Scouting;
+            if (s is null)
+            {
+                Scouting item = new Scouting();
+                player.trees.Add(item);
+                item.Activate();
+            }
+            else
+                s.Xp += objects.Count;
+            MessageBox.Show(report);
+            if(running)
+                controller.Start();
+        }
+
+        private void SkipDay_Click(object sender, EventArgs e)
+        {
+            if(player.spectatorMode || player.toMove.Count != 0)
+            {
+                MessageBox.Show("You can only skip time when not part of a caravan or moving!");
+                return;
+            }
+            World.Instance.ProgressTime(new TimeSpan(23, 30, 0));
+            WorldProgressTime(sender, e);
         }
     }
 }

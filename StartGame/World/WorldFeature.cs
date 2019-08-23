@@ -76,7 +76,9 @@ namespace StartGame.World
     {
         public Road(Point position) : base(++ID, position, Resources.Road)
         {
-            World.Instance.costMap[position.X, position.Y]  -= 0.5;
+            World.Instance.costMap[position.X, position.Y] = 0.5;
+            World.Instance.worldMap[position.X, position.Y].movementCost = 0.5;
+            //World.Instance.costMap[position.X, position.Y] = World.Instance.costMap[position.X, position.Y].Cut(0.5, 1000);
             Bitmap aImage = new Bitmap(image.Width, image.Height);
             using (Graphics gfx = Graphics.FromImage(aImage))
             {

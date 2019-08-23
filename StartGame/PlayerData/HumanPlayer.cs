@@ -1,6 +1,7 @@
 ﻿using StartGame.GameMap;
 using StartGame.Rendering;
 using StartGame.World;
+using StartGame.World.Cities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -20,6 +21,16 @@ namespace StartGame.PlayerData
         public int xp = 0;
         public int levelXP = 5;
         public int storedLevelUps = 0;
+
+        public PlayerView playerView;
+
+        /// <summary>
+        /// If in spectator mode the user can only watch the character move on the world stage and cannot change the path. 
+        /// This is used when he is part of a caravan.
+        /// </summary>
+        public bool spectatorMode = false;
+
+        public CaravanRoute caravan;
 
         public HumanPlayer(PlayerType Type, string Name, Map Map, Player[] Enemies, MainGameWindow window, int Money) 
             : base(Type, Name, Map, Enemies, 0, 1, 1, 1, 1, 1, 10, constantMovementFunction: false)
@@ -54,7 +65,6 @@ namespace StartGame.PlayerData
         public override void WorldAction(double newWorldActionPoints)
         {
             worldActionPoints += newWorldActionPoints;
-            availableActions = possibleActions.Where(a => a.Available(this)).ToList();
             if (toMove.Count == 0) worldActionPoints = 0; //TODO: Find a better system to handle actions which need more action points than available in one step
 
             //What action to do?
@@ -62,6 +72,7 @@ namespace StartGame.PlayerData
                 return;
 
             HandleMovement();
+            availableActions = possibleActions.Where(a => a.Available(this)).ToList();
         }
 
         internal override void HandleMovement(double? maxPointUsed = null)
@@ -69,6 +80,8 @@ namespace StartGame.PlayerData
             if (toMove.Count == 0) return;
 
             double points = worldActionPoints;
+            if (caravan != null)
+                points *= 2;
             if (maxPointUsed != null)
                 points = Math.Min(points, maxPointUsed.Value);
 
@@ -88,6 +101,11 @@ namespace StartGame.PlayerData
                     return;
             }
             worldActionPoints += points;
+        }
+
+        public Tree GetTree(string name)
+        {
+            return trees.Find(t => t.name == name);
         }
     }
 }

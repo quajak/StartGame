@@ -72,12 +72,15 @@ namespace StartGame
         {
             if (mapBiome is null)
                 mapBiome = new GrasslandMapBiome();
-            Map map = new Map();
+            Map map = new Map() {
+                mapBiome = mapBiome
+            };
             Thread mapCreator = new Thread(() => map.SetupMap(mapBiome.DefaultParameters().PerlinDiff, World.World.random.Next(), mapBiome.DefaultParameters().HeightDiff + mission.heightDiff, mapBiome));
             mapCreator.Start();
             mapCreator.Priority = ThreadPriority.Highest;
             bool validMap = false;
             bool finished = mapCreator.Join(Map.creationTime);
+            int counter = 20;
             while (!(finished && validMap))
             {
                 int seed = World.World.random.Next();
@@ -86,6 +89,9 @@ namespace StartGame
                 mapCreator.Priority = ThreadPriority.Highest;
                 finished = mapCreator.Join(Map.creationTime);
                 validMap = mission.MapValidity(map);
+                counter--;
+                if (counter == 0)
+                    throw new Exception("Can not find valid map!");
             }
 
             return map;

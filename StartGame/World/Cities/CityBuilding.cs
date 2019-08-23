@@ -44,6 +44,13 @@ namespace StartGame.World.Cities
         {
             
         }
+
+        /// <summary>
+        /// Called when the nation has been initialised
+        /// </summary>
+        public virtual void Initialse() {
+        }
+
     }
 
 
@@ -95,7 +102,7 @@ namespace StartGame.World.Cities
             time = new TimeSpan(AIUtility.Distance(city.position, selected.position) / 20, 0, 0);
             cost = (int)time.TotalHours * 10;
             cityV.actionOptionLabel.Visible = true;
-            cityV.actionOptionLabel.Text = $"Travel in {time.Days} days and {time.Hours} hours. It costs {cost} coins.";
+            cityV.actionOptionLabel.Text = $"{selected.Description} Travel in {time.Days} days and {time.Hours} hours. It costs {cost} coins.";
             cityV.button1.Click += Button1_Click;
             cityV.button1.Visible = true;
             cityV.button1.Enabled = cityV.player.Money.Value >= cost;
@@ -112,6 +119,7 @@ namespace StartGame.World.Cities
             cityV.worldView.FocusOnPlayer();
             cityV.worldView.Render();
             cityV.Close();
+            cityV.player.playerView.Render();
         }
     }
     public class CityBuildingAction

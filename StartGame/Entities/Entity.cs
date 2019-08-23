@@ -101,7 +101,7 @@ namespace StartGame.Entities
 
         public Entity(string Name, Point Position, Bitmap Image, bool Blocking, Map map)
         {
-            Trace.TraceInformation($"Entity Created: {Name} at {Position}");
+            //Trace.TraceInformation($"Entity Created: {Name} at {Position}");
             this.Name = Name;
             Map = map;
             blocking = Blocking;

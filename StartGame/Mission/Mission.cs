@@ -97,6 +97,7 @@ namespace StartGame.Mission
         public string Name;
         public bool forced = false;
         public readonly bool canPlayerEscape;
+        public readonly bool lootDead;
         public double heightDiff = 0;
         public bool EnemyMoveTogether = false;
 
@@ -108,12 +109,13 @@ namespace StartGame.Mission
         public static WinCheck playerDeath = ((_map, main) => main.humanPlayer == null || main.humanPlayer.troop.health.Value <= 0);
         public readonly bool useWinChecks;
 
-        public Mission(string name, bool UseWinChecks = true, bool Forced = false, bool canPlayerEscape = true)
+        public Mission(string name, bool UseWinChecks = true, bool Forced = false, bool canPlayerEscape = true, bool lootDead = true)
         {
             Name = name;
             useWinChecks = UseWinChecks;
             forced = Forced;
             this.canPlayerEscape = canPlayerEscape;
+            this.lootDead = lootDead;
         }
 
         public abstract bool MapValidity(Map map);
@@ -123,6 +125,9 @@ namespace StartGame.Mission
         public abstract bool MissionAllowed(int Round);
 
         public abstract bool MissionAllowed(WorldTileType type, int wealth);
+        internal virtual int GetEnemyNumber(int difficulty) {
+            throw new NotImplementedException();
+        }
     }
 
     //TODO: Underwater mission
@@ -698,9 +703,9 @@ namespace StartGame.Mission
             Map _map = map;
             while (startPos.Count > enemyNumber)
             {
-                if (startPos.Exists(f => _map.map[f.X, f.Y].type.type == MapTileTypeEnum.path))
+                if (startPos.Exists(f => _map.map[f.X, f.Y].type.type == MapTileTypeEnum.road))
                 {
-                    startPos.Remove(startPos.First(f => _map.map[f.X, f.Y].type.type == MapTileTypeEnum.path));
+                    startPos.Remove(startPos.First(f => _map.map[f.X, f.Y].type.type == MapTileTypeEnum.road));
                 }
                 //If no path left remove random
                 else

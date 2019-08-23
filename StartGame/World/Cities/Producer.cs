@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Windows.Forms;
 using StartGame.Items;
 using StartGame.PlayerData;
 
@@ -67,11 +69,79 @@ namespace StartGame.World.Cities
     public class Logger : Producer
     {
         private readonly City city;
+        CityView cityV;
+        HumanPlayer player;
 
-        public Logger(City city) : base(++ID, "Logger", "The logger works in the sorrounding area and cuts wood", new List<CityBuildingAction> { })
+        public Logger(City city) : base(++ID, "Logger", "The logger works in the sorrounding area and cuts wood", new List<CityBuildingAction> { new CityBuildingAction("Work") })
         {
             this.city = city;
             workers = city.Population / 100; //TODO: Get a better way to handle the population
+        }
+
+        public override void OnAction(CityBuildingAction action, CityView cityView)
+        {
+            cityV = cityView;
+            player = cityV.player;
+            Trace.TraceInformation($"Store::OnAction {action.name}");
+            if (action.name == "Deselect")
+            {
+                cityV.actionOptionLabel.Visible = false;
+                cityV.button1.Visible = false;
+            }
+            else if (action.name == "Work")
+            {
+                cityV.actionOptionLabel.Visible = false;
+                Skill skill = (player.GetTree("Woodcutter") as Skill);
+                int payment = GetPayment(skill);
+                cityV.actionOptionLabel.Text = $"You can work for the day as a logger for {payment} coins.";
+                cityV.button1.Visible = true;
+                cityV.button1.Text = "Work";
+                cityV.button1.Click += Button1_Click;
+
+            }
+        }
+
+        private static int GetPayment(Skill skill)
+        {
+            return (int)(20 * (1d + (skill?.level ?? 0) / 20d));
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            cityV.Close();
+            bool running = cityV.worldView.controller.Enabled;
+            PlayerWork();
+            if (running)
+                cityV.worldView.controller.Start();
+        }
+
+        private void PlayerWork()
+        {
+            World.Instance.ProgressTime(new TimeSpan(8, 0, 0));
+            Skill s = player.GetTree("Woodcutter") as Skill;
+            int payment = GetPayment(s);
+            string text = $"You have finished working for the logger and been payed {payment} coins.";
+            if (s is null)
+            {
+                s = new Woodcutter();
+                player.trees.Add(s);
+                s.Activate();
+                text += " You have also gained the woodcutter skill.";
+            }
+            else
+            {
+                s.Xp += 1;
+                text += " You have gained 1 Xp in the woodcutter skill.";
+            }
+            player.Money.RawValue += payment;
+            player.playerView.Render();
+            ProduceItem("Wood", 2);
+            cityV.worldView.controller.Stop();
+            text += " Do you want to continue working for the logger?";
+            if (MessageBox.Show(text, "Logger", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                PlayerWork();
+            }
         }
 
         int week = 0;

@@ -190,7 +190,9 @@ namespace StartGame.World
                     case Jewelry j:
                         player.troop.jewelries.Add(j);
                         break;
-
+                    case SellableItem s:
+                        player.troop.items.Add(s);
+                        break;
                     default:
                         throw new NotImplementedException($"Reward must be spell, armour, coin, jewelry or weapon not: {item.GetType()}");
                 }

@@ -70,7 +70,7 @@ namespace StartGame.World
                     forest = 0;
                     break;
                 default:
-                    throw new System.NotImplementedException();
+                    throw new NotImplementedException();
             }
             forest.Cut(0, 100);
             // TODO: Find a better way to determine these values
@@ -235,10 +235,11 @@ namespace StartGame.World
             {
                 Instance.lost[oldType]++;
                 Instance.gained[type]++;
-                Instance.GetAtmosphereValue(position.X, position.Y, 0).baseEvaporationRate = GetEvaporationRate(type);
-                Instance.GetAtmosphereValue(position.X, position.Y, 0).albedo = GetAlebdo(type);
-                Instance.GetAtmosphereValue(position.X, position.Y, 0).groundHeatCapacity = GetGroundHeatCapacity(type);
-                Instance.GetAtmosphereValue(position.X, position.Y, 0).baseMinimumHumditiy = GetMinimumHumdity(type);
+                WeatherPoint weatherPoint = Instance.GetAtmosphereValue(position.X, position.Y, 0);
+                weatherPoint.baseEvaporationRate = GetEvaporationRate(type);
+                weatherPoint.albedo = GetAlebdo(type);
+                weatherPoint.groundHeatCapacity = GetGroundHeatCapacity(type);
+                weatherPoint.baseMinimumHumditiy = GetMinimumHumdity(type);
             }
             landWater = 0;
         }
